@@ -51,10 +51,14 @@ export const languages: Record<LanguageCode, Language> = {
     },
 };
 
-export function t(lang: LanguageCode, key: keyof Language, params: Record<string, string> = {}) {
-    let value = languages[lang]?.[key] || languages[defaultLanguage][key];
-    for (const key in params) {
-        value = value.replaceAll(`{${key}}`, params[key]);
-    }
-    return value;
+export type TranslateFn = (key: keyof Language, params?: Record<string, string>) => string;
+
+export function translate(lang: LanguageCode): TranslateFn {
+    return (key, params = {}) => {
+        let value = languages[lang]?.[key] || languages[defaultLanguage][key];
+        for (const key in params) {
+            value = value.replaceAll(`{${key}}`, params[key]);
+        }
+        return value;
+    };
 }
