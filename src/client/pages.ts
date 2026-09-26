@@ -4,7 +4,7 @@ import { errorPage } from '#src/client/pages/ErrorPage.js';
 import { homePage } from '#src/client/pages/HomePage.js';
 import { loginPage } from '#src/client/pages/LoginPage.js';
 import { casinoPage } from '#src/client/pages/app/CasinoPage.js';
-import { LanguageCode } from './language.js';
+import { LanguageCode, TranslateFn } from './language.js';
 
 export const registeredPages = {
     // These keys are used in the writePage function
@@ -17,7 +17,7 @@ export const registeredPages = {
 
 export type Page<P> = {
     Component: ComponentType<P>;
-    title: (lang: LanguageCode, props: P) => string;
+    title: (t: TranslateFn, props: P, lang: LanguageCode) => string;
 };
 
 export type RegisteredPageId = keyof typeof registeredPages;

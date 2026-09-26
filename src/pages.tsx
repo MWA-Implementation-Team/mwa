@@ -7,7 +7,7 @@ import { renderToString } from 'preact-render-to-string';
 import { cookieLanguage, cookieThemeOverride, cookieUsername } from './client/constants.js';
 import { Context } from 'hono';
 import { getCookie } from 'hono/cookie';
-import { defaultLanguage, LanguageCode } from './client/language.js';
+import { defaultLanguage, LanguageCode, translate } from './client/language.js';
 import { StatusCode } from 'hono/utils/http-status';
 
 export function writePage<P extends RegisteredPageId>(
@@ -94,7 +94,7 @@ export function Root<P extends RegisteredPageId>({
 
     const page = registeredPages[pageId] as Page<RegisteredPageProps<P>>;
 
-    const title = page.title(ctxInit.lang, pageProps);
+    const title = page.title(translate(ctxInit.lang), pageProps, ctxInit.lang);
 
     let bodyStyle = undefined;
     if (themeOverride) {

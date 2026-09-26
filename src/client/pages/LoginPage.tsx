@@ -1,6 +1,5 @@
 import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
-import { t } from '../language.js';
 
 type LoginPageProps = {
     errorMessage?: string;
@@ -8,7 +7,7 @@ type LoginPageProps = {
 
 export const loginPage: Page<LoginPageProps> = {
     Component: LoginPage,
-    title: (lang) => t(lang, 'titleLogin'),
+    title: (t) => t('titleLogin'),
 };
 
 function LoginPage({ errorMessage }: LoginPageProps) {
