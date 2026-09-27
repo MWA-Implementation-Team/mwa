@@ -24,7 +24,6 @@ export const ClientContext = createContext<ClientContextType>({
 export type ClientContextWrapperInit = {
     lang: LanguageCode;
     user: User | null;
-    fakeUsername: string;
 };
 
 export type ClientContextWrapperProps<P extends RegisteredPageId> = {

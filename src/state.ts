@@ -11,8 +11,3 @@ export let database = new DatabaseSync('db.sqlite');
 // SQLite leaves FK enforcement off by default; without this every
 // FOREIGN KEY in the schema is decorative.
 database.exec('PRAGMA foreign_keys = ON');
-
-// Username the app pretends to be logged in as in dev mode.
-// Must be a seeded user to simulate logged-in; a nonexistent
-// name simulates logged-out.
-export let fakeUsername: string = 'alice';
