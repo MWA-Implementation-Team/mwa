@@ -1,5 +1,5 @@
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from '#src/client/pages.js';
-import { isDevMode } from '#src/state.js';
+import { fakeUsername, isDevMode } from '#src/state.js';
 import { ClientContextWrapper, ClientContextWrapperInit } from '#src/client/context.js';
 import { Hono } from 'hono';
 import { serveStatic } from '@hono/node-server/serve-static';
@@ -18,6 +18,7 @@ export function writePage<P extends RegisteredPageId>(
     const ctxInit: ClientContextWrapperInit = {
         lang: (getCookie(ctx, cookieLanguage) as LanguageCode) ?? defaultLanguage, // not validated
         username: getCookie(ctx, cookieUsername) ?? null,
+        fakeUsername,
     };
 
     const root = Root({
