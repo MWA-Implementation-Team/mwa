@@ -1,4 +1,6 @@
-import '#src/db/index.js';
+import { migrateDatabase } from '#src/db/migrate.js';
+await migrateDatabase();
+
 import { database } from '#src/state.js';
 
 // Seed the database with sample data. Run via `npm run seed`.

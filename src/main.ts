@@ -1,4 +1,3 @@
-import '#src/db/index.js';
 import { isDevMode } from '#src/state.js';
 import { registerNodeModulesRoutes, writeErrorPage } from '#src/pages.js';
 import { registerLoginRoutes } from '#src/routes/pages/login.js';
