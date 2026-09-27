@@ -23,7 +23,6 @@ export function migrateDatabase() {
         .map((file) => [Number(file.split('_')[0]), file] satisfies [number, string])
         .sort(([a], [b]) => a - b);
 
-    console.log('migrations', JSON.stringify(migrations));
     for (const [ver, file] of migrations) {
         if (currentVersion >= ver) {
             continue;
