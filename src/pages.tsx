@@ -78,21 +78,10 @@ export function Root<P extends RegisteredPageId>({
         },
     };
 
-    const ssrHydrateScript = `
-    import { createElement, hydrate } from 'preact';
-    import { registeredPages } from '#src/client/pages.js';
-    import { ClientContextWrapper } from '#src/client/context.js';
-
-    const Component = registeredPages[${JSON.stringify(pageId)}].Component;
-    const content = createElement(Component, ${JSON.stringify(pageProps)});
-    const wrapped = createElement(ClientContextWrapper, {
-        pageId: ${JSON.stringify(pageId)},
-        pageProps: ${JSON.stringify(pageProps)},
-        init: ${JSON.stringify(ctxInit)},
-        content
-    });
-    hydrate(wrapped, document.getElementById('app'));
-    `;
+    // Hydration data is delivered as JSON inside a script tag and
+    // read back by src/client/bootstrap.ts. Escape '<' so a value
+    // containing '</script>' can't break out of the tag.
+    const ssrData = JSON.stringify({ pageId, pageProps, init: ctxInit }).replace(/</g, '\\u003c');
 
     const page = registeredPages[pageId] as Page<RegisteredPageProps<P>>;
 
@@ -113,7 +102,12 @@ export function Root<P extends RegisteredPageId>({
                     type="importmap"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(importmap) }}
                 />
-                <script type="module" dangerouslySetInnerHTML={{ __html: ssrHydrateScript }} />
+                <script
+                    id="ssr-data"
+                    type="application/json"
+                    dangerouslySetInnerHTML={{ __html: ssrData }}
+                />
+                <script type="module" src="/client/bootstrap.js" />
                 <link rel="stylesheet" href="/oat.css" />
                 <link rel="stylesheet" href="/style/main.css" />
                 <script src="/oat.js" defer />
