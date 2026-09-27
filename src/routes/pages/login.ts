@@ -1,11 +1,12 @@
+import { currentUser } from '#src/auth.js';
 import { cookieUsername } from '#src/client/constants.js';
 import { writePage } from '#src/pages.js';
 import { Hono } from 'hono';
-import { getCookie, setCookie } from 'hono/cookie';
+import { setCookie } from 'hono/cookie';
 
 export function registerLoginRoutes(app: Hono) {
     app.get('/login', async (ctx) => {
-        if (getCookie(ctx, cookieUsername)) {
+        if (currentUser(ctx)) {
             return ctx.redirect('/app');
         }
 

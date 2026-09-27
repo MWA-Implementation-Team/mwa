@@ -1,13 +1,13 @@
+import { currentUser } from '#src/auth.js';
 import { cookieUsername } from '#src/client/constants.js';
 import { writePage } from '#src/pages.js';
 import { Hono } from 'hono';
-import { deleteCookie, getCookie } from 'hono/cookie';
+import { deleteCookie } from 'hono/cookie';
 import { Context } from 'hono';
 
 export function registerAppRoutes(app: Hono) {
     app.get('/app', async (ctx) => {
-        const username = getCookie(ctx, cookieUsername);
-        if (!username) return goLogin(ctx);
+        if (!currentUser(ctx)) return goLogin(ctx);
 
         return writePage(ctx, 'appHome', {});
     });
@@ -18,8 +18,7 @@ export function registerAppRoutes(app: Hono) {
     });
 
     app.get('/app/casino', async (ctx) => {
-        const username = getCookie(ctx, cookieUsername);
-        if (!username) return goLogin(ctx);
+        if (!currentUser(ctx)) return goLogin(ctx);
 
         return writePage(ctx, 'casino', {});
     });

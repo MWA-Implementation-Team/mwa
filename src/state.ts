@@ -12,5 +12,7 @@ export let database = new DatabaseSync('db.sqlite');
 // FOREIGN KEY in the schema is decorative.
 database.exec('PRAGMA foreign_keys = ON');
 
-// Username the frontend pretends to be logged in as.
-export let fakeUsername: string = 'dev';
+// Username the app pretends to be logged in as in dev mode.
+// Must be a seeded user to simulate logged-in; a nonexistent
+// name simulates logged-out.
+export let fakeUsername: string = 'alice';
