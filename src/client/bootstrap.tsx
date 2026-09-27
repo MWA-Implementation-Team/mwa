@@ -14,10 +14,12 @@ const data: BootData = JSON.parse(document.getElementById('ssr-data')!.textConte
 
 const PageComponent = registeredPages[data.pageId].Component as ComponentType<any>;
 const content = createElement(PageComponent, data.pageProps);
-const wrapped = <ClientContextWrapper
-    pageId={data.pageId}
-    pageProps={data.pageProps}
-    init={data.init}
-    content={content}
-/>;
+const wrapped = (
+    <ClientContextWrapper
+        pageId={data.pageId}
+        pageProps={data.pageProps}
+        init={data.init}
+        content={content}
+    />
+);
 hydrate(wrapped, document.getElementById('app')!);

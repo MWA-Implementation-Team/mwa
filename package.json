@@ -12,7 +12,7 @@
         "seed": "npm run build && node dist/seed.js",
         "tsc-watch": "tsc --watch --preserveWatchOutput",
         "format": "prettier --write .",
-        "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && prettier --check --log-level error ."
+        "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && prettier --check ."
     },
     "devDependencies": {
         "@types/node": "^22.20.3",

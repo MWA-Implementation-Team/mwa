@@ -1,5 +1,6 @@
 import { currentUser } from '#src/auth.js';
 import { cookieUsername } from '#src/client/constants.js';
+import { findUserByUsername } from '#src/db/users.js';
 import { writePage } from '#src/pages.js';
 import { Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
@@ -20,6 +21,12 @@ export function registerLoginRoutes(app: Hono) {
         if (typeof username !== 'string' || username.trim() === '') {
             return writePage(ctx, 'login', {
                 errorMessage: 'Invalid username',
+            });
+        }
+
+        if (!findUserByUsername(username)) {
+            return writePage(ctx, 'login', {
+                errorMessage: 'Unknown user',
             });
         }
 
