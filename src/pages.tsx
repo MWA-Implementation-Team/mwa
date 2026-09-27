@@ -1,10 +1,11 @@
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from '#src/client/pages.js';
+import { currentUser } from '#src/auth.js';
 import { fakeUsername, isDevMode } from '#src/state.js';
 import { ClientContextWrapper, ClientContextWrapperInit } from '#src/client/context.js';
 import { Hono } from 'hono';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { renderToString } from 'preact-render-to-string';
-import { cookieLanguage, cookieThemeOverride, cookieUsername } from './client/constants.js';
+import { cookieLanguage, cookieThemeOverride } from './client/constants.js';
 import { Context } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { defaultLanguage, LanguageCode, translate } from './client/language.js';
@@ -17,7 +18,7 @@ export function writePage<P extends RegisteredPageId>(
 ): Response {
     const ctxInit: ClientContextWrapperInit = {
         lang: (getCookie(ctx, cookieLanguage) as LanguageCode) ?? defaultLanguage, // not validated
-        username: getCookie(ctx, cookieUsername) ?? null,
+        user: currentUser(ctx),
         fakeUsername,
     };
 

@@ -3,27 +3,27 @@ import { ReactNode } from 'preact/compat';
 import { useState, useMemo, useEffect } from 'preact/hooks';
 import { defaultLanguage, LanguageCode, translate, TranslateFn } from './language.js';
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
-import { ensureFakeLogin } from './fakeAuth.js';
+import { User } from '#src/client/api/users.js';
 
 export type ClientContextType = {
     lang: LanguageCode;
     updateLang: (lang: LanguageCode) => void;
     t: TranslateFn;
-    username: string | null; // username if logged in, else null
+    user: User | null; // logged-in user, else null
 };
 
 export const ClientContext = createContext<ClientContextType>({
     lang: defaultLanguage,
     updateLang: () => {},
     t: translate(defaultLanguage),
-    username: null,
+    user: null,
 });
 
 // ---
 
 export type ClientContextWrapperInit = {
     lang: LanguageCode;
-    username: string | null;
+    user: User | null;
     fakeUsername: string;
 };
 
@@ -42,20 +42,15 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
     content,
 }: ClientContextWrapperProps<P>) {
     let [lang, setLang] = useState(init.lang);
-    let [username, setUsername] = useState(init.username);
-
-    useEffect(() => {
-        setUsername(ensureFakeLogin(init.fakeUsername));
-    }, []);
 
     const value: ClientContextType = useMemo(
         () => ({
             lang,
             updateLang: (newLang) => setLang(newLang),
             t: translate(lang),
-            username,
+            user: init.user,
         }),
-        [lang, username],
+        [lang, init.user],
     );
 
     useEffect(() => {

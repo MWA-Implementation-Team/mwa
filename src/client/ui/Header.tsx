@@ -4,7 +4,7 @@ import ThemeToggle from './ThemeToggle.js';
 import LanguageToggle from './LanguageToggle.js';
 
 export default function Header() {
-    const { t, username } = useContext(ClientContext);
+    const { t, user } = useContext(ClientContext);
 
     return (
         <nav>
@@ -14,11 +14,11 @@ export default function Header() {
                     <a href="/">{t('headerHome')}</a>
                 </li>
                 <li>
-                    {!username ? (
+                    {!user ? (
                         <a href="/login">{t('headerLogin')}</a>
                     ) : (
                         <a href="/app">
-                            {t('headerApp')} ({username})
+                            {t('headerApp')} ({user.username})
                         </a>
                     )}
                 </li>
