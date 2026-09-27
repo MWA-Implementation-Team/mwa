@@ -1,4 +1,3 @@
-import '#src/db/index.js';
 import { database } from '#src/state.js';
 
 // Seed the database with sample data. Run via `npm run seed`.
