@@ -11,13 +11,13 @@ export const appHomePage: Page<AppHomePageProps> = {
 };
 
 function AppHomePage({}: AppHomePageProps) {
-    const { t, username } = useContext(ClientContext);
+    const { t, user } = useContext(ClientContext);
 
     return (
         <>
             <Header />
 
-            <h1>{t('appWelcome', { name: username! })}</h1>
+            <h1>{t('appWelcome', { name: user!.username })}</h1>
             <form method="POST">
                 <button type="submit">Logout</button>
             </form>

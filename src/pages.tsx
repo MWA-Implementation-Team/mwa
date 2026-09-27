@@ -1,14 +1,16 @@
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from '#src/client/pages.js';
+import { currentUser } from '#src/auth.js';
 import { isDevMode } from '#src/state.js';
 import { ClientContextWrapper, ClientContextWrapperInit } from '#src/client/context.js';
 import { Hono } from 'hono';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { renderToString } from 'preact-render-to-string';
-import { cookieLanguage, cookieThemeOverride, cookieUsername } from './client/constants.js';
+import { cookieLanguage, cookieThemeOverride } from './client/constants.js';
 import { Context } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { defaultLanguage, LanguageCode, translate } from './client/language.js';
 import { StatusCode } from 'hono/utils/http-status';
+import { BootData } from './client/bootstrap.js';
 
 export function writePage<P extends RegisteredPageId>(
     ctx: Context,
@@ -17,7 +19,7 @@ export function writePage<P extends RegisteredPageId>(
 ): Response {
     const ctxInit: ClientContextWrapperInit = {
         lang: (getCookie(ctx, cookieLanguage) as LanguageCode) ?? defaultLanguage, // not validated
-        username: getCookie(ctx, cookieUsername) ?? null,
+        user: currentUser(ctx),
     };
 
     const root = Root({
@@ -76,21 +78,14 @@ export function Root<P extends RegisteredPageId>({
         },
     };
 
-    const ssrHydrateScript = `
-    import { createElement, hydrate } from 'preact';
-    import { registeredPages } from '#src/client/pages.js';
-    import { ClientContextWrapper } from '#src/client/context.js';
-
-    const Component = registeredPages[${JSON.stringify(pageId)}].Component;
-    const content = createElement(Component, ${JSON.stringify(pageProps)});
-    const wrapped = createElement(ClientContextWrapper, {
-        pageId: ${JSON.stringify(pageId)},
-        pageProps: ${JSON.stringify(pageProps)},
-        init: ${JSON.stringify(ctxInit)},
-        content
-    });
-    hydrate(wrapped, document.getElementById('app'));
-    `;
+    // Hydration data is delivered as JSON inside a script tag and
+    // read back by src/client/bootstrap.ts. Escape '<' so a value
+    // containing '</script>' can't break out of the tag.
+    const ssrData = JSON.stringify({
+        pageId,
+        pageProps,
+        init: ctxInit,
+    } satisfies BootData).replace(/</g, '\\u003c');
 
     const page = registeredPages[pageId] as Page<RegisteredPageProps<P>>;
 
@@ -111,7 +106,12 @@ export function Root<P extends RegisteredPageId>({
                     type="importmap"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(importmap) }}
                 />
-                <script type="module" dangerouslySetInnerHTML={{ __html: ssrHydrateScript }} />
+                <script
+                    id="ssr-data"
+                    type="application/json"
+                    dangerouslySetInnerHTML={{ __html: ssrData }}
+                />
+                <script type="module" src="/client/bootstrap.js" />
                 <link rel="stylesheet" href="/oat.css" />
                 <link rel="stylesheet" href="/style/main.css" />
                 <script src="/oat.js" defer />

@@ -3,26 +3,27 @@ import { ReactNode } from 'preact/compat';
 import { useState, useMemo, useEffect } from 'preact/hooks';
 import { defaultLanguage, LanguageCode, translate, TranslateFn } from './language.js';
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
+import { User } from '#src/client/api/users.js';
 
 export type ClientContextType = {
     lang: LanguageCode;
     updateLang: (lang: LanguageCode) => void;
     t: TranslateFn;
-    username: string | null; // username if logged in, else null
+    user: User | null; // logged-in user, else null
 };
 
 export const ClientContext = createContext<ClientContextType>({
     lang: defaultLanguage,
     updateLang: () => {},
     t: translate(defaultLanguage),
-    username: null,
+    user: null,
 });
 
 // ---
 
 export type ClientContextWrapperInit = {
     lang: LanguageCode;
-    username: string | null;
+    user: User | null;
 };
 
 export type ClientContextWrapperProps<P extends RegisteredPageId> = {
@@ -46,9 +47,9 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
             lang,
             updateLang: (newLang) => setLang(newLang),
             t: translate(lang),
-            username: init.username,
+            user: init.user,
         }),
-        [lang],
+        [lang, init.user],
     );
 
     useEffect(() => {

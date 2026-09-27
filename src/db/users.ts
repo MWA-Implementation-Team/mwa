@@ -15,3 +15,9 @@ const listUsersQuery = database.prepare(`SELECT * FROM users ORDER BY id`);
 export function listUsers(): User[] {
     return listUsersQuery.all() as unknown as User[];
 }
+
+const userByUsernameQuery = database.prepare(`SELECT * FROM users WHERE username = ?`);
+
+export function findUserByUsername(username: string): User | null {
+    return (userByUsernameQuery.get(username) as User | undefined) ?? null;
+}
