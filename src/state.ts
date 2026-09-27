@@ -1,4 +1,5 @@
 import { DatabaseSync } from 'node:sqlite';
+import { migrateDatabase } from './db/migrate.js';
 
 // Global state for the server.
 
@@ -7,3 +8,5 @@ import { DatabaseSync } from 'node:sqlite';
 export let isDevMode: boolean = process.argv[2] === '--dev';
 
 export let database = new DatabaseSync('db.sqlite');
+
+migrateDatabase();
