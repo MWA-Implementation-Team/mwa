@@ -4,8 +4,6 @@ import path from 'path';
 
 export function migrateDatabase() {
     database.exec(`
-    PRAGMA foreign_keys = ON;
-
     CREATE TABLE IF NOT EXISTS migration_status (
         id INTEGER PRIMARY KEY CHECK (id = 1),
         current_version INTEGER NOT NULL

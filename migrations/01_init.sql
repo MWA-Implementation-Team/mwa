@@ -1,84 +1,52 @@
-CREATE TABLE IF NOT EXISTS "activities" (
-	"id" INTEGER NOT NULL,
-	"local_id" TEXT NOT NULL UNIQUE,
-	"title" TEXT NOT NULL,
-	"description" TEXT NOT NULL,
-	PRIMARY KEY("id")
-);
+CREATE TABLE users (
+  id         TEXT PRIMARY KEY NOT NULL, -- uuid
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  email      TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  username   TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  role       TEXT NOT NULL CHECK (role IN ('admin', 'host', 'user'))
+) STRICT;
 
-CREATE TABLE IF NOT EXISTS "badges" (
-	"id" INTEGER NOT NULL,
-	"local_id" TEXT NOT NULL UNIQUE,
-	"activity_id" INTEGER NOT NULL,
-	"title" TEXT NOT NULL,
-	"description" TEXT NOT NULL,
-	PRIMARY KEY("id"),
-	FOREIGN KEY ("activity_id") REFERENCES "activities"("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
-	CONSTRAINT "badges_unique_0" UNIQUE ("activity_id")
-);
-CREATE TABLE IF NOT EXISTS "user_badges" (
-	"id" INTEGER NOT NULL,
-	"badge_id" INTEGER NOT NULL,
-	"user_id" INTEGER NOT NULL,
-	"received_at" TIMESTAMP NOT NULL,
-	PRIMARY KEY("id"),
-	FOREIGN KEY ("badge_id") REFERENCES "badges"("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
-	FOREIGN KEY ("user_id") REFERENCES "users"("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
-	CONSTRAINT "user_badges_unique_0" UNIQUE ("badge_id", "user_id")
-);
-CREATE INDEX IF NOT EXISTS "user_badges_index_0" ON "user_badges" ("user_id");
+CREATE TABLE system_qr_codes (
+  id            INTEGER PRIMARY KEY,
+  created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  expires_at    TEXT,
+  secret        TEXT UNIQUE NOT NULL, -- unguessable random string encoded in qr code
+  balance_delta INTEGER NOT NULL,
+  max_uses      INTEGER NOT NULL,
+  CHECK (expires_at IS NULL OR expires_at > created_at),
+  CHECK (balance_delta <> 0),
+  CHECK (max_uses > 0)
+) STRICT;
 
-CREATE TABLE IF NOT EXISTS "qr" (
-	"id" INTEGER NOT NULL,
-	"user_id" INTEGER NOT NULL,
-	"code" TEXT NOT NULL UNIQUE,
-	"expires_at" TIMESTAMP NOT NULL,
-	"created_at" TIMESTAMP NOT NULL,
-	PRIMARY KEY("id"),
-	FOREIGN KEY ("user_id") REFERENCES "users"("id") ON UPDATE NO ACTION ON DELETE NO ACTION
-);
+CREATE TABLE parent_transactions (
+  id         INTEGER PRIMARY KEY,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  kind       TEXT NOT NULL CHECK (kind IN ('transfer', 'purchase', 'system'))
+) STRICT;
 
-CREATE TABLE IF NOT EXISTS "parent_transactions" (
-	"id" INTEGER NOT NULL,
-	"created_by" INTEGER,
-	-- p2p
-	-- purchase
-	-- admin_grant
-	-- system
-	"kind" TEXT NOT NULL CHECK(
-		"kind" IN ('p2p', 'purchase', 'admin_grant', 'system')
-	),
-	"issued_at" TIMESTAMP NOT NULL,
-	PRIMARY KEY("id"),
-	FOREIGN KEY ("created_by") REFERENCES "users"("id") ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-CREATE TABLE IF NOT EXISTS "child_transactions" (
-	"id" INTEGER NOT NULL,
-	"parent_id" INTEGER,
-	"user_id" INTEGER NOT NULL,
-	-- Sent: Player2Player
-	-- Received: P2P
-	-- Assignment: Admin2Player
-	-- Purchase: P2A
-	-- System: Automatic (By Event)
-	"type" TEXT NOT NULL,
-	"amount" INTEGER NOT NULL,
-	"balance_after" INTEGER NOT NULL,
-	"issued_at" TIMESTAMP NOT NULL,
-	PRIMARY KEY("id"),
-	FOREIGN KEY ("user_id") REFERENCES "users"("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
-	FOREIGN KEY ("parent_id") REFERENCES "parent_transactions"("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
-	CONSTRAINT "child_transactions_unique_0" UNIQUE ("parent_id", "user_id")
-);
-CREATE INDEX IF NOT EXISTS "child_transactions_index_0" ON "child_transactions" ("user_id", "issued_at");
+CREATE TABLE child_transactions (
+  id                INTEGER PRIMARY KEY,
+  parent_id         INTEGER NOT NULL REFERENCES parent_transactions(id),
+  user_id           TEXT NOT NULL REFERENCES users(id),
+  balance_delta     INTEGER NOT NULL,
+  system_qr_code_id INTEGER REFERENCES system_qr_codes(id), -- if not null, parent_transactions kind must be 'system'
+  CHECK (balance_delta <> 0),
+  UNIQUE (parent_id, user_id)
+) STRICT;
 
-CREATE TABLE IF NOT EXISTS "users" (
-	"id" INTEGER NOT NULL,
-	"username" TEXT NOT NULL UNIQUE,
-	"email" TEXT NOT NULL UNIQUE,
-	"balance_current" INTEGER NOT NULL DEFAULT 0,
-	"lifetime_earned" INTEGER NOT NULL DEFAULT 0,
-	"type" TEXT NOT NULL CHECK("type" IN ('admin', 'host', 'user')),
-	"created_at" TIMESTAMP NOT NULL,
-	PRIMARY KEY("id")
-);
+CREATE INDEX child_transactions_index_system_qr_code_id
+  ON child_transactions (system_qr_code_id)
+  WHERE system_qr_code_id IS NOT NULL;
+
+CREATE INDEX child_transactions_index_user_id
+  ON child_transactions (user_id);
+
+CREATE TABLE user_badges (
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  badge_id   TEXT NOT NULL, -- references app config id
+  user_id    TEXT NOT NULL REFERENCES users(id),
+  UNIQUE (badge_id, user_id)
+) STRICT;
+
+CREATE INDEX user_badges_index_user_id
+  ON user_badges (user_id);
