@@ -1,6 +1,5 @@
 import { database } from '#src/state.js';
-import { UserRole } from '#src/db/users.js';
-import { randomUUID } from 'node:crypto';
+import type { UserRole } from '#src/db/users.js';
 
 // Seed the database with sample data. Run via `npm run seed`.
 // Refuses to run if the users table isn't empty — delete db.sqlite
@@ -13,26 +12,22 @@ if (existing > 0) {
     process.exit(0);
 }
 
-const insertUser = database.prepare(
-    `INSERT INTO users (id, username, email, role) VALUES (?, ?, ?, ?)`,
-);
+const insertUser = database.prepare(`INSERT INTO users (username, email, role) VALUES (?, ?, ?)`);
 const insertParent = database.prepare(`INSERT INTO parent_transactions (kind) VALUES (?)`);
 const insertLeg = database.prepare(
     `INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)`,
 );
 const awardBadge = database.prepare(`INSERT INTO user_badges (badge_id, user_id) VALUES (?, ?)`);
 
-function addUser(username: string, email: string, role: UserRole): string {
-    const id = randomUUID();
-    insertUser.run(id, username, email, role);
-    return id;
+function addUser(username: string, email: string, role: UserRole): number {
+    return Number(insertUser.run(username, email, role).lastInsertRowid);
 }
 
 function addParent(kind: 'transfer' | 'purchase' | 'system'): number {
     return Number(insertParent.run(kind).lastInsertRowid);
 }
 
-function leg(parentId: number, userId: string, balanceDelta: number) {
+function leg(parentId: number, userId: number, balanceDelta: number) {
     insertLeg.run(parentId, userId, balanceDelta);
 }
 

@@ -4,7 +4,7 @@ import { SQLOutputValue } from 'node:sqlite';
 export type UserRole = 'admin' | 'host' | 'user';
 
 export type User = {
-    id: string;
+    id: number;
     createdAt: Date;
     email: string;
     username: string;
@@ -54,7 +54,7 @@ export function findUserByUsername(username: string): User | null {
 
 function mapUser(row: Record<string, SQLOutputValue>): User {
     return {
-        id: row.id as string,
+        id: row.id as number,
         createdAt: new Date(row.created_at as string),
         email: row.email as string,
         username: row.username as string,
