@@ -40,7 +40,7 @@ function HomePage({ users: initialUsers }: HomePageProps) {
                     <ul>
                         {users.map((u) => (
                             <li key={u.id}>
-                                {u.username} ({u.type}) — {u.balance_current} pts
+                                {u.username} ({u.role}) — {u.currentBalance} pts
                             </li>
                         ))}
                     </ul>

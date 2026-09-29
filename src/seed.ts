@@ -1,10 +1,9 @@
 import { database } from '#src/state.js';
+import type { UserRole } from '#src/db/users.js';
 
 // Seed the database with sample data. Run via `npm run seed`.
 // Refuses to run if the users table isn't empty — delete db.sqlite
 // to start over.
-
-const now = () => new Date().toISOString();
 
 const existing =
     (database.prepare(`SELECT COUNT(*) AS n FROM users`).get() as { n: number }).n ?? 0;
@@ -13,52 +12,23 @@ if (existing > 0) {
     process.exit(0);
 }
 
-const insertUser = database.prepare(
-    `INSERT INTO users (username, email, type, created_at) VALUES (?, ?, ?, ?)`,
-);
-const insertParent = database.prepare(
-    `INSERT INTO parent_transactions (created_by, kind, issued_at) VALUES (?, ?, ?)`,
-);
+const insertUser = database.prepare(`INSERT INTO users (username, email, role) VALUES (?, ?, ?)`);
+const insertParent = database.prepare(`INSERT INTO parent_transactions (kind) VALUES (?)`);
 const insertLeg = database.prepare(
-    `INSERT INTO child_transactions (parent_id, user_id, type, amount, balance_after, issued_at)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)`,
 );
-const updateBalance = database.prepare(
-    `UPDATE users
-     SET balance_current = balance_current + ?,
-         lifetime_earned = lifetime_earned + ?
-     WHERE id = ?`,
-);
-const balanceOf = database.prepare(`SELECT balance_current AS b FROM users WHERE id = ?`);
-const insertActivity = database.prepare(
-    `INSERT INTO activities (local_id, title, description) VALUES (?, ?, ?)`,
-);
-const insertBadge = database.prepare(
-    `INSERT INTO badges (local_id, activity_id, title, description) VALUES (?, ?, ?, ?)`,
-);
-const awardBadge = database.prepare(
-    `INSERT INTO user_badges (badge_id, user_id, received_at) VALUES (?, ?, ?)`,
-);
+const awardBadge = database.prepare(`INSERT INTO user_badges (badge_id, user_id) VALUES (?, ?)`);
 
-function addUser(username: string, email: string, type: 'admin' | 'host' | 'user'): number {
-    return Number(insertUser.run(username, email, type, now()).lastInsertRowid);
+function addUser(username: string, email: string, role: UserRole): number {
+    return Number(insertUser.run(username, email, role).lastInsertRowid);
 }
 
-function addParent(kind: string, createdBy: number | null): number {
-    return Number(insertParent.run(createdBy, kind, now()).lastInsertRowid);
+function addParent(kind: 'transfer' | 'purchase' | 'system'): number {
+    return Number(insertParent.run(kind).lastInsertRowid);
 }
 
-// Keeps the money invariants in sync: updates balance_current /
-// lifetime_earned and records the resulting balance on the leg.
-function leg(
-    parentId: number | null,
-    userId: number,
-    type: 'sent' | 'received' | 'assignment' | 'purchase' | 'system',
-    amount: number,
-) {
-    updateBalance.run(amount, Math.max(amount, 0), userId);
-    const balanceAfter = (balanceOf.get(userId) as { b: number }).b;
-    insertLeg.run(parentId, userId, type, amount, balanceAfter, now());
+function leg(parentId: number, userId: number, balanceDelta: number) {
+    insertLeg.run(parentId, userId, balanceDelta);
 }
 
 database.exec('BEGIN');
@@ -69,28 +39,21 @@ try {
     const bobId = addUser('bob', 'bob@mwa.dev', 'user');
     const carolId = addUser('carol', 'carol@mwa.dev', 'user');
 
-    const grantId = addParent('admin_grant', adminId);
-    leg(grantId, aliceId, 'assignment', 100);
-    leg(grantId, adminId, 'assignment', -100);
+    const grantId = addParent('transfer');
+    leg(grantId, aliceId, 100);
+    leg(grantId, adminId, -100);
 
-    const p2pId = addParent('p2p', aliceId);
-    leg(p2pId, aliceId, 'sent', -30);
-    leg(p2pId, bobId, 'received', 30);
+    const p2pId = addParent('transfer');
+    leg(p2pId, aliceId, -30);
+    leg(p2pId, bobId, 30);
 
-    const purchaseId = addParent('purchase', bobId);
-    leg(purchaseId, bobId, 'purchase', -20);
+    const purchaseId = addParent('purchase');
+    leg(purchaseId, bobId, -20);
 
-    // System legs are parentless by design.
-    leg(null, carolId, 'system', 50);
+    const systemId = addParent('system');
+    leg(systemId, carolId, 50);
 
-    const egyptId = Number(
-        insertActivity.run('egypt', 'Egypt Booth', 'Find the hidden scarabs').lastInsertRowid,
-    );
-    const badgeId = Number(
-        insertBadge.run('scarab', egyptId, 'Scarab Hunter', 'Found all scarabs at the Egypt booth')
-            .lastInsertRowid,
-    );
-    awardBadge.run(badgeId, aliceId, now());
+    awardBadge.run('test_badge', aliceId);
 
     database.exec('COMMIT');
 } catch (error) {
@@ -99,7 +62,15 @@ try {
 }
 
 const balances = database
-    .prepare(`SELECT username, balance_current, lifetime_earned FROM users ORDER BY id`)
+    .prepare(
+        `SELECT users.username,
+                COALESCE(SUM(child_transactions.balance_delta), 0) AS balance_current,
+                COALESCE(SUM(MAX(child_transactions.balance_delta, 0)), 0) AS lifetime_earned
+         FROM users
+         LEFT JOIN child_transactions ON child_transactions.user_id = users.id
+         GROUP BY users.id
+         ORDER BY users.username`,
+    )
     .all();
 console.table(balances);
 console.log('Seeded.');

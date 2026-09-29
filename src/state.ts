@@ -9,4 +9,6 @@ export let isDevMode: boolean = process.argv[2] === '--dev';
 
 export let database = new DatabaseSync('db.sqlite');
 
+database.exec('PRAGMA foreign_keys = ON;');
+
 migrateDatabase();
