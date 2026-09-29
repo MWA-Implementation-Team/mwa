@@ -1,3 +1,8 @@
+# MWA
+
+A university project: infrastructure for a real-life event. Hono server, Preact pages
+rendered on the server and hydrated in the browser, SQLite — no bundler.
+
 ## Requirements
 
 Node.js v24. Check that you have it, not an older version:
