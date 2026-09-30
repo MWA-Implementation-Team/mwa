@@ -1,27 +1,32 @@
 /* Ensure full height layout and smooth rendering */
-html, body {
-  min-height: 100vh;
-  background-color: var(--color-bg-main);
-  color: var(--color-text-main);
+html,
+body {
+    min-height: 100vh;
+    background-color: var(--color-bg-main);
+    color: var(--color-text-main);
 }
 
 /* Ensure images and media don't break layouts */
-img, picture, video, canvas, svg {
-  display: block;
-  max-width: 100%;
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
 }
 
 #app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 a:hover {
-  color: var(--color-accent-hover);
+    color: var(--color-accent-hover);
 }
 
 .error-message {
-  color: var(--danger, #d32f2f);
-  font-size: var(--text-7, 0.875rem);
+    color: var(--danger, #d32f2f);
+    font-size: var(--text-7, 0.875rem);
 }

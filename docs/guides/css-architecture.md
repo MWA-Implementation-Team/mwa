@@ -8,9 +8,9 @@ The app uses Oat as its base framework. App-specific styles live in
 `static/style/main.css` is the entry point:
 
 ```css
-@import "./tokens.css";
-@import "./base.css";
-@import "./components/button.css";
+@import './tokens.css';
+@import './base.css';
+@import './components/button.css';
 ```
 
 - `tokens.css` — shared colors, spacing, and other variables.
@@ -72,7 +72,9 @@ For example, this `.btn-primary` rule in
     border-radius: var(--radius-md);
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
 }
 ```
 

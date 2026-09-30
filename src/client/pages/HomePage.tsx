@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 import { fetchUsers, User } from '#src/client/api/users.js';
-import { TestCard } from '../ui/TestCard.js'
+import { TestCard } from '../ui/TestCard.js';
 
 // `users` comes from the route (SSR) — it exists in the initial HTML.
 // useState(initial) keeps it live so fetchUsers() can refresh it client-side.
