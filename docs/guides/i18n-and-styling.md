@@ -41,8 +41,20 @@ Two stylesheets load on every page (see `Root` in `src/pages.tsx`):
 
 - `/oat.css` — the [Oat.](https://oat.ink) CSS framework: a classless-ish base theme with
   CSS variables. It's third-party — edit only if absolutely necessary.
-- `/style/main.css` — **your** styles (`static/style/main.css`). Today it contains only
-  `.error-message`; add rules here.
+- `/style/main.css` — **your** stylesheet entry point
+  (`static/style/main.css`). It imports tokens, base styles, and component styles.
+
+The CSS layers are:
+
+- `static/style/tokens.css` — shared design tokens and app-facing aliases for Oat
+  variables;
+- `static/style/base.css` — document-wide defaults, media rules, and the `#app`
+  layout;
+- `static/style/components/` — one stylesheet per reusable component or component
+  family, imported by `main.css`.
+
+See [css-architecture](css-architecture.md) for the full layering convention,
+component examples, and how to override Oat styles without editing `oat.css`.
 
 Since `static/` changes trigger a browser reload without a server restart, CSS edits
 show up immediately in dev.
