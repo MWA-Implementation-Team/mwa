@@ -1,26 +1,34 @@
 :root {
-  /* Override oat internal variables */
-  --background: #ffffff;         /* Main background: White */
-  --foreground: #000000;         /* Text color: Black */
-  --card: #f8fafc;               /* Subtle off-white for cards */
-  --card-foreground: #000000;
-  
-  --primary: #2563eb;            /* Accent Blue (used for buttons & links) */
-  --primary-foreground: #ffffff; /* Text on primary buttons: White */
-  
-  --muted-foreground: #475569;   /* Muted text color */
-  --border: #e2e8f0;             /* Border color */
-  --radius-medium: 8px;           /* Radius */
+    /* Override oat internal variables */
+    --background: #ffffff;         /* Main background: White */
+    --foreground: #000000;         /* Text color: Black */
+    --card: #f8fafc;               /* Subtle off-white for cards */
+    --card-foreground: #000000;
+    
+    --primary: #2563eb;            /* Accent Blue (used for buttons & links) */
+    --primary-foreground: #ffffff; /* Text on primary buttons: White */
+    
+    --muted-foreground: #475569;   /* Muted text color */
+    --border: #e2e8f0;             /* Border color */
+    --radius-medium: 8px;            /* Radius */
+    --space-2: 2px;
+    --space-4: 4px;
+    --space-6: 6px;
+    --space-10: 10px;
+    --space-14: 14px;
 
+    /* Set preferred variable names */
+    --color-bg-main: var(--background);
+    --color-surface: var(--card);
+    --color-text-main: var(--foreground);
+    --color-text-muted: var(--muted-foreground);
+    --color-accent: var(--primary);
+    --color-accent-hover: #1d4ed8;
+    --color-accent-light: #eff6ff;
+    --color-border: var(--border);
+    --radius-md: var(--radius-medium);
 
-  /* Set preferred variable names */
-  --color-bg-main: var(--background);
-  --color-surface: var(--card);
-  --color-text-main: var(--foreground);
-  --color-text-muted: var(--muted-foreground);
-  --color-accent: var(--primary);
-  --color-accent-hover: #1d4ed8;
-  --color-accent-light: #eff6ff;
-  --color-border: var(--border);
-  --radius-md: var(--radius-medium);
+    --space-sm: var(--space-4);
+    --space-md: var(--space-6);
+    --space-lg: var(--space-10)
 }
