@@ -1,0 +1,36 @@
+:root {
+    color-scheme: light dark;
+
+    /* Override oat internal variables with dark-aware colors */
+    --background: light-dark(#ffffff, #0f172a); /* Main background */
+    --foreground: light-dark(#000000, #f8fafc); /* Text color */
+    --card: light-dark(#f8fafc, #111827); /* Card surfaces */
+    --card-foreground: light-dark(#000000, #f8fafc);
+
+    --primary: #2563eb; /* Accent Blue (used for buttons & links) */
+    --primary-foreground: #ffffff; /* Text on primary buttons: White */
+
+    --muted-foreground: light-dark(#475569, #94a3b8); /* Muted text color */
+    --border: light-dark(#e2e8f0, #334155); /* Border color */
+    --radius-medium: 8px; /* Radius */
+    --space-2: 2px;
+    --space-4: 4px;
+    --space-6: 6px;
+    --space-10: 10px;
+    --space-14: 14px;
+
+    /* Set preferred variable names */
+    --color-bg-main: var(--background);
+    --color-surface: var(--card);
+    --color-text-main: var(--foreground);
+    --color-text-muted: var(--muted-foreground);
+    --color-accent: var(--primary);
+    --color-accent-hover: #1d4ed8;
+    --color-accent-light: #eff6ff;
+    --color-border: var(--border);
+    --radius-md: var(--radius-medium);
+
+    --space-sm: var(--space-4);
+    --space-md: var(--space-6);
+    --space-lg: var(--space-10);
+}

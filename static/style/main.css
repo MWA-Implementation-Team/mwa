@@ -1,3 +1,14 @@
-.error-message {
-    color: red;
-}
+/*
+    Design tokens and variables
+    Overrides oat.css (if needed), defaults and defines global constants
+*/
+@import './tokens.css';
+
+/* 
+    Base styles and layout
+    Global element resets, body defaults and app wrapper layout
+*/
+@import './base.css';
+
+/* Components */
+@import './components/button.css';
