@@ -40,7 +40,7 @@ into `ctxInit.lang`.
 Two stylesheets load on every page (see `Root` in `src/pages.tsx`):
 
 - `/oat.css` — the [Oat.](https://oat.ink) CSS framework: a classless-ish base theme with
-  CSS variables. It's third-party and minified — **don't edit it**.
+  CSS variables. It's third-party — edit only if absolutely necessary.
 - `/style/main.css` — **your** styles (`static/style/main.css`). Today it contains only
   `.error-message`; add rules here.
 

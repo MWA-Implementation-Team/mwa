@@ -20,7 +20,8 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 │                              (run by src/db/migrate.ts, progress tracked in migration_status database table)
 │
 ├── static/                    files served as-is
-│   ├── oat.css / oat.js       Oat. CSS framework — third-party, minified, don't edit
+│   ├── oat.css                Oat CSS framework — third-party, editable if needed
+│   ├── oat.js                 Oat CSS framework JS, minified, don't edit
 │   ├── style/main.css         your app styles go here
 │   └── reload.js              dev-only auto-reload client
 │
