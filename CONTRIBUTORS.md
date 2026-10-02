@@ -4,4 +4,5 @@ Append your name as a new bullet below, push your branch, and open a pull reques
 
 - katrewkate
 - Karolis K
+- Kavamalis
 - Titas G
