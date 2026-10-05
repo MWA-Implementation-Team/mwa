@@ -51,7 +51,13 @@ export const registeredPages = {
     landing: landingPage,
     login: loginPage,
     home: homePage,
+    activities: activitiesPage,
+    activity: activityPage,
+    account: accountPage,
+    leaderboard: leaderboardPage,
+    group: groupPage,
     casino: casinoPage,
+    admin: adminPage,
     badges: badgesPage,
     error: errorPage,
 } satisfies Record<string, Page<any>>;

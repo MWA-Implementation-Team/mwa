@@ -3,7 +3,13 @@ import { homePage } from '#src/client/pages/app/HomePage.js';
 import { errorPage } from '#src/client/pages/ErrorPage.js';
 import { landingPage } from '#src/client/pages/LandingPage.js';
 import { loginPage } from '#src/client/pages/LoginPage.js';
+import { activitiesPage } from '#src/client/pages/app/ActivitiesPage.js';
+import { activityPage } from '#src/client/pages/app/ActivityPage.js';
+import { accountPage } from '#src/client/pages/app/AccountPage.js';
+import { leaderboardPage } from '#src/client/pages/app/LeaderboardPage.js';
+import { groupPage } from '#src/client/pages/app/GroupPage.js';
 import { casinoPage } from '#src/client/pages/app/CasinoPage.js';
+import { adminPage } from '#src/client/pages/AdminPage.js';
 import { LanguageCode, TranslateFn } from './language.js';
 
 export const registeredPages = {
@@ -11,7 +17,13 @@ export const registeredPages = {
     landing: landingPage,
     login: loginPage,
     home: homePage,
+    activities: activitiesPage,
+    activity: activityPage,
+    account: accountPage,
+    leaderboard: leaderboardPage,
+    group: groupPage,
     casino: casinoPage,
+    admin: adminPage,
     error: errorPage,
 } satisfies Record<string, Page<any>>;
 

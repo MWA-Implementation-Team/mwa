@@ -30,10 +30,18 @@ export function registerLoginRoutes(app: Hono) {
             });
         }
 
-        const allowedGotos = new Set<string>(['/app', '/app/casino']);
+        const allowedGotos = new Set<string>([
+            '/app',
+            '/app/activities',
+            '/app/account',
+            '/app/leaderboard',
+            '/app/group',
+            '/app/casino',
+            '/admin',
+        ]);
 
         let goto = ctx.req.query('goto') ?? null;
-        if (goto && !allowedGotos.has(goto)) {
+        if (goto && !allowedGotos.has(goto) && !goto.startsWith('/app/activities/')) {
             goto = null;
         }
         goto = goto ?? '/app';
