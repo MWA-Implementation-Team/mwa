@@ -5,49 +5,49 @@ export const defaultLanguage: LanguageCode = 'en';
 export type Language = {
     displayName: string;
 
-    titleHome: string;
+    titleLanding: string;
     titleLogin: string;
-    titleApp: string;
+    titleHome: string;
     titleCasino: string;
     titleError: string;
 
-    headerHome: string;
+    headerLanding: string;
     headerLogin: string;
-    headerApp: string;
+    headerHome: string;
 
-    appWelcome: string;
+    homeWelcome: string;
 };
 
 export const languages: Record<LanguageCode, Language> = {
     en: {
         displayName: 'English',
 
-        titleHome: 'MWA | Home',
+        titleLanding: 'MWA | Home',
         titleLogin: 'MWA | Login',
-        titleApp: 'MWA | App',
+        titleHome: 'MWA | App',
         titleCasino: 'MWA | Casino',
         titleError: 'MWA | {status}',
 
-        headerHome: 'Home',
+        headerLanding: 'Home',
         headerLogin: 'Login',
-        headerApp: 'App',
+        headerHome: 'App',
 
-        appWelcome: 'Welcome back, {name}',
+        homeWelcome: 'Welcome back, {name}',
     },
     lt: {
         displayName: 'Lietuvių',
 
-        titleHome: 'MWA | Pradžia',
+        titleLanding: 'MWA | Pradžia',
         titleLogin: 'MWA | Prisijungimas',
-        titleApp: 'MWA | Programa',
+        titleHome: 'MWA | Programa',
         titleCasino: 'MWA | Kazino',
         titleError: 'MWA | {status}',
 
-        headerHome: 'Pradžia',
+        headerLanding: 'Pradžia',
         headerLogin: 'Prisijungimas',
-        headerApp: 'Programa',
+        headerHome: 'Programa',
 
-        appWelcome: 'Sveiki sugrįžę, {name}',
+        homeWelcome: 'Sveiki sugrįžę, {name}',
     },
 };
 

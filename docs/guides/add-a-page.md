@@ -48,9 +48,9 @@ import { badgesPage } from '#src/client/pages/app/BadgesPage.js';
 
 ```ts
 export const registeredPages = {
-    home: homePage,
+    landing: landingPage,
     login: loginPage,
-    appHome: appHomePage,
+    home: homePage,
     casino: casinoPage,
     badges: badgesPage,
     error: errorPage,

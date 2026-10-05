@@ -17,13 +17,13 @@ string, the browser loads the _same_ compiled modules through an
 Follow `GET /` through the code:
 
 1. **Hono matches a route.** `src/main.ts` creates the app and calls the
-   `register*Routes` functions. `/` lives in `src/routes/pages/home.ts`.
+   `register*Routes` functions. `/` lives in `src/routes/pages/landing.ts`.
 2. **The route resolves the user.** `currentUser(ctx)` (`src/auth.ts`) reads the
    `mwa-username` cookie and looks the username up in the `users` table. This is
    dev-only cookie auth — see [auth-in-dev](guides/auth-in-dev.md).
 3. **The route loads data.** It calls typed functions from `src/db/*.ts` (e.g.
    `listUsers()`), which wrap prepared statements. The results become _page props_.
-4. **`writePage` renders the page.** `writePage(ctx, 'home', { users })` in
+4. **`writePage` renders the page.** `writePage(ctx, 'landing', { users })` in
    `src/pages.tsx` builds `ctxInit = { lang, user }` (lang from the `mwa-language`
    cookie, user from `currentUser`) and renders the `Root` component with
    `preact-render-to-string`.

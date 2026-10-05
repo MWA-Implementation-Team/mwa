@@ -11,14 +11,14 @@ export default function Header() {
             <img src="/Logotipas.png" style={'width:200px;'} />
             <ul>
                 <li>
-                    <a href="/">{t('headerHome')}</a>
+                    <a href="/">{t('headerLanding')}</a>
                 </li>
                 <li>
                     {!user ? (
                         <a href="/login">{t('headerLogin')}</a>
                     ) : (
                         <a href="/app">
-                            {t('headerApp')} ({user.username})
+                            {t('headerHome')} ({user.username})
                         </a>
                     )}
                 </li>

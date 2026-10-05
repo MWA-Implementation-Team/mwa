@@ -9,7 +9,7 @@ export function registerAppRoutes(app: Hono) {
     app.get('/app', async (ctx) => {
         if (!currentUser(ctx)) return goLogin(ctx);
 
-        return writePage(ctx, 'appHome', {});
+        return writePage(ctx, 'home', {});
     });
 
     app.post('/app', async (ctx) => {

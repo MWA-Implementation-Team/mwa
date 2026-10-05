@@ -6,16 +6,16 @@ import { TestCard } from '../ui/TestCard.js';
 
 // `users` comes from the route (SSR) — it exists in the initial HTML.
 // useState(initial) keeps it live so fetchUsers() can refresh it client-side.
-type HomePageProps = {
+type LandingPageProps = {
     users: User[] | null;
 };
 
-export const homePage: Page<HomePageProps> = {
-    Component: HomePage,
-    title: (t) => t('titleHome'),
+export const landingPage: Page<LandingPageProps> = {
+    Component: LandingPage,
+    title: (t) => t('titleLanding'),
 };
 
-function HomePage({ users: initialUsers }: HomePageProps) {
+function LandingPage({ users: initialUsers }: LandingPageProps) {
     const [value, setValue] = useState(0);
     const [users, setUsers] = useState(initialUsers);
     const [error, setError] = useState<string | null>(null);

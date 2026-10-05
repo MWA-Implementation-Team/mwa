@@ -80,7 +80,7 @@ always reach for the type through the `client/api/` re-export so client code nev
 runtime-imports a db module.
 
 The route decides _what_ the page gets — it's where auth-based variation belongs.
-`src/routes/pages/home.ts` passes `users` or `null` depending on `currentUser`, and the
+`src/routes/pages/landing.ts` passes `users` or `null` depending on `currentUser`, and the
 component renders accordingly.
 
 ## Option B — client fetch
@@ -109,7 +109,7 @@ You own the loading and error states — that's the cost of this option.
 
 ## Option C — the hybrid (recommended for refreshable data)
 
-`src/client/pages/HomePage.tsx` shows the pattern: take the SSR prop as initial state,
+`src/client/pages/LandingPage.tsx` shows the pattern: take the SSR prop as initial state,
 then refresh it by fetch:
 
 ```ts

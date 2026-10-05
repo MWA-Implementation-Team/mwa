@@ -1,16 +1,16 @@
 import { ComponentProps, ComponentType } from 'preact/compat';
-import { appHomePage } from '#src/client/pages/app/AppHomePage.js';
+import { homePage } from '#src/client/pages/app/HomePage.js';
 import { errorPage } from '#src/client/pages/ErrorPage.js';
-import { homePage } from '#src/client/pages/HomePage.js';
+import { landingPage } from '#src/client/pages/LandingPage.js';
 import { loginPage } from '#src/client/pages/LoginPage.js';
 import { casinoPage } from '#src/client/pages/app/CasinoPage.js';
 import { LanguageCode, TranslateFn } from './language.js';
 
 export const registeredPages = {
     // These keys are used in the writePage function
-    home: homePage,
+    landing: landingPage,
     login: loginPage,
-    appHome: appHomePage,
+    home: homePage,
     casino: casinoPage,
     error: errorPage,
 } satisfies Record<string, Page<any>>;
