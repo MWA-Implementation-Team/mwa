@@ -11,7 +11,7 @@ import { ClientContext } from '#src/client/context.js';
 
 const { t } = useContext(ClientContext);
 // ...
-<h1>{t('appWelcome', { name: user.username })}</h1>;
+<h1>{t('homeWelcome', { name: user.username })}</h1>;
 ```
 
 Keys and values live in `src/client/language.ts`. To add a string:

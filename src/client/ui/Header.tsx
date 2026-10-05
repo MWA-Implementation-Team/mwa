@@ -11,17 +11,38 @@ export default function Header() {
             <img src="/Logotipas.png" style={'width:200px;'} />
             <ul>
                 <li>
-                    <a href="/">{t('headerHome')}</a>
+                    <a href="/">{t('headerLanding')}</a>
                 </li>
                 <li>
                     {!user ? (
                         <a href="/login">{t('headerLogin')}</a>
                     ) : (
                         <a href="/app">
-                            {t('headerApp')} ({user.username})
+                            {t('headerHome')} ({user.username})
                         </a>
                     )}
                 </li>
+                {user && (
+                    <>
+                        <li>
+                            <a href="/app/activities">{t('headerActivities')}</a>
+                        </li>
+                        <li>
+                            <a href="/app/leaderboard">{t('headerLeaderboard')}</a>
+                        </li>
+                        <li>
+                            <a href="/app/group">{t('headerGroup')}</a>
+                        </li>
+                        <li>
+                            <a href="/app/account">{t('headerAccount')}</a>
+                        </li>
+                        {user.role === 'admin' && (
+                            <li>
+                                <a href="/admin">{t('headerAdmin')}</a>
+                            </li>
+                        )}
+                    </>
+                )}
             </ul>
             <ThemeToggle />
             <LanguageToggle />

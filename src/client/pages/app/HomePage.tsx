@@ -3,21 +3,21 @@ import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 
-type AppHomePageProps = {};
+type HomePageProps = {};
 
-export const appHomePage: Page<AppHomePageProps> = {
-    Component: AppHomePage,
-    title: (t) => t('titleApp'),
+export const homePage: Page<HomePageProps> = {
+    Component: HomePage,
+    title: (t) => t('titleHome'),
 };
 
-function AppHomePage({}: AppHomePageProps) {
+function HomePage({}: HomePageProps) {
     const { t, user } = useContext(ClientContext);
 
     return (
         <>
             <Header />
 
-            <h1>{t('appWelcome', { name: user!.username })}</h1>
+            <h1>{t('homeWelcome', { name: user!.username })}</h1>
             <form method="POST">
                 <button type="submit">Logout</button>
             </form>

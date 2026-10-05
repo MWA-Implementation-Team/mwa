@@ -48,10 +48,16 @@ import { badgesPage } from '#src/client/pages/app/BadgesPage.js';
 
 ```ts
 export const registeredPages = {
-    home: homePage,
+    landing: landingPage,
     login: loginPage,
-    appHome: appHomePage,
+    home: homePage,
+    activities: activitiesPage,
+    activity: activityPage,
+    account: accountPage,
+    leaderboard: leaderboardPage,
+    group: groupPage,
     casino: casinoPage,
+    admin: adminPage,
     badges: badgesPage,
     error: errorPage,
 } satisfies Record<string, Page<any>>;
