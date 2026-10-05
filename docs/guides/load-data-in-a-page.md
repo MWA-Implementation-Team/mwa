@@ -109,16 +109,8 @@ You own the loading and error states — that's the cost of this option.
 
 ## Option C — the hybrid (recommended for refreshable data)
 
-`src/client/pages/LandingPage.tsx` shows the pattern: take the SSR prop as initial state,
-then refresh it by fetch:
-
-```ts
-const [users, setUsers] = useState(initialUsers); // prop → state
-
-function refreshUsers() {
-    fetchUsers().then(setUsers, (e) => setError(e.message));
-}
-```
+`src/client/pages/LandingPage.tsx` shows the pattern: feed the SSR prop into `useState`,
+then refresh the state by calling the fetcher again (`refreshUsers`).
 
 First paint shows real data, and a **Refresh** button re-fetches without a page load —
 no loading state needed on mount because the prop already contains data.
