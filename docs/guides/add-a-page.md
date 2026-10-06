@@ -46,23 +46,6 @@ In `src/client/pages.ts`, import the page and add it to `registeredPages`:
 import { badgesPage } from '#src/client/pages/app/BadgesPage.js';
 ```
 
-```ts
-export const registeredPages = {
-    landing: landingPage,
-    login: loginPage,
-    home: homePage,
-    activities: activitiesPage,
-    activity: activityPage,
-    account: accountPage,
-    leaderboard: leaderboardPage,
-    group: groupPage,
-    casino: casinoPage,
-    admin: adminPage,
-    badges: badgesPage,
-    error: errorPage,
-} satisfies Record<string, Page<any>>;
-```
-
 The key (`badges`) is the page id you'll pass to `writePage`. It's typechecked — a typo
 is a compile error, not a 404.
 
@@ -119,11 +102,7 @@ headerBadges: 'Ženkleliai',
 
 In `src/routes/pages/login.ts`, add the path to `allowedGotos`. If the route has a
 dynamic segment (like `/app/activities/:id`), add a prefix to `allowedGotoPrefixes`
-instead:
-
-```ts
-const allowedGotos = new Set<string>(['/app', '/app/casino', '/app/badges']);
-```
+instead.
 
 Without this, a logged-out visitor who clicked `/app/badges` gets sent to `/login`, but
 the `goto` parameter is dropped — after logging in they'd land on `/app` instead of
