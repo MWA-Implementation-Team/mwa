@@ -7,3 +7,4 @@ Append your name as a new bullet below, push your branch, and open a pull reques
 - Kavamalis
 - Titas G
 - Augustas K
+- Nedas G
