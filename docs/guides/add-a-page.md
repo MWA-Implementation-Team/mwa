@@ -117,7 +117,9 @@ headerBadges: 'Ženkleliai',
 
 ## 6. Allow it as a login redirect
 
-In `src/routes/pages/login.ts`, add the path to `allowedGotos`:
+In `src/routes/pages/login.ts`, add the path to `allowedGotos`. If the route has a
+dynamic segment (like `/app/activities/:id`), add a prefix to `allowedGotoPrefixes`
+instead:
 
 ```ts
 const allowedGotos = new Set<string>(['/app', '/app/casino', '/app/badges']);
