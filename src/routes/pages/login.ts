@@ -2,7 +2,7 @@ import { currentUser } from '#src/auth.js';
 import { cookieUsername } from '#src/client/constants.js';
 import { findUserByUsername } from '#src/db/users.js';
 import { writePage } from '#src/pages.js';
-import { Hono } from 'hono';
+import { Context, Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
 
 // Login redirects are limited to known app pages so ?goto= can't be used
@@ -19,8 +19,26 @@ const allowedGotos = new Set<string>([
 ]);
 const allowedGotoPrefixes = ['/app/activities/'];
 
-function isAllowedGoto(goto: string): boolean {
-    return allowedGotos.has(goto) || allowedGotoPrefixes.some((p) => goto.startsWith(p));
+// Normalize goto before checking: a raw startsWith lets `..` escape the
+// prefix (browsers resolve it), and absolute URLs on other origins must be
+// rejected outright. Only the normalized path is used as the redirect target.
+function safeGoto(ctx: Context, raw: string | undefined): string | null {
+    if (!raw) {
+        return null;
+    }
+    try {
+        const origin = new URL(ctx.req.url).origin;
+        const url = new URL(raw, origin);
+        if (url.origin !== origin) {
+            return null;
+        }
+        const allowed =
+            allowedGotos.has(url.pathname) ||
+            allowedGotoPrefixes.some((p) => url.pathname.startsWith(p));
+        return allowed ? url.pathname + url.search : null;
+    } catch {
+        return null;
+    }
 }
 
 export function registerLoginRoutes(app: Hono) {
@@ -48,11 +66,7 @@ export function registerLoginRoutes(app: Hono) {
             });
         }
 
-        let goto = ctx.req.query('goto') ?? null;
-        if (goto && !isAllowedGoto(goto)) {
-            goto = null;
-        }
-        goto = goto ?? '/app';
+        const goto = safeGoto(ctx, ctx.req.query('goto')) ?? '/app';
 
         setCookie(ctx, cookieUsername, username);
         return ctx.redirect(goto);
