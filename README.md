@@ -41,7 +41,6 @@ auth, see [docs/guides/auth-in-dev.md](docs/guides/auth-in-dev.md)).
 - [docs/file-map.md](docs/file-map.md) — what the important files and folders are for
 - Guides (one worked example — a badges feature — runs through all of them):
     - [docs/guides/add-a-page.md](docs/guides/add-a-page.md)
-    - [docs/guides/add-an-activity.md](docs/guides/add-an-activity.md)
     - [docs/guides/add-an-api-endpoint.md](docs/guides/add-an-api-endpoint.md)
     - [docs/guides/load-data-in-a-page.md](docs/guides/load-data-in-a-page.md)
     - [docs/guides/change-the-database.md](docs/guides/change-the-database.md)
