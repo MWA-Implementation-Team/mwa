@@ -16,7 +16,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── AGENTS.md                  project conventions — read before contributing
 ├── .github/workflows/ci.yml   CI: npm ci + npm run lint
 │
-├── migrations/                numbered SQL files, applied in order on every server start
+├── migrations/                issue-numbered SQL files (`<issue>_<name>.sql`), applied in order on every server start
 │                              (run by src/db/migrate.ts, progress tracked in migration_status database table)
 │
 ├── static/                    files served as-is
