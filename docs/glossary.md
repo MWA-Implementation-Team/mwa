@@ -56,3 +56,19 @@ functions around them.
 
 Preact's mechanism for passing values deep into the component tree without threading
 props through every level.
+
+## Activity
+
+An irl station at the event — something visitors queue for and complete. In code it's
+a `registeredActivities` entry (`src/client/activities.ts`): a slug mapped to
+`{ name, Card, Detail }`. The slug is its identity in the url
+(`/app/activities/<slug>`) and as a row in the `activities` table, so queue/badge
+records can reference it.
+
+## Registry
+
+A compile-time-checked map of everything of a kind — `registeredPages` for pages,
+`registeredActivities` for activities. Keys are string ids; `satisfies` plus derived
+`keyof` types turn misconfiguration (a typo'd key, a missing field) into a `tsc`
+error. Server code resolves entries at request time (the activities route) or syncs
+them into a table at startup (`syncActivities` → `activities`).
