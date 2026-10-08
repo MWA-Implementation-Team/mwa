@@ -45,6 +45,25 @@ Deleting `db.sqlite` is safe: `migrateDatabase()` recreates the schema from
 `migrations/` on the next start (see
 [change-the-database](guides/change-the-database.md)).
 
+## Server crashes with `no such table` right after switching branches
+
+Your `db.sqlite` was built by a different set of migrations than this branch has.
+`migration_status` only stores the highest applied version number, so a migration file
+numbered _below_ that watermark gets skipped even though it's new — then some
+`db/*.ts` module prepares a query against a table that was never created and crashes
+at startup.
+
+`db.sqlite` is disposable dev data — recreate it:
+
+```shell
+rm db.sqlite
+npm run dev        # migrations rebuild the schema
+npm run seed       # optional: refill sample data
+```
+
+This is the known trade-off of issue-numbered migration filenames — see the watermark
+rule in [change-the-database](guides/change-the-database.md).
+
 ## The page renders but buttons do nothing / toggles don't work
 
 Hydration failed. Open the browser console.
