@@ -18,23 +18,23 @@ shape, and [change-the-database](change-the-database.md) if you need a new table
 Create `src/routes/api/badges.ts`:
 
 ```ts
-import { currentUser } from '#src/auth.js';
+import { requireApiUser } from '#src/auth.js';
 import { listBadges } from '#src/db/badges.js';
 import { Hono } from 'hono';
 
 export function registerBadgesRoutes(app: Hono) {
     app.get('/api/badges', (ctx) => {
-        if (!currentUser(ctx)) {
-            return ctx.json({ error: 'unauthorized' }, 401);
-        }
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
 
         return ctx.json(listBadges());
     });
 }
 ```
 
-API routes return `401` JSON when logged out (page routes redirect to `/login`
-instead — see [auth-in-dev](auth-in-dev.md)).
+API routes return `401`/`403` JSON instead of redirecting — fetch calls can't
+follow a login redirect usefully. `requireApiRole(ctx, 'host', 'admin')` is the
+staff variant. See [auth](auth.md) for the guard list.
 
 ## 3. Register it in `src/main.ts`
 
@@ -65,7 +65,7 @@ Two things going on here:
   by `tsc`, so the emitted JS never references the module. Re-exporting the type keeps
   one source of truth for the API response shape.
 - **Plain `fetch` sends the auth cookie.** Same-origin requests include cookies by
-  default, so `mwa-username` rides along with no config.
+  default, so `mwa-session` rides along with no config.
 
 ## 5. Consume it
 
@@ -86,8 +86,9 @@ The full pattern — including when to fetch vs. pass props — is in
 2. `npm run dev`, then:
     - `curl -i http://localhost:3000/api/badges` → `401` and
       `{"error":"unauthorized"}`.
-    - `curl -s -b 'mwa-username=alice' http://localhost:3000/api/badges` → a JSON array
-      containing `Scarab Hunter` (if you ran `npm run seed`). Setting the cookie by hand
-      works because dev auth is just the username in a cookie.
+    - `curl -s -b cookies.txt http://localhost:3000/api/badges` → a JSON array
+      containing `Scarab Hunter` (if you ran `npm run seed`). Mint `cookies.txt`
+      through the verify flow in [auth](auth.md) — session cookies can't be
+      forged.
 3. In the browser while logged in: `fetch('/api/badges').then(r => r.json())` in the
    console returns the same array.

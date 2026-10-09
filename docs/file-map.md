@@ -32,7 +32,8 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
     ├── main.ts                Hono app: registers routes, static serving, 404/500 handlers
     ├── pages.tsx              writePage() + Root: the SSR document shell, importmap, ssr-data
     ├── state.ts               isDevMode flag + shared db handle; runs migrations on import
-    ├── auth.ts                currentUser(ctx): mwa-username cookie → User | null
+    ├── auth.ts                currentUser() + require*/redirectIfAuthed guards — all auth decisions
+    ├── mailer.ts              sendLoginEmail() seam — console now, SMTP later
     ├── seed.ts                `npm run seed` — sample data; refuses if users exist
     │
     ├── db/                    one module per domain: row type + prepared statements + functions
@@ -45,7 +46,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
         ├── pages.ts           registeredPages: page id → { Component, title }
         ├── context.tsx        ClientContext: lang, updateLang, t(), user
         ├── language.ts        translations (en, lt) + translate() / t()
-        ├── constants.ts       cookie names (mwa-username, mwa-language, mwa-theme-override)
+        ├── constants.ts       cookie names (mwa-session, mwa-language, mwa-theme-override)
         ├── api/               fetch wrappers + type-only re-exports of db types
         ├── pages/             one component per page, each a Page<P> object
         └── ui/                shared components (header, toggles, icons)

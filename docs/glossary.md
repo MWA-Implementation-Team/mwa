@@ -36,7 +36,7 @@ JSON-serializable.
 
 A small key/value the server asks the browser to store and send back on every request to
 the same origin. This app uses three (names in `src/client/constants.ts`):
-`mwa-username` (dev auth), `mwa-language`, `mwa-theme-override`. Same-origin `fetch`
+`mwa-session` (auth), `mwa-language`, `mwa-theme-override`. Same-origin `fetch`
 sends cookies automatically — that's why `client/api/*` fetchers need no auth code.
 
 ## Migration
