@@ -1,9 +1,11 @@
-import { currentUser } from '#src/auth.js';
-import { cookieUsername } from '#src/client/constants.js';
-import { findUserByUsername } from '#src/db/users.js';
+import { redirectIfAuthed } from '#src/auth.js';
+import { findUserByEmail } from '#src/db/users.js';
+import { createLoginToken, deleteExpiredSessions, lastLoginTokenSentAt } from '#src/db/sessions.js';
+import { sendLoginEmail } from '#src/mailer.js';
 import { writePage } from '#src/pages.js';
 import { Context, Hono } from 'hono';
-import { setCookie } from 'hono/cookie';
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Login redirects are limited to known app pages so ?goto= can't be used
 // as an open redirect. Exact paths cover static routes; prefixes cover
@@ -22,7 +24,7 @@ const allowedGotoPrefixes = ['/app/activities/'];
 // Normalize goto before checking: a raw startsWith lets `..` escape the
 // prefix (browsers resolve it), and absolute URLs on other origins must be
 // rejected outright. Only the normalized path is used as the redirect target.
-function safeGoto(ctx: Context, raw: string | undefined): string | null {
+export function safeGoto(ctx: Context, raw: string | undefined): string | null {
     if (!raw) {
         return null;
     }
@@ -41,34 +43,50 @@ function safeGoto(ctx: Context, raw: string | undefined): string | null {
     }
 }
 
+const resendCooldownMs = 60_000;
+
 export function registerLoginRoutes(app: Hono) {
     app.get('/login', async (ctx) => {
-        if (currentUser(ctx)) {
-            return ctx.redirect('/app');
+        const redirect = redirectIfAuthed(ctx);
+        if (redirect) {
+            return redirect;
         }
 
         return writePage(ctx, 'login', {});
     });
 
     app.post('/login', async (ctx) => {
-        const form = await ctx.req.formData();
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) {
+            return ctx.text('Bad Request', 400);
+        }
+        const email = String(form.get('email') ?? '')
+            .trim()
+            .toLowerCase();
 
-        let username = form.get('username');
-        if (typeof username !== 'string' || username.trim() === '') {
-            return writePage(ctx, 'login', {
-                errorMessage: 'Invalid username',
-            });
+        if (!emailPattern.test(email)) {
+            return writePage(ctx, 'login', { errorMessage: 'Enter a valid email' });
         }
 
-        if (!findUserByUsername(username)) {
-            return writePage(ctx, 'login', {
-                errorMessage: 'Unknown user',
-            });
+        const isSignup = !findUserByEmail(email);
+        const lastSent = lastLoginTokenSentAt(email);
+        if (!lastSent || Date.now() - lastSent.getTime() > resendCooldownMs) {
+            const { token, code } = createLoginToken(email);
+            const url = new URL('/auth/verify', ctx.req.url);
+            url.searchParams.set('token', token);
+            // goto passes through unvalidated — safeGoto re-checks it on
+            // the verify request, so nothing here can smuggle a bad redirect.
+            const goto = ctx.req.query('goto');
+            if (goto) {
+                url.searchParams.set('goto', goto);
+            }
+            sendLoginEmail(email, url.toString(), code);
         }
+        deleteExpiredSessions();
 
-        const goto = safeGoto(ctx, ctx.req.query('goto')) ?? '/app';
-
-        setCookie(ctx, cookieUsername, username);
-        return ctx.redirect(goto);
+        return writePage(ctx, 'login', {
+            sentTo: email,
+            sentKind: isSignup ? 'signup' : 'login',
+        });
     });
 }

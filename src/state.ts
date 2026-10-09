@@ -7,7 +7,7 @@ import { migrateDatabase } from './db/migrate.js';
 // Also, a reload watcher starts listening on the client for auto reload
 export let isDevMode: boolean = process.argv[2] === '--dev';
 
-export let database = new DatabaseSync('db.sqlite');
+export let database = new DatabaseSync(process.env.MWA_DB_PATH ?? 'db.sqlite');
 
 database.exec('PRAGMA foreign_keys = ON;');
 

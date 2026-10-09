@@ -1,4 +1,4 @@
-import { currentUser } from '#src/auth.js';
+import { requireApiUser } from '#src/auth.js';
 import { listUsers } from '#src/db/users.js';
 import { Hono } from 'hono';
 
@@ -8,9 +8,8 @@ export function registerUsersRoutes(app: Hono) {
     // typed function; the route handler just checks auth and
     // serializes the result.
     app.get('/api/users', (ctx) => {
-        if (!currentUser(ctx)) {
-            return ctx.json({ error: 'unauthorized' }, 401);
-        }
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
 
         return ctx.json(listUsers());
     });
