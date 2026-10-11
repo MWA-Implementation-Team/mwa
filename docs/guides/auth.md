@@ -19,6 +19,8 @@ alongside mailpit; the web inbox is at http://localhost:8025. Bare-metal
   sha256 hashes stored, keyed by `email` (not `user_id` — a token can outlive
   "no account yet"). The response page says which happened — "login link" vs
   "signup link" — and renders a code field posting to `/auth/verify`.
+  Revealing registration state is deliberate (the flow can't proceed without
+  it anyway), not an oversight.
 - **Two credentials per token.** The link carries a 43-char `token`; the email
   also shows an 8-char unambiguous-alphabet `code` for typing. Wrong codes count
   `attempts` on the row — 5 strikes kills it. Resends are capped at one per
