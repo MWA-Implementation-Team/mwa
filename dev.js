@@ -6,7 +6,7 @@
 // which can't run TS files natively.
 
 import { spawn, exec as execCallback, ChildProcess } from 'child_process';
-import { watch } from 'fs';
+import { existsSync, watch } from 'fs';
 import { promisify } from 'util';
 import { createServer, ServerResponse } from 'http';
 const exec = promisify(execCallback);
@@ -48,6 +48,10 @@ function broadcastReload() {
 let tscWatcher;
 /** @type {ChildProcess} */
 let server;
+let crashTimer;
+let crashCount = 0;
+// Children we killed on purpose — their 'exit' isn't a crash.
+const killedForRestart = new WeakSet();
 
 function startServer() {
     const child = spawn('node', ['./dist/main.js', '--dev'], {
@@ -64,12 +68,46 @@ function startServer() {
         buffer += chunk.toString();
         if (buffer.includes('Server running')) {
             isServerRunning = true;
+            crashCount = 0;
             buffer = '';
 
             // now we know the server is available, send reload signals to every receiver
             broadcastReload();
         }
     });
+
+    child.once('exit', () => {
+        // Nothing respawns a dead server on its own — restart() only fires on
+        // tsc output, and if dist/main.js was deleted mid-rebuild this child
+        // dies with MODULE_NOT_FOUND. Respawn once the artifact exists again,
+        // with backoff for real crash loops (e.g. port in use).
+        if (killedForRestart.has(child)) return;
+        crashCount++;
+        clearTimeout(crashTimer);
+        crashTimer = setTimeout(respawnWhenBuilt, Math.min(500 * crashCount, 5000));
+    });
+}
+
+function respawnWhenBuilt() {
+    if (existsSync('./dist/main.js')) {
+        restart();
+    } else {
+        crashTimer = setTimeout(respawnWhenBuilt, 250);
+    }
+}
+
+async function restart() {
+    clearTimeout(crashTimer);
+    const old = server;
+    // exitCode stays null for signal-killed children — check both, and for an
+    // 'exit' that already fired there's nothing to wait on.
+    if (old && old.exitCode === null && old.signalCode === null) {
+        killedForRestart.add(old);
+        const exited = new Promise((resolve) => old.once('exit', resolve));
+        old.kill('SIGTERM');
+        await exited;
+    }
+    startServer();
 }
 
 function stop() {
@@ -95,25 +133,29 @@ try {
 }
 startServer();
 
-tscWatcher = spawn(jsRuntime, ['run', 'tsc-watch'], { stdio: 'inherit' });
+tscWatcher = spawn(jsRuntime, ['run', 'tsc-watch'], {
+    stdio: ['inherit', 'pipe', 'inherit'],
+});
+tscWatcher.stdout.pipe(process.stdout);
 
 /** @type {NodeJS.Timeout} */
 let debounceId;
 
-watch('dist', { recursive: true }, () => {
-    if (debounceId) {
-        clearTimeout(debounceId);
-    }
-    debounceId = setTimeout(async () => {
+// tsc prints "Found N errors. Watching for file changes." once per completed
+// compile — that, not a filesystem watcher on dist/, is the reliable "safe to
+// restart" signal. (fs.watch('dist') races: dist is shared with the host via
+// the docker bind mount, and `npm test`'s `rm -rf dist` both deletes main.js
+// mid-rebuild and kills the inotify watch itself.)
+let tscBuffer = '';
+tscWatcher.stdout.on('data', (/** @type {Buffer} */ chunk) => {
+    tscBuffer += chunk.toString();
+    const marker = 'Found 0 errors. Watching for file changes.';
+    if (!tscBuffer.includes(marker)) return;
+    tscBuffer = '';
+    clearTimeout(debounceId);
+    debounceId = setTimeout(() => {
         console.log('[dev] Restarting...');
-        if (server) {
-            await new Promise((resolve) => {
-                server.once('exit', () => resolve());
-                server.kill('SIGTERM');
-            });
-        }
-
-        startServer();
+        restart();
     }, 100);
 });
 
