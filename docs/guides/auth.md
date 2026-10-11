@@ -7,9 +7,10 @@ your account. There are no passwords — owning the email _is_ the credential.
 
 In dev, the mailer prints the link and code to the server console. To test with
 real emails, run `docker compose up` — it runs `npm run dev` inside a container
-(same hot-reload loop, db in `./mwa-data/`) alongside mailpit; the web inbox is
-at http://localhost:8025. Bare-metal `npm run dev` without `MWA_SMTP_*` stays on
-the console mailer — see `src/mailer.ts` for the env seam.
+(same hot-reload loop, and the bind mount shares the repo's `db.sqlite`)
+alongside mailpit; the web inbox is at http://localhost:8025. Bare-metal
+`npm run dev` without `MWA_SMTP_*` stays on the console mailer — see
+`src/mailer.tsx` for the env seam.
 
 ## The pieces
 
@@ -21,7 +22,8 @@ the console mailer — see `src/mailer.ts` for the env seam.
 - **Two credentials per token.** The link carries a 43-char `token`; the email
   also shows an 8-char unambiguous-alphabet `code` for typing. Wrong codes count
   `attempts` on the row — 5 strikes kills it. Resends are capped at one per
-  minute per email, and a new request invalidates the old token.
+  minute per email, and a successfully sent email invalidates the previous
+  token (a failed send discards the new row, so the old link stays alive).
 - **`GET /auth/verify?token=`** and **`POST /auth/verify` (`email` + `code`)**
   (`src/routes/pages/auth.ts`) share `logIn`: consume the token atomically
   (replays get an error page), then resolve the user — registered email →

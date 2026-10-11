@@ -4,12 +4,15 @@ import { describe, it } from 'node:test';
 import { database } from '#src/state.js';
 import { createUser } from './users.js';
 import {
+    confirmLoginTokenSent,
     createLoginToken,
     createSession,
     deleteSession,
+    discardLoginToken,
     findSessionUserId,
     lastLoginTokenSentAt,
     maxCodeAttempts,
+    pruneLoginTokens,
     redeemLoginCode,
     redeemLoginToken,
 } from './sessions.js';
@@ -39,11 +42,31 @@ describe('db/sessions — login tokens', () => {
         assert.equal(redeemLoginToken(token), null);
     });
 
-    it('requesting a new token invalidates the previous one', () => {
+    it('a confirmed send invalidates the previous token', () => {
         const first = createLoginToken('tok3@example.com');
         const second = createLoginToken('tok3@example.com');
+        confirmLoginTokenSent('tok3@example.com', second.id);
         assert.equal(redeemLoginToken(first.token), null);
         assert.equal(redeemLoginToken(second.token), 'tok3@example.com');
+    });
+
+    it('discarding an unsent token keeps the previous link alive', () => {
+        const first = createLoginToken('tok5@example.com');
+        const second = createLoginToken('tok5@example.com');
+        discardLoginToken(second.id);
+        assert.equal(redeemLoginToken(first.token), 'tok5@example.com');
+    });
+
+    it('pruneLoginTokens reclaims used and expired rows', () => {
+        const { token } = createLoginToken('prune@example.com');
+        redeemLoginToken(token);
+        const { token: expired } = createLoginToken('prune@example.com');
+        expireToken('login_tokens', expired);
+        pruneLoginTokens();
+        const row = database
+            .prepare('SELECT COUNT(*) AS n FROM login_tokens WHERE email = ?')
+            .get('prune@example.com');
+        assert.equal(row!.n, 0);
     });
 
     it('lastLoginTokenSentAt reports the most recent send for the resend cap', () => {

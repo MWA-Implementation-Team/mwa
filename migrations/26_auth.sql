@@ -17,4 +17,4 @@ CREATE TABLE sessions (
   token_hash TEXT NOT NULL UNIQUE,
   user_id INTEGER NOT NULL REFERENCES users(id)
 ) STRICT;
-CREATE INDEX sessions_index_token_hash ON sessions (token_hash);
+CREATE INDEX login_tokens_index_email ON login_tokens (email);

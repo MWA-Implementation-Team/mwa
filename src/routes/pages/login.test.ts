@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { Hono } from 'hono';
 import { database } from '#src/state.js';
+import { redeemLoginToken } from '#src/db/sessions.js';
 import { createUser } from '#src/db/users.js';
 import { setMailTransport } from '#src/mailer.js';
 import { registerLoginRoutes } from './login.js';
@@ -81,5 +82,38 @@ describe('POST /login — validation and caps', () => {
         sent = [];
         await postLogin({ email: 'goto@example.com' }, '?goto=%2Fapp%2Fcasino');
         assert.match(sent[0].url, /goto=%2Fapp%2Fcasino/);
+    });
+
+    it('a failed send errors, keeps the old link alive, and does not arm the cap', async () => {
+        createUser('smtpdown@example.com', 'smtpdown_user');
+        sent = [];
+        await postLogin({ email: 'smtpdown@example.com' });
+        const firstToken = new URL(sent[0].url).searchParams.get('token')!;
+
+        // Age the send past the cooldown so a second request tries to send.
+        database
+            .prepare(
+                `UPDATE login_tokens SET created_at = '2000-01-01T00:00:00.000Z' WHERE email = ?`,
+            )
+            .run('smtpdown@example.com');
+
+        setMailTransport(() => {
+            throw new Error('smtp down');
+        });
+        const res = await postLogin({ email: 'smtpdown@example.com' });
+        assert.match(await res.text(), /Could not send/);
+
+        // The failed send discarded its row — the previous link still redeems.
+        assert.equal(redeemLoginToken(firstToken), 'smtpdown@example.com');
+
+        setMailTransport((to, url, code) => {
+            sent.push({ to, url, code });
+        });
+
+        // And the discarded row left no trace for the resend cap — an
+        // immediate retry sends again.
+        sent = [];
+        await postLogin({ email: 'smtpdown@example.com' });
+        assert.equal(sent.length, 1);
     });
 });

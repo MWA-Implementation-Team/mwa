@@ -33,7 +33,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
     ├── pages.tsx              writePage() + Root: the SSR document shell, importmap, ssr-data
     ├── state.ts               isDevMode flag + shared db handle; runs migrations on import
     ├── auth.ts                currentUser() + require*/redirectIfAuthed guards — all auth decisions
-    ├── mailer.ts              sendLoginEmail() seam — SMTP when MWA_SMTP_* is set,
+    ├── mailer.tsx             sendLoginEmail() seam — SMTP when MWA_SMTP_* is set,
     │                          console otherwise; renders src/emails/ components
     ├── emails/                mail templates as Preact components — html + text
     │                          fallback sharing the same props

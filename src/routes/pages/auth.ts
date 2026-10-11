@@ -23,7 +23,7 @@ export function registerAuthRoutes(app: Hono) {
                 errorMessage: 'That login link is expired or already used — request a new one',
             });
         }
-        return logIn(ctx, email);
+        return logIn(ctx, email, ctx.req.query('goto'));
     });
 
     // The paste-the-code fallback on the "we sent it" page. Wrong codes count
@@ -37,6 +37,7 @@ export function registerAuthRoutes(app: Hono) {
             .trim()
             .toLowerCase();
         const code = String(form.get('code') ?? '').trim();
+        const goto = String(form.get('goto') ?? '') || undefined;
 
         const result = redeemLoginCode(email, code);
         if (result !== 'redeemed') {
@@ -46,14 +47,15 @@ export function registerAuthRoutes(app: Hono) {
                         ? 'Wrong code — check the email and try again'
                         : 'That code is expired or already used — request a new one',
                 sentTo: email,
-                sentKind: 'login',
+                sentKind: findUserByEmail(email) ? 'login' : 'signup',
+                goto,
             });
         }
-        return logIn(ctx, email);
+        return logIn(ctx, email, goto);
     });
 }
 
-async function logIn(ctx: Context, email: string): Promise<Response> {
+async function logIn(ctx: Context, email: string, goto?: string): Promise<Response> {
     let user = findUserByEmail(email);
     const isNewAccount = !user;
     if (!user) {
@@ -71,5 +73,5 @@ async function logIn(ctx: Context, email: string): Promise<Response> {
     // New accounts default to the profile page so the derived username can be
     // fixed; a valid goto still wins either way.
     const fallback = isNewAccount ? '/app/account' : '/app';
-    return ctx.redirect(safeGoto(ctx, ctx.req.query('goto')) ?? fallback);
+    return ctx.redirect(safeGoto(ctx, goto) ?? fallback);
 }

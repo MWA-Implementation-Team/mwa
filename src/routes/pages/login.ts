@@ -1,6 +1,13 @@
 import { redirectIfAuthed } from '#src/auth.js';
 import { findUserByEmail } from '#src/db/users.js';
-import { createLoginToken, deleteExpiredSessions, lastLoginTokenSentAt } from '#src/db/sessions.js';
+import {
+    confirmLoginTokenSent,
+    createLoginToken,
+    deleteExpiredSessions,
+    discardLoginToken,
+    lastLoginTokenSentAt,
+    pruneLoginTokens,
+} from '#src/db/sessions.js';
 import { sendLoginEmail } from '#src/mailer.js';
 import { writePage } from '#src/pages.js';
 import { Context, Hono } from 'hono';
@@ -71,9 +78,9 @@ export function registerLoginRoutes(app: Hono) {
         const isSignup = !findUserByEmail(email);
         const lastSent = lastLoginTokenSentAt(email);
         if (!lastSent || Date.now() - lastSent.getTime() > resendCooldownMs) {
-            const { token, code } = createLoginToken(email);
+            const created = createLoginToken(email);
             const url = new URL('/auth/verify', ctx.req.url);
-            url.searchParams.set('token', token);
+            url.searchParams.set('token', created.token);
             // goto passes through unvalidated — safeGoto re-checks it on
             // the verify request, so nothing here can smuggle a bad redirect.
             const goto = ctx.req.query('goto');
@@ -81,20 +88,26 @@ export function registerLoginRoutes(app: Hono) {
                 url.searchParams.set('goto', goto);
             }
             try {
-                await sendLoginEmail(email, url.toString(), code);
+                await sendLoginEmail(email, url.toString(), created.code);
             } catch (error) {
-                // SMTP down/unreachable — tell the user instead of a 500.
+                // SMTP down/unreachable — drop the token so a retry actually
+                // re-sends instead of hitting the resend cap on an email that
+                // never existed, and the previous link stays alive.
+                discardLoginToken(created.id);
                 console.error('Failed to send login email', error);
                 return writePage(ctx, 'login', {
                     errorMessage: 'Could not send the email — try again in a moment',
                 });
             }
+            confirmLoginTokenSent(email, created.id);
         }
         deleteExpiredSessions();
+        pruneLoginTokens();
 
         return writePage(ctx, 'login', {
             sentTo: email,
             sentKind: isSignup ? 'signup' : 'login',
+            goto: ctx.req.query('goto'),
         });
     });
 }

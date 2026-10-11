@@ -19,11 +19,11 @@ function sessionCookie(res: Response): string {
     return match[1];
 }
 
-function postVerify(email: string, code: string) {
+function postVerify(email: string, code: string, extra: Record<string, string> = {}) {
     return app.request('/auth/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ email, code }).toString(),
+        body: new URLSearchParams({ email, code, ...extra }).toString(),
     });
 }
 
@@ -103,6 +103,18 @@ describe('POST /auth/verify — code path', () => {
         assert.equal(res.status, 302);
         assert.equal(res.headers.get('location'), '/app');
         sessionCookie(res);
+    });
+
+    it('honours the form goto and rejects foreign ones', async () => {
+        createUser('goto3@example.com', 'goto3_u');
+        for (const [goto, expected] of [
+            ['/app/casino', '/app/casino'],
+            ['https://evil.example/', '/app'],
+        ]) {
+            const { code } = createLoginToken('goto3@example.com');
+            const res = await postVerify('goto3@example.com', code, { goto });
+            assert.equal(res.headers.get('location'), expected);
+        }
     });
 
     it('rejects a wrong code with a retry message', async () => {

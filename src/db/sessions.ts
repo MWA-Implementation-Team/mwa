@@ -20,6 +20,7 @@ const now = `strftime('%Y-%m-%dT%H:%M:%fZ', 'now')`;
 
 const insertLoginTokenQuery = database.prepare(`
 INSERT INTO login_tokens (expires_at, token_hash, code_hash, email) VALUES (?, ?, ?, ?)
+RETURNING id
 `);
 
 const consumeByTokenQuery = database.prepare(`
@@ -31,6 +32,7 @@ RETURNING email
 const tokenByEmailQuery = database.prepare(`
 SELECT id, code_hash FROM login_tokens
 WHERE email = ? AND used_at IS NULL AND expires_at > ${now}
+ORDER BY created_at DESC
 `);
 
 const markTokenUsedQuery = database.prepare(`
@@ -45,33 +47,65 @@ const killTokenQuery = database.prepare(`
 UPDATE login_tokens SET used_at = ${now} WHERE id = ?
 `);
 
-const invalidateLoginTokensQuery = database.prepare(`
+const invalidateOtherTokensQuery = database.prepare(`
 UPDATE login_tokens SET used_at = ${now}
-WHERE email = ? AND used_at IS NULL
+WHERE email = ? AND used_at IS NULL AND id != ?
+`);
+
+const deleteTokenQuery = database.prepare(`
+DELETE FROM login_tokens WHERE id = ?
 `);
 
 const lastLoginTokenSentAtQuery = database.prepare(`
 SELECT MAX(created_at) AS last_sent FROM login_tokens WHERE email = ?
 `);
 
-export type LoginToken = { token: string; code: string };
+const pruneLoginTokensQuery = database.prepare(`
+DELETE FROM login_tokens WHERE used_at IS NOT NULL OR expires_at <= ${now}
+`);
+
+export type LoginToken = { id: number; token: string; code: string };
 
 // Returns the raw credentials for the email — the link carries `token`, the
-// paste-field carries `code`. Only sha256 hashes hit the database. A new request
-// invalidates the email's previous unconsumed tokens (newest link wins).
+// paste-field carries `code`. Only sha256 hashes hit the database. Inserts a
+// row WITHOUT invalidating older tokens — see confirmLoginTokenSent: invalidation
+// happens after the email is actually sent, so a failed send never bricks the
+// previous link. Retries on the astronomically-unlikely hash collision instead
+// of letting the UNIQUE constraint 500 the request.
 export function createLoginToken(email: string): LoginToken {
-    const token = randomBytes(32).toString('base64url');
-    const code = Array.from({ length: 8 }, () => codeAlphabet[randomInt(codeAlphabet.length)]).join(
-        '',
-    );
-    invalidateLoginTokensQuery.run(email);
-    insertLoginTokenQuery.run(
-        expiresIn(loginTokenTtlMinutes * 60_000),
-        hashToken(token),
-        hashToken(code),
-        email,
-    );
-    return { token, code };
+    for (let attempt = 0; attempt < 3; attempt++) {
+        const token = randomBytes(32).toString('base64url');
+        const code = Array.from(
+            { length: 8 },
+            () => codeAlphabet[randomInt(codeAlphabet.length)],
+        ).join('');
+        try {
+            const row = insertLoginTokenQuery.get(
+                expiresIn(loginTokenTtlMinutes * 60_000),
+                hashToken(token),
+                hashToken(code),
+                email,
+            );
+            return { id: Number(row!.id), token, code };
+        } catch (error) {
+            if (!(error instanceof Error && error.message.includes('UNIQUE'))) {
+                throw error;
+            }
+        }
+    }
+    throw new Error('could not mint a unique login token after 3 tries');
+}
+
+// Call after the email is confirmed sent — kills every other live token for
+// the email (newest link wins).
+export function confirmLoginTokenSent(email: string, keepId: number) {
+    invalidateOtherTokensQuery.run(email, keepId);
+}
+
+// Call when the send failed — removes the just-inserted row so the resend cap
+// doesn't arm and the email's previous token stays valid.
+export function discardLoginToken(id: number) {
+    deleteTokenQuery.run(id);
 }
 
 // Link path — consumes atomically and returns the email the token was issued to.
@@ -102,6 +136,12 @@ export function redeemLoginCode(email: string, code: string): CodeResult {
 export function lastLoginTokenSentAt(email: string): Date | null {
     const row = lastLoginTokenSentAtQuery.get(email);
     return row?.last_sent ? new Date(row.last_sent as string) : null;
+}
+
+// Lazy cleanup — expired/used rows are ignored on read anyway, this reclaims
+// them. Called opportunistically from POST /login.
+export function pruneLoginTokens() {
+    pruneLoginTokensQuery.run();
 }
 
 const insertSessionQuery = database.prepare(`

@@ -5,6 +5,7 @@ type LoginPageProps = {
     errorMessage?: string;
     sentTo?: string;
     sentKind?: 'login' | 'signup';
+    goto?: string;
 };
 
 export const loginPage: Page<LoginPageProps> = {
@@ -12,7 +13,7 @@ export const loginPage: Page<LoginPageProps> = {
     title: (t) => t('titleLogin'),
 };
 
-function LoginPage({ errorMessage, sentTo, sentKind }: LoginPageProps) {
+function LoginPage({ errorMessage, sentTo, sentKind, goto }: LoginPageProps) {
     return (
         <>
             <Header />
@@ -26,6 +27,7 @@ function LoginPage({ errorMessage, sentTo, sentKind }: LoginPageProps) {
                     </p>
                     <form method="POST" action="/auth/verify">
                         <input type="hidden" name="email" value={sentTo} />
+                        {goto && <input type="hidden" name="goto" value={goto} />}
                         <input
                             type="text"
                             name="code"

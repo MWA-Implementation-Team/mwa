@@ -45,7 +45,8 @@ migrations/26_auth.sql             sessions + login_tokens + email_verified_at
                                    (issue #26, shared with accounts)
 src/db/sessions.ts                 session + login-token queries (domain module)
 src/auth.ts                        currentUser() swaps cookie lookup → session verify
-src/mailer.ts                      sendLoginEmail() — console impl now; SMTP later
+src/mailer.tsx                     sendLoginEmail() — console impl, or SMTP when
+                                   MWA_SMTP_* env is set
 src/routes/pages/login.ts          POST /login sends link; GET unchanged shape
 src/routes/pages/auth.ts           GET /auth/verify — registerAuthRoutes(app)
 src/routes/pages/app.ts            POST /app (logout) deletes session + cookie
@@ -79,7 +80,8 @@ CREATE TABLE sessions (
   token_hash TEXT NOT NULL UNIQUE,
   user_id INTEGER NOT NULL REFERENCES users(id)
 ) STRICT;
-CREATE INDEX sessions_index_token_hash ON sessions (token_hash);
+CREATE INDEX login_tokens_index_email ON login_tokens (email);
+-- (token_hash is already indexed by its UNIQUE constraint)
 ```
 
 Tokens: 32 bytes from `crypto.randomBytes`, base64url-encoded into the link/cookie,
@@ -100,11 +102,13 @@ a token is "login" if the email is registered at consume-time, "signup" if not.
   says which thing happened — "we sent a login link" vs "we sent a signup link"
   (registration state is deliberately not hidden) — and renders a code-input form
   posting to `/auth/verify`. If a user exists for the email:
-    - Invalidate any unconsumed tokens for that email (newest link wins).
     - Refuse silently (same page) if a token was sent <60s ago — resend cap.
     - Create a `login_tokens` row expiring in 15 min; email link + code.
       If no user exists: same token machinery with the email stored
       for account creation.
+    - Only after the email sends successfully: invalidate the email's other
+      live tokens (newest link wins). A failed send discards the new row, so
+      the previous link stays alive and the resend cap doesn't arm.
 - `GET /auth/verify?token=&goto=` and `POST /auth/verify` (form field `code`) —
   same consume path. Look up `sha256(token)` or `sha256(UPPER(code))`; require
   unused + unexpired. On success: mark `used_at`; if the email is registered,
@@ -123,11 +127,11 @@ a token is "login" if the email is registered at consume-time, "signup" if not.
   (Today it only deletes the cookie, which dev auth made equivalent — not anymore.)
 - CSRF — `SameSite=Lax` already blocks cross-site POSTs carrying the cookie; add
   `hono/csrf` (built-in, no dep) on mutating routes for defense in depth.
-- Mail transport: `sendLoginEmail(to, url)` in `src/mailer.ts`. **This module ships
-  a console implementation only** — it logs the full login link to the server
-  console. Real SMTP delivery (`nodemailer` + `MWA_SMTP_*` env vars) is a
-  deliberate follow-up once server details exist; the function signature is the
-  seam, so that change touches `mailer.ts` and nothing else.
+- Mail transport: `sendLoginEmail(to, url, code)` in `src/mailer.tsx`. Console
+  implementation by default; real SMTP delivery (`nodemailer` + `MWA_SMTP_*` env
+  vars, mailpit in the compose dev stack) activates when the env vars are set.
+  The function signature is the seam, so transport changes touch `mailer.tsx`
+  and nothing else.
 - Dev convenience: the `mwa-username` cookie mechanism is **deleted**. Dev login =
   POST /login → click the link printed in server logs. `docs/guides/auth.md`
   documents this.
