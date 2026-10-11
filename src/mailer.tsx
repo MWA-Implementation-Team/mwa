@@ -4,13 +4,13 @@
 // to the server console — the bare-metal dev login flow. Call sites never
 // change.
 //
-// Templates live in emails/*.txt — first line is `Subject: ...`, the rest is
-// the body. {{name}} placeholders are filled from a vars object; unknown
-// placeholders are left alone so a typo shows up in the output instead of
-// silently dropping text. Files are read per send so copy edits are live in dev.
+// Templates are Preact components in src/emails/ — one file exports the HTML
+// component and a text fallback sharing the same props. Both are always sent
+// (multipart/alternative): HTML for clients that render it, text otherwise.
 
-import { readFileSync } from 'node:fs';
 import nodemailer from 'nodemailer';
+import { renderToString } from 'preact-render-to-string';
+import { LoginEmail, loginSubject, loginText } from './emails/login.js';
 
 type Transport = (to: string, url: string, code: string) => void | Promise<void>;
 
@@ -24,25 +24,19 @@ const smtp = smtpHost
     : null;
 const from = process.env.MWA_MAIL_FROM ?? 'mwa@localhost';
 
-function renderTemplate(name: string, vars: Record<string, string>) {
-    const rendered = readFileSync(`emails/${name}.txt`, 'utf8').replace(
-        /\{\{\s*(\w+)\s*\}\}/g,
-        (placeholder, key: string) => vars[key] ?? placeholder,
-    );
-    const newline = rendered.indexOf('\n');
-    return {
-        subject: rendered.slice(0, newline).replace(/^Subject:\s*/, ''),
-        text: rendered.slice(newline + 1).trim(),
-    };
-}
-
 const consoleTransport: Transport = (to, url, code) => {
-    const { subject, text } = renderTemplate('login', { url, code });
-    console.log(`[mailer] ${to} — ${subject}\n${text}`);
+    console.log(`[mailer] ${to} — ${loginSubject}\n${loginText({ url, code })}`);
 };
 
 const smtpTransport: Transport = async (to, url, code) => {
-    await smtp!.sendMail({ from, to, ...renderTemplate('login', { url, code }) });
+    const props = { url, code };
+    await smtp!.sendMail({
+        from,
+        to,
+        subject: loginSubject,
+        text: loginText(props),
+        html: '<!DOCTYPE html>' + renderToString(<LoginEmail {...props} />),
+    });
 };
 
 let transport: Transport = smtp ? smtpTransport : consoleTransport;
