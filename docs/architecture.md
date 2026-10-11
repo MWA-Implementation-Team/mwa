@@ -98,3 +98,9 @@ real SSR pages with real hydration, not special-cased HTML.
 `RegisteredPageId` is derived from its keys and `RegisteredPageProps` from each page's
 component, so `writePage(ctx, 'badges', { badges })` is fully typechecked — wrong or
 missing props are a compile error caught by `npm run lint`, not a runtime surprise.
+
+`registeredActivities` in `src/client/activities.ts` plays the same role for activity
+stations: `ActivitySlug` is derived from its keys, the `/app/activities/:slug` route
+validates the param against it (unknown slug → 404), and `syncActivities()`
+(`src/db/activities.ts`) inserts every slug into the `activities` table on server
+start so queue/badge rows can foreign-key them.
