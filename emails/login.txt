@@ -1,0 +1,7 @@
+Subject: Your MWA sign-in link
+
+Sign in: {{url}}
+
+Or enter this code on the login page: {{code}}
+
+The link and code expire in 15 minutes.

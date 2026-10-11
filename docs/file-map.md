@@ -19,6 +19,9 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── migrations/                numbered SQL files, applied in order on every server start
 │                              (run by src/db/migrate.ts, progress tracked in migration_status database table)
 │
+├── emails/                    mail templates — `Subject:` first line, {{var}} placeholders
+│                              (read per send by src/mailer.ts, edits live in dev)
+│
 ├── static/                    files served as-is
 │   ├── oat.css                Oat CSS framework — third-party, editable if needed
 │   ├── oat.js                 Oat CSS framework JS, minified, don't edit
@@ -33,7 +36,8 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
     ├── pages.tsx              writePage() + Root: the SSR document shell, importmap, ssr-data
     ├── state.ts               isDevMode flag + shared db handle; runs migrations on import
     ├── auth.ts                currentUser() + require*/redirectIfAuthed guards — all auth decisions
-    ├── mailer.ts              sendLoginEmail() seam — console now, SMTP later
+    ├── mailer.ts              sendLoginEmail() seam — SMTP when MWA_SMTP_* is set,
+    │                          console otherwise; renders emails/*.txt templates
     ├── seed.ts                `npm run seed` — sample data; refuses if users exist
     │
     ├── db/                    one module per domain: row type + prepared statements + functions
