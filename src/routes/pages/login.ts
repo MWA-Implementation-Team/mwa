@@ -80,7 +80,15 @@ export function registerLoginRoutes(app: Hono) {
             if (goto) {
                 url.searchParams.set('goto', goto);
             }
-            sendLoginEmail(email, url.toString(), code);
+            try {
+                await sendLoginEmail(email, url.toString(), code);
+            } catch (error) {
+                // SMTP down/unreachable — tell the user instead of a 500.
+                console.error('Failed to send login email', error);
+                return writePage(ctx, 'login', {
+                    errorMessage: 'Could not send the email — try again in a moment',
+                });
+            }
         }
         deleteExpiredSessions();
 

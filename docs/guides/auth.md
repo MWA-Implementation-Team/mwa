@@ -5,8 +5,11 @@ enter an email, and you get a one-time link **and** a short code — click the l
 or paste the code. If the email is registered it logs you in; if not, it creates
 your account. There are no passwords — owning the email _is_ the credential.
 
-In dev, emails aren't sent: the link and code are printed to the server console
-(see `src/mailer.ts` — real SMTP lands behind that seam later).
+In dev, the mailer prints the link and code to the server console. To test with
+real emails, run `docker compose up` — it runs `npm run dev` inside a container
+(same hot-reload loop, db in `./mwa-data/`) alongside mailpit; the web inbox is
+at http://localhost:8025. Bare-metal `npm run dev` without `MWA_SMTP_*` stays on
+the console mailer — see `src/mailer.ts` for the env seam.
 
 ## The pieces
 
