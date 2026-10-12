@@ -43,7 +43,9 @@ sends cookies automatically — that's why `client/api/*` fetchers need no auth 
 
 A versioned SQL file in `migrations/` that changes the database schema. `migrate.ts`
 applies pending files in numeric order on server start and records the highest applied
-version in `migration_status`. Migrations only go forward — no automatic undo.
+version in `migration_status`. Migrations only go forward — no automatic undo. CI
+runs `scripts/check-migrations.sh` on migration PRs to keep filenames digit-prefixed,
+versions strictly increasing, and existing files append-only.
 
 ## Prepared statement
 

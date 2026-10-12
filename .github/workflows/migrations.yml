@@ -1,0 +1,16 @@
+name: Migrations
+
+on:
+    pull_request:
+        branches: ['main']
+        paths: ['migrations/**']
+
+jobs:
+    order:
+        runs-on: ubuntu-26.04
+        steps:
+            - uses: actions/checkout@v7.0.1
+              with:
+                  fetch-depth: 0
+            - name: enforce append-only, increasing versions
+              run: bash scripts/check-migrations.sh "origin/${{ github.base_ref }}"
