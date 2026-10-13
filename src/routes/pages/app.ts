@@ -22,6 +22,12 @@ export function registerAppRoutes(app: Hono) {
 
         return writePage(ctx, 'casino', {});
     });
+
+    app.get('/app/groups', async (ctx) => {
+        if (!currentUser(ctx)) return goLogin(ctx);
+
+        return writePage(ctx, 'groups', {});
+    });
 }
 
 function goLogin(ctx: Context): Response {
