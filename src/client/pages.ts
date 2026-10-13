@@ -4,7 +4,7 @@ import { errorPage } from '#src/client/pages/ErrorPage.js';
 import { homePage } from '#src/client/pages/HomePage.js';
 import { loginPage } from '#src/client/pages/LoginPage.js';
 import { casinoPage } from '#src/client/pages/app/CasinoPage.js';
-import { groupsPage } from '#src/client/pages/app/GroupsPage.js'; 
+import { groupsPage } from '#src/client/pages/app/GroupPage.js';
 import { LanguageCode, TranslateFn } from './language.js';
 
 export const registeredPages = {
@@ -14,7 +14,7 @@ export const registeredPages = {
     appHome: appHomePage,
     casino: casinoPage,
     error: errorPage,
-    groups: groupsPage, 
+    groups: groupsPage,
 } satisfies Record<string, Page<any>>;
 
 export type Page<P> = {

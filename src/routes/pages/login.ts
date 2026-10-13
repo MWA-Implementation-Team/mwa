@@ -30,7 +30,7 @@ export function registerLoginRoutes(app: Hono) {
             });
         }
 
-        const allowedGotos = new Set<string>(['/app', '/app/casino']);
+        const allowedGotos = new Set<string>(['/app', '/app/casino', '/app/group']);
 
         let goto = ctx.req.query('goto') ?? null;
         if (goto && !allowedGotos.has(goto)) {

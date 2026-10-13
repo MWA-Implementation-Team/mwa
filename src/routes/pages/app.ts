@@ -24,7 +24,7 @@ export function registerAppRoutes(app: Hono) {
         return writePage(ctx, 'casino', {});
     });
 
-    app.get('/app/groups', async (ctx) => {
+    app.get('/app/group', async (ctx) => {
         const user = currentUser(ctx);
         if (!user) return goLogin(ctx);
 

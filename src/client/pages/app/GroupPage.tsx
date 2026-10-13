@@ -45,9 +45,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
 
-                <form
-                    onSubmit={handleCreateGroup}
-                >
+                <form onSubmit={handleCreateGroup}>
                     <div>
                         <label>Group Name: </label>
                         <input
@@ -76,9 +74,9 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                     <p>no groups found</p>
                 ) : (
                     <ul>
-                        {groups.map((g) => (
-                            <li key={g.id}>
-                                {g.name} ({g.phone_number})
+                        {groups.map((group) => (
+                            <li key={group.id}>
+                                {group.name} ({group.phone_number})
                             </li>
                         ))}
                     </ul>
