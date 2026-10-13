@@ -15,7 +15,12 @@ export const landingPage: Page<LandingPageProps> = {
 function LandingPage({}: LandingPageProps) {
     const { t, user } = useContext(ClientContext);
 
-    const socials = [FacebookIcon, TwitterIcon, LinkedinIcon, InstagramIcon];
+    const socials = [
+        { Icon: FacebookIcon, name: 'Facebook' },
+        { Icon: TwitterIcon, name: 'Twitter' },
+        { Icon: LinkedinIcon, name: 'LinkedIn' },
+        { Icon: InstagramIcon, name: 'Instagram' },
+    ];
 
     const news = [
         { title: t('landingNews1Title'), body: t('landingNews1Body') },
@@ -47,8 +52,8 @@ function LandingPage({}: LandingPageProps) {
                     <h2 class="section-title">{t('landingSocialTitle')}</h2>
 
                     <div class="social-row divider-bottom">
-                        {socials.map((Icon) => (
-                            <a href="#" class="social-button" aria-label="Social link">
+                        {socials.map(({ Icon, name }) => (
+                            <a key={name} href="#" class="social-button" aria-label={name}>
                                 <Icon />
                             </a>
                         ))}
@@ -56,7 +61,7 @@ function LandingPage({}: LandingPageProps) {
 
                     <div class="news-list">
                         {news.map((item) => (
-                            <article class="news-item">
+                            <article key={item.title} class="news-item">
                                 <h3>{item.title}</h3>
                                 <p class="muted">{item.body}</p>
                             </article>
@@ -77,7 +82,7 @@ function LandingPage({}: LandingPageProps) {
 
                     <div class="activity-list">
                         {[1, 2].map((n) => (
-                            <div class="activity-card">
+                            <div key={n} class="activity-card">
                                 <div class="activity-badge">{n}</div>
                                 <div class="wireframe-box activity-image">IMG</div>
                                 <div class="activity-body">
@@ -107,8 +112,10 @@ function LandingPage({}: LandingPageProps) {
                     <h2 class="section-title">{t('sponsorsTitle')}</h2>
                     <p class="muted sponsor-subtitle">{t('sponsorsSubtitle')}</p>
                     <div class="sponsor-grid cols-4">
-                        {[1, 2, 3, 4].map(() => (
-                            <div class="sponsor">LOGO</div>
+                        {[1, 2, 3, 4].map((n) => (
+                            <div key={n} class="sponsor">
+                                LOGO
+                            </div>
                         ))}
                     </div>
                 </section>
