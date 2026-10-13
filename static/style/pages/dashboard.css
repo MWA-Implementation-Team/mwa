@@ -1,0 +1,184 @@
+/* ============================================================
+   USER DASHBOARD
+   ============================================================ */
+.page-title {
+    margin: 0;
+    font-size: var(--text-display-lg);
+    text-align: center;
+}
+
+/* Balance */
+.balance {
+    padding: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+
+    text-align: center;
+
+    background: var(--highlight-bg);
+    border: 0.1875rem solid var(--highlight-border);
+    border-radius: var(--radius-xl);
+}
+
+.balance-label {
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-lg);
+}
+
+.balance-value {
+    font-size: var(--text-balance);
+    font-weight: 800;
+}
+
+/* Transactions */
+.transaction-title {
+    margin-bottom: 0.625rem;
+    font-size: var(--text-xl);
+    font-weight: 800;
+}
+
+.transactions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.transaction {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+
+    padding: 0.8125rem var(--space-lg);
+
+    background: var(--surface-soft);
+    border: 0.125rem solid var(--edge-soft);
+    border-radius: 0.625rem;
+}
+
+.transaction-icon {
+    width: 2.625rem;
+    height: 2.625rem;
+    flex-shrink: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: var(--accent-bg);
+    border: 0.125rem solid var(--accent-dark);
+    border-radius: 50%;
+
+    font-weight: 800;
+}
+
+.transaction-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.transaction-name {
+    font-weight: 800;
+}
+
+.transaction-date {
+    font-size: var(--text-sm);
+    opacity: 0.9;
+}
+
+.transaction-value {
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.transaction-value.positive {
+    color: var(--value-positive);
+}
+
+.transaction-value.negative {
+    color: var(--value-negative);
+}
+
+/* QR code */
+.qr-description {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    line-height: 1.4;
+}
+
+.qr-placeholder {
+    width: min(17.5rem, 80%);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+
+    border-width: 0.25rem;
+    border-radius: var(--radius-card);
+    font-size: var(--text-2xl);
+}
+
+/* Support */
+.support-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+}
+
+.support-button {
+    min-height: 9.375rem;
+    padding: var(--space-lg);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem;
+
+    background: var(--accent-bg);
+    border: 0.1875rem solid var(--accent-dark);
+    border-radius: var(--radius-md);
+}
+
+.support-button.alt {
+    background: var(--highlight-bg);
+    border-color: var(--highlight-border);
+}
+
+.support-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.support-label {
+    font-size: 1.05rem;
+    text-align: center;
+}
+
+.guide-box {
+    margin-top: var(--space-lg);
+    padding: var(--space-lg);
+
+    background: var(--edge-soft);
+    border-radius: 0.625rem;
+
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* Sponsors */
+.sponsor-subtitle {
+    text-align: center;
+    margin: calc(-1 * var(--space-sm)) 0 var(--space-xl);
+    font-size: var(--text-sm);
+}
+
+@media (max-width: 37.5rem) {
+    .transaction {
+        padding: 0.625rem;
+    }
+
+    .transaction-value {
+        font-size: var(--text-sm);
+    }
+
+    .support-button {
+        min-height: 8.125rem;
+    }
+}

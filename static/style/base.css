@@ -1,9 +1,28 @@
-/* Ensure full height layout and smooth rendering */
+/* Custom font — drop outfit.ttf into static/ to activate */
+@font-face {
+    font-family: 'outfit';
+    src: url('/outfit.ttf') format('truetype');
+    font-display: swap;
+}
+
 html,
 body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
     min-height: 100vh;
-    background-color: var(--color-bg-main);
-    color: var(--color-text-main);
+    position: relative;
+    isolation: isolate;
+
+    font-family: 'outfit', sans-serif;
+    background: var(--page-bg);
+    color: var(--text);
+    text-shadow: var(--text-shadow);
+
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Ensure images and media don't break layouts */
@@ -16,17 +35,77 @@ svg {
     max-width: 100%;
 }
 
+/* Animated texture above the page background but below the content.
+   Rendered as <div class="page-effect"> in the document shell. */
+.page-effect {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+
+    background-image: url('https://64.media.tumblr.com/2891ae1ed8e9e75e1b71863218833a06/7ab0732983858d05-6d/s540x810/c33bb28a9aa5ae8f411d766272428d1475526352.gifv');
+    background-size: cover;
+    background-position: center;
+    background-repeat: repeat;
+
+    mix-blend-mode: soft-light;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 #app {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+/* Page content column */
+main.page {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+
+    width: min(var(--content-width), 94%);
+    margin: var(--space-2xl) auto 3.75rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+main.page-narrow {
+    width: min(var(--content-width-narrow), 94%);
 }
 
 a:hover {
-    color: var(--color-accent-hover);
+    color: var(--text-muted);
+}
+
+footer {
+    position: relative;
+    z-index: 2;
+    padding: var(--space-xl);
+    background: var(--footer-bg);
+    text-align: center;
+    font-size: var(--text-sm);
 }
 
 .error-message {
-    color: var(--danger, #d32f2f);
-    font-size: var(--text-7, 0.875rem);
+    color: var(--danger);
+    font-size: var(--text-sm);
+    font-weight: 700;
+}
+
+@media (max-width: 37.5rem) {
+    :root {
+        --header-height: 3.875rem;
+    }
+
+    main.page {
+        margin-top: var(--space-xl);
+    }
 }
