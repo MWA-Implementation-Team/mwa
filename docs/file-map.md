@@ -27,10 +27,11 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── static/                    files served as-is
 │   ├── oat.css                Oat CSS framework — third-party, editable if needed
 │   ├── oat.js                 Oat CSS framework JS, minified, don't edit
-│   ├── style/main.css         stylesheet entry point; imports tokens, base, components
-│   ├── style/tokens.css       design tokens and Oat variable overrides
-│   ├── style/base.css         document-wide defaults and app shell layout
+│   ├── style/main.css         stylesheet entry point; imports tokens, base, components, pages
+│   ├── style/tokens.css       design tokens: raw palette + semantic colors, type and spacing scale
+│   ├── style/base.css         document-wide defaults, page texture overlay, app shell layout
 │   ├── style/components/      one stylesheet per reusable component or component family
+│   ├── style/pages/           page-specific styles (landing, dashboard)
 │   └── reload.js              dev-only auto-reload client
 │
 └── src/

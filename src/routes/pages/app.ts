@@ -1,4 +1,5 @@
 import { requireUser } from '#src/auth.js';
+import { listUserTransactions } from '#src/db/transactions.js';
 import { isActivitySlug } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
 import { deleteSession } from '#src/db/sessions.js';
@@ -11,7 +12,7 @@ export function registerAppRoutes(app: Hono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        return writePage(ctx, 'home', {});
+        return writePage(ctx, 'home', { transactions: listUserTransactions(user.id) });
     });
 
     app.post('/app', async (ctx) => {
