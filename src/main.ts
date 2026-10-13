@@ -1,8 +1,10 @@
 import { isDevMode } from '#src/state.js';
+import { syncActivities } from '#src/db/activities.js';
 import { registerNodeModulesRoutes, writeErrorPage } from '#src/pages.js';
 import { registerLoginRoutes } from '#src/routes/pages/login.js';
 import { registerAppRoutes } from '#src/routes/pages/app.js';
-import { registerHomeRoutes } from '#src/routes/pages/home.js';
+import { registerAdminRoutes } from '#src/routes/pages/admin.js';
+import { registerLandingRoutes } from '#src/routes/pages/landing.js';
 import { registerUsersRoutes } from '#src/routes/api/users.js';
 import { registerGroupsRoutes } from '#src/routes/api/groups.js';
 import { Hono } from 'hono';
@@ -11,9 +13,10 @@ import { serveStatic } from '@hono/node-server/serve-static';
 
 const app = new Hono();
 
-registerHomeRoutes(app);
+registerLandingRoutes(app);
 registerLoginRoutes(app);
 registerAppRoutes(app);
+registerAdminRoutes(app);
 registerUsersRoutes(app);
 registerGroupsRoutes(app);
 
@@ -42,6 +45,9 @@ app.onError(async (error, ctx) => {
     console.error('Error during request', error);
     return writeErrorPage(ctx, 500);
 });
+
+// Insert the registry's activity slugs so queue/badge rows can foreign-key them
+syncActivities();
 
 const server = serve(
     {

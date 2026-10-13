@@ -10,15 +10,28 @@ database file is your undo button.
 
 ## 1. Write the migration
 
-Create the next numbered file — `migrations/02_add_user_tagline.sql`:
+Create the next numbered file — `migrations/03_add_user_tagline.sql`:
 
 ```sql
 ALTER TABLE "users" ADD COLUMN "tagline" TEXT NOT NULL DEFAULT '';
 ```
 
-The number before the first `_` is the version (`02` → 2). Migrations run in that order,
+The number before the first `_` is the version (`03` → 3). Migrations run in that order,
 each in a transaction — a failing statement rolls the file back and crashes the server
 loudly, never leaves it half-applied.
+
+**Numbering rules**, enforced by CI on every PR that touches `migrations/`
+(`.github/workflows/migrations.yml` runs `scripts/check-migrations.sh`; locally:
+`npm run check:migrations`):
+
+- The filename must start with digits — `draft_thing.sql` parses as `NaN` and breaks
+  the migrator's bookkeeping.
+- The version must be greater than every migration already on `main` — two branches
+  that both add `03_x`/`03_y` collide in CI; whoever merges second renames to `04_`
+  (and recreates `db.sqlite`, since a rename after the file applied confuses the
+  local watermark).
+- Existing files are append-only — editing or deleting a migration that may have
+  applied anywhere is forbidden.
 
 ## 2. Apply it
 
@@ -48,8 +61,8 @@ has rows — deleting the file is also how you reseed.)
 
 ## How to verify
 
-1. Server log shows `[migrate] applied 02_add_user_tagline.sql` (files already applied
+1. Server log shows `[migrate] applied 03_add_user_tagline.sql` (files already applied
    are skipped silently — `current_version` gates them).
-2. `sqlite3 db.sqlite "SELECT current_version FROM migration_status;"` → `2`.
+2. `sqlite3 db.sqlite "SELECT current_version FROM migration_status;"` → `3`.
 3. `sqlite3 db.sqlite ".schema users"` → the new column is listed.
 4. `npm run lint` — confirms the `User` type and its consumers agree.

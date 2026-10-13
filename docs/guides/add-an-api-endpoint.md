@@ -1,27 +1,17 @@
 # Guide: add an API endpoint
 
-Worked example: `GET /api/badges`, returning the badges list as JSON. The query already
-exists — `src/db/badges.ts` exports `listBadges()` — so this guide covers the three
-remaining pieces: the route, its registration, and a client-side fetcher.
+Worked example: `GET /api/badges`, returning the badges list as JSON. This guide covers
+the four pieces: the db function, the route, its registration, and a client-side
+fetcher.
 
 The pattern (from `src/routes/api/users.ts`): the SQL lives in `db/<domain>.ts` as a
 prepared statement + typed function; the route handler only checks auth and serializes.
 
-## 1. The db function (already exists)
+## 1. The db function
 
-`src/db/badges.ts` follows the house pattern — a row type, a prepared statement, and a
-typed function:
-
-```ts
-const listBadgesQuery = database.prepare(`SELECT * FROM badges ORDER BY id`);
-
-export function listBadges(): Badge[] {
-    return listBadgesQuery.all() as unknown as Badge[];
-}
-```
-
-For a new domain, create `src/db/<domain>.ts` in the same shape — see
-[change-the-database](change-the-database.md) if you need a new table first.
+Write `listBadges()` in `src/db/badges.ts` following the house pattern — a row type, a
+prepared statement, and a typed function that wraps it. See `src/db/users.ts` for the
+shape, and [change-the-database](change-the-database.md) if you need a new table first.
 
 ## 2. Add the route
 
@@ -48,14 +38,7 @@ instead — see [auth-in-dev](auth-in-dev.md)).
 
 ## 3. Register it in `src/main.ts`
 
-```ts
-import { registerBadgesRoutes } from '#src/routes/api/badges.js';
-```
-
-```ts
-registerUsersRoutes(app);
-registerBadgesRoutes(app);
-```
+Import `registerBadgesRoutes` and call it alongside the other `register*Routes` calls.
 
 ## 4. Add a client fetcher
 

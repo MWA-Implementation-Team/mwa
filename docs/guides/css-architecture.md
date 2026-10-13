@@ -5,13 +5,8 @@ The app uses Oat as its base framework. App-specific styles live in
 
 ## Where styles go
 
-`static/style/main.css` is the entry point:
-
-```css
-@import './tokens.css';
-@import './base.css';
-@import './components/button.css';
-```
+`static/style/main.css` is the entry point — it `@import`s `tokens.css`, `base.css`,
+and every file in `components/`.
 
 - `tokens.css` — shared colors, spacing, and other variables.
 - `base.css` — page-wide defaults and layout rules.
@@ -60,25 +55,9 @@ This changes every Oat component that uses those variables.
 
 ### Change one component
 
-For example, this `.btn-primary` rule in
-`static/style/components/button.css` overrides Oat's default button styles:
-
-```css
-.btn-primary {
-    background-color: var(--color-accent);
-    color: #ffffff;
-    border: 1px solid var(--color-accent);
-    padding: var(--space-md) var(--space-md);
-    border-radius: var(--radius-md);
-    font-weight: 500;
-    cursor: pointer;
-    transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease;
-}
-```
-
-The class limits these changes to elements with `class="btn-primary"`.
+For example, the `.btn-primary` rule in `static/style/components/button.css` overrides
+Oat's default button styles. The class limits these changes to elements with
+`class="btn-primary"`.
 The values such as `--color-accent`, `--space-md`, and `--radius-md` come from
 `tokens.css`, so they can be changed without rewriting the button rule.
 

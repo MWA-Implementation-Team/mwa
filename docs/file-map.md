@@ -14,10 +14,15 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── tsconfig.json              strict TS, JSX → preact, "#src/*" → "./src/*" for tsc
 ├── Dockerfile                 two-stage build: compile TS, run dist/main.js
 ├── AGENTS.md                  project conventions — read before contributing
-├── .github/workflows/ci.yml   CI: npm ci + npm run lint
+├── .github/workflows/         ci.yml — npm ci + npm run lint;
+│                              migrations.yml — runs scripts/check-migrations.sh on migration PRs
 │
 ├── migrations/                numbered SQL files, applied in order on every server start
 │                              (run by src/db/migrate.ts, progress tracked in migration_status database table)
+│
+├── scripts/                   runnable checks shared by CI and local runs
+│   └── check-migrations.sh    new migrations must be digit-prefixed, append-only,
+│                              and sort after the highest version on the base branch
 │
 ├── static/                    files served as-is
 │   ├── oat.css                Oat CSS framework — third-party, editable if needed
@@ -43,10 +48,12 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
     └── client/                code that also runs in the browser
         ├── bootstrap.tsx      browser entry: reads #ssr-data, hydrates #app
         ├── pages.ts           registeredPages: page id → { Component, title }
+        ├── activities.ts      registeredActivities: activity slug → { name, Card, Detail }
         ├── context.tsx        ClientContext: lang, updateLang, t(), user
         ├── language.ts        translations (en, lt) + translate() / t()
         ├── constants.ts       cookie names (mwa-username, mwa-language, mwa-theme-override)
         ├── api/               fetch wrappers + type-only re-exports of db types
+        ├── activities/        one slug-named folder per station (Card + Detail + activity.ts)
         ├── pages/             one component per page, each a Page<P> object
         └── ui/                shared components (header, toggles, icons)
 

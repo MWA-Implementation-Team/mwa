@@ -17,13 +17,13 @@ string, the browser loads the _same_ compiled modules through an
 Follow `GET /` through the code:
 
 1. **Hono matches a route.** `src/main.ts` creates the app and calls the
-   `register*Routes` functions. `/` lives in `src/routes/pages/home.ts`.
+   `register*Routes` functions. `/` lives in `src/routes/pages/landing.ts`.
 2. **The route resolves the user.** `currentUser(ctx)` (`src/auth.ts`) reads the
    `mwa-username` cookie and looks the username up in the `users` table. This is
    dev-only cookie auth — see [auth-in-dev](guides/auth-in-dev.md).
 3. **The route loads data.** It calls typed functions from `src/db/*.ts` (e.g.
    `listUsers()`), which wrap prepared statements. The results become _page props_.
-4. **`writePage` renders the page.** `writePage(ctx, 'home', { users })` in
+4. **`writePage` renders the page.** `writePage(ctx, 'landing', { users })` in
    `src/pages.tsx` builds `ctxInit = { lang, user }` (lang from the `mwa-language`
    cookie, user from `currentUser`) and renders the `Root` component with
    `preact-render-to-string`.
@@ -98,3 +98,9 @@ real SSR pages with real hydration, not special-cased HTML.
 `RegisteredPageId` is derived from its keys and `RegisteredPageProps` from each page's
 component, so `writePage(ctx, 'badges', { badges })` is fully typechecked — wrong or
 missing props are a compile error caught by `npm run lint`, not a runtime surprise.
+
+`registeredActivities` in `src/client/activities.ts` plays the same role for activity
+stations: `ActivitySlug` is derived from its keys, the `/app/activities/:slug` route
+validates the param against it (unknown slug → 404), and `syncActivities()`
+(`src/db/activities.ts`) inserts every slug into the `activities` table on server
+start so queue/badge rows can foreign-key them.
