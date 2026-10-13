@@ -1,4 +1,5 @@
 import { currentUser } from '#src/auth.js';
+import { listUserTransactions } from '#src/db/transactions.js';
 import { isActivitySlug } from '#src/client/activities.js';
 import { cookieUsername } from '#src/client/constants.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
@@ -8,9 +9,10 @@ import { Context } from 'hono';
 
 export function registerAppRoutes(app: Hono) {
     app.get('/app', async (ctx) => {
-        if (!currentUser(ctx)) return goLogin(ctx);
+        const user = currentUser(ctx);
+        if (!user) return goLogin(ctx);
 
-        return writePage(ctx, 'home', {});
+        return writePage(ctx, 'home', { transactions: listUserTransactions(user.id) });
     });
 
     app.post('/app', async (ctx) => {
