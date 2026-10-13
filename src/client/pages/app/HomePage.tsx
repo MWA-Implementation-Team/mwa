@@ -4,6 +4,7 @@ import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { Transaction } from '#src/client/api/transactions.js';
+import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
 
 type HomePageProps = {
     transactions: Transaction[];
@@ -21,7 +22,7 @@ const transactionKindKey = {
 } as const;
 
 function HomePage({ transactions }: HomePageProps) {
-    const { t, user } = useContext(ClientContext);
+    const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
 
     return (
@@ -47,8 +48,8 @@ function HomePage({ transactions }: HomePageProps) {
                         {transactions.length === 0 && (
                             <p class="muted">{t('dashNoTransactions')}</p>
                         )}
-                        {transactions.map((tx) => (
-                            <div class="transaction">
+                        {transactions.map((tx, i) => (
+                            <div key={i} class="transaction">
                                 <div class="transaction-icon">
                                     {tx.balanceDelta > 0 ? '↑' : '↓'}
                                 </div>
@@ -56,13 +57,15 @@ function HomePage({ transactions }: HomePageProps) {
                                     <div class="transaction-name">
                                         {t(transactionKindKey[tx.kind])}
                                     </div>
-                                    <div class="transaction-date">{tx.createdAt.slice(0, 10)}</div>
+                                    <div class="transaction-date">
+                                        {new Date(tx.createdAt).toLocaleDateString(lang)}
+                                    </div>
                                 </div>
                                 <div
                                     class={`transaction-value ${tx.balanceDelta > 0 ? 'positive' : 'negative'}`}
                                 >
                                     {tx.balanceDelta > 0 ? '+' : ''}
-                                    {tx.balanceDelta}
+                                    {tx.balanceDelta.toFixed(2)}
                                 </div>
                             </div>
                         ))}
@@ -84,7 +87,9 @@ function HomePage({ transactions }: HomePageProps) {
 
                     <div class="support-options">
                         <button class="support-button">
-                            <div class="support-icon">☎</div>
+                            <div class="support-icon">
+                                <PhoneIcon />
+                            </div>
                             <div class="support-label">{t('dashCall')}</div>
                         </button>
                         <button
@@ -92,7 +97,9 @@ function HomePage({ transactions }: HomePageProps) {
                             aria-expanded={guideOpen}
                             onClick={() => setGuideOpen(!guideOpen)}
                         >
-                            <div class="support-icon">📖</div>
+                            <div class="support-icon">
+                                <BookIcon />
+                            </div>
                             <div class="support-label">{t('dashGuide')}</div>
                         </button>
                     </div>
@@ -104,8 +111,10 @@ function HomePage({ transactions }: HomePageProps) {
                     <h2 class="section-title">{t('sponsorsTitle')}</h2>
                     <p class="muted sponsor-subtitle">{t('sponsorsSubtitle')}</p>
                     <div class="sponsor-grid">
-                        {[1, 2, 3, 4, 5, 6].map(() => (
-                            <div class="sponsor">LOGO</div>
+                        {[1, 2, 3, 4, 5, 6].map((n) => (
+                            <div key={n} class="sponsor">
+                                LOGO
+                            </div>
                         ))}
                     </div>
                 </section>

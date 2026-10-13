@@ -146,6 +146,11 @@
     line-height: 1;
 }
 
+.support-icon svg {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
 .support-label {
     font-size: 1.05rem;
     text-align: center;
