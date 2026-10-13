@@ -28,8 +28,8 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
         setSuccessMsg(null);
         try {
             await deleteGroup(groupId);
-            setGroups((currentGroups) =>
-                currentGroups?.filter((group) => group.id !== groupId) ?? null,
+            setGroups(
+                (currentGroups) => currentGroups?.filter((group) => group.id !== groupId) ?? null,
             );
             setSuccessMsg('Group deleted successfully!');
         } catch (err: any) {
@@ -96,7 +96,10 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                             <li key={group.id}>
                                 {group.name} ({group.phone_number})
                                 {group.ownerId === user?.id && (
-                                    <button type="button" onClick={() => handleDeleteGroup(group.id)}>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeleteGroup(group.id)}
+                                    >
                                         Delete group
                                     </button>
                                 )}

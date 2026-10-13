@@ -1,5 +1,5 @@
-import { database } from "#src/state.js";
-import { SQLOutputValue } from "node:sqlite";
+import { database } from '#src/state.js';
+import { SQLOutputValue } from 'node:sqlite';
 
 // Local group type
 export type Group = {
@@ -86,7 +86,7 @@ function mapGroup(row: Record<string, SQLOutputValue>): Group {
         name: row.name as string,
         ownerId: row.owner_id as number,
         phone_number: row.phone_number as string,
-        created_at: new Date(row.created_at as string)
+        created_at: new Date(row.created_at as string),
     };
 }
 
@@ -94,7 +94,7 @@ function mapGroupMember(row: Record<string, SQLOutputValue>): GroupMember {
     return {
         group_id: row.group_id as number,
         user_id: row.user_id as number,
-        joined_at: new Date(row.joined_at as string)
+        joined_at: new Date(row.joined_at as string),
     };
 }
 
@@ -134,26 +134,35 @@ export function listUserGroups(user_id: number): Group[] {
     return rows.map((row) => mapGroup(row));
 }
 
-export function addGroupMember(group_id: number, user_id: number): { success: boolean, error?: string } {
+export function addGroupMember(
+    group_id: number,
+    user_id: number,
+): { success: boolean; error?: string } {
     const row = getGroupMemberCountQuery.get(group_id) as { count: number };
 
     if (row.count >= 6) {
-        return { success: false, error: "Group has reached the max limit of 6 members" };
+        return { success: false, error: 'Group has reached the max limit of 6 members' };
     }
 
     try {
         addMemberQuery.run(group_id, user_id);
         return { success: true };
     } catch {
-        return { success: false, error: "Member is already in a group" };
+        return { success: false, error: 'Member is already in a group' };
     }
 }
 
-export function removeGroupMember(group_id: number, user_id: number): { success: boolean, error?: string } {
+export function removeGroupMember(
+    group_id: number,
+    user_id: number,
+): { success: boolean; error?: string } {
     const row = getGroupMemberCountQuery.get(group_id) as { count: number };
 
     if (row.count <= 2) {
-        return { success: false, error: "Cannot remove member. Groups must maintain a minimum of 2 members" };
+        return {
+            success: false,
+            error: 'Cannot remove member. Groups must maintain a minimum of 2 members',
+        };
     }
 
     removeMemberQuery.run(group_id, user_id);

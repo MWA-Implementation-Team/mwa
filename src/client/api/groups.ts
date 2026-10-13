@@ -1,7 +1,11 @@
 import type { Group, GroupMember } from '#src/db/groups.js';
 export type { Group, GroupMember };
 
-export async function createGroup(name: string, ownerId: number, phone_number: string): Promise<Group> {
+export async function createGroup(
+    name: string,
+    ownerId: number,
+    phone_number: string,
+): Promise<Group> {
     const res = await fetch('/api/groups', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -27,7 +31,10 @@ export async function deleteGroup(groupId: number): Promise<void> {
     if (!res.ok) throw new Error('Couldntt delete group');
 }
 
-export async function addGroupMember(groupId: number, userId: number): Promise<{ success: boolean; error?: string }> {
+export async function addGroupMember(
+    groupId: number,
+    userId: number,
+): Promise<{ success: boolean; error?: string }> {
     const res = await fetch(`/api/groups/${groupId}/members`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,7 +43,10 @@ export async function addGroupMember(groupId: number, userId: number): Promise<{
     return res.json();
 }
 
-export async function removeGroupMember(groupId: number, userId: number): Promise<{ success: boolean; error?: string }> {
+export async function removeGroupMember(
+    groupId: number,
+    userId: number,
+): Promise<{ success: boolean; error?: string }> {
     const res = await fetch(`/api/groups/${groupId}/members/${userId}`, {
         method: 'DELETE',
     });

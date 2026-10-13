@@ -6,7 +6,7 @@ import {
     listUserGroups,
     addGroupMember,
     removeGroupMember,
-    listGroupMembers
+    listGroupMembers,
 } from '#src/db/groups.js';
 import { Hono } from 'hono';
 
@@ -56,7 +56,7 @@ export function registerGroupsRoutes(app: Hono) {
             return ctx.json({ error: 'Group not found' }, 404);
         }
         return ctx.json(group);
-    })
+    });
 
     app.delete('/api/groups/:id', (ctx) => {
         const user = currentUser(ctx);
