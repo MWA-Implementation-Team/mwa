@@ -7,7 +7,10 @@ export async function createGroup(name: string, ownerId: number, phone_number: s
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, ownerId, phone_number }),
     });
-    if (!res.ok) throw new Error(`POST /api/groups failed: ${res.status}`);
+    if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? `POST /api/groups failed: ${res.status}`);
+    }
     return res.json();
 }
 

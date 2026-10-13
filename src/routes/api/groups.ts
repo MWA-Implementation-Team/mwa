@@ -1,11 +1,11 @@
 import { currentUser } from '#src/auth.js';
-import { 
-    createGroup, 
-    findGroupById, 
+import {
+    createGroup,
+    findGroupById,
     listUserGroups,
-    addGroupMember, 
-    removeGroupMember, 
-    listGroupMembers 
+    addGroupMember,
+    removeGroupMember,
+    listGroupMembers
 } from '#src/db/groups.js';
 import { Hono } from 'hono';
 
@@ -29,6 +29,10 @@ export function registerGroupsRoutes(app: Hono) {
         const body = await ctx.req.json();
         const { name, phone_number } = body;
 
+        if (listUserGroups(user.id).length > 0) {
+            return ctx.json({ error: 'You are already in a group.' }, 409);
+        }
+
         try {
             // Automatically use the logged in users id as the owner
             const group = createGroup(name, user.id, phone_number);
@@ -40,7 +44,7 @@ export function registerGroupsRoutes(app: Hono) {
 
     // Get group details by id
     app.get('/api/groups/:id', (ctx) => {
-        if(!currentUser(ctx)) {
+        if (!currentUser(ctx)) {
             return ctx.json({ error: 'unauthorized' }, 401);
         }
 
