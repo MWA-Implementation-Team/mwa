@@ -9,11 +9,7 @@ import { accountPage } from '#src/client/pages/app/AccountPage.js';
 import { leaderboardPage } from '#src/client/pages/app/LeaderboardPage.js';
 import { groupPage } from '#src/client/pages/app/GroupPage.js';
 import { casinoPage } from '#src/client/pages/app/CasinoPage.js';
-<<<<<<< HEAD
-import { groupsPage } from '#src/client/pages/app/GroupPage.js';
-=======
 import { adminPage } from '#src/client/pages/AdminPage.js';
->>>>>>> origin/main
 import { LanguageCode, TranslateFn } from './language.js';
 
 export const registeredPages = {
@@ -29,7 +25,6 @@ export const registeredPages = {
     casino: casinoPage,
     admin: adminPage,
     error: errorPage,
-    groups: groupsPage,
 } satisfies Record<string, Page<any>>;
 
 export type Page<P> = {

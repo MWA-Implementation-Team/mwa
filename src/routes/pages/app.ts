@@ -48,22 +48,16 @@ export function registerAppRoutes(app: Hono) {
     });
 
     app.get('/app/group', async (ctx) => {
-        if (!currentUser(ctx)) return goLogin(ctx);
+        const user = currentUser(ctx);
+        if (!user) return goLogin(ctx);
 
-        return writePage(ctx, 'group', {});
+        return writePage(ctx, 'group', { initialGroups: listUserGroups(user.id) });
     });
 
     app.get('/app/casino', async (ctx) => {
         if (!currentUser(ctx)) return goLogin(ctx);
 
         return writePage(ctx, 'casino', {});
-    });
-
-    app.get('/app/group', async (ctx) => {
-        const user = currentUser(ctx);
-        if (!user) return goLogin(ctx);
-
-        return writePage(ctx, 'groups', { initialGroups: listUserGroups(user.id) });
     });
 }
 

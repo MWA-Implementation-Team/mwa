@@ -1,6 +1,7 @@
 import { currentUser } from '#src/auth.js';
 import {
     createGroup,
+    deleteGroup,
     findGroupById,
     listUserGroups,
     addGroupMember,
@@ -30,7 +31,7 @@ export function registerGroupsRoutes(app: Hono) {
         const { name, phone_number } = body;
 
         if (listUserGroups(user.id).length > 0) {
-            return ctx.json({ error: 'You are already in a group.' }, 409);
+            return ctx.json({ error: 'you are already in a group' }, 409);
         }
 
         try {
@@ -56,6 +57,25 @@ export function registerGroupsRoutes(app: Hono) {
         }
         return ctx.json(group);
     })
+
+    app.delete('/api/groups/:id', (ctx) => {
+        const user = currentUser(ctx);
+        if (!user) {
+            return ctx.json({ error: 'unauthorized' }, 401);
+        }
+
+        const groupId = Number(ctx.req.param('id'));
+        const group = findGroupById(groupId);
+        if (!group) {
+            return ctx.json({ error: 'Group not found' }, 404);
+        }
+        if (group.ownerId !== user.id) {
+            return ctx.json({ error: 'Only the group owner can delete it' }, 403);
+        }
+
+        deleteGroup(groupId, user.id);
+        return ctx.json({ success: true });
+    });
 
     // Add a member to a group
     app.post('/api/groups/:id/members', async (ctx) => {

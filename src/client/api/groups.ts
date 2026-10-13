@@ -20,6 +20,13 @@ export async function fetchGroupById(groupId: number): Promise<Group> {
     return res.json();
 }
 
+export async function deleteGroup(groupId: number): Promise<void> {
+    const res = await fetch(`/api/groups/${groupId}`, {
+        method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Couldntt delete group');
+}
+
 export async function addGroupMember(groupId: number, userId: number): Promise<{ success: boolean; error?: string }> {
     const res = await fetch(`/api/groups/${groupId}/members`, {
         method: 'POST',

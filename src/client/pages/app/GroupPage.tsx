@@ -1,23 +1,41 @@
-import { useState } from 'preact/hooks';
+import { useContext, useState } from 'preact/hooks';
 import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
-import { createGroup, type Group } from '#src/client/api/groups.js';
+import { ClientContext } from '#src/client/context.js';
+import { createGroup, deleteGroup, type Group } from '#src/client/api/groups.js';
 
 type GroupsPageProps = {
     initialGroups?: Group[] | null;
 };
 
-export const groupsPage: Page<GroupsPageProps> = {
+export const groupPage: Page<GroupsPageProps> = {
     Component: GroupsComponent,
     title: () => 'groups',
 };
 
 function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
+    const { user } = useContext(ClientContext);
     const [groups, setGroups] = useState(initialGroups);
     const [groupName, setGroupName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+    const handleDeleteGroup = async (groupId: number) => {
+        if (!window.confirm('Delete group?')) return;
+
+        setError(null);
+        setSuccessMsg(null);
+        try {
+            await deleteGroup(groupId);
+            setGroups((currentGroups) =>
+                currentGroups?.filter((group) => group.id !== groupId) ?? null,
+            );
+            setSuccessMsg('Group deleted successfully!');
+        } catch (err: any) {
+            setError(err.message || 'failed to delete group');
+        }
+    };
 
     const handleCreateGroup = async (e: Event) => {
         e.preventDefault();
@@ -77,6 +95,11 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                         {groups.map((group) => (
                             <li key={group.id}>
                                 {group.name} ({group.phone_number})
+                                {group.ownerId === user?.id && (
+                                    <button type="button" onClick={() => handleDeleteGroup(group.id)}>
+                                        Delete group
+                                    </button>
+                                )}
                             </li>
                         ))}
                     </ul>

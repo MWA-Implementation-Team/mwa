@@ -31,6 +31,11 @@ const getGroupByIdQuery = database.prepare(`
     WHERE id = ?
 `);
 
+const deleteGroupQuery = database.prepare(`
+    DELETE FROM groups
+    WHERE id = ? AND owner_id = ?
+`);
+
 // Get group of user by user id
 const getUserGroupQuery = database.prepare(`
     SELECT *
@@ -113,6 +118,11 @@ export function findGroupById(group_id: number): Group | null {
     return mapGroup(row);
 }
 
+export function deleteGroup(group_id: number, owner_id: number): boolean {
+    const result = deleteGroupQuery.run(group_id, owner_id);
+    return result.changes > 0;
+}
+
 export function findUserGroup(user_id: number): Group | null {
     const row = getUserGroupQuery.get(user_id);
     if (!row?.id) return null;
@@ -141,7 +151,7 @@ export function addGroupMember(group_id: number, user_id: number): { success: bo
 
 export function removeGroupMember(group_id: number, user_id: number): { success: boolean, error?: string } {
     const row = getGroupMemberCountQuery.get(group_id) as { count: number };
-    
+
     if (row.count <= 2) {
         return { success: false, error: "Cannot remove member. Groups must maintain a minimum of 2 members" };
     }
