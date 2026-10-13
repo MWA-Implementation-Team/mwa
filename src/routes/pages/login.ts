@@ -66,13 +66,7 @@ export function registerLoginRoutes(app: Hono) {
             });
         }
 
-        const allowedGotos = new Set<string>(['/app', '/app/casino', '/app/group']);
-
-        let goto = ctx.req.query('goto') ?? null;
-        if (goto && !allowedGotos.has(goto)) {
-            goto = null;
-        }
-        goto = goto ?? '/app';
+        const goto = safeGoto(ctx, ctx.req.query('goto')) ?? '/app';
 
         setCookie(ctx, cookieUsername, username);
         return ctx.redirect(goto);
