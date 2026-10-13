@@ -7,17 +7,17 @@
        To try a different color scheme, only edit this block —
        every component reads the semantic tokens further down.
        ============================================================ */
-    --color1: #ffa3a5;
-    --color2: #ff86c8;
-    --color3: #ffbf81;
-    --color4: #ff69eb;
-    --color5: #ffdc5e;
+    --color1: #a9e6bb;
+    --color2: #7fd6a4;
+    --color3: #ffd98a;
+    --color4: #4fbf8f;
+    --color5: #fff3b0;
 
-    --color1d: #e09293;
-    --color2d: #d46fa7;
-    --color3d: #d6a370;
-    --color4d: #d258c2;
-    --color5d: #ddbf53;
+    --color1d: #93c9a4;
+    --color2d: #6fbb8d;
+    --color3d: #debd75;
+    --color4d: #44a67b;
+    --color5d: #ded398;
 
     /* ============================================================
        SEMANTIC COLORS
