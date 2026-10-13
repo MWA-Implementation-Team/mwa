@@ -13,7 +13,8 @@
         "test": "rm -rf dist && npm run build && MWA_DB_PATH=':memory:' node --test 'dist/**/*.test.js'",
         "tsc-watch": "tsc --watch --preserveWatchOutput",
         "format": "prettier --write .",
-        "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && prettier --check ."
+        "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && prettier --check .",
+        "check:migrations": "bash scripts/check-migrations.sh"
     },
     "devDependencies": {
         "@types/node": "^22.20.3",

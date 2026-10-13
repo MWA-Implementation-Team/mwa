@@ -1,7 +1,8 @@
 import { requireUser } from '#src/auth.js';
+import { isActivitySlug } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
 import { deleteSession } from '#src/db/sessions.js';
-import { writePage } from '#src/pages.js';
+import { writeErrorPage, writePage } from '#src/pages.js';
 import { Hono } from 'hono';
 import { deleteCookie, getCookie } from 'hono/cookie';
 
@@ -31,11 +32,14 @@ export function registerAppRoutes(app: Hono) {
         return writePage(ctx, 'activities', {});
     });
 
-    app.get('/app/activities/:id', async (ctx) => {
+    app.get('/app/activities/:slug', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        return writePage(ctx, 'activity', { id: ctx.req.param('id') });
+        const slug = ctx.req.param('slug');
+        if (!isActivitySlug(slug)) return writeErrorPage(ctx, 404);
+
+        return writePage(ctx, 'activity', { slug });
     });
 
     app.get('/app/account', async (ctx) => {
