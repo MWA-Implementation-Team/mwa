@@ -1,4 +1,5 @@
 import { currentUser } from '#src/auth.js';
+import { listUserGroups } from '#src/db/groups.js';
 import { cookieUsername } from '#src/client/constants.js';
 import { writePage } from '#src/pages.js';
 import { Hono } from 'hono';
@@ -24,9 +25,10 @@ export function registerAppRoutes(app: Hono) {
     });
 
     app.get('/app/groups', async (ctx) => {
-        if (!currentUser(ctx)) return goLogin(ctx);
+        const user = currentUser(ctx);
+        if (!user) return goLogin(ctx);
 
-        return writePage(ctx, 'groups', {});
+        return writePage(ctx, 'groups', { initialGroups: listUserGroups(user.id) });
     });
 }
 

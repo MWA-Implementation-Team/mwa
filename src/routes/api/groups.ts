@@ -2,6 +2,7 @@ import { currentUser } from '#src/auth.js';
 import { 
     createGroup, 
     findGroupById, 
+    listUserGroups,
     addGroupMember, 
     removeGroupMember, 
     listGroupMembers 
@@ -9,6 +10,15 @@ import {
 import { Hono } from 'hono';
 
 export function registerGroupsRoutes(app: Hono) {
+    app.get('/api/groups', (ctx) => {
+        const user = currentUser(ctx);
+        if (!user) {
+            return ctx.json({ error: 'unauthorized' }, 401);
+        }
+
+        return ctx.json(listUserGroups(user.id));
+    });
+
     // Create new group
     app.post('/api/groups', async (ctx) => {
         const user = currentUser(ctx);

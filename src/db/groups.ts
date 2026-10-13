@@ -39,6 +39,15 @@ const getUserGroupQuery = database.prepare(`
     WHERE group_members.user_id = ?    
 `);
 
+// Get user groups
+const getUserGroupsQuery = database.prepare(`
+    SELECT DISTINCT groups.id, groups.name, groups.owner_id, groups.phone_number, groups.created_at
+    FROM groups
+    LEFT JOIN group_members ON groups.id = group_members.group_id
+    WHERE groups.owner_id = ? OR group_members.user_id = ?
+    ORDER BY groups.created_at DESC
+`);
+
 // Get current group member count (Fixed trailing comma!)
 const getGroupMemberCountQuery = database.prepare(`
     SELECT COUNT(*) as count
@@ -86,8 +95,16 @@ function mapGroupMember(row: Record<string, SQLOutputValue>): GroupMember {
 
 // Actions
 export function createGroup(name: string, ownerId: number, phone_number: string): Group {
-    const row = createGroupQuery.get(name, ownerId, phone_number);
-    return mapGroup(row!);
+    database.exec('BEGIN');
+    try {
+        const row = createGroupQuery.get(name, ownerId, phone_number);
+        addMemberQuery.run(row!.id, ownerId);
+        database.exec('COMMIT');
+        return mapGroup(row!);
+    } catch (error) {
+        database.exec('ROLLBACK');
+        throw error;
+    }
 }
 
 export function findGroupById(group_id: number): Group | null {
@@ -100,6 +117,11 @@ export function findUserGroup(user_id: number): Group | null {
     const row = getUserGroupQuery.get(user_id);
     if (!row?.id) return null;
     return mapGroup(row);
+}
+
+export function listUserGroups(user_id: number): Group[] {
+    const rows = getUserGroupsQuery.all(user_id, user_id);
+    return rows.map((row) => mapGroup(row));
 }
 
 export function addGroupMember(group_id: number, user_id: number): { success: boolean, error?: string } {

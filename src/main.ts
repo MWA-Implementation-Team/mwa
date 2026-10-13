@@ -4,6 +4,7 @@ import { registerLoginRoutes } from '#src/routes/pages/login.js';
 import { registerAppRoutes } from '#src/routes/pages/app.js';
 import { registerHomeRoutes } from '#src/routes/pages/home.js';
 import { registerUsersRoutes } from '#src/routes/api/users.js';
+import { registerGroupsRoutes } from '#src/routes/api/groups.js';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
@@ -14,6 +15,7 @@ registerHomeRoutes(app);
 registerLoginRoutes(app);
 registerAppRoutes(app);
 registerUsersRoutes(app);
+registerGroupsRoutes(app);
 
 registerNodeModulesRoutes(app);
 
