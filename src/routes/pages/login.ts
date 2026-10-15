@@ -1,3 +1,4 @@
+import { translate } from '#src/client/language.js';
 import { redirectIfAuthed } from '#src/auth.js';
 import { findUserByEmail } from '#src/db/users.js';
 import {
@@ -65,7 +66,7 @@ export function registerLoginRoutes(app: MwaHono) {
     app.post('/login', async (ctx) => {
         const form = await ctx.req.formData().catch(() => null);
         if (!form) {
-            return ctx.text('Bad Request', 400);
+            return ctx.text(translate(getRequestLanguage(ctx))('badRequest'), 400);
         }
 
         const lang = getRequestLanguage(ctx);
@@ -75,7 +76,7 @@ export function registerLoginRoutes(app: MwaHono) {
             .toLowerCase();
 
         if (!emailPattern.test(email)) {
-            return writePage(ctx, 'login', { errorMessage: 'Enter a valid email' });
+            return writePage(ctx, 'login', { errorKey: 'loginInvalidEmail' });
         }
 
         const isSignup = !findUserByEmail(ctx.var, email);
@@ -103,7 +104,7 @@ export function registerLoginRoutes(app: MwaHono) {
                 discardLoginToken(ctx.var, created.id);
                 console.error('Failed to send login email', error);
                 return writePage(ctx, 'login', {
-                    errorMessage: 'Could not send the email — try again in a moment',
+                    errorKey: 'loginSendFailed',
                 });
             }
             confirmLoginTokenSent(ctx.var, email, created.id);

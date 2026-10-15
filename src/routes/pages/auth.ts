@@ -1,3 +1,5 @@
+import { getRequestLanguage } from '#src/utils.js';
+import { translate } from '#src/client/language.js';
 import { cookieSession } from '#src/client/constants.js';
 import {
     createSession,
@@ -19,7 +21,7 @@ export function registerAuthRoutes(app: MwaHono) {
         const email = token ? redeemLoginToken(ctx.var, token) : null;
         if (!email) {
             return writePage(ctx, 'login', {
-                errorMessage: 'That login link is expired or already used — request a new one',
+                errorKey: 'loginLinkExpired',
             });
         }
         return logIn(ctx, email, ctx.req.query('goto'));
@@ -30,7 +32,7 @@ export function registerAuthRoutes(app: MwaHono) {
     app.post('/auth/verify', async (ctx) => {
         const form = await ctx.req.formData().catch(() => null);
         if (!form) {
-            return ctx.text('Bad Request', 400);
+            return ctx.text(translate(getRequestLanguage(ctx))('badRequest'), 400);
         }
         const email = String(form.get('email') ?? '')
             .trim()
@@ -41,10 +43,7 @@ export function registerAuthRoutes(app: MwaHono) {
         const result = redeemLoginCode(ctx.var, email, code);
         if (result !== 'redeemed') {
             return writePage(ctx, 'login', {
-                errorMessage:
-                    result === 'wrong'
-                        ? 'Wrong code — check the email and try again'
-                        : 'That code is expired or already used — request a new one',
+                errorKey: result === 'wrong' ? 'loginWrongCode' : 'loginCodeExpired',
                 sentTo: email,
                 sentKind: findUserByEmail(ctx.var, email) ? 'login' : 'signup',
                 goto,

@@ -18,8 +18,11 @@ The factory selects SMTP when `MWA_SMTP_HOST` is set. It also reads `MWA_SMTP_PO
 (default `25`), `MWA_SMTP_SECURE` (`true` enables TLS), and `MWA_MAIL_FROM` (default
 `mwa@localhost`). The login route calls
 `ctx.var.mailer.sendLoginEmail(to, { lang, url, code })`. `getRequestLanguage(ctx)`
-reads the language cookie, defaulting to English; the template currently still
-uses English copy.
+reads the language cookie, defaulting to English. The email subject, HTML body,
+and plain-text fallback use that language through the shared translation system.
+Login labels, confirmations, and errors are available in English and Lithuanian.
+Routes pass typed error keys to the login page, so errors also update immediately
+when the visitor switches language.
 
 Tests inject a `Mailer` with `createTestMwaState({ mailer })` to capture sends or
 simulate failures. Without an override, the test factory uses a no-op mailer.

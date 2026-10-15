@@ -1,14 +1,14 @@
+import { translate } from '#src/client/language.js';
+import { LoginEmailProps } from './mailer.js';
+
 // Email templates are Preact components — type-checked props, same model as
 // the pages. Email HTML is constrained: table layout, inline styles only,
 // no classes/flex (Outlook renders with Word's engine). The `text` export is
 // the multipart/alternative fallback — clients that block HTML show it, and
 // sending both scores better with spam filters. Keep the copy in sync.
 
-import { LoginEmailProps } from "./mailer.js";
-
-export const loginSubject = 'Your MWA sign-in link';
-
-export function LoginEmail({ lang: _lang, url, code }: LoginEmailProps) {
+export function LoginEmail({ lang, url, code }: LoginEmailProps) {
+    const t = translate(lang);
     return (
         <table
             role="presentation"
@@ -33,12 +33,12 @@ export function LoginEmail({ lang: _lang, url, code }: LoginEmailProps) {
                         }}
                     >
                         <tr>
-                            <td style={{ fontSize: '18px', fontWeight: 600 }}>Sign in to MWA</td>
+                            <td style={{ fontSize: '18px', fontWeight: 600 }}>
+                                {t('emailLoginHeading')}
+                            </td>
                         </tr>
                         <tr>
-                            <td style={{ padding: '16px 0' }}>
-                                Click the button below to sign in. The link expires in 15 minutes.
-                            </td>
+                            <td style={{ padding: '16px 0' }}>{t('emailLoginIntro')}</td>
                         </tr>
                         <tr>
                             <td style={{ padding: '8px 0 16px' }}>
@@ -54,13 +54,13 @@ export function LoginEmail({ lang: _lang, url, code }: LoginEmailProps) {
                                         fontWeight: 600,
                                     }}
                                 >
-                                    Sign in
+                                    {t('emailLoginAction')}
                                 </a>
                             </td>
                         </tr>
                         <tr>
                             <td style={{ paddingBottom: '8px', fontSize: '14px' }}>
-                                Or enter this code on the login page:
+                                {t('emailLoginCode')}
                             </td>
                         </tr>
                         <tr>
@@ -83,7 +83,7 @@ export function LoginEmail({ lang: _lang, url, code }: LoginEmailProps) {
                                     wordBreak: 'break-all',
                                 }}
                             >
-                                If the button doesn't work, paste this link into your browser: {url}
+                                {t('emailLoginFallback')} {url}
                             </td>
                         </tr>
                     </table>
@@ -93,10 +93,11 @@ export function LoginEmail({ lang: _lang, url, code }: LoginEmailProps) {
     );
 }
 
-export function loginText({ url, code }: LoginEmailProps) {
-    return `Sign in: ${url}
+export function loginText({ lang, url, code }: LoginEmailProps) {
+    const t = translate(lang);
+    return `${t('emailLoginAction')}: ${url}
 
-Or enter this code on the login page: ${code}
+${t('emailLoginCode')} ${code}
 
-The link and code expire in 15 minutes.`;
+${t('emailLoginExpiry')}`;
 }

@@ -1,8 +1,17 @@
+import { useContext } from 'preact/hooks';
+import { ClientContext } from '#src/client/context.js';
 import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 
+export type LoginErrorKey =
+    | 'loginInvalidEmail'
+    | 'loginSendFailed'
+    | 'loginLinkExpired'
+    | 'loginWrongCode'
+    | 'loginCodeExpired';
+
 type LoginPageProps = {
-    errorMessage?: string;
+    errorKey?: LoginErrorKey;
     sentTo?: string;
     sentKind?: 'login' | 'signup';
     goto?: string;
@@ -13,7 +22,8 @@ export const loginPage: Page<LoginPageProps> = {
     title: (t) => t('titleLogin'),
 };
 
-function LoginPage({ errorMessage, sentTo, sentKind, goto }: LoginPageProps) {
+function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
+    const { t } = useContext(ClientContext);
     return (
         <>
             <Header />
@@ -22,8 +32,8 @@ function LoginPage({ errorMessage, sentTo, sentKind, goto }: LoginPageProps) {
                 <>
                     <p>
                         {sentKind === 'signup'
-                            ? `We sent a signup link to ${sentTo} — click it to create your account.`
-                            : `We sent a login link to ${sentTo}.`}
+                            ? t('signupSent', { email: sentTo })
+                            : t('loginSent', { email: sentTo })}
                     </p>
                     <form method="POST" action="/auth/verify">
                         <input type="hidden" name="email" value={sentTo} />
@@ -31,22 +41,22 @@ function LoginPage({ errorMessage, sentTo, sentKind, goto }: LoginPageProps) {
                         <input
                             type="text"
                             name="code"
-                            placeholder="Code from the email"
+                            placeholder={t('loginCodePlaceholder')}
                             autoComplete="one-time-code"
                             required
                         />
-                        <button type="submit">Verify code</button>
+                        <button type="submit">{t('loginVerifyCode')}</button>
                     </form>
                 </>
             ) : (
                 <form method="POST">
-                    <h1>Login with email</h1>
-                    <input type="email" name="email" placeholder="Email" required />
-                    <button type="submit">Send login link</button>
+                    <h1>{t('loginHeading')}</h1>
+                    <input type="email" name="email" placeholder={t('loginEmail')} required />
+                    <button type="submit">{t('loginSendLink')}</button>
                 </form>
             )}
 
-            {errorMessage && <p class="error-message">{errorMessage}</p>}
+            {errorKey && <p class="error-message">{t(errorKey)}</p>}
         </>
     );
 }
