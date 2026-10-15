@@ -7,12 +7,11 @@ import type { UserRole } from '#src/db/users.js';
 
 try {
     process.loadEnvFile('.env');
-} catch { }
+} catch {}
 
 const state = createDefaultMwaState(false);
 
-const existing =
-    (state.prepare(`SELECT COUNT(*) AS n FROM users`).get() as { n: number }).n ?? 0;
+const existing = (state.prepare(`SELECT COUNT(*) AS n FROM users`).get() as { n: number }).n ?? 0;
 if (existing > 0) {
     console.log(`Database already has ${existing} user(s) — delete db.sqlite to reseed.`);
     process.exit(0);

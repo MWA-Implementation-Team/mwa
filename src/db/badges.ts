@@ -6,7 +6,6 @@ export type UserBadge = {
     userId: number;
 };
 
-
 export function listUserBadges(state: MwaState): UserBadge[] {
     const query = state.prepare(`
     SELECT created_at, badge_id, user_id FROM user_badges ORDER BY created_at

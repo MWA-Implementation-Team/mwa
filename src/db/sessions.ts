@@ -32,7 +32,6 @@ export function createLoginToken(state: MwaState, email: string): LoginToken {
     RETURNING id
     `);
 
-
     for (let attempt = 0; attempt < 3; attempt++) {
         const token = randomBytes(32).toString('base64url');
         const code = Array.from(

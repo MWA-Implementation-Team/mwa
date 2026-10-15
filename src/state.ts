@@ -5,11 +5,11 @@ import { migrateDatabase } from './db/migrate.js';
 import nodemailer from 'nodemailer';
 
 export type MwaState = {
-    isDevMode: boolean,
-    db: DatabaseSync,
-    mailer: Mailer,
+    isDevMode: boolean;
+    db: DatabaseSync;
+    mailer: Mailer;
 
-    prepare(sql: string): StatementSync,
+    prepare(sql: string): StatementSync;
 };
 
 export type MwaContext = Context<{ Variables: MwaState }>;
@@ -21,18 +21,18 @@ export function setupHonoState(app: MwaHono, state: MwaState) {
         ctx.set('db', state.db);
         ctx.set('mailer', state.mailer);
         ctx.set('prepare', state.prepare);
-        await next()
-    })
+        await next();
+    });
 }
 
 export function createDefaultMwaState(isDevMode: boolean): MwaState {
     const smtpHost = process.env.MWA_SMTP_HOST;
     const smtpClient = smtpHost
         ? nodemailer.createTransport({
-            host: smtpHost,
-            port: Number(process.env.MWA_SMTP_PORT ?? 25),
-            secure: process.env.MWA_SMTP_SECURE === 'true',
-        })
+              host: smtpHost,
+              port: Number(process.env.MWA_SMTP_PORT ?? 25),
+              secure: process.env.MWA_SMTP_SECURE === 'true',
+          })
         : null;
     const smtpFrom = process.env.MWA_MAIL_FROM ?? 'mwa@localhost';
 
@@ -47,9 +47,7 @@ export function createDefaultMwaState(isDevMode: boolean): MwaState {
     });
 }
 
-export function createTestMwaState(init: {
-    mailer?: Mailer,
-}): MwaState {
+export function createTestMwaState(init: { mailer?: Mailer }): MwaState {
     return createMwaState({
         isDevMode: false,
         db: createDatabase(':memory:'),
@@ -64,11 +62,7 @@ function createDatabase(path: string) {
     return db;
 }
 
-function createMwaState(init: {
-    isDevMode: boolean,
-    db: DatabaseSync,
-    mailer: Mailer,
-}): MwaState {
+function createMwaState(init: { isDevMode: boolean; db: DatabaseSync; mailer: Mailer }): MwaState {
     const statements: Record<string, StatementSync> = {};
     return {
         isDevMode: init.isDevMode,
@@ -86,4 +80,3 @@ function createMwaState(init: {
         },
     };
 }
-

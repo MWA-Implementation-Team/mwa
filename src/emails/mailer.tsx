@@ -19,7 +19,9 @@ export const noopMailer: Mailer = {
 
 export const consoleMailer: Mailer = {
     async sendLoginEmail(to, props) {
-        console.log(`[console mailer] ${to} - ${translate(props.lang)('emailLoginSubject')}\n${loginText(props)}`);
+        console.log(
+            `[console mailer] ${to} - ${translate(props.lang)('emailLoginSubject')}\n${loginText(props)}`,
+        );
     },
 };
 

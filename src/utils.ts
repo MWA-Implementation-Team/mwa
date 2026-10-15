@@ -1,7 +1,7 @@
-import { Context } from "hono";
-import { defaultLanguage, LanguageCode } from "./client/language.js";
-import { getCookie } from "hono/cookie";
-import { cookieLanguage } from "./client/constants.js";
+import { Context } from 'hono';
+import { defaultLanguage, LanguageCode } from './client/language.js';
+import { getCookie } from 'hono/cookie';
+import { cookieLanguage } from './client/constants.js';
 
 // Server side utilities that don't belong in any other file
 

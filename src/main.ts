@@ -17,7 +17,7 @@ const isDevMode: boolean = process.argv[2] === '--dev';
 if (isDevMode) {
     try {
         process.loadEnvFile('.env');
-    } catch { }
+    } catch {}
 }
 
 const state = createDefaultMwaState(isDevMode);

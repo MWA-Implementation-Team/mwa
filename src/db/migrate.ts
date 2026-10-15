@@ -31,12 +31,14 @@ export function migrateDatabase(database: DatabaseSync) {
         try {
             database.exec(sql);
             database
-                .prepare(`
+                .prepare(
+                    `
                 INSERT INTO migration_status (id, current_version)
                 VALUES (1, ?)
                 ON CONFLICT(id) DO UPDATE
                 SET current_version = excluded.current_version;
-                `)
+                `,
+                )
                 .run(ver);
             database.exec('COMMIT');
         } catch (err) {
