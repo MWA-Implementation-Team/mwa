@@ -27,6 +27,19 @@ export type Language = {
     headerAdmin: string;
 
     homeWelcome: string;
+
+    groupManagement: string;
+    groupName: string;
+    groupPhone: string;
+    groupCreate: string;
+    groupYourGroups: string;
+    groupEmpty: string;
+    groupDelete: string;
+    groupDeleteConfirm: string;
+    groupCreated: string;
+    groupDeleted: string;
+    groupCreateFailed: string;
+    groupDeleteFailed: string;
 };
 
 export const languages: Record<LanguageCode, Language> = {
@@ -55,6 +68,19 @@ export const languages: Record<LanguageCode, Language> = {
         headerAdmin: 'Admin',
 
         homeWelcome: 'Welcome back, {name}',
+
+        groupManagement: 'Group Management',
+        groupName: 'Group Name',
+        groupPhone: 'Enter emergency phone Number',
+        groupCreate: 'Create Group',
+        groupYourGroups: 'your Groups',
+        groupEmpty: 'no groups found',
+        groupDelete: 'Delete group',
+        groupDeleteConfirm: 'Delete group?',
+        groupCreated: 'Group created successfully!',
+        groupDeleted: 'Group deleted successfully!',
+        groupCreateFailed: 'failed to create group',
+        groupDeleteFailed: 'failed to delete group',
     },
     lt: {
         displayName: 'Lietuvių',
@@ -81,6 +107,19 @@ export const languages: Record<LanguageCode, Language> = {
         headerAdmin: 'Administravimas',
 
         homeWelcome: 'Sveiki sugrįžę, {name}',
+
+        groupManagement: 'Grupių valdymas',
+        groupName: 'Grupės pavadinimas',
+        groupPhone: 'Įveskite skubios pagalbos telefono numerį',
+        groupCreate: 'Sukurti grupę',
+        groupYourGroups: 'tavo grupės',
+        groupEmpty: 'grupių nerasta',
+        groupDelete: 'Ištrinti grupę',
+        groupDeleteConfirm: 'Ištrinti grupę?',
+        groupCreated: 'Grupė sėkmingai sukurta!',
+        groupDeleted: 'Grupė sėkmingai ištrinta!',
+        groupCreateFailed: 'nepavyko sukurti grupės',
+        groupDeleteFailed: 'nepavyko ištrinti grupės',
     },
 };
 

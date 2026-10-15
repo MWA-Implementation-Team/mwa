@@ -10,11 +10,11 @@ type GroupsPageProps = {
 
 export const groupPage: Page<GroupsPageProps> = {
     Component: GroupsComponent,
-    title: () => 'groups',
+    title: (t) => t('titleGroup'),
 };
 
 function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
-    const { user } = useContext(ClientContext);
+    const { t, user } = useContext(ClientContext);
     const [groups, setGroups] = useState(initialGroups);
     const [groupName, setGroupName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -22,7 +22,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     const handleDeleteGroup = async (groupId: number) => {
-        if (!window.confirm('Delete group?')) return;
+        if (!window.confirm(t('groupDeleteConfirm'))) return;
 
         setError(null);
         setSuccessMsg(null);
@@ -31,9 +31,9 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
             setGroups(
                 (currentGroups) => currentGroups?.filter((group) => group.id !== groupId) ?? null,
             );
-            setSuccessMsg('Group deleted successfully!');
+            setSuccessMsg(t('groupDeleted'));
         } catch (err: any) {
-            setError(err.message || 'failed to delete group');
+            setError(err.message || t('groupDeleteFailed'));
         }
     };
 
@@ -45,11 +45,11 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
         try {
             const group = await createGroup(groupName, 0, phoneNumber);
             setGroups((currentGroups) => [...(currentGroups ?? []), group]);
-            setSuccessMsg('Group created successfully!');
+            setSuccessMsg(t('groupCreated'));
             setGroupName('');
             setPhoneNumber('');
         } catch (err: any) {
-            setError(err.message || 'failed to create group');
+            setError(err.message || t('groupCreateFailed'));
         }
     };
 
@@ -58,14 +58,14 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
             <Header />
 
             <div>
-                <h1>Group Management</h1>
+                <h1>{t('groupManagement')}</h1>
 
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
 
                 <form onSubmit={handleCreateGroup}>
                     <div>
-                        <label>Group Name: </label>
+                        <label>{t('groupName')}: </label>
                         <input
                             type="text"
                             value={groupName}
@@ -74,7 +74,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                         />
                     </div>
                     <div>
-                        <label>Enter emergency phone Number: </label>
+                        <label>{t('groupPhone')}: </label>
                         <input
                             type="text"
                             value={phoneNumber}
@@ -83,13 +83,13 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                         />
                     </div>
                     <button type="submit" class="btn-primary">
-                        Create Group
+                        {t('groupCreate')}
                     </button>
                 </form>
 
-                <h2>your Groups</h2>
+                <h2>{t('groupYourGroups')}</h2>
                 {groups === null || groups.length === 0 ? (
-                    <p>no groups found</p>
+                    <p>{t('groupEmpty')}</p>
                 ) : (
                     <ul>
                         {groups.map((group) => (
@@ -100,7 +100,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                                         type="button"
                                         onClick={() => handleDeleteGroup(group.id)}
                                     >
-                                        Delete group
+                                        {t('groupDelete')}
                                     </button>
                                 )}
                             </li>
