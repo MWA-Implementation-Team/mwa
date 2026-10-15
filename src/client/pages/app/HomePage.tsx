@@ -3,14 +3,17 @@ import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 
-type HomePageProps = {};
+type HomePageProps = {
+    qrSvg: string;
+    interactUrl: string;
+};
 
 export const homePage: Page<HomePageProps> = {
     Component: HomePage,
     title: (t) => t('titleHome'),
 };
 
-function HomePage({}: HomePageProps) {
+function HomePage({ qrSvg, interactUrl }: HomePageProps) {
     const { t, user } = useContext(ClientContext);
 
     return (
@@ -25,6 +28,12 @@ function HomePage({}: HomePageProps) {
             <a href="/app/casino">
                 <button>GO GAMBLING</button>
             </a>
+
+            <section>
+                <h2>{t('homeQrTitle')}</h2>
+                <div class="qr-code" dangerouslySetInnerHTML={{ __html: qrSvg }} />
+                <a href={interactUrl}>{interactUrl}</a>
+            </section>
         </>
     );
 }

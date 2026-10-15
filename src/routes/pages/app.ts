@@ -1,17 +1,23 @@
 import { requireUser } from '#src/auth.js';
 import { isActivitySlug } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
+import { getOrCreateInteractToken } from '#src/db/interactions.js';
 import { deleteSession } from '#src/db/sessions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { Hono } from 'hono';
 import { deleteCookie, getCookie } from 'hono/cookie';
+import { renderSVG } from 'uqr';
 
 export function registerAppRoutes(app: Hono) {
     app.get('/app', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        return writePage(ctx, 'home', {});
+        // Personal QR — a stable link others scan to reach the interact page.
+        const token = getOrCreateInteractToken(user.id);
+        const interactUrl = new URL(`/app/interact/${token}`, ctx.req.url).toString();
+
+        return writePage(ctx, 'home', { qrSvg: renderSVG(interactUrl), interactUrl });
     });
 
     app.post('/app', async (ctx) => {
