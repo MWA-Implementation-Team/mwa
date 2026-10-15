@@ -28,7 +28,7 @@ export async function deleteGroup(groupId: number): Promise<void> {
     const res = await fetch(`/api/groups/${groupId}`, {
         method: 'DELETE',
     });
-    if (!res.ok) throw new Error('Couldntt delete group');
+    if (!res.ok) throw new Error('Could not delete group');
 }
 
 export async function addGroupMember(

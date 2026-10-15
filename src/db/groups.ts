@@ -1,6 +1,11 @@
 import { database } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
 
+export const MIN_GROUP_MEMBERS = 2;
+export const MAX_GROUP_MEMBERS = 6;
+export const MAX_GROUP_NAME_LENGTH = 64;
+export const MAX_PHONE_NUMBER_LENGTH = 32;
+
 // Local group type
 export type Group = {
     id: number;
@@ -38,7 +43,7 @@ const deleteGroupQuery = database.prepare(`
 
 // Get group of user by user id
 const getUserGroupQuery = database.prepare(`
-    SELECT *
+    SELECT groups.id, groups.name, groups.owner_id, groups.phone_number, groups.created_at
     FROM groups
     JOIN group_members ON groups.id = group_members.group_id
     WHERE group_members.user_id = ?    
@@ -74,7 +79,7 @@ const removeMemberQuery = database.prepare(`
 
 // Get members of group
 const getGroupMembersQuery = database.prepare(`
-   SELECT *
+   SELECT group_id, user_id, joined_at
    FROM group_members
    WHERE group_id = ?
 `);
@@ -140,15 +145,22 @@ export function addGroupMember(
 ): { success: boolean; error?: string } {
     const row = getGroupMemberCountQuery.get(group_id) as { count: number };
 
-    if (row.count >= 6) {
-        return { success: false, error: 'Group has reached the max limit of 6 members' };
+    if (row.count >= MAX_GROUP_MEMBERS) {
+        return {
+            success: false,
+            error: `Group has reached the max limit of ${MAX_GROUP_MEMBERS} members`,
+        };
+    }
+
+    if (findUserGroup(user_id)) {
+        return { success: false, error: 'Member is already in a group' };
     }
 
     try {
         addMemberQuery.run(group_id, user_id);
         return { success: true };
     } catch {
-        return { success: false, error: 'Member is already in a group' };
+        return { success: false, error: 'Failed to add member' };
     }
 }
 
@@ -156,12 +168,21 @@ export function removeGroupMember(
     group_id: number,
     user_id: number,
 ): { success: boolean; error?: string } {
+    const group = getGroupByIdQuery.get(group_id);
+    if (!group) {
+        return { success: false, error: 'Group not found' };
+    }
+
+    if (group.owner_id === user_id) {
+        return { success: false, error: 'Cannot remove the group owner' };
+    }
+
     const row = getGroupMemberCountQuery.get(group_id) as { count: number };
 
-    if (row.count <= 2) {
+    if (row.count <= MIN_GROUP_MEMBERS) {
         return {
             success: false,
-            error: 'Cannot remove member. Groups must maintain a minimum of 2 members',
+            error: `Cannot remove member. Groups must maintain a minimum of ${MIN_GROUP_MEMBERS} members`,
         };
     }
 
