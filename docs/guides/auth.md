@@ -5,12 +5,25 @@ enter an email, and you get a one-time link **and** a short code — click the l
 or paste the code. If the email is registered it logs you in; if not, it creates
 your account. There are no passwords — owning the email _is_ the credential.
 
-In dev, the mailer prints the link and code to the server console. To test with
+Without `MWA_SMTP_HOST`, the mailer prints the link and code to the server console. To test with
 real emails, run `docker compose up` — it runs `npm run dev` inside a container
 (same hot-reload loop, and the bind mount shares the repo's `db.sqlite`)
 alongside mailpit; the web inbox is at http://localhost:8025. Bare-metal
 `npm run dev` without `MWA_SMTP_*` stays on the console mailer — see
-`src/mailer.tsx` for the env seam.
+`createDefaultMwaState` in `src/state.ts` for environment configuration and
+`src/emails/mailer.tsx` for implementations. Dev startup and `npm run seed` attempt
+to load `.env`; production startup uses the process environment.
+
+The factory selects SMTP when `MWA_SMTP_HOST` is set. It also reads `MWA_SMTP_PORT`
+(default `25`), `MWA_SMTP_SECURE` (`true` enables TLS), and `MWA_MAIL_FROM` (default
+`mwa@localhost`). The login route calls
+`ctx.var.mailer.sendLoginEmail(to, { lang, url, code })`. `getRequestLanguage(ctx)`
+reads the language cookie, defaulting to English; the template currently still
+uses English copy.
+
+Tests inject a `Mailer` with `createTestMwaState({ mailer })` to capture sends or
+simulate failures. Without an override, the test factory uses a no-op mailer.
+There is no global transport setter.
 
 ## The pieces
 
@@ -70,9 +83,10 @@ sqlite3 db.sqlite "UPDATE users SET role = 'host' WHERE username = 'alice';"
 1. `npm run seed` (if you haven't), `npm run dev`.
 2. On `/login` enter `alice@mwa.dev`, submit — the page says a login link was sent
    and shows a code field.
-3. The server console shows `[mailer] login link for alice@mwa.dev:
-http://localhost:3000/auth/verify?token=…  (code: …)`. Open the link — you're
-   logged in; the header shows `App (alice)`.
+3. With the console mailer, look for `[console mailer] alice@mwa.dev` followed by
+   the subject and email text containing the link and code. With SMTP/mailpit, open
+   the web inbox instead. Open the link — you're logged in; the header shows
+   `App (alice)`.
 4. Or instead: submit again, then type the **code** into the field — same result.
 5. A fresh email → "signup link" copy; the link creates the
    account and lands on `/app/account` with a derived username.
