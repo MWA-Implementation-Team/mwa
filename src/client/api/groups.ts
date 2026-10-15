@@ -1,5 +1,16 @@
 import type { Group, GroupMember } from '#src/db/groups.js';
+import { revive, type Serialized } from '#src/client/serialize.js';
 export type { Group, GroupMember };
+export type GroupJson = Serialized<Group>;
+export type GroupMemberJson = Serialized<GroupMember>;
+
+export function reviveGroup(group: GroupJson): Group {
+    return revive(group, 'created_at');
+}
+
+export function reviveGroupMember(member: GroupMemberJson): GroupMember {
+    return revive(member, 'joined_at');
+}
 
 export async function createGroup(
     name: string,
@@ -15,13 +26,13 @@ export async function createGroup(
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
         throw new Error(body?.error ?? `POST /api/groups failed: ${res.status}`);
     }
-    return res.json();
+    return reviveGroup(await res.json());
 }
 
 export async function fetchGroupById(groupId: number): Promise<Group> {
     const res = await fetch(`/api/groups/${groupId}`);
     if (!res.ok) throw new Error(`GET /api/groups/${groupId} failed: ${res.status}`);
-    return res.json();
+    return reviveGroup(await res.json());
 }
 
 export async function deleteGroup(groupId: number): Promise<void> {
@@ -56,5 +67,5 @@ export async function removeGroupMember(
 export async function fetchGroupMembers(groupId: number): Promise<GroupMember[]> {
     const res = await fetch(`/api/groups/${groupId}/members`);
     if (!res.ok) throw new Error(`GET /api/groups/${groupId}/members failed: ${res.status}`);
-    return res.json();
+    return (await res.json()).map(reviveGroupMember);
 }

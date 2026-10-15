@@ -1,5 +1,6 @@
 import { currentUser } from '#src/auth.js';
 import { listUserGroups } from '#src/db/groups.js';
+import { serialize } from '#src/client/serialize.js';
 import { isActivitySlug } from '#src/client/activities.js';
 import { cookieUsername } from '#src/client/constants.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
@@ -51,7 +52,9 @@ export function registerAppRoutes(app: Hono) {
         const user = currentUser(ctx);
         if (!user) return goLogin(ctx);
 
-        return writePage(ctx, 'group', { initialGroups: listUserGroups(user.id) });
+        return writePage(ctx, 'group', {
+            initialGroups: listUserGroups(user.id).map(serialize),
+        });
     });
 
     app.get('/app/casino', async (ctx) => {

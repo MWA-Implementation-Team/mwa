@@ -3,7 +3,7 @@ import { ReactNode } from 'preact/compat';
 import { useState, useMemo, useEffect } from 'preact/hooks';
 import { defaultLanguage, LanguageCode, translate, TranslateFn } from './language.js';
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
-import { User } from '#src/client/api/users.js';
+import { reviveUser, User, UserJson } from '#src/client/api/users.js';
 
 export type ClientContextType = {
     lang: LanguageCode;
@@ -23,7 +23,7 @@ export const ClientContext = createContext<ClientContextType>({
 
 export type ClientContextWrapperInit = {
     lang: LanguageCode;
-    user: User | null;
+    user: UserJson | null;
 };
 
 export type ClientContextWrapperProps<P extends RegisteredPageId> = {
@@ -47,7 +47,7 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
             lang,
             updateLang: (newLang) => setLang(newLang),
             t: translate(lang),
-            user: init.user,
+            user: init.user && reviveUser(init.user),
         }),
         [lang, init.user],
     );

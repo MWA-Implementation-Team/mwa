@@ -52,7 +52,8 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
         ├── context.tsx        ClientContext: lang, updateLang, t(), user
         ├── language.ts        translations (en, lt) + translate() / t()
         ├── constants.ts       cookie names (mwa-username, mwa-language, mwa-theme-override)
-        ├── api/               fetch wrappers + type-only re-exports of db types
+        ├── serialize.ts       Serialized<T> wire types + serialize()/revive() for Date fields
+        ├── api/               fetch wrappers + Serialized<T> wire types + db type re-exports
         ├── activities/        one slug-named folder per station (Card + Detail + activity.ts)
         ├── pages/             one component per page, each a Page<P> object
         └── ui/                shared components (header, toggles, icons)

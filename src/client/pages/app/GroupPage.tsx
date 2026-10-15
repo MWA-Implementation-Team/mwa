@@ -2,10 +2,10 @@ import { useContext, useState } from 'preact/hooks';
 import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
-import { createGroup, deleteGroup, type Group } from '#src/client/api/groups.js';
+import { createGroup, deleteGroup, reviveGroup, type GroupJson } from '#src/client/api/groups.js';
 
 type GroupsPageProps = {
-    initialGroups?: Group[] | null;
+    initialGroups?: GroupJson[] | null;
 };
 
 export const groupPage: Page<GroupsPageProps> = {
@@ -15,7 +15,7 @@ export const groupPage: Page<GroupsPageProps> = {
 
 function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
     const { t, user } = useContext(ClientContext);
-    const [groups, setGroups] = useState(initialGroups);
+    const [groups, setGroups] = useState(initialGroups?.map(reviveGroup) ?? null);
     const [groupName, setGroupName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [error, setError] = useState<string | null>(null);
