@@ -12,18 +12,18 @@ try {
 const state = createDefaultMwaState(false);
 
 const existing =
-    (state.db.prepare(`SELECT COUNT(*) AS n FROM users`).get() as { n: number }).n ?? 0;
+    (state.prepare(`SELECT COUNT(*) AS n FROM users`).get() as { n: number }).n ?? 0;
 if (existing > 0) {
     console.log(`Database already has ${existing} user(s) — delete db.sqlite to reseed.`);
     process.exit(0);
 }
 
-const insertUser = state.db.prepare(`INSERT INTO users (username, email, role) VALUES (?, ?, ?)`);
-const insertParent = state.db.prepare(`INSERT INTO parent_transactions (kind) VALUES (?)`);
-const insertLeg = state.db.prepare(
+const insertUser = state.prepare(`INSERT INTO users (username, email, role) VALUES (?, ?, ?)`);
+const insertParent = state.prepare(`INSERT INTO parent_transactions (kind) VALUES (?)`);
+const insertLeg = state.prepare(
     `INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)`,
 );
-const awardBadge = state.db.prepare(`INSERT INTO user_badges (badge_id, user_id) VALUES (?, ?)`);
+const awardBadge = state.prepare(`INSERT INTO user_badges (badge_id, user_id) VALUES (?, ?)`);
 
 function addUser(username: string, email: string, role: UserRole): number {
     return Number(insertUser.run(username, email, role).lastInsertRowid);

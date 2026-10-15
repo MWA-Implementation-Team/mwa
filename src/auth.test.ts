@@ -37,7 +37,7 @@ app.get('/probe/api-staff', (ctx) => {
 let seq = 0;
 function userAs(role: UserRole): { user: User; cookie: string } {
     const user = createUser(state, `guard${seq}@example.com`, `guard${seq++}`);
-    state.db.prepare(`UPDATE users SET role = ? WHERE id = ?`).run(role, user.id);
+    state.prepare(`UPDATE users SET role = ? WHERE id = ?`).run(role, user.id);
     return { user: { ...user, role }, cookie: `mwa-session=${createSession(state, user.id)}` };
 }
 
