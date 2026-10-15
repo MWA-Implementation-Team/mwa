@@ -1,7 +1,7 @@
 import { requireUser } from '#src/auth.js';
 import { isActivitySlug } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
-import { getOrCreateInteractToken } from '#src/db/interactions.js';
+import { findUserByInteractToken, getOrCreateInteractToken } from '#src/db/interactions.js';
 import { deleteSession } from '#src/db/sessions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { Hono } from 'hono';
@@ -75,5 +75,31 @@ export function registerAppRoutes(app: Hono) {
         if (user instanceof Response) return user;
 
         return writePage(ctx, 'casino', {});
+    });
+
+    app.get('/app/interact/:token', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const target = findUserByInteractToken(ctx.req.param('token'));
+        if (!target) return writeErrorPage(ctx, 404);
+
+        const self = target.id === user.id;
+        // Profile detail is serialized into #ssr-data — populate it only for
+        // roles whose view includes it, never for regular users.
+        const detail =
+            !self && (user.role === 'host' || user.role === 'admin')
+                ? {
+                      email: target.email,
+                      currentBalance: target.currentBalance,
+                      joinedAt: target.createdAt.toISOString(),
+                  }
+                : null;
+
+        return writePage(ctx, 'interact', {
+            self,
+            target: { username: target.username },
+            detail,
+        });
     });
 }

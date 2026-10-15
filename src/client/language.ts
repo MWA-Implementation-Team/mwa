@@ -14,6 +14,7 @@ export type Language = {
     titleLeaderboard: string;
     titleGroup: string;
     titleCasino: string;
+    titleInteract: string;
     titleAdmin: string;
     titleError: string;
 
@@ -27,6 +28,16 @@ export type Language = {
     headerAdmin: string;
 
     homeWelcome: string;
+    homeQrTitle: string;
+
+    interactHeading: string;
+    interactSelfJoke: string;
+    interactSendMoneyTitle: string;
+    interactComingSoon: string;
+    interactProfileDetailTitle: string;
+    interactDetailEmail: string;
+    interactDetailBalance: string;
+    interactDetailJoined: string;
 };
 
 export const languages: Record<LanguageCode, Language> = {
@@ -42,6 +53,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleLeaderboard: 'MWA | Leaderboard',
         titleGroup: 'MWA | Group',
         titleCasino: 'MWA | Casino',
+        titleInteract: 'MWA | Interact',
         titleAdmin: 'MWA | Admin',
         titleError: 'MWA | {status}',
 
@@ -55,6 +67,16 @@ export const languages: Record<LanguageCode, Language> = {
         headerAdmin: 'Admin',
 
         homeWelcome: 'Welcome back, {name}',
+        homeQrTitle: 'Your QR code',
+
+        interactHeading: 'Interact with {name}',
+        interactSelfJoke: "That's you! Scan someone else's code instead.",
+        interactSendMoneyTitle: 'Send money',
+        interactComingSoon: 'Coming soon',
+        interactProfileDetailTitle: 'Profile details',
+        interactDetailEmail: 'Email',
+        interactDetailBalance: 'Balance',
+        interactDetailJoined: 'Joined',
     },
     lt: {
         displayName: 'Lietuvių',
@@ -68,6 +90,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleLeaderboard: 'MWA | Lyderių lentelė',
         titleGroup: 'MWA | Grupė',
         titleCasino: 'MWA | Kazino',
+        titleInteract: 'MWA | Sąveika',
         titleAdmin: 'MWA | Administravimas',
         titleError: 'MWA | {status}',
 
@@ -81,6 +104,16 @@ export const languages: Record<LanguageCode, Language> = {
         headerAdmin: 'Administravimas',
 
         homeWelcome: 'Sveiki sugrįžę, {name}',
+        homeQrTitle: 'Jūsų QR kodas',
+
+        interactHeading: 'Sąveika su {name}',
+        interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
+        interactSendMoneyTitle: 'Siųsti pinigus',
+        interactComingSoon: 'Netrukus',
+        interactProfileDetailTitle: 'Profilio detalės',
+        interactDetailEmail: 'El. paštas',
+        interactDetailBalance: 'Balansas',
+        interactDetailJoined: 'Prisijungė',
     },
 };
 

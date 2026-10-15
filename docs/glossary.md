@@ -74,3 +74,21 @@ A compile-time-checked map of everything of a kind — `registeredPages` for pag
 `keyof` types turn misconfiguration (a typo'd key, a missing field) into a `tsc`
 error. Server code resolves entries at request time (the activities route) or syncs
 them into a table at startup (`syncActivities` → `activities`).
+
+## Interact token
+
+A permanent, unguessable string identifying a user for the personal-QR flow — the
+`<token>` in `/app/interact/<token>`. Minted lazily by `getOrCreateInteractToken`
+(`src/db/interactions.ts`) on the owner's first `/app` render and stored raw in
+`interact_tokens` (like `system_qr_codes.secret`), because the QR needs the real
+value every render. It identifies the target but authorizes nothing — the
+scanner's session and role decide what they can do.
+
+## Interaction
+
+Something a scanner can do with the owner of an interact token — today just a
+conditional section on `InteractPage` (`src/client/pages/app/InteractPage.tsx`).
+Role gating is data-driven, not renderer-driven: the route only serializes
+elevated fields (the `detail` prop) for host/admin scanners, so a section can
+never receive data its role shouldn't see. If interactions multiply, this can
+graduate to a registry like `registeredActivities`.
