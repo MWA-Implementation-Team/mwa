@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { Hono } from 'hono';
-import { database } from '#src/state.js';
 import { createUser, User, UserRole } from '#src/db/users.js';
 import { createSession } from '#src/db/sessions.js';
 import { requireApiRole, requireApiUser, requireRole, requireUser } from './auth.js';
+import { createTestMwaState, MwaHono, setupHonoState } from './state.js';
 
-const app = new Hono();
+const state = createTestMwaState({});
+const app: MwaHono = new Hono();
+setupHonoState(app, state);
 
 app.get('/probe/page', (ctx) => {
     const user = requireUser(ctx);
@@ -34,9 +36,9 @@ app.get('/probe/api-staff', (ctx) => {
 
 let seq = 0;
 function userAs(role: UserRole): { user: User; cookie: string } {
-    const user = createUser(`guard${seq}@example.com`, `guard${seq++}`);
-    database.prepare(`UPDATE users SET role = ? WHERE id = ?`).run(role, user.id);
-    return { user: { ...user, role }, cookie: `mwa-session=${createSession(user.id)}` };
+    const user = createUser(state, `guard${seq}@example.com`, `guard${seq++}`);
+    state.db.prepare(`UPDATE users SET role = ? WHERE id = ?`).run(role, user.id);
+    return { user: { ...user, role }, cookie: `mwa-session=${createSession(state, user.id)}` };
 }
 
 describe('page guards', () => {

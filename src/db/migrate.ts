@@ -1,8 +1,8 @@
-import { database } from '#src/state.js';
+import { DatabaseSync } from 'node:sqlite';
 import { readdirSync, readFileSync } from 'fs';
 import path from 'path';
 
-export function migrateDatabase() {
+export function migrateDatabase(database: DatabaseSync) {
     database.exec(`
     CREATE TABLE IF NOT EXISTS migration_status (
         id INTEGER PRIMARY KEY CHECK (id = 1),
@@ -31,14 +31,12 @@ export function migrateDatabase() {
         try {
             database.exec(sql);
             database
-                .prepare(
-                    `
-            INSERT INTO migration_status (id, current_version)
-            VALUES (1, ?)
-            ON CONFLICT(id) DO UPDATE
-            SET current_version = excluded.current_version;
-            `,
-                )
+                .prepare(`
+                INSERT INTO migration_status (id, current_version)
+                VALUES (1, ?)
+                ON CONFLICT(id) DO UPDATE
+                SET current_version = excluded.current_version;
+                `)
                 .run(ver);
             database.exec('COMMIT');
         } catch (err) {

@@ -1,6 +1,6 @@
 services:
     app:
-        image: node:24-slim
+        image: docker.io/node:24-slim
         working_dir: /app
         volumes:
             - .:/app
@@ -22,7 +22,7 @@ services:
                 condition: service_started
 
     mailpit:
-        image: axllent/mailpit:latest
+        image: docker.io/axllent/mailpit:v1.31.6
         ports:
             - '1025:1025'
             - '8025:8025'

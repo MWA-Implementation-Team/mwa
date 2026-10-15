@@ -4,14 +4,11 @@
 // the multipart/alternative fallback — clients that block HTML show it, and
 // sending both scores better with spam filters. Keep the copy in sync.
 
-export type LoginEmailProps = {
-    url: string;
-    code: string;
-};
+import { LoginEmailProps } from "./mailer.js";
 
 export const loginSubject = 'Your MWA sign-in link';
 
-export function LoginEmail({ url, code }: LoginEmailProps) {
+export function LoginEmail({ lang: _lang, url, code }: LoginEmailProps) {
     return (
         <table
             role="presentation"
