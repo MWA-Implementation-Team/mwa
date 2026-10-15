@@ -18,6 +18,12 @@ const insertLeg = database.prepare(
     `INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)`,
 );
 const awardBadge = database.prepare(`INSERT INTO user_badges (badge_id, user_id) VALUES (?, ?)`);
+const insertGroup = database.prepare(
+    `INSERT INTO groups (name, owner_id, phone_number) VALUES (?, ?, ?)`,
+);
+const insertMember = database.prepare(
+    `INSERT INTO group_members (group_id, user_id) VALUES (?, ?)`,
+);
 
 function addUser(username: string, email: string, role: UserRole): number {
     return Number(insertUser.run(username, email, role).lastInsertRowid);
@@ -29,6 +35,14 @@ function addParent(kind: 'transfer' | 'purchase' | 'system'): number {
 
 function leg(parentId: number, userId: number, balanceDelta: number) {
     insertLeg.run(parentId, userId, balanceDelta);
+}
+
+function addGroup(name: string, ownerId: number, phoneNumber: string): number {
+    return Number(insertGroup.run(name, ownerId, phoneNumber).lastInsertRowid);
+}
+
+function member(groupId: number, userId: number) {
+    insertMember.run(groupId, userId);
 }
 
 database.exec('BEGIN');
@@ -55,6 +69,11 @@ try {
 
     awardBadge.run('test_badge', aliceId);
 
+    const groupId = addGroup('high rollers', aliceId, '555-0100');
+    member(groupId, aliceId);
+    member(groupId, bobId);
+    member(groupId, carolId);
+
     database.exec('COMMIT');
 } catch (error) {
     database.exec('ROLLBACK');
@@ -73,4 +92,18 @@ const balances = database
     )
     .all();
 console.table(balances);
+
+const groups = database
+    .prepare(
+        `SELECT groups.name,
+                users.username AS owner,
+                COUNT(group_members.user_id) AS members,
+                groups.phone_number
+         FROM groups
+         JOIN users ON users.id = groups.owner_id
+         LEFT JOIN group_members ON group_members.group_id = groups.id
+         GROUP BY groups.id`,
+    )
+    .all();
+console.table(groups);
 console.log('Seeded.');
