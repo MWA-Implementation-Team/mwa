@@ -1,6 +1,7 @@
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from '#src/client/pages.js';
 import { currentUser } from '#src/auth.js';
 import { ClientContextWrapper, ClientContextWrapperInit } from '#src/client/context.js';
+import { serialize } from '#src/client/serialize.js';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { renderToString } from 'preact-render-to-string';
 import { cookieThemeOverride } from './client/constants.js';
@@ -16,9 +17,10 @@ export function writePage<P extends RegisteredPageId>(
     id: P,
     props: RegisteredPageProps<P>,
 ): Response {
+    const user = currentUser(ctx);
     const ctxInit: ClientContextWrapperInit = {
         lang: getRequestLanguage(ctx),
-        user: currentUser(ctx),
+        user: user && serialize(user),
     };
 
     const root = Root({

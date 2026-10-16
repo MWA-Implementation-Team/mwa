@@ -1,4 +1,6 @@
 import { requireUser } from '#src/auth.js';
+import { listUserGroups } from '#src/db/groups.js';
+import { serialize } from '#src/client/serialize.js';
 import { isActivitySlug } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
 import { deleteSession } from '#src/db/sessions.js';
@@ -61,7 +63,9 @@ export function registerAppRoutes(app: MwaHono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        return writePage(ctx, 'group', {});
+        return writePage(ctx, 'group', {
+            initialGroups: listUserGroups(ctx.var, user.id).map(serialize),
+        });
     });
 
     app.get('/app/casino', async (ctx) => {
