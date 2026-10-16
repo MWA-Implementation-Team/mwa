@@ -1,3 +1,5 @@
+import { getRequestLanguage } from '#src/utils.js';
+import { translate } from '#src/client/language.js';
 import { cookieSession } from '#src/client/constants.js';
 import {
     createSession,
@@ -8,19 +10,18 @@ import {
 import { createUser, deriveUsername, findUserByEmail, markEmailVerified } from '#src/db/users.js';
 import { writePage } from '#src/pages.js';
 import { safeGoto } from '#src/routes/pages/login.js';
-import { isDevMode } from '#src/state.js';
-import { Context, Hono } from 'hono';
+import { MwaContext, MwaHono } from '#src/state.js';
 import { setCookie } from 'hono/cookie';
 
-export function registerAuthRoutes(app: Hono) {
+export function registerAuthRoutes(app: MwaHono) {
     // The link inside login emails. Consuming a token is one-shot: it's marked
     // used in the same statement that returns the email, so replays get nothing.
     app.get('/auth/verify', async (ctx) => {
         const token = ctx.req.query('token');
-        const email = token ? redeemLoginToken(token) : null;
+        const email = token ? redeemLoginToken(ctx.var, token) : null;
         if (!email) {
             return writePage(ctx, 'login', {
-                errorMessage: 'That login link is expired or already used — request a new one',
+                errorKey: 'loginLinkExpired',
             });
         }
         return logIn(ctx, email, ctx.req.query('goto'));
@@ -31,7 +32,7 @@ export function registerAuthRoutes(app: Hono) {
     app.post('/auth/verify', async (ctx) => {
         const form = await ctx.req.formData().catch(() => null);
         if (!form) {
-            return ctx.text('Bad Request', 400);
+            return ctx.text(translate(getRequestLanguage(ctx))('badRequest'), 400);
         }
         const email = String(form.get('email') ?? '')
             .trim()
@@ -39,15 +40,12 @@ export function registerAuthRoutes(app: Hono) {
         const code = String(form.get('code') ?? '').trim();
         const goto = String(form.get('goto') ?? '') || undefined;
 
-        const result = redeemLoginCode(email, code);
+        const result = redeemLoginCode(ctx.var, email, code);
         if (result !== 'redeemed') {
             return writePage(ctx, 'login', {
-                errorMessage:
-                    result === 'wrong'
-                        ? 'Wrong code — check the email and try again'
-                        : 'That code is expired or already used — request a new one',
+                errorKey: result === 'wrong' ? 'loginWrongCode' : 'loginCodeExpired',
                 sentTo: email,
-                sentKind: findUserByEmail(email) ? 'login' : 'signup',
+                sentKind: findUserByEmail(ctx.var, email) ? 'login' : 'signup',
                 goto,
             });
         }
@@ -55,17 +53,17 @@ export function registerAuthRoutes(app: Hono) {
     });
 }
 
-async function logIn(ctx: Context, email: string, goto?: string): Promise<Response> {
-    let user = findUserByEmail(email);
+async function logIn(ctx: MwaContext, email: string, goto?: string): Promise<Response> {
+    let user = findUserByEmail(ctx.var, email);
     const isNewAccount = !user;
     if (!user) {
-        user = createUser(email, deriveUsername(email));
+        user = createUser(ctx.var, email, deriveUsername(ctx.var, email));
     }
-    markEmailVerified(user.id);
-    setCookie(ctx, cookieSession, createSession(user.id), {
+    markEmailVerified(ctx.var, user.id);
+    setCookie(ctx, cookieSession, createSession(ctx.var, user.id), {
         httpOnly: true,
         sameSite: 'Lax',
-        secure: !isDevMode,
+        secure: !ctx.var.isDevMode,
         maxAge: sessionTtlDays * 86_400,
         path: '/',
     });

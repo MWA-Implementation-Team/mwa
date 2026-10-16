@@ -1,8 +1,8 @@
 import { requireApiUser } from '#src/auth.js';
 import { listUsers } from '#src/db/users.js';
-import { Hono } from 'hono';
+import { MwaHono } from '#src/state.js';
 
-export function registerUsersRoutes(app: Hono) {
+export function registerUsersRoutes(app: MwaHono) {
     // Example JSON list endpoint. Pattern for future endpoints:
     // the query lives in db/<domain>.ts as a prepared statement +
     // typed function; the route handler just checks auth and
@@ -11,6 +11,6 @@ export function registerUsersRoutes(app: Hono) {
         const user = requireApiUser(ctx);
         if (user instanceof Response) return user;
 
-        return ctx.json(listUsers());
+        return ctx.json(listUsers(ctx.var));
     });
 }

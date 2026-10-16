@@ -3,10 +3,10 @@ import { isActivitySlug } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
 import { deleteSession } from '#src/db/sessions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
-import { Hono } from 'hono';
+import { MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';
 
-export function registerAppRoutes(app: Hono) {
+export function registerAppRoutes(app: MwaHono) {
     app.get('/app', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
@@ -19,7 +19,7 @@ export function registerAppRoutes(app: Hono) {
         // stops working the moment it's logged out.
         const token = getCookie(ctx, cookieSession);
         if (token) {
-            deleteSession(token);
+            deleteSession(ctx.var, token);
         }
         deleteCookie(ctx, cookieSession);
         return ctx.redirect('/login', 303);

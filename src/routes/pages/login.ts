@@ -1,3 +1,4 @@
+import { translate } from '#src/client/language.js';
 import { redirectIfAuthed } from '#src/auth.js';
 import { findUserByEmail } from '#src/db/users.js';
 import {
@@ -8,9 +9,9 @@ import {
     lastLoginTokenSentAt,
     pruneLoginTokens,
 } from '#src/db/sessions.js';
-import { sendLoginEmail } from '#src/mailer.js';
+import { MwaContext, MwaHono } from '#src/state.js';
 import { writePage } from '#src/pages.js';
-import { Context, Hono } from 'hono';
+import { getRequestLanguage } from '#src/utils.js';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -31,7 +32,7 @@ const allowedGotoPrefixes = ['/app/activities/'];
 // Normalize goto before checking: a raw startsWith lets `..` escape the
 // prefix (browsers resolve it), and absolute URLs on other origins must be
 // rejected outright. Only the normalized path is used as the redirect target.
-export function safeGoto(ctx: Context, raw: string | undefined): string | null {
+export function safeGoto(ctx: MwaContext, raw: string | undefined): string | null {
     if (!raw) {
         return null;
     }
@@ -52,7 +53,7 @@ export function safeGoto(ctx: Context, raw: string | undefined): string | null {
 
 const resendCooldownMs = 60_000;
 
-export function registerLoginRoutes(app: Hono) {
+export function registerLoginRoutes(app: MwaHono) {
     app.get('/login', async (ctx) => {
         const redirect = redirectIfAuthed(ctx);
         if (redirect) {
@@ -65,20 +66,23 @@ export function registerLoginRoutes(app: Hono) {
     app.post('/login', async (ctx) => {
         const form = await ctx.req.formData().catch(() => null);
         if (!form) {
-            return ctx.text('Bad Request', 400);
+            return ctx.text(translate(getRequestLanguage(ctx))('badRequest'), 400);
         }
+
+        const lang = getRequestLanguage(ctx);
+
         const email = String(form.get('email') ?? '')
             .trim()
             .toLowerCase();
 
         if (!emailPattern.test(email)) {
-            return writePage(ctx, 'login', { errorMessage: 'Enter a valid email' });
+            return writePage(ctx, 'login', { errorKey: 'loginInvalidEmail' });
         }
 
-        const isSignup = !findUserByEmail(email);
-        const lastSent = lastLoginTokenSentAt(email);
+        const isSignup = !findUserByEmail(ctx.var, email);
+        const lastSent = lastLoginTokenSentAt(ctx.var, email);
         if (!lastSent || Date.now() - lastSent.getTime() > resendCooldownMs) {
-            const created = createLoginToken(email);
+            const created = createLoginToken(ctx.var, email);
             const url = new URL('/auth/verify', ctx.req.url);
             url.searchParams.set('token', created.token);
             // goto passes through unvalidated — safeGoto re-checks it on
@@ -88,21 +92,25 @@ export function registerLoginRoutes(app: Hono) {
                 url.searchParams.set('goto', goto);
             }
             try {
-                await sendLoginEmail(email, url.toString(), created.code);
+                await ctx.var.mailer.sendLoginEmail(email, {
+                    lang,
+                    url: url.toString(),
+                    code: created.code,
+                });
             } catch (error) {
                 // SMTP down/unreachable — drop the token so a retry actually
                 // re-sends instead of hitting the resend cap on an email that
                 // never existed, and the previous link stays alive.
-                discardLoginToken(created.id);
+                discardLoginToken(ctx.var, created.id);
                 console.error('Failed to send login email', error);
                 return writePage(ctx, 'login', {
-                    errorMessage: 'Could not send the email — try again in a moment',
+                    errorKey: 'loginSendFailed',
                 });
             }
-            confirmLoginTokenSent(email, created.id);
+            confirmLoginTokenSent(ctx.var, email, created.id);
         }
-        deleteExpiredSessions();
-        pruneLoginTokens();
+        deleteExpiredSessions(ctx.var);
+        pruneLoginTokens(ctx.var);
 
         return writePage(ctx, 'login', {
             sentTo: email,

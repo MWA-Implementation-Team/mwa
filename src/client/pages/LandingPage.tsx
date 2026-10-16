@@ -1,4 +1,5 @@
-import { useState } from 'preact/hooks';
+import { ClientContext } from '#src/client/context.js';
+import { useState, useContext } from 'preact/hooks';
 import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 import { fetchUsers, User } from '#src/client/api/users.js';
@@ -16,6 +17,7 @@ export const landingPage: Page<LandingPageProps> = {
 };
 
 function LandingPage({ users: initialUsers }: LandingPageProps) {
+    const { t } = useContext(ClientContext);
     const [value, setValue] = useState(0);
     const [users, setUsers] = useState(initialUsers);
     const [error, setError] = useState<string | null>(null);
@@ -40,7 +42,7 @@ function LandingPage({ users: initialUsers }: LandingPageProps) {
             <h2>Users</h2>
             {error && <p class="error-message">{error}</p>}
             {users === null ? (
-                <p>Log in to see users.</p>
+                <p>{t('usersLoginRequired')}</p>
             ) : (
                 <>
                     <ul>

@@ -50,14 +50,23 @@ versions strictly increasing, and existing files append-only.
 ## Prepared statement
 
 A SQL query compiled once with parameter placeholders (`?`) and executed many times —
-faster, and parameters are bound safely instead of string-concatenated. Every `db/*.ts`
-module prepares its queries at module load (`database.prepare(...)`) and exports typed
-functions around them.
+faster, and parameters are bound safely instead of string-concatenated. Domain functions in
+`db/*.ts` accept `MwaState` and call `state.prepare(sql)` when invoked. Each state
+caches statements by SQL string for reuse on its own connection.
+
+## MwaState
+
+The server dependencies defined in `src/state.ts`: the dev-mode flag, database,
+mailer, and statement preparation cache. Factories create state explicitly;
+`setupHonoState` exposes its fields as `ctx.var` in typed Hono handlers. Tests can
+create independent states with in-memory databases and injected mailers.
 
 ## Context
 
 Preact's mechanism for passing values deep into the component tree without threading
-props through every level.
+props through every level. The server also has Hono request contexts: `MwaContext`
+is the app-specific type, with `MwaState` fields available through `ctx.var`. This
+is separate from the Preact context passed to page components.
 
 ## Activity
 

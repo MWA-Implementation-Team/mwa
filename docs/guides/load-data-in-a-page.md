@@ -29,7 +29,8 @@ secrets in props.
 
 ## Option A — SSR props
 
-Continuing the [badges example](add-a-page.md). In `src/routes/pages/app.ts`:
+Continuing the [badges example](add-a-page.md). In `src/routes/pages/app.ts`, the app is typed as `MwaHono` and state middleware is
+already registered by `main.ts`. Pass `ctx.var` to DB functions:
 
 ```ts
 import { listBadges } from '#src/db/badges.js';
@@ -38,7 +39,7 @@ app.get('/app/badges', async (ctx) => {
     const user = requireUser(ctx);
     if (user instanceof Response) return user;
 
-    return writePage(ctx, 'badges', { badges: listBadges() });
+    return writePage(ctx, 'badges', { badges: listBadges(ctx.var) });
 });
 ```
 
