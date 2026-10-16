@@ -7,7 +7,7 @@ export type { User };
 
 // Pattern for calling protected endpoints from pages: plain
 // same-origin fetch sends cookies automatically
-// (default credentials: 'same-origin'), so the mwa-username
+// (default credentials: 'same-origin'), so the mwa-session
 // auth cookie is attached with no extra config.
 export async function fetchUsers(): Promise<User[]> {
     const res = await fetch('/api/users');

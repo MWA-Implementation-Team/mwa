@@ -29,15 +29,17 @@ secrets in props.
 
 ## Option A — SSR props
 
-Continuing the [badges example](add-a-page.md). In `src/routes/pages/app.ts`:
+Continuing the [badges example](add-a-page.md). In `src/routes/pages/app.ts`, the app is typed as `MwaHono` and state middleware is
+already registered by `main.ts`. Pass `ctx.var` to DB functions:
 
 ```ts
 import { listBadges } from '#src/db/badges.js';
 // ...
 app.get('/app/badges', async (ctx) => {
-    if (!currentUser(ctx)) return goLogin(ctx);
+    const user = requireUser(ctx);
+    if (user instanceof Response) return user;
 
-    return writePage(ctx, 'badges', { badges: listBadges() });
+    return writePage(ctx, 'badges', { badges: listBadges(ctx.var) });
 });
 ```
 
@@ -118,9 +120,10 @@ no loading state needed on mount because the prop already contains data.
 ## How to verify
 
 1. `npm run lint`.
-2. Props path: `curl -s -b 'mwa-username=alice' http://localhost:3000/app/badges` — the
-   `<li>` elements are already in the HTML, and the badge data also appears inside
-   `<script id="ssr-data">`. That's proof SSR and hydration render identically.
+2. Props path: `curl -s -b cookies.txt http://localhost:3000/app/badges` (mint
+   `cookies.txt` via [auth](auth.md)) — the `<li>` elements are already in the
+   HTML, and the badge data also appears inside `<script id="ssr-data">`. That's
+   proof SSR and hydration render identically.
 3. Fetch path: open the browser's Network tab, trigger the fetch (page load or button),
    see `GET /api/badges` return `200` with JSON.
 4. Fetch path, logged out: the endpoint returns `401`; the page shows your error state

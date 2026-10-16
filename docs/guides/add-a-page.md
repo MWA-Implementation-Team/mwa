@@ -51,18 +51,24 @@ is a compile error, not a 404.
 
 ## 3. Add the route
 
-In `src/routes/pages/app.ts`, next to the other `/app/*` routes:
+In `src/routes/pages/app.ts`, next to the other `/app/*` routes. Its registration
+function accepts `MwaHono`, so handlers receive the `MwaContext` expected by guards
+and `writePage`. For a new route module, use the same type and register it in
+`main.ts` after `setupHonoState(app, state)`:
 
 ```ts
 app.get('/app/badges', async (ctx) => {
-    if (!currentUser(ctx)) return goLogin(ctx);
+    const user = requireUser(ctx);
+    if (user instanceof Response) return user;
 
     return writePage(ctx, 'badges', {});
 });
 ```
 
-`goLogin` is the existing helper that redirects logged-out visitors to
-`/login?goto=<path>`.
+`requireUser` (from `src/auth.ts`) returns the logged-in `User`, or a login
+redirect for anonymous visitors — `instanceof Response` picks between them. For
+staff-only pages use `requireRole(ctx, 'admin')` instead — wrong roles get a 403
+page. See [auth](auth.md) for the full guard list and route policy.
 
 ## 4. Add a nav link
 
@@ -111,11 +117,13 @@ back on the badges page.
 ## How to verify
 
 1. `npm run lint` — catches unregistered ids, missing translation keys, unused imports.
-2. `npm run dev`, log in as `alice`, open http://localhost:3000/app/badges — the page
-   renders and the browser tab shows `MWA | Badges`.
-3. `curl -s -b 'mwa-username=alice' http://localhost:3000/app/badges` and search the HTML
-   for `"pageId":"badges"` inside the `<script id="ssr-data">` tag — that confirms the
-   right page id was serialized for hydration.
+2. `npm run dev`, log in (see [auth](auth.md) — the link is in the server console),
+   open http://localhost:3000/app/badges — the page renders and the browser tab
+   shows `MWA | Badges`.
+3. `curl -s -b cookies.txt http://localhost:3000/app/badges` (mint `cookies.txt` via
+   the verify flow in [auth](auth.md)) and search the HTML for `"pageId":"badges"`
+   inside the `<script id="ssr-data">` tag — that confirms the right page id was
+   serialized for hydration.
 4. Click the **Badges** nav link — a full page load lands on the new page.
 5. In an incognito window, open `/app/badges` — you're redirected to
    `/login?goto=/app/badges`; after logging in you land back on `/app/badges`.

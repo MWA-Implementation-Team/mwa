@@ -20,8 +20,9 @@ npm run seed   # optional: sample data (users alice, bob, carol, admin, host)
 npm run dev
 ```
 
-Visit http://localhost:3000/ — log in as `alice` (no password; this is dev-only cookie
-auth, see [docs/guides/auth-in-dev.md](docs/guides/auth-in-dev.md)).
+Visit http://localhost:3000/ — log in with `alice@mwa.dev`: submit the form, then open
+the login link printed in the server console (dev "email" goes to logs, see
+[docs/guides/auth.md](docs/guides/auth.md)).
 
 ## Commands
 
@@ -31,6 +32,7 @@ auth, see [docs/guides/auth-in-dev.md](docs/guides/auth-in-dev.md)).
 | `npm run build`  | compile `src/` → `dist/` with tsc                                        |
 | `npm start`      | run the compiled server (`dist/main.js`, production mode)                |
 | `npm run seed`   | fill `db.sqlite` with sample data (no-op if the users table isn't empty) |
+| `npm test`       | build + run `node:test` suites on an in-memory database                  |
 | `npm run lint`   | typecheck + prettier check — what CI runs                                |
 | `npm run format` | auto-format everything with prettier                                     |
 
@@ -44,7 +46,7 @@ auth, see [docs/guides/auth-in-dev.md](docs/guides/auth-in-dev.md)).
     - [docs/guides/add-an-api-endpoint.md](docs/guides/add-an-api-endpoint.md)
     - [docs/guides/load-data-in-a-page.md](docs/guides/load-data-in-a-page.md)
     - [docs/guides/change-the-database.md](docs/guides/change-the-database.md)
-    - [docs/guides/auth-in-dev.md](docs/guides/auth-in-dev.md)
+    - [docs/guides/auth.md](docs/guides/auth.md)
     - [docs/guides/i18n-and-styling.md](docs/guides/i18n-and-styling.md)
 - [docs/workflow/making-a-pull-request.md](docs/workflow/making-a-pull-request.md)
 - [docs/troubleshooting.md](docs/troubleshooting.md) — real errors and their fixes
