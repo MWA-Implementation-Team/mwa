@@ -64,7 +64,7 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         return writePage(ctx, 'group', {
-            initialGroups: listUserGroups(user.id).map(serialize),
+            initialGroups: listUserGroups(ctx.var, user.id).map(serialize),
         });
     });
 

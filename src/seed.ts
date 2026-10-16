@@ -96,7 +96,7 @@ const balances = state.db
     .all();
 console.table(balances);
 
-const groups = database
+const groups = state.db
     .prepare(
         `SELECT groups.name,
                 users.username AS owner,

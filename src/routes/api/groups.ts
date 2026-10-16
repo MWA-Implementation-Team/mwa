@@ -1,4 +1,4 @@
-import { currentUser } from '#src/auth.js';
+import { requireApiUser } from '#src/auth.js';
 import {
     createGroup,
     deleteGroup,
@@ -11,9 +11,9 @@ import {
     MAX_GROUP_NAME_LENGTH,
     MAX_PHONE_NUMBER_LENGTH,
 } from '#src/db/groups.js';
-import { Context, Hono } from 'hono';
+import { MwaContext, MwaHono } from '#src/state.js';
 
-async function readJsonBody(ctx: Context) {
+async function readJsonBody(ctx: MwaContext) {
     try {
         const body = await ctx.req.json();
         return (body ?? {}) as Record<string, unknown>;
@@ -22,22 +22,18 @@ async function readJsonBody(ctx: Context) {
     }
 }
 
-export function registerGroupsRoutes(app: Hono) {
+export function registerGroupsRoutes(app: MwaHono) {
     app.get('/api/groups', (ctx) => {
-        const user = currentUser(ctx);
-        if (!user) {
-            return ctx.json({ error: 'unauthorized' }, 401);
-        }
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
 
-        return ctx.json(listUserGroups(user.id));
+        return ctx.json(listUserGroups(ctx.var, user.id));
     });
 
     // Create new group
     app.post('/api/groups', async (ctx) => {
-        const user = currentUser(ctx);
-        if (!user) {
-            return ctx.json({ error: 'unauthorized' }, 401);
-        }
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
 
         const body = await readJsonBody(ctx);
         if (!body) {
@@ -56,13 +52,13 @@ export function registerGroupsRoutes(app: Hono) {
             return ctx.json({ error: 'invalid name or phone_number' }, 400);
         }
 
-        if (listUserGroups(user.id).length > 0) {
+        if (listUserGroups(ctx.var, user.id).length > 0) {
             return ctx.json({ error: 'you are already in a group' }, 409);
         }
 
         try {
             // Automatically use the logged in users id as the owner
-            const group = createGroup(name.trim(), user.id, phone_number.trim());
+            const group = createGroup(ctx.var, name.trim(), user.id, phone_number.trim());
             return ctx.json(group, 201);
         } catch {
             return ctx.json({ error: 'Failed to create group' }, 400);
@@ -71,16 +67,15 @@ export function registerGroupsRoutes(app: Hono) {
 
     // Get group details by id
     app.get('/api/groups/:id', (ctx) => {
-        if (!currentUser(ctx)) {
-            return ctx.json({ error: 'unauthorized' }, 401);
-        }
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
 
         const groupId = Number(ctx.req.param('id'));
         if (!Number.isInteger(groupId)) {
             return ctx.json({ error: 'invalid group id' }, 400);
         }
 
-        const group = findGroupById(groupId);
+        const group = findGroupById(ctx.var, groupId);
 
         if (!group) {
             return ctx.json({ error: 'Group not found' }, 404);
@@ -89,17 +84,15 @@ export function registerGroupsRoutes(app: Hono) {
     });
 
     app.delete('/api/groups/:id', (ctx) => {
-        const user = currentUser(ctx);
-        if (!user) {
-            return ctx.json({ error: 'unauthorized' }, 401);
-        }
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
 
         const groupId = Number(ctx.req.param('id'));
         if (!Number.isInteger(groupId)) {
             return ctx.json({ error: 'invalid group id' }, 400);
         }
 
-        const group = findGroupById(groupId);
+        const group = findGroupById(ctx.var, groupId);
         if (!group) {
             return ctx.json({ error: 'Group not found' }, 404);
         }
@@ -107,22 +100,20 @@ export function registerGroupsRoutes(app: Hono) {
             return ctx.json({ error: 'Only the group owner can delete it' }, 403);
         }
 
-        deleteGroup(groupId, user.id);
+        deleteGroup(ctx.var, groupId, user.id);
         return ctx.json({ success: true });
     });
 
     // Add a member to a group — any member of that group may add
     app.post('/api/groups/:id/members', async (ctx) => {
-        const user = currentUser(ctx);
-        if (!user) {
-            return ctx.json({ error: 'unauthorized' }, 401);
-        }
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
 
         const groupId = Number(ctx.req.param('id'));
         if (!Number.isInteger(groupId)) {
             return ctx.json({ error: 'invalid group id' }, 400);
         }
-        if (!findGroupById(groupId)) {
+        if (!findGroupById(ctx.var, groupId)) {
             return ctx.json({ error: 'Group not found' }, 404);
         }
 
@@ -136,20 +127,18 @@ export function registerGroupsRoutes(app: Hono) {
             return ctx.json({ error: 'invalid userId' }, 400);
         }
 
-        if (findUserGroup(user.id)?.id !== groupId) {
+        if (findUserGroup(ctx.var, user.id)?.id !== groupId) {
             return ctx.json({ error: 'only group members can add members' }, 403);
         }
 
-        const result = addGroupMember(groupId, userId);
+        const result = addGroupMember(ctx.var, groupId, userId);
         return ctx.json(result);
     });
 
     // Remove a member from a group — owner only
     app.delete('/api/groups/:id/members/:userId', (ctx) => {
-        const user = currentUser(ctx);
-        if (!user) {
-            return ctx.json({ error: 'unauthorized' }, 401);
-        }
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
 
         const groupId = Number(ctx.req.param('id'));
         const userId = Number(ctx.req.param('userId'));
@@ -157,7 +146,7 @@ export function registerGroupsRoutes(app: Hono) {
             return ctx.json({ error: 'invalid id' }, 400);
         }
 
-        const group = findGroupById(groupId);
+        const group = findGroupById(ctx.var, groupId);
         if (!group) {
             return ctx.json({ error: 'Group not found' }, 404);
         }
@@ -165,22 +154,21 @@ export function registerGroupsRoutes(app: Hono) {
             return ctx.json({ error: 'Only the group owner can remove members' }, 403);
         }
 
-        const result = removeGroupMember(groupId, userId);
+        const result = removeGroupMember(ctx.var, groupId, userId);
         return ctx.json(result);
     });
 
     // List all members of a group
     app.get('/api/groups/:id/members', (ctx) => {
-        if (!currentUser(ctx)) {
-            return ctx.json({ error: 'unauthorized' }, 401);
-        }
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
 
         const groupId = Number(ctx.req.param('id'));
         if (!Number.isInteger(groupId)) {
             return ctx.json({ error: 'invalid group id' }, 400);
         }
 
-        const members = listGroupMembers(groupId);
+        const members = listGroupMembers(ctx.var, groupId);
         return ctx.json(members);
     });
 }
