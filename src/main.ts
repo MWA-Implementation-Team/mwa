@@ -1,7 +1,7 @@
-import { isDevMode } from '#src/state.js';
 import { syncActivities } from '#src/db/activities.js';
 import { registerNodeModulesRoutes, writeErrorPage } from '#src/pages.js';
 import { registerLoginRoutes } from '#src/routes/pages/login.js';
+import { registerAuthRoutes } from '#src/routes/pages/auth.js';
 import { registerAppRoutes } from '#src/routes/pages/app.js';
 import { registerAdminRoutes } from '#src/routes/pages/admin.js';
 import { registerLandingRoutes } from '#src/routes/pages/landing.js';
@@ -10,11 +10,34 @@ import { registerGroupsRoutes } from '#src/routes/api/groups.js';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
+import { csrf } from 'hono/csrf';
+import { HTTPException } from 'hono/http-exception';
+import { MwaHono, createDefaultMwaState, setupHonoState } from './state.js';
 
-const app = new Hono();
+const isDevMode: boolean = process.argv[2] === '--dev';
+if (isDevMode) {
+    try {
+        process.loadEnvFile('.env');
+    } catch {}
+}
+
+const state = createDefaultMwaState(isDevMode);
+
+// Insert the registry's activity slugs so queue/badge rows can foreign-key them
+syncActivities(state);
+
+const app: MwaHono = new Hono();
+setupHonoState(app, state);
+
+// SameSite=Lax already blocks cross-site cookie POSTs; this is the second layer.
+// Intercepts form-encoded unsafe requests and 403s unless Sec-Fetch-Site or
+// Origin proves same-origin — browsers always send one, curl users add -H
+// 'Origin: http://localhost:3000' (or send JSON, which browsers can't cross-post).
+app.use('*', csrf());
 
 registerLandingRoutes(app);
 registerLoginRoutes(app);
+registerAuthRoutes(app);
 registerAppRoutes(app);
 registerAdminRoutes(app);
 registerUsersRoutes(app);
@@ -42,12 +65,14 @@ app.notFound(async (ctx) => {
 });
 
 app.onError(async (error, ctx) => {
+    // Middleware (e.g. csrf) throws HTTPException carrying its intended response —
+    // don't flatten it into a 500.
+    if (error instanceof HTTPException) {
+        return error.getResponse();
+    }
     console.error('Error during request', error);
     return writeErrorPage(ctx, 500);
 });
-
-// Insert the registry's activity slugs so queue/badge rows can foreign-key them
-syncActivities();
 
 const server = serve(
     {

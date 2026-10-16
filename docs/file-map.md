@@ -14,7 +14,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── tsconfig.json              strict TS, JSX → preact, "#src/*" → "./src/*" for tsc
 ├── Dockerfile                 two-stage build: compile TS, run dist/main.js
 ├── AGENTS.md                  project conventions — read before contributing
-├── .github/workflows/         ci.yml — npm ci + npm run lint;
+├── .github/workflows/         ci.yml — npm ci + npm run lint + npm run test;
 │                              migrations.yml — runs scripts/check-migrations.sh on migration PRs
 │
 ├── migrations/                numbered SQL files, applied in order on every server start
@@ -34,10 +34,14 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 │   └── reload.js              dev-only auto-reload client
 │
 └── src/
-    ├── main.ts                Hono app: registers routes, static serving, 404/500 handlers
+    ├── main.ts                creates state + Hono app; routes, static serving, 404/500 handlers
     ├── pages.tsx              writePage() + Root: the SSR document shell, importmap, ssr-data
-    ├── state.ts               isDevMode flag + shared db handle; runs migrations on import
-    ├── auth.ts                currentUser(ctx): mwa-username cookie → User | null
+    ├── state.ts               MwaState factories, statement cache, typed Hono state middleware
+    ├── auth.ts                currentUser() + require*/redirectIfAuthed guards — all auth decisions
+    ├── utils.ts               server helpers, including getRequestLanguage(ctx)
+    ├── emails/                mail templates as Preact components — html + text
+    │                          fallback sharing the same props
+    │   └── mailer.tsx         Mailer interface + SMTP, console, and no-op implementations
     ├── seed.ts                `npm run seed` — sample data; refuses if users exist
     │
     ├── db/                    one module per domain: row type + prepared statements + functions
@@ -51,7 +55,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
         ├── activities.ts      registeredActivities: activity slug → { name, Card, Detail }
         ├── context.tsx        ClientContext: lang, updateLang, t(), user
         ├── language.ts        translations (en, lt) + translate() / t()
-        ├── constants.ts       cookie names (mwa-username, mwa-language, mwa-theme-override)
+        ├── constants.ts       cookie names (mwa-session, mwa-language, mwa-theme-override)
         ├── serialize.ts       Serialized<T> wire types + serialize()/revive() for Date fields
         ├── api/               fetch wrappers + Serialized<T> wire types + db type re-exports
         ├── activities/        one slug-named folder per station (Card + Detail + activity.ts)

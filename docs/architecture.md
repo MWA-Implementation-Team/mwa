@@ -19,10 +19,10 @@ Follow `GET /` through the code:
 1. **Hono matches a route.** `src/main.ts` creates the app and calls the
    `register*Routes` functions. `/` lives in `src/routes/pages/landing.ts`.
 2. **The route resolves the user.** `currentUser(ctx)` (`src/auth.ts`) reads the
-   `mwa-username` cookie and looks the username up in the `users` table. This is
-   dev-only cookie auth — see [auth-in-dev](guides/auth-in-dev.md).
+   `mwa-session` cookie and resolves it through the `sessions` table to a `users`
+   row — see [auth](guides/auth.md).
 3. **The route loads data.** It calls typed functions from `src/db/*.ts` (e.g.
-   `listUsers()`), which wrap prepared statements. The results become _page props_.
+   `listUsers(ctx.var)`), which wrap prepared statements. The results become _page props_.
 4. **`writePage` renders the page.** `writePage(ctx, 'landing', { users })` in
    `src/pages.tsx` builds `ctxInit = { lang, user }` (lang from the `mwa-language`
    cookie, user from `currentUser`) and renders the `Root` component with
@@ -65,8 +65,8 @@ Two consequences:
 
 - Imports always use `#src/...` with a `.js` extension (NodeNext resolution requires
   the extension; it refers to the _compiled_ file).
-- **Client code must never do a runtime import of `src/db/*`** — those modules open
-  the database on import, and the URL wouldn't resolve anyway. `import type` is erased
+- **Client code must never do a runtime import of `src/db/*`** — these are server-only
+  modules whose URLs are not served in production. Initialization is now explicit. `import type` is erased
   at compile time and is fine — that's the whole reason `src/client/api/users.ts`
   exists (see [add-an-api-endpoint](guides/add-an-api-endpoint.md)).
 
@@ -75,7 +75,7 @@ Two consequences:
 `npm run dev` runs `dev.js`, which:
 
 1. builds once, then spawns `node dist/main.js --dev` — the `--dev` flag sets
-   `isDevMode` in `src/state.ts`;
+   `isDevMode` in `src/main.ts`, which passes it to the state factory;
 2. runs `tsc --watch`; when `dist/` changes, it restarts the server and broadcasts
    `refresh` over a Server-Sent Events endpoint on port **3001**;
 3. `static/reload.js` (only included in dev mode, see `Root`) listens on
@@ -101,6 +101,6 @@ missing props are a compile error caught by `npm run lint`, not a runtime surpri
 
 `registeredActivities` in `src/client/activities.ts` plays the same role for activity
 stations: `ActivitySlug` is derived from its keys, the `/app/activities/:slug` route
-validates the param against it (unknown slug → 404), and `syncActivities()`
+validates the param against it (unknown slug → 404), and `syncActivities(state)`
 (`src/db/activities.ts`) inserts every slug into the `activities` table on server
 start so queue/badge rows can foreign-key them.

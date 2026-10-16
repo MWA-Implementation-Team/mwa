@@ -19,7 +19,7 @@ function HomePage({}: HomePageProps) {
 
             <h1>{t('homeWelcome', { name: user!.username })}</h1>
             <form method="POST">
-                <button type="submit">Logout</button>
+                <button type="submit">{t('logout')}</button>
             </form>
 
             <a href="/app/casino">

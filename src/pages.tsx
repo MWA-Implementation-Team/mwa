@@ -1,30 +1,30 @@
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from '#src/client/pages.js';
 import { currentUser } from '#src/auth.js';
-import { isDevMode } from '#src/state.js';
 import { ClientContextWrapper, ClientContextWrapperInit } from '#src/client/context.js';
 import { serialize } from '#src/client/serialize.js';
-import { Hono } from 'hono';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { renderToString } from 'preact-render-to-string';
-import { cookieLanguage, cookieThemeOverride } from './client/constants.js';
-import { Context } from 'hono';
+import { cookieThemeOverride } from './client/constants.js';
 import { getCookie } from 'hono/cookie';
-import { defaultLanguage, LanguageCode, translate } from './client/language.js';
+import { translate } from './client/language.js';
 import { StatusCode } from 'hono/utils/http-status';
 import { BootData } from './client/bootstrap.js';
+import { getRequestLanguage } from './utils.js';
+import { MwaContext, MwaHono } from './state.js';
 
 export function writePage<P extends RegisteredPageId>(
-    ctx: Context,
+    ctx: MwaContext,
     id: P,
     props: RegisteredPageProps<P>,
 ): Response {
     const user = currentUser(ctx);
     const ctxInit: ClientContextWrapperInit = {
-        lang: (getCookie(ctx, cookieLanguage) as LanguageCode) ?? defaultLanguage, // not validated
+        lang: getRequestLanguage(ctx),
         user: user && serialize(user),
     };
 
     const root = Root({
+        isDevMode: ctx.var.isDevMode,
         pageId: id,
         pageProps: props,
         ctxInit,
@@ -34,12 +34,12 @@ export function writePage<P extends RegisteredPageId>(
     return ctx.html('<!DOCTYPE html>' + renderToString(root));
 }
 
-export function writeErrorPage(ctx: Context, status: StatusCode): Response {
+export function writeErrorPage(ctx: MwaContext, status: StatusCode): Response {
     ctx.status(status);
     return writePage(ctx, 'error', { status });
 }
 
-export function registerNodeModulesRoutes(app: Hono) {
+export function registerNodeModulesRoutes(app: MwaHono) {
     app.get(
         '/preact.module.js',
         serveStatic({ path: 'node_modules/preact/dist/preact.module.js' }),
@@ -57,6 +57,7 @@ export function registerNodeModulesRoutes(app: Hono) {
 }
 
 type RootProps<P extends RegisteredPageId> = {
+    isDevMode: boolean;
     pageId: RegisteredPageId;
     pageProps: RegisteredPageProps<P>;
     ctxInit: ClientContextWrapperInit;
@@ -64,6 +65,7 @@ type RootProps<P extends RegisteredPageId> = {
 };
 
 export function Root<P extends RegisteredPageId>({
+    isDevMode,
     pageId,
     pageProps,
     ctxInit,

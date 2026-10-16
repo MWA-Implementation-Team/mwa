@@ -17,3 +17,4 @@ jobs:
                   node-version: '24.20.0'
             - run: npm ci
             - run: npm run lint
+            - run: npm run test
