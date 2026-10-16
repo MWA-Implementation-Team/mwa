@@ -22,7 +22,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 │
 ├── scripts/                   runnable checks shared by CI and local runs
 │   └── check-migrations.sh    new migrations must be digit-prefixed, append-only,
-│                              and sort after the highest version on the base branch
+│                              and take the next sequential version on the base branch
 │
 ├── static/                    files served as-is
 │   ├── oat.css                Oat CSS framework — third-party, editable if needed
