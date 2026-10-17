@@ -1,4 +1,4 @@
-import { database } from '#src/state.js';
+import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
 
 export type UserRole = 'admin' | 'host' | 'user';
@@ -28,69 +28,69 @@ FROM users
 LEFT JOIN child_transactions ON child_transactions.user_id = users.id
 `;
 
-const listUsersQuery = database.prepare(`${selectUserWithBalance} GROUP BY users.id`);
+export function listUsers(state: MwaState): User[] {
+    const listUsersQuery = state.prepare(`${selectUserWithBalance} GROUP BY users.id`);
 
-export function listUsers(): User[] {
     return listUsersQuery.all().map((row) => mapUser(row));
 }
 
-const userByUsernameQuery = database.prepare(
-    `${selectUserWithBalance} WHERE username = ? GROUP BY users.id`,
-);
+export function findUserByUsername(state: MwaState, username: string): User | null {
+    const userByUsernameQuery = state.prepare(
+        `${selectUserWithBalance} WHERE username = ? GROUP BY users.id`,
+    );
 
-export function findUserByUsername(username: string): User | null {
     const row = userByUsernameQuery.get(username);
     return row?.id ? mapUser(row) : null;
 }
 
-const userByEmailQuery = database.prepare(
-    `${selectUserWithBalance} WHERE email = ? GROUP BY users.id`,
-);
+export function findUserByEmail(state: MwaState, email: string): User | null {
+    const userByEmailQuery = state.prepare(
+        `${selectUserWithBalance} WHERE email = ? GROUP BY users.id`,
+    );
 
-export function findUserByEmail(email: string): User | null {
     const row = userByEmailQuery.get(email);
     return row?.id ? mapUser(row) : null;
 }
 
-const userByIdQuery = database.prepare(
-    `${selectUserWithBalance} WHERE users.id = ? GROUP BY users.id`,
-);
+export function findUserById(state: MwaState, id: number): User | null {
+    const userByIdQuery = state.prepare(
+        `${selectUserWithBalance} WHERE users.id = ? GROUP BY users.id`,
+    );
 
-export function findUserById(id: number): User | null {
     const row = userByIdQuery.get(id);
     return row?.id ? mapUser(row) : null;
 }
 
-const createUserQuery = database.prepare(
-    `INSERT INTO users (email, username, role) VALUES (?, ?, 'user')`,
-);
-
 // Signup path — always role='user'. Hosts/admins are promoted by SQL, never
 // through the app.
-export function createUser(email: string, username: string): User {
+export function createUser(state: MwaState, email: string, username: string): User {
+    const createUserQuery = state.prepare(
+        `INSERT INTO users (email, username, role) VALUES (?, ?, 'user')`,
+    );
+
     const id = Number(createUserQuery.run(email, username).lastInsertRowid);
-    return findUserById(id)!;
+    return findUserById(state, id)!;
 }
 
-const markEmailVerifiedQuery = database.prepare(
-    `UPDATE users SET email_verified_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-     WHERE id = ? AND email_verified_at IS NULL`,
-);
-
 // Called by the sessions module when a login link is consumed.
-export function markEmailVerified(userId: number) {
+export function markEmailVerified(state: MwaState, userId: number) {
+    const markEmailVerifiedQuery = state.prepare(
+        `UPDATE users SET email_verified_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+     WHERE id = ? AND email_verified_at IS NULL`,
+    );
+
     markEmailVerifiedQuery.run(userId);
 }
 
 // New accounts are created from an email link, so nobody picks a username at
 // signup — derive one from the email's local part. Users fix it on /app/account.
-export function deriveUsername(email: string): string {
+export function deriveUsername(state: MwaState, email: string): string {
     const local = email.split('@')[0].toLowerCase();
     const base = local.replace(/[^a-z0-9_-]/g, '_').replace(/^_+|_+$/g, '') || 'user';
     const trimmed = base.slice(0, 16);
     let candidate = trimmed;
     let n = 2;
-    while (findUserByUsername(candidate)) {
+    while (findUserByUsername(state, candidate)) {
         const suffix = `${n++}`;
         candidate = trimmed.slice(0, 16 - suffix.length) + suffix;
     }

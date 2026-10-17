@@ -51,7 +51,10 @@ is a compile error, not a 404.
 
 ## 3. Add the route
 
-In `src/routes/pages/app.ts`, next to the other `/app/*` routes:
+In `src/routes/pages/app.ts`, next to the other `/app/*` routes. Its registration
+function accepts `MwaHono`, so handlers receive the `MwaContext` expected by guards
+and `writePage`. For a new route module, use the same type and register it in
+`main.ts` after `setupHonoState(app, state)`:
 
 ```ts
 app.get('/app/badges', async (ctx) => {

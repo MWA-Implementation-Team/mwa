@@ -1,4 +1,4 @@
-import { database } from '#src/state.js';
+import { MwaState } from '#src/state.js';
 
 export type TransactionKind = 'transfer' | 'purchase' | 'system';
 
@@ -10,19 +10,19 @@ export type Transaction = {
     balanceDelta: number;
 };
 
-const listUserTransactionsQuery = database.prepare(`
-SELECT
-    parent_transactions.created_at,
-    parent_transactions.kind,
-    child_transactions.balance_delta
-FROM child_transactions
-JOIN parent_transactions ON parent_transactions.id = child_transactions.parent_id
-WHERE child_transactions.user_id = ?
-ORDER BY child_transactions.id DESC
-LIMIT ?
-`);
+export function listUserTransactions(state: MwaState, userId: number, limit = 10): Transaction[] {
+    const listUserTransactionsQuery = state.prepare(`
+    SELECT
+        parent_transactions.created_at,
+        parent_transactions.kind,
+        child_transactions.balance_delta
+    FROM child_transactions
+    JOIN parent_transactions ON parent_transactions.id = child_transactions.parent_id
+    WHERE child_transactions.user_id = ?
+    ORDER BY child_transactions.id DESC
+    LIMIT ?
+    `);
 
-export function listUserTransactions(userId: number, limit = 10): Transaction[] {
     return listUserTransactionsQuery.all(userId, limit).map((row) => ({
         createdAt: row.created_at as string,
         kind: row.kind as TransactionKind,

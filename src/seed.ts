@@ -1,23 +1,32 @@
-import { database } from '#src/state.js';
+import { createDefaultMwaState } from '#src/state.js';
 import type { UserRole } from '#src/db/users.js';
 
 // Seed the database with sample data. Run via `npm run seed`.
 // Refuses to run if the users table isn't empty — delete db.sqlite
 // to start over.
 
-const existing =
-    (database.prepare(`SELECT COUNT(*) AS n FROM users`).get() as { n: number }).n ?? 0;
+try {
+    process.loadEnvFile('.env');
+} catch {}
+
+const state = createDefaultMwaState(false);
+
+const existing = (state.prepare(`SELECT COUNT(*) AS n FROM users`).get() as { n: number }).n ?? 0;
 if (existing > 0) {
     console.log(`Database already has ${existing} user(s) — delete db.sqlite to reseed.`);
     process.exit(0);
 }
 
-const insertUser = database.prepare(`INSERT INTO users (username, email, role) VALUES (?, ?, ?)`);
-const insertParent = database.prepare(`INSERT INTO parent_transactions (kind) VALUES (?)`);
-const insertLeg = database.prepare(
+const insertUser = state.prepare(`INSERT INTO users (username, email, role) VALUES (?, ?, ?)`);
+const insertParent = state.prepare(`INSERT INTO parent_transactions (kind) VALUES (?)`);
+const insertLeg = state.prepare(
     `INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)`,
 );
-const awardBadge = database.prepare(`INSERT INTO user_badges (badge_id, user_id) VALUES (?, ?)`);
+const awardBadge = state.prepare(`INSERT INTO user_badges (badge_id, user_id) VALUES (?, ?)`);
+const insertGroup = state.prepare(
+    `INSERT INTO groups (name, owner_id, phone_number) VALUES (?, ?, ?)`,
+);
+const insertMember = state.prepare(`INSERT INTO group_members (group_id, user_id) VALUES (?, ?)`);
 
 function addUser(username: string, email: string, role: UserRole): number {
     return Number(insertUser.run(username, email, role).lastInsertRowid);
@@ -31,7 +40,15 @@ function leg(parentId: number, userId: number, balanceDelta: number) {
     insertLeg.run(parentId, userId, balanceDelta);
 }
 
-database.exec('BEGIN');
+function addGroup(name: string, ownerId: number, phoneNumber: string): number {
+    return Number(insertGroup.run(name, ownerId, phoneNumber).lastInsertRowid);
+}
+
+function member(groupId: number, userId: number) {
+    insertMember.run(groupId, userId);
+}
+
+state.db.exec('BEGIN');
 try {
     const adminId = addUser('admin', 'admin@mwa.dev', 'admin');
     addUser('host', 'host@mwa.dev', 'host');
@@ -55,13 +72,18 @@ try {
 
     awardBadge.run('test_badge', aliceId);
 
-    database.exec('COMMIT');
+    const groupId = addGroup('high rollers', aliceId, '555-0100');
+    member(groupId, aliceId);
+    member(groupId, bobId);
+    member(groupId, carolId);
+
+    state.db.exec('COMMIT');
 } catch (error) {
-    database.exec('ROLLBACK');
+    state.db.exec('ROLLBACK');
     throw error;
 }
 
-const balances = database
+const balances = state.db
     .prepare(
         `SELECT users.username,
                 COALESCE(SUM(child_transactions.balance_delta), 0) AS balance_current,
@@ -73,4 +95,18 @@ const balances = database
     )
     .all();
 console.table(balances);
+
+const groups = state.db
+    .prepare(
+        `SELECT groups.name,
+                users.username AS owner,
+                COUNT(group_members.user_id) AS members,
+                groups.phone_number
+         FROM groups
+         JOIN users ON users.id = groups.owner_id
+         LEFT JOIN group_members ON group_members.group_id = groups.id
+         GROUP BY groups.id`,
+    )
+    .all();
+console.table(groups);
 console.log('Seeded.');

@@ -4,8 +4,15 @@ import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 
+export type LoginErrorKey =
+    | 'loginInvalidEmail'
+    | 'loginSendFailed'
+    | 'loginLinkExpired'
+    | 'loginWrongCode'
+    | 'loginCodeExpired';
+
 type LoginPageProps = {
-    errorMessage?: string;
+    errorKey?: LoginErrorKey;
     sentTo?: string;
     sentKind?: 'login' | 'signup';
     goto?: string;
@@ -16,9 +23,8 @@ export const loginPage: Page<LoginPageProps> = {
     title: (t) => t('titleLogin'),
 };
 
-function LoginPage({ errorMessage, sentTo, sentKind, goto }: LoginPageProps) {
+function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
     const { t } = useContext(ClientContext);
-
     return (
         <>
             <Header />
@@ -67,7 +73,7 @@ function LoginPage({ errorMessage, sentTo, sentKind, goto }: LoginPageProps) {
                         </form>
                     )}
 
-                    {errorMessage && <p class="error-message">{errorMessage}</p>}
+                    {errorKey && <p class="error-message">{t(errorKey)}</p>}
                 </section>
             </main>
 
