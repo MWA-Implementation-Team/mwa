@@ -42,4 +42,9 @@ describe('feature gating', () => {
         assert.equal(res.status, 404);
         assert.match(await res.text(), /id="ssr-data"/);
     });
+
+    it('serializes the enabled features into #ssr-data', async () => {
+        const res = await appWith('landing').request('/');
+        assert.match(await res.text(), /"features":\["landing"\]/);
+    });
 });

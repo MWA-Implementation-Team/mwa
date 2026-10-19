@@ -16,16 +16,18 @@ string, the browser loads the _same_ compiled modules through an
 
 Follow `GET /` through the code:
 
-1. **Hono matches a route.** `src/main.ts` creates the app and calls the
-   `register*Routes` functions. `/` lives in `src/routes/pages/landing.ts`.
+1. **Hono matches a route.** `createApp` (`src/app.ts`) builds the app and
+   registers each route group whose feature id is enabled — `MWA_FEATURES`,
+   see `src/features.ts`. `/` lives in `src/routes/pages/landing.ts`.
 2. **The route resolves the user.** `currentUser(ctx)` (`src/auth.ts`) reads the
    `mwa-session` cookie and resolves it through the `sessions` table to a `users`
    row — see [auth](guides/auth.md).
 3. **The route loads data.** It calls typed functions from `src/db/*.ts` (e.g.
    `listUsers(ctx.var)`), which wrap prepared statements. The results become _page props_.
 4. **`writePage` renders the page.** `writePage(ctx, 'landing', { users })` in
-   `src/pages.tsx` builds `ctxInit = { lang, user }` (lang from the `mwa-language`
-   cookie, user from `currentUser`) and renders the `Root` component with
+   `src/pages.tsx` builds `ctxInit = { lang, user, features }` (lang from the
+   `mwa-language` cookie, user from `currentUser`, features from
+   `state.features`) and renders the `Root` component with
    `preact-render-to-string`.
 5. **`Root` emits the document shell** (`src/pages.tsx`). The `<head>` contains:
     - the importmap (explained below),
@@ -41,7 +43,7 @@ Follow `GET /` through the code:
     `ClientContextWrapper` wrapping the page component — real HTML, not a placeholder.
 
 6. **The browser boots.** `/client/bootstrap.js` is served out of `dist/` by
-   `app.use('/client/*', serveStatic({ root: './dist' }))` in `main.ts`.
+   `app.use('/client/*', serveStatic({ root: './dist' }))` in `app.ts`.
    `src/client/bootstrap.tsx` parses `#ssr-data`, looks up
    `registeredPages[data.pageId].Component`, and calls `hydrate()` on `#app`.
 7. **Hydration.** Preact attaches event handlers and state to the DOM the server
@@ -57,7 +59,7 @@ works in three different environments:
 - **TypeScript** resolves `#src/*` via `tsconfig.json` `paths` → `./src/*`.
 - **Node** resolves `#src/*` via `package.json` `imports` → `./dist/*` (the compiled
   output — `tsc` leaves the specifier untouched).
-- **The browser** resolves `#src/` via the importmap to `/`, and `main.ts` serves
+- **The browser** resolves `#src/` via the importmap to `/`, and the app serves
   `dist/` — so `#src/client/pages.js` becomes `/client/pages.js`, i.e.
   `dist/client/pages.js`.
 
@@ -82,13 +84,13 @@ Two consequences:
    `http://localhost:3001/watch` and reloads the tab;
 4. changes in `static/` broadcast a reload without restarting the server.
 
-In dev mode, `main.ts` also serves the whole repo root as static files (so sourcemaps
+In dev mode, the app also serves the whole repo root as static files (so sourcemaps
 and sources resolve). In production it only serves `static/` and `dist/`, and refuses
 `.js.map` requests.
 
 ## Errors and 404s
 
-`app.notFound` and `app.onError` in `main.ts` both call `writeErrorPage(ctx, status)`,
+`app.notFound` and `app.onError` in `app.ts` both call `writeErrorPage(ctx, status)`,
 which renders the `error` page through the same `writePage` pipeline — error pages are
 real SSR pages with real hydration, not special-cased HTML.
 

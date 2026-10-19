@@ -34,7 +34,9 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 │   └── reload.js              dev-only auto-reload client
 │
 └── src/
-    ├── main.ts                creates state + Hono app; routes, static serving, 404/500 handlers
+    ├── main.ts                entrypoint: env, state, serve — app wiring lives in app.ts
+    ├── app.ts                 createApp(state): csrf, feature-gated routes, static, 404/500
+    ├── features.ts            FEATURE_IDS + parseFeatures — the MWA_FEATURES allowlist
     ├── pages.tsx              writePage() + Root: the SSR document shell, importmap, ssr-data
     ├── state.ts               MwaState factories, statement cache, typed Hono state middleware
     ├── auth.ts                currentUser() + require*/redirectIfAuthed guards — all auth decisions
@@ -53,7 +55,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
         ├── bootstrap.tsx      browser entry: reads #ssr-data, hydrates #app
         ├── pages.ts           registeredPages: page id → { Component, title }
         ├── activities.ts      registeredActivities: activity slug → { name, Card, Detail }
-        ├── context.tsx        ClientContext: lang, updateLang, t(), user
+        ├── context.tsx        ClientContext: lang, updateLang, t(), user, features
         ├── language.ts        translations (en, lt) + translate() / t()
         ├── constants.ts       cookie names (mwa-session, mwa-language, mwa-theme-override)
         ├── serialize.ts       Serialized<T> wire types + serialize()/revive() for Date fields

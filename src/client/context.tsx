@@ -4,12 +4,14 @@ import { useState, useMemo, useEffect } from 'preact/hooks';
 import { defaultLanguage, LanguageCode, translate, TranslateFn } from './language.js';
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
 import { reviveUser, User, UserJson } from '#src/client/api/users.js';
+import type { FeatureId } from '#src/features.js';
 
 export type ClientContextType = {
     lang: LanguageCode;
     updateLang: (lang: LanguageCode) => void;
     t: TranslateFn;
     user: User | null; // logged-in user, else null
+    features: Set<FeatureId>;
 };
 
 export const ClientContext = createContext<ClientContextType>({
@@ -17,6 +19,7 @@ export const ClientContext = createContext<ClientContextType>({
     updateLang: () => {},
     t: translate(defaultLanguage),
     user: null,
+    features: new Set(),
 });
 
 // ---
@@ -24,6 +27,7 @@ export const ClientContext = createContext<ClientContextType>({
 export type ClientContextWrapperInit = {
     lang: LanguageCode;
     user: UserJson | null;
+    features: FeatureId[];
 };
 
 export type ClientContextWrapperProps<P extends RegisteredPageId> = {
@@ -48,8 +52,9 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
             updateLang: (newLang) => setLang(newLang),
             t: translate(lang),
             user: init.user && reviveUser(init.user),
+            features: new Set(init.features),
         }),
-        [lang, init.user],
+        [lang, init.user, init.features],
     );
 
     useEffect(() => {

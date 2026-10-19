@@ -21,6 +21,7 @@ export function writePage<P extends RegisteredPageId>(
     const ctxInit: ClientContextWrapperInit = {
         lang: getRequestLanguage(ctx),
         user: user && serialize(user),
+        features: [...ctx.var.features],
     };
 
     const root = Root({
