@@ -28,15 +28,25 @@ export function setupHonoState(app: MwaHono, state: MwaState) {
     });
 }
 
+export function smtpConfigFromEnv(env: NodeJS.ProcessEnv) {
+    const host = env.MWA_SMTP_HOST;
+    if (!host) {
+        return null;
+    }
+    const user = env.MWA_SMTP_USER;
+    return {
+        host,
+        port: Number(env.MWA_SMTP_PORT ?? 25),
+        secure: env.MWA_SMTP_SECURE === 'true',
+        // auth only when a user is configured — plain `auth: undefined` would
+        // still create the key and change nodemailer's greeting
+        ...(user ? { auth: { user, pass: env.MWA_SMTP_PASS ?? '' } } : {}),
+    };
+}
+
 export function createDefaultMwaState(isDevMode: boolean): MwaState {
-    const smtpHost = process.env.MWA_SMTP_HOST;
-    const smtpClient = smtpHost
-        ? nodemailer.createTransport({
-              host: smtpHost,
-              port: Number(process.env.MWA_SMTP_PORT ?? 25),
-              secure: process.env.MWA_SMTP_SECURE === 'true',
-          })
-        : null;
+    const smtpConfig = smtpConfigFromEnv(process.env);
+    const smtpClient = smtpConfig ? nodemailer.createTransport(smtpConfig) : null;
     const smtpFrom = process.env.MWA_MAIL_FROM ?? 'mwa@localhost';
 
     const mailer = smtpClient ? createSmtpMailer(smtpClient, smtpFrom) : consoleMailer;
