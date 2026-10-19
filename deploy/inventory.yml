@@ -1,0 +1,5 @@
+all:
+    hosts:
+        mwa:
+            ansible_host: 203.0.113.10 # TODO: real VM IP/hostname
+            ansible_user: ubuntu # ssh user with sudo

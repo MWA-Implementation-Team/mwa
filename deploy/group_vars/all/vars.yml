@@ -1,0 +1,25 @@
+# Non-secret config — real values, committed plaintext.
+
+domain: example.com # TODO: real domain, e.g. mwa.example.lt
+deploy_dir: /opt/mwa
+
+# Repo the VM clones + builds from. Private repo → the VM needs a
+# read-only GitHub deploy key (see deploy/README.md).
+repo_url: git@github.com:MWA-Implementation-Team/mwa-template.git
+repo_ref: main
+
+# Feature ids enabled in prod — SPEC-feature-gating.md
+mwa_features: landing
+
+# Both operators' public keys. Flip ssh_lockdown only after confirming
+# both can log in — the playbook then disables password auth.
+ssh_public_keys:
+    - ssh-ed25519 AAAA... operator1 # TODO
+    - ssh-ed25519 AAAA... operator2 # TODO
+ssh_lockdown: false
+
+# SMTP — credentials live in vault.yml
+smtp_host: smtp.example.com # TODO
+smtp_port: 587
+smtp_secure: false # false = STARTTLS on 587; true = implicit TLS on 465
+mail_from: mwa@example.com # TODO

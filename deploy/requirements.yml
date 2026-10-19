@@ -1,0 +1,3 @@
+# Install with: ansible-galaxy install -r deploy/requirements.yml
+collections:
+    - name: ansible.posix # authorized_key

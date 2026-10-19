@@ -1,0 +1,58 @@
+- name: provision the mwa VM
+  hosts: all
+  become: true
+
+  handlers:
+      - name: restart ssh
+        ansible.builtin.service:
+            name: ssh
+            state: restarted
+
+  tasks:
+      - name: update apt cache
+        tags: [base]
+        ansible.builtin.apt:
+            update_cache: true
+            cache_valid_time: 3600
+
+      - name: install base packages
+        tags: [base]
+        ansible.builtin.apt:
+            name: [ufw, git, curl, ca-certificates, cron]
+            state: present
+
+      - name: allow ssh, http and https inbound
+        tags: [base, ufw]
+        ansible.builtin.ufw:
+            rule: allow
+            port: '{{ item }}'
+            proto: tcp
+        loop: ['22', '80', '443']
+
+      - name: deny everything else inbound, allow outbound
+        tags: [base, ufw]
+        ansible.builtin.ufw:
+            state: enabled
+            direction: '{{ item.direction }}'
+            policy: '{{ item.policy }}'
+        loop:
+            - { direction: incoming, policy: deny }
+            - { direction: outgoing, policy: allow }
+
+      - name: install operator ssh keys
+        tags: [base, ssh]
+        ansible.posix.authorized_key:
+            user: '{{ ansible_user }}'
+            key: '{{ item }}'
+        loop: '{{ ssh_public_keys }}'
+
+      # sshd_config.d drops win over sshd_config body on cloud images —
+      # a drop file, not lineinfile, is what actually takes effect.
+      - name: disable ssh password auth once both keys are confirmed
+        tags: [base, ssh]
+        ansible.builtin.copy:
+            dest: /etc/ssh/sshd_config.d/99-mwa.conf
+            content: "PasswordAuthentication no\n"
+            mode: '0644'
+        when: ssh_lockdown | bool
+        notify: restart ssh

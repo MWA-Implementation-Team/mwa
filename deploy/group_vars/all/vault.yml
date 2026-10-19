@@ -1,0 +1,9 @@
+# Secrets — fill in real values, then encrypt before committing:
+#
+#     ansible-vault encrypt deploy/group_vars/all/vault.yml
+#
+# This file must NEVER reach git with real values left unencrypted.
+# The placeholder values below are safe to commit as-is.
+
+smtp_user: CHANGEME
+smtp_pass: CHANGEME
