@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>user dashboard</title>
+
+    <style>
+        :root {
+            --color1: #ffa3a5;
+            --color2: #ff86c8;
+            --color3: #ffbf81;
+            --color4: #ff69eb;
+            --color5: #ffdc5e;
+
+            /* darker */
+            --color1d: #e09293;
+            --color2d: #d46fa7;
+            --color3d: #d6a370;
+            --color4d: #d258c2;
+            --color5d: #ddbf53;
+
+            --transparent: rgba(0, 0, 0, 0.12);
+            --transparent-dark: rgba(0, 0, 0, 0.18);
+        }
+
+        @font-face {
+            font-family: "outfit";
+            src: url("/outfit.ttf") format("truetype");
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+
+            font-family: "outfit", sans-serif;
+
+            background: var(--color1);
+
+            color: white;
+
+            text-shadow:
+                black 0.05em 0.05em 0;
+        }
+
+        body {
+            min-height: 100vh;
+
+            position: relative;
+
+            isolation: isolate;
+        }
+
+
+        /* =========================
+           navbar
+        ========================= */
+
+        nav {
+            width: 100%;
+            height: 70px;
+
+            padding: 0 20px;
+
+            display: flex;
+            align-items: center;
+
+            position: relative;
+
+            background: var(--color4);
+
+            overflow: hidden;
+
+            border-bottom: 3px solid var(--color4d);
+
+            z-index: 10;
+        }
+
+        .nav-effect {
+            position: absolute;
+
+            inset: 0;
+
+            background:
+                url("https://godotshaders.com/wp-content/uploads/2021/01/water2-3.gif");
+
+            background-size: cover;
+            background-position: center;
+
+            mix-blend-mode: soft-light;
+
+            pointer-events: none;
+
+            opacity: 0.8;
+
+            z-index: 0;
+        }
+
+        .nav-content {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+
+            position: relative;
+
+            z-index: 1;
+        }
+
+        .hamburger {
+            width: 45px;
+            min-width: 45px;
+
+            padding: 5px;
+
+            margin-right: 15px;
+
+            background: transparent;
+
+            border: none;
+
+            font-size: 30px;
+
+            cursor: pointer;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .login {
+            margin-left: auto;
+        }
+
+
+        /* =========================
+           page gif overlay
+        ========================= */
+
+        .page-effect {
+            position: fixed;
+
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            background-image:
+                url("https://64.media.tumblr.com/2891ae1ed8e9e75e1b71863218833a06/7ab0732983858d05-6d/s540x810/c33bb28a9aa5ae8f411d766272428d1475526352.gifv");
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat;
+
+            mix-blend-mode: soft-light;
+
+            opacity: 0.55;
+
+            pointer-events: none;
+
+            z-index: 0;
+        }
+
+
+        /* =========================
+           buttons
+        ========================= */
+
+        button {
+            font-family: "outfit", sans-serif;
+
+            color: white;
+
+            text-shadow:
+                black 0.05em 0.05em 0;
+
+            font-weight: 700;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                filter 0.15s ease;
+        }
+
+        button:hover {
+            filter: brightness(1.1);
+
+            transform: translatey(-2px);
+        }
+
+        button:active {
+            transform: translatey(1px);
+        }
+
+        .button6 {
+            padding: 9px 22px;
+
+            background: var(--color3);
+
+            border: 2px solid var(--color5);
+        }
+
+
+        /* =========================
+           page
+        ========================= */
+
+        main {
+            width: min(700px, 94%);
+
+            margin: 30px auto 60px auto;
+
+            position: relative;
+
+            z-index: 2;
+        }
+
+        .page-title {
+            margin: 0 0 20px 0;
+
+            font-size: clamp(2rem, 7vw, 3.5rem);
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           general card
+        ========================= */
+
+        .card {
+            width: 100%;
+
+            padding: 20px;
+
+            margin-bottom: 25px;
+
+            background: rgba(0, 0, 0, 0.15);
+
+            border:
+                3px solid rgba(0, 0, 0, 0.15);
+
+            border-radius: 20px;
+
+            backdrop-filter: blur(4px);
+        }
+
+        .section-title {
+            margin: 0 0 18px 0;
+
+            font-size: 2rem;
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           finances
+        ========================= */
+
+        .balance {
+            padding: 25px;
+
+            margin-bottom: 30px;
+
+            text-align: center;
+
+            background: var(--color2);
+
+            border: 3px solid var(--color2d);
+
+            border-radius: 14px;
+        }
+
+        .balance-label {
+            margin-bottom: 5px;
+
+            font-size: 1.1rem;
+        }
+
+        .balance-value {
+            font-size: 3rem;
+
+            font-weight: 800;
+        }
+
+
+        /* =========================
+           transactions
+        ========================= */
+
+        .transaction-title {
+            margin-bottom: 10px;
+
+            font-size: 1.3rem;
+
+            font-weight: 800;
+        }
+
+        .transactions {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+        }
+
+        .transaction {
+            width: 100%;
+
+            padding: 13px 15px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            background: rgba(0, 0, 0, 0.13);
+
+            border:
+                2px solid rgba(0, 0, 0, 0.15);
+
+            border-radius: 10px;
+        }
+
+        .transaction-icon {
+            width: 42px;
+            height: 42px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            background: var(--color3);
+
+            border: 2px solid var(--color3d);
+
+            border-radius: 50%;
+
+            font-weight: 800;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-name {
+            font-weight: 800;
+        }
+
+        .transaction-date {
+            font-size: 0.85rem;
+
+            opacity: 0.9;
+        }
+
+        .transaction-value {
+            font-weight: 800;
+
+            white-space: nowrap;
+        }
+
+        .positive {
+            color: #d8ffd5;
+        }
+
+        .negative {
+            color: #ffd6d6;
+        }
+
+
+        /* =========================
+           qr
+        ========================= */
+
+        .qr-description {
+            text-align: center;
+
+            margin-bottom: 20px;
+
+            line-height: 1.4;
+        }
+
+        .qr-placeholder {
+            width: min(280px, 80%);
+
+            aspect-ratio: 1 / 1;
+
+            margin: 0 auto;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            background: rgba(255, 255, 255, 0.15);
+
+            border:
+                4px dashed rgba(0, 0, 0, 0.3);
+
+            border-radius: 15px;
+
+            font-size: 1.5rem;
+
+            font-weight: 800;
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           support
+        ========================= */
+
+        .support-options {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 15px;
+        }
+
+        .support-button {
+            min-height: 150px;
+
+            padding: 15px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+            align-items: center;
+
+            gap: 10px;
+
+            background: var(--color3);
+
+            border: 3px solid var(--color3d);
+        }
+
+        .support-button:nth-child(2) {
+            background: var(--color2);
+
+            border-color: var(--color2d);
+        }
+
+        .support-icon {
+            font-size: 2.5rem;
+        }
+
+        .support-label {
+            font-size: 1.05rem;
+
+            text-align: center;
+        }
+
+        .guide-box {
+            margin-top: 15px;
+
+            padding: 15px;
+
+            display: none;
+
+            background: rgba(0, 0, 0, 0.15);
+
+            border-radius: 10px;
+
+            text-align: center;
+
+            line-height: 1.4;
+        }
+
+        .guide-box.visible {
+            display: block;
+        }
+
+
+        /* =========================
+           sponsors
+        ========================= */
+
+        .sponsor-subtitle {
+            text-align: center;
+
+            margin-top: -10px;
+
+            margin-bottom: 20px;
+
+            font-size: 0.9rem;
+        }
+
+        .sponsors {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 12px;
+        }
+
+        .sponsor {
+            min-height: 80px;
+
+            padding: 10px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(255, 255, 255, 0.12);
+
+            border:
+                2px solid rgba(0, 0, 0, 0.12);
+
+            border-radius: 10px;
+
+            font-weight: 700;
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           footer
+        ========================= */
+
+        footer {
+            padding: 20px;
+
+            position: relative;
+
+            z-index: 2;
+
+            text-align: center;
+
+            background: var(--color4d);
+
+            font-size: 0.9rem;
+        }
+
+
+        /* =========================
+           mobile
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            nav {
+                height: 62px;
+
+                padding: 0 12px;
+            }
+
+            .page-effect {
+                top: 62px;
+            }
+
+            .logo {
+                font-size: 1.3rem;
+            }
+
+            .hamburger {
+                margin-right: 5px;
+
+                font-size: 25px;
+            }
+
+            .button6 {
+                padding: 7px 15px;
+            }
+
+            main {
+                width: 94%;
+
+                margin-top: 20px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .balance-value {
+                font-size: 2.5rem;
+            }
+
+            .transaction {
+                padding: 10px;
+            }
+
+            .transaction-value {
+                font-size: 0.9rem;
+            }
+
+            .support-options {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .support-button {
+                min-height: 130px;
+            }
+
+            .sponsors {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- nav -->
+
+    <nav>
+
+        <div class="nav-effect"></div>
+
+        <div class="nav-content">
+
+            <button class="hamburger">
+                ☰
+            </button>
+
+            <div class="logo">
+                logo
+            </div>
+
+            <button class="button6 login">
+                log in
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!--
+        gif over the pink background.
+        it is below the content but above body background.
+    -->
+
+    <div class="page-effect"></div>
+
+
+
+    <main>
+
+        <h1 class="page-title">
+            user dashboard
+        </h1>
+
+
+        <!-- finances -->
+
+        <section class="card">
+
+            <h2 class="section-title">
+                your finances
+            </h2>
+
+
+            <div class="balance">
+
+                <div class="balance-label">
+                    current balance
+                </div>
+
+                <div class="balance-value">
+                    150.00 micius koinai
+                </div>
+
+            </div>
+
+
+            <div class="transaction-title">
+                transaction history
+            </div>
+
+
+            <div class="transactions">
+
+                <div class="transaction">
+
+                    <div class="transaction-icon">
+                        ↑
+                    </div>
+
+                    <div class="transaction-info">
+
+                        <div class="transaction-name">
+                            event ticket purchase
+                        </div>
+
+                        <div class="transaction-date">
+                            july 2021
+                        </div>
+
+                    </div>
+
+                    <div class="transaction-value positive">
+                        +$150.00
+                    </div>
+
+                </div>
+
+
+                <div class="transaction">
+
+                    <div class="transaction-icon">
+                        ↓
+                    </div>
+
+                    <div class="transaction-info">
+
+                        <div class="transaction-name">
+                            account top-up
+                        </div>
+
+                        <div class="transaction-date">
+                            july 2021
+                        </div>
+
+                    </div>
+
+                    <div class="transaction-value positive">
+                        +$30.00
+                    </div>
+
+                </div>
+
+
+                <div class="transaction">
+
+                    <div class="transaction-icon">
+                        ↓
+                    </div>
+
+                    <div class="transaction-info">
+
+                        <div class="transaction-name">
+                            account top-up
+                        </div>
+
+                        <div class="transaction-date">
+                            july 2021
+                        </div>
+
+                    </div>
+
+                    <div class="transaction-value negative">
+                        -$20.00
+                    </div>
+
+                </div>
+
+
+                <div class="transaction">
+
+                    <div class="transaction-icon">
+                        ↓
+                    </div>
+
+                    <div class="transaction-info">
+
+                        <div class="transaction-name">
+                            account top-up
+                        </div>
+
+                        <div class="transaction-date">
+                            july 2021
+                        </div>
+
+                    </div>
+
+                    <div class="transaction-value negative">
+                        -$10.00
+                    </div>
+
+                </div>
+
+
+                <div class="transaction">
+
+                    <div class="transaction-icon">
+                        ↑
+                    </div>
+
+                    <div class="transaction-info">
+
+                        <div class="transaction-name">
+                            event ticket purchase
+                        </div>
+
+                        <div class="transaction-date">
+                            july 2021
+                        </div>
+
+                    </div>
+
+                    <div class="transaction-value positive">
+                        +$10.00
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- qr placeholder -->
+
+        <section class="card">
+
+            <h2 class="section-title">
+                account qr code
+            </h2>
+
+            <div class="qr-description">
+
+                <strong>
+                    use for admin access
+                </strong>
+
+                <br>
+
+                show this code to an administrator
+                to allow access to your account details.
+
+            </div>
+
+
+            <div class="qr-placeholder">
+                qr code
+                <br>
+                placeholder
+            </div>
+
+        </section>
+
+
+
+        <!-- support -->
+
+        <section class="card">
+
+            <h2 class="section-title">
+                support
+            </h2>
+
+
+            <div class="support-options">
+
+                <button class="support-button">
+
+                    <div class="support-icon">
+                        ☎
+                    </div>
+
+                    <div class="support-label">
+                        call support
+                    </div>
+
+                </button>
+
+
+                <button
+                    class="support-button"
+                    onclick="toggleguide()"
+                >
+
+                    <div class="support-icon">
+                        📖
+                    </div>
+
+                    <div class="support-label">
+                        guide &
+                        explanations
+                    </div>
+
+                </button>
+
+            </div>
+
+
+            <div
+                class="guide-box"
+                id="guide"
+            >
+
+                this section can contain explanations
+                of the dashboard features.
+
+            </div>
+
+        </section>
+
+
+
+        <!-- sponsors -->
+
+        <section class="card">
+
+            <h2 class="section-title">
+                sponsors
+            </h2>
+
+            <div class="sponsor-subtitle">
+                our generous sponsors
+            </div>
+
+
+            <div class="sponsors">
+
+                <div class="sponsor">
+                    sponsor 1
+                </div>
+
+                <div class="sponsor">
+                    sponsor 2
+                </div>
+
+                <div class="sponsor">
+                    sponsor 3
+                </div>
+
+                <div class="sponsor">
+                    sponsor 4
+                </div>
+
+                <div class="sponsor">
+                    sponsor 5
+                </div>
+
+                <div class="sponsor">
+                    sponsor 6
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        dashboard frontend
+    </footer>
+
+
+    <script>
+
+        function toggleguide() {
+
+            const guide =
+                document.getelementbyid("guide");
+
+            guide.classlist.toggle("visible");
+
+        }
+
+    </script>
+
+</body>
+
+</html>

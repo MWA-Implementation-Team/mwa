@@ -3,6 +3,7 @@ import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
 import { createGroup, deleteGroup, reviveGroup, type GroupJson } from '#src/client/api/groups.js';
+import PageShell from './PageShell.js';
 
 type GroupsPageProps = {
     initialGroups?: GroupJson[] | null;
@@ -28,9 +29,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
         setSuccessMsg(null);
         try {
             await deleteGroup(groupId);
-            setGroups(
-                (currentGroups) => currentGroups?.filter((group) => group.id !== groupId) ?? null,
-            );
+            setGroups((currentGroups) => currentGroups?.filter((group) => group.id !== groupId) ?? null);
             setSuccessMsg(t('groupDeleted'));
         } catch (err: any) {
             setError(err.message || t('groupDeleteFailed'));
@@ -56,58 +55,54 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
     return (
         <>
             <Header />
+            <PageShell title={t('groupManagement')} subtitle="Create a group or manage the groups you belong to.">
+                {error && <p class="mwa-notice mwa-notice--error" role="alert">{error}</p>}
+                {successMsg && <p class="mwa-notice mwa-notice--success" role="status">{successMsg}</p>}
 
-            <div>
-                <h1>{t('groupManagement')}</h1>
+                <div class="mwa-columns">
+                    <section class="mwa-panel">
+                        <div class="mwa-panel-heading"><h2>{t('groupYourGroups')}</h2><span class="mwa-badge">{groups?.length ?? 0}</span></div>
+                        <div class="mwa-panel-body">
+                            {groups === null || groups.length === 0 ? (
+                                <div class="mwa-empty"><h3>{t('groupEmpty')}</h3></div>
+                            ) : (
+                                <ul class="mwa-list">
+                                    {groups.map((group) => (
+                                        <li class="mwa-list-item" key={group.id}>
+                                            <div>
+                                                <span class="mwa-list-title">{group.name}</span>
+                                                <div class="mwa-list-meta">{group.phone_number}</div>
+                                            </div>
+                                            {group.ownerId === user?.id && (
+                                                <button class="mwa-btn--danger" type="button" onClick={() => handleDeleteGroup(group.id)}>
+                                                    {t('groupDelete')}
+                                                </button>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </section>
 
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
-
-                <form onSubmit={handleCreateGroup}>
-                    <div>
-                        <label>{t('groupName')}: </label>
-                        <input
-                            type="text"
-                            value={groupName}
-                            onInput={(e) => setGroupName((e.target as HTMLInputElement).value)}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>{t('groupPhone')}: </label>
-                        <input
-                            type="text"
-                            value={phoneNumber}
-                            onInput={(e) => setPhoneNumber((e.target as HTMLInputElement).value)}
-                            required
-                        />
-                    </div>
-                    <button type="submit" class="btn-primary">
-                        {t('groupCreate')}
-                    </button>
-                </form>
-
-                <h2>{t('groupYourGroups')}</h2>
-                {groups === null || groups.length === 0 ? (
-                    <p>{t('groupEmpty')}</p>
-                ) : (
-                    <ul>
-                        {groups.map((group) => (
-                            <li key={group.id}>
-                                {group.name} ({group.phone_number})
-                                {group.ownerId === user?.id && (
-                                    <button
-                                        type="button"
-                                        onClick={() => handleDeleteGroup(group.id)}
-                                    >
-                                        {t('groupDelete')}
-                                    </button>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
+                    <section class="mwa-panel">
+                        <div class="mwa-panel-heading"><h2>{t('groupCreate')}</h2></div>
+                        <div class="mwa-panel-body">
+                            <form class="mwa-form" onSubmit={handleCreateGroup}>
+                                <div class="mwa-field">
+                                    <label for="group-name">{t('groupName')}</label>
+                                    <input id="group-name" type="text" value={groupName} onInput={(e) => setGroupName((e.target as HTMLInputElement).value)} required />
+                                </div>
+                                <div class="mwa-field">
+                                    <label for="group-phone">{t('groupPhone')}</label>
+                                    <input id="group-phone" type="text" value={phoneNumber} onInput={(e) => setPhoneNumber((e.target as HTMLInputElement).value)} required />
+                                </div>
+                                <div class="mwa-form-actions"><button type="submit" class="btn-primary">{t('groupCreate')}</button></div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </PageShell>
         </>
     );
 }

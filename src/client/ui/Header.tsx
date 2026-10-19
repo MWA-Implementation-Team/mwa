@@ -8,7 +8,7 @@ export default function Header() {
 
     return (
         <nav>
-            <img src="/Logotipas.png" style={'width:200px;'} />
+            <img src="/3Logotipas.png" style={'width:200px;'} />
             <ul>
                 <li>
                     <a href="/">{t('headerLanding')}</a>
