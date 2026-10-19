@@ -1,6 +1,7 @@
 import { DatabaseSync, StatementSync } from 'node:sqlite';
 import { consoleMailer, createSmtpMailer, Mailer, noopMailer } from '#src/emails/mailer.js';
 import { Context, Hono } from 'hono';
+import { FEATURE_IDS, FeatureId, parseFeatures } from './features.js';
 import { migrateDatabase } from './db/migrate.js';
 import nodemailer from 'nodemailer';
 
@@ -8,6 +9,7 @@ export type MwaState = {
     isDevMode: boolean;
     db: DatabaseSync;
     mailer: Mailer;
+    features: Set<FeatureId>;
 
     prepare(sql: string): StatementSync;
 };
@@ -20,6 +22,7 @@ export function setupHonoState(app: MwaHono, state: MwaState) {
         ctx.set('isDevMode', state.isDevMode);
         ctx.set('db', state.db);
         ctx.set('mailer', state.mailer);
+        ctx.set('features', state.features);
         ctx.set('prepare', state.prepare);
         await next();
     });
@@ -44,14 +47,16 @@ export function createDefaultMwaState(isDevMode: boolean): MwaState {
         isDevMode,
         db,
         mailer,
+        features: parseFeatures(process.env.MWA_FEATURES),
     });
 }
 
-export function createTestMwaState(init: { mailer?: Mailer }): MwaState {
+export function createTestMwaState(init: { mailer?: Mailer; features?: Set<FeatureId> }): MwaState {
     return createMwaState({
         isDevMode: false,
         db: createDatabase(':memory:'),
         mailer: init.mailer ?? noopMailer,
+        features: init.features ?? new Set(FEATURE_IDS),
     });
 }
 
@@ -62,12 +67,18 @@ function createDatabase(path: string) {
     return db;
 }
 
-function createMwaState(init: { isDevMode: boolean; db: DatabaseSync; mailer: Mailer }): MwaState {
+function createMwaState(init: {
+    isDevMode: boolean;
+    db: DatabaseSync;
+    mailer: Mailer;
+    features: Set<FeatureId>;
+}): MwaState {
     const statements: Record<string, StatementSync> = {};
     return {
         isDevMode: init.isDevMode,
         db: init.db,
         mailer: init.mailer,
+        features: init.features,
 
         prepare(sql) {
             const existing = statements[sql];
