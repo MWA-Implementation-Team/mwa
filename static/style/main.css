@@ -1,15 +1,23 @@
 /*
     Design tokens and variables
-    Overrides oat.css (if needed), defaults and defines global constants
+    Raw palette, semantic colors, type scale, spacing, radii
 */
 @import './tokens.css';
 
-/* 
+/*
     Base styles and layout
-    Global element resets, body defaults and app wrapper layout
+    Font, body defaults, page texture overlay, app shell, footer
 */
 @import './base.css';
 
 /* Components */
+@import './components/header.css';
 @import './components/button.css';
+@import './components/card.css';
+@import './components/form.css';
+@import './components/sponsors.css';
 @import './components/qr-code.css';
+
+/* Pages */
+@import './pages/landing.css';
+@import './pages/dashboard.css';

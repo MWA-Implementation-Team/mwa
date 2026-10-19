@@ -1,9 +1,43 @@
-/* Ensure full height layout and smooth rendering */
+/* Outfit variable font (100–900), self-hosted subsets */
+@font-face {
+    font-family: 'outfit';
+    src: url('/fonts/outfit-latin.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+    unicode-range:
+        U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+        U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'outfit';
+    src: url('/fonts/outfit-latin-ext.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+    unicode-range:
+        U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+        U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113,
+        U+2C60-2C7F, U+A720-A7FF;
+}
+
 html,
 body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
     min-height: 100vh;
-    background-color: var(--color-bg-main);
-    color: var(--color-text-main);
+    position: relative;
+    isolation: isolate;
+
+    font-family: 'outfit', sans-serif;
+    background: var(--page-bg);
+    color: var(--text);
+    text-shadow: var(--text-shadow);
+
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Ensure images and media don't break layouts */
@@ -16,17 +50,77 @@ svg {
     max-width: 100%;
 }
 
+/* Animated texture above the page background but below the content.
+   Rendered as <div class="page-effect"> in the document shell. */
+.page-effect {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+
+    background-image: url('/texture.gif');
+    background-size: cover;
+    background-position: center;
+    background-repeat: repeat;
+
+    mix-blend-mode: soft-light;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 #app {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+/* Page content column */
+main.page {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+
+    width: min(var(--content-width), 94%);
+    margin: var(--space-2xl) auto 3.75rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+main.page-narrow {
+    width: min(var(--content-width-narrow), 94%);
 }
 
 a:hover {
-    color: var(--color-accent-hover);
+    color: var(--text-muted);
+}
+
+footer {
+    position: relative;
+    z-index: 2;
+    padding: var(--space-xl);
+    background: var(--footer-bg);
+    text-align: center;
+    font-size: var(--text-sm);
 }
 
 .error-message {
-    color: var(--danger, #d32f2f);
-    font-size: var(--text-7, 0.875rem);
+    color: var(--danger);
+    font-size: var(--text-sm);
+    font-weight: 700;
+}
+
+@media (max-width: 37.5rem) {
+    :root {
+        --header-height: 3.875rem;
+    }
+
+    main.page {
+        margin-top: var(--space-xl);
+    }
 }

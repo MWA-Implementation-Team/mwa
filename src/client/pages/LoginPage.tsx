@@ -1,8 +1,18 @@
 import Header from '#src/client/ui/Header.js';
+import Footer from '#src/client/ui/Footer.js';
 import { Page } from '#src/client/pages.js';
+import { useContext } from 'preact/hooks';
+import { ClientContext } from '#src/client/context.js';
+
+export type LoginErrorKey =
+    | 'loginInvalidEmail'
+    | 'loginSendFailed'
+    | 'loginLinkExpired'
+    | 'loginWrongCode'
+    | 'loginCodeExpired';
 
 type LoginPageProps = {
-    errorMessage?: string;
+    errorKey?: LoginErrorKey;
     sentTo?: string;
     sentKind?: 'login' | 'signup';
     goto?: string;
@@ -13,40 +23,61 @@ export const loginPage: Page<LoginPageProps> = {
     title: (t) => t('titleLogin'),
 };
 
-function LoginPage({ errorMessage, sentTo, sentKind, goto }: LoginPageProps) {
+function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
+    const { t } = useContext(ClientContext);
     return (
         <>
             <Header />
 
-            {sentTo ? (
-                <>
-                    <p>
-                        {sentKind === 'signup'
-                            ? `We sent a signup link to ${sentTo} — click it to create your account.`
-                            : `We sent a login link to ${sentTo}.`}
-                    </p>
-                    <form method="POST" action="/auth/verify">
-                        <input type="hidden" name="email" value={sentTo} />
-                        {goto && <input type="hidden" name="goto" value={goto} />}
-                        <input
-                            type="text"
-                            name="code"
-                            placeholder="Code from the email"
-                            autoComplete="one-time-code"
-                            required
-                        />
-                        <button type="submit">Verify code</button>
-                    </form>
-                </>
-            ) : (
-                <form method="POST">
-                    <h1>Login with email</h1>
-                    <input type="email" name="email" placeholder="Email" required />
-                    <button type="submit">Send login link</button>
-                </form>
-            )}
+            <main class="page page-narrow">
+                <section class="card">
+                    <h1 class="section-title">{t('loginTitle')}</h1>
 
-            {errorMessage && <p class="error-message">{errorMessage}</p>}
+                    {sentTo ? (
+                        <>
+                            <p class="muted">
+                                {sentKind === 'signup'
+                                    ? t('loginSentSignup', { email: sentTo })
+                                    : t('loginSentLogin', { email: sentTo })}
+                            </p>
+                            <form method="POST" action="/auth/verify" class="form-stack">
+                                <input type="hidden" name="email" value={sentTo} />
+                                {goto && <input type="hidden" name="goto" value={goto} />}
+                                <label for="code">{t('loginCode')}</label>
+                                <input
+                                    type="text"
+                                    id="code"
+                                    name="code"
+                                    placeholder={t('loginCode')}
+                                    autoComplete="one-time-code"
+                                    required
+                                />
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    {t('loginVerify')}
+                                </button>
+                            </form>
+                        </>
+                    ) : (
+                        <form method="POST" class="form-stack">
+                            <label for="email">{t('loginEmail')}</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder={t('loginEmail')}
+                                required
+                            />
+                            <button type="submit" class="btn btn-primary btn-block">
+                                {t('loginSendLink')}
+                            </button>
+                        </form>
+                    )}
+
+                    {errorKey && <p class="error-message">{t(errorKey)}</p>}
+                </section>
+            </main>
+
+            <Footer />
         </>
     );
 }

@@ -32,7 +32,7 @@ Seed: npm run seed
 
 ## Project Structure
 
-migrations/27_interact_tokens.sql → interact_tokens table
+migrations/05_interact_tokens.sql → interact_tokens table
 src/db/interactions.ts → token mint/resolve, prepared statements
 src/client/pages/app/InteractPage.tsx → scanner view; interactions are
 conditional sections in this file, gated by which props the route

@@ -3,7 +3,14 @@ import type { User } from '#src/db/users.js';
 // loads src/db/users.ts (it opens the database on import). Keeps one
 // source of truth for the API response shape.
 
+import { revive, type Serialized } from '#src/client/serialize.js';
+
 export type { User };
+export type UserJson = Serialized<User>;
+
+export function reviveUser(user: UserJson): User {
+    return revive(user, 'createdAt');
+}
 
 // Pattern for calling protected endpoints from pages: plain
 // same-origin fetch sends cookies automatically
@@ -12,5 +19,5 @@ export type { User };
 export async function fetchUsers(): Promise<User[]> {
     const res = await fetch('/api/users');
     if (!res.ok) throw new Error(`GET /api/users failed: ${res.status}`);
-    return res.json();
+    return (await res.json()).map(reviveUser);
 }

@@ -1,23 +1,30 @@
 import { requireUser } from '#src/auth.js';
+import { listUserTransactions } from '#src/db/transactions.js';
+import { listUserGroups } from '#src/db/groups.js';
+import { serialize } from '#src/client/serialize.js';
 import { isActivitySlug } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
 import { findUserByInteractToken, getOrCreateInteractToken } from '#src/db/interactions.js';
 import { deleteSession } from '#src/db/sessions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
-import { Hono } from 'hono';
+import { MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';
 import { renderSVG } from 'uqr';
 
-export function registerAppRoutes(app: Hono) {
+export function registerAppRoutes(app: MwaHono) {
     app.get('/app', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
         // Personal QR — a stable link others scan to reach the interact page.
-        const token = getOrCreateInteractToken(user.id);
+        const token = getOrCreateInteractToken(ctx.var, user.id);
         const interactUrl = new URL(`/app/interact/${token}`, ctx.req.url).toString();
 
-        return writePage(ctx, 'home', { qrSvg: renderSVG(interactUrl), interactUrl });
+        return writePage(ctx, 'home', {
+            qrSvg: renderSVG(interactUrl),
+            interactUrl,
+            transactions: listUserTransactions(ctx.var, user.id),
+        });
     });
 
     app.post('/app', async (ctx) => {
@@ -25,7 +32,7 @@ export function registerAppRoutes(app: Hono) {
         // stops working the moment it's logged out.
         const token = getCookie(ctx, cookieSession);
         if (token) {
-            deleteSession(token);
+            deleteSession(ctx.var, token);
         }
         deleteCookie(ctx, cookieSession);
         return ctx.redirect('/login', 303);
@@ -67,7 +74,9 @@ export function registerAppRoutes(app: Hono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        return writePage(ctx, 'group', {});
+        return writePage(ctx, 'group', {
+            initialGroups: listUserGroups(ctx.var, user.id).map(serialize),
+        });
     });
 
     app.get('/app/casino', async (ctx) => {
@@ -81,7 +90,7 @@ export function registerAppRoutes(app: Hono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        const target = findUserByInteractToken(ctx.req.param('token'));
+        const target = findUserByInteractToken(ctx.var, ctx.req.param('token'));
         if (!target) return writeErrorPage(ctx, 404);
 
         const self = target.id === user.id;

@@ -1,4 +1,4 @@
-import { database } from '#src/state.js';
+import { MwaState } from '#src/state.js';
 
 export type UserBadge = {
     createdAt: Date;
@@ -6,12 +6,12 @@ export type UserBadge = {
     userId: number;
 };
 
-const listUserBadgesQuery = database.prepare(`
-SELECT created_at, badge_id, user_id FROM user_badges ORDER BY created_at
-`);
+export function listUserBadges(state: MwaState): UserBadge[] {
+    const query = state.prepare(`
+    SELECT created_at, badge_id, user_id FROM user_badges ORDER BY created_at
+    `);
 
-export function listUserBadges(): UserBadge[] {
-    return listUserBadgesQuery.all().map((row) => {
+    return query.all().map((row) => {
         return {
             createdAt: new Date(row.created_at as string),
             badgeId: row.badge_id as string,

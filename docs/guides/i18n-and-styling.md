@@ -35,6 +35,23 @@ inside the component. It runs server-side for the `<title>` tag in `writePage`, 
 _next_ SSR response (navigations, reloads) use the same language — `writePage` reads it
 into `ctxInit.lang`.
 
+## Server responses and emails
+
+Server code uses `translate(getRequestLanguage(ctx))` from
+`src/client/language.ts` and `src/utils.ts` for plain-text responses such as a
+malformed login request. For errors rendered in a page, pass a translation key
+instead of a translated string: login routes pass `errorKey: 'loginInvalidEmail'`,
+and `LoginPage` renders `t(errorKey)`. This keeps SSR and hydration consistent and
+lets the language selector update an existing error without a reload.
+
+Login emails receive `lang` from the request cookie. `loginSubject(lang)`,
+`LoginEmail(props)`, and `loginText(props)` use the same dictionary for the subject,
+HTML, and plain text, including console-mailer output. Email content stays in the
+language selected when it was sent.
+
+API error identifiers (`unauthorized`, `forbidden`) and server diagnostics remain
+stable identifiers/logs. Translate the user-facing message where it is displayed.
+
 ## Styling
 
 Two stylesheets load on every page (see `Root` in `src/pages.tsx`):
