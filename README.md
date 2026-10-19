@@ -49,5 +49,7 @@ the login link printed in the server console (dev "email" goes to logs, see
     - [docs/guides/auth.md](docs/guides/auth.md)
     - [docs/guides/i18n-and-styling.md](docs/guides/i18n-and-styling.md)
 - [docs/workflow/making-a-pull-request.md](docs/workflow/making-a-pull-request.md)
+- [deploy/README.md](deploy/README.md) — one Ansible playbook provisions the
+  production VM (docker, caddy TLS, secrets, backups)
 - [docs/troubleshooting.md](docs/troubleshooting.md) — real errors and their fixes
 - [docs/glossary.md](docs/glossary.md) — hydration, SSR, importmap, and friends
