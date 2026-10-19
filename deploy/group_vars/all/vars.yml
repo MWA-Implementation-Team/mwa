@@ -1,6 +1,6 @@
 # Non-secret config — real values, committed plaintext.
 
-domain: example.com # TODO: real domain, e.g. mwa.example.lt
+domain: example.com
 deploy_dir: /opt/mwa
 
 # Repo the VM clones + builds from. Private repo → the VM needs a
@@ -11,15 +11,12 @@ repo_ref: main
 # Feature ids enabled in prod — SPEC-feature-gating.md
 mwa_features: landing
 
-# Both operators' public keys. Flip ssh_lockdown only after confirming
-# both can log in — the playbook then disables password auth.
-ssh_public_keys:
-    - ssh-ed25519 AAAA... operator1 # TODO
-    - ssh-ed25519 AAAA... operator2 # TODO
+# Operators manage their own ssh keys by hand. Flip ssh_lockdown only
+# after confirming everyone can still log in — it disables password auth.
 ssh_lockdown: false
 
 # SMTP — credentials live in vault.yml
-smtp_host: smtp.example.com # TODO
+smtp_host: micius@mif.vusa.lt
 smtp_port: 587
 smtp_secure: false # false = STARTTLS on 587; true = implicit TLS on 465
-mail_from: mwa@example.com # TODO
+mail_from: micius@mif.vusa.lt

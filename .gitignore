@@ -6,3 +6,6 @@ Caddyfile
 db.sqlite
 bun.lock
 deno.lock
+
+# never commit the vault password
+*.vault_pass

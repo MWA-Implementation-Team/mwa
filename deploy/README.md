@@ -8,13 +8,15 @@ encrypted vault, nightly sqlite backups. Spec: [../SPEC-deploy.md](../SPEC-deplo
 
 - ansible-core ≥ 2.17 on your machine (`ansible --version`)
 - `ansible-galaxy collection install -r deploy/requirements.yml`
-- A VM: Ubuntu 24.04, reachable over ssh, sudo for `ansible_user`
+- A VM: Ubuntu 24.04, reachable over ssh **with key auth** —
+  `ssh root@<ip>` must work non-interactively. Operators install their
+  own keys on the VM by hand (e.g. `ssh-copy-id`).
 - DNS: A/AAAA record for `domain` → the VM's IP, done at your registrar.
   Do this **before** the first run — Caddy can't issue a cert until it
   resolves.
-- A GitHub **deploy key** on the VM (the repo is private):
-  `ssh-keygen -t ed25519` on the VM, add the pubkey under the repo's
-  Settings → Deploy keys (read-only).
+- A GitHub ssh key **in your local agent** — `ssh -T git@github.com`
+  works, `ssh-add -l` lists it. The VM clones the private repo through
+  agent forwarding (`ansible_ssh_extra_args` in inventory.yml).
 - The vault password (ask the other operator)
 
 ## Fill in the real values

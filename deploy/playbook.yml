@@ -43,16 +43,9 @@
             - { direction: incoming, policy: deny }
             - { direction: outgoing, policy: allow }
 
-      - name: install operator ssh keys
-        tags: [base, ssh]
-        ansible.posix.authorized_key:
-            user: '{{ ansible_user }}'
-            key: '{{ item }}'
-        loop: '{{ ssh_public_keys }}'
-
       # sshd_config.d drops win over sshd_config body on cloud images —
       # a drop file, not lineinfile, is what actually takes effect.
-      - name: disable ssh password auth once both keys are confirmed
+      - name: disable ssh password auth once key login is confirmed
         tags: [base, ssh]
         ansible.builtin.copy:
             dest: /etc/ssh/sshd_config.d/99-mwa.conf
