@@ -1,4 +1,5 @@
 import { requireUser } from '#src/auth.js';
+import { listUserTransactions } from '#src/db/transactions.js';
 import { listUserGroups } from '#src/db/groups.js';
 import { serialize } from '#src/client/serialize.js';
 import { isActivitySlug } from '#src/client/activities.js';
@@ -13,7 +14,7 @@ export function registerAppRoutes(app: MwaHono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        return writePage(ctx, 'home', {});
+        return writePage(ctx, 'home', { transactions: listUserTransactions(ctx.var, user.id) });
     });
 
     app.post('/app', async (ctx) => {

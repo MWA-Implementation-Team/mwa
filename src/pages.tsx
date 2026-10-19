@@ -122,6 +122,7 @@ export function Root<P extends RegisteredPageId>({
                 {isDevMode && <script src="/reload.js" defer />}
             </head>
             <body style={bodyStyle}>
+                <div class="page-effect" aria-hidden="true" />
                 <div id="app">
                     <ClientContextWrapper
                         pageId={pageId}

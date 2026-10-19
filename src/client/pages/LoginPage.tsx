@@ -1,7 +1,8 @@
+import Header from '#src/client/ui/Header.js';
+import Footer from '#src/client/ui/Footer.js';
+import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
-import Header from '#src/client/ui/Header.js';
-import { Page } from '#src/client/pages.js';
 
 export type LoginErrorKey =
     | 'loginInvalidEmail'
@@ -28,35 +29,55 @@ function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
         <>
             <Header />
 
-            {sentTo ? (
-                <>
-                    <p>
-                        {sentKind === 'signup'
-                            ? t('signupSent', { email: sentTo })
-                            : t('loginSent', { email: sentTo })}
-                    </p>
-                    <form method="POST" action="/auth/verify">
-                        <input type="hidden" name="email" value={sentTo} />
-                        {goto && <input type="hidden" name="goto" value={goto} />}
-                        <input
-                            type="text"
-                            name="code"
-                            placeholder={t('loginCodePlaceholder')}
-                            autoComplete="one-time-code"
-                            required
-                        />
-                        <button type="submit">{t('loginVerifyCode')}</button>
-                    </form>
-                </>
-            ) : (
-                <form method="POST">
-                    <h1>{t('loginHeading')}</h1>
-                    <input type="email" name="email" placeholder={t('loginEmail')} required />
-                    <button type="submit">{t('loginSendLink')}</button>
-                </form>
-            )}
+            <main class="page page-narrow">
+                <section class="card">
+                    <h1 class="section-title">{t('loginTitle')}</h1>
 
-            {errorKey && <p class="error-message">{t(errorKey)}</p>}
+                    {sentTo ? (
+                        <>
+                            <p class="muted">
+                                {sentKind === 'signup'
+                                    ? t('loginSentSignup', { email: sentTo })
+                                    : t('loginSentLogin', { email: sentTo })}
+                            </p>
+                            <form method="POST" action="/auth/verify" class="form-stack">
+                                <input type="hidden" name="email" value={sentTo} />
+                                {goto && <input type="hidden" name="goto" value={goto} />}
+                                <label for="code">{t('loginCode')}</label>
+                                <input
+                                    type="text"
+                                    id="code"
+                                    name="code"
+                                    placeholder={t('loginCode')}
+                                    autoComplete="one-time-code"
+                                    required
+                                />
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    {t('loginVerify')}
+                                </button>
+                            </form>
+                        </>
+                    ) : (
+                        <form method="POST" class="form-stack">
+                            <label for="email">{t('loginEmail')}</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder={t('loginEmail')}
+                                required
+                            />
+                            <button type="submit" class="btn btn-primary btn-block">
+                                {t('loginSendLink')}
+                            </button>
+                        </form>
+                    )}
+
+                    {errorKey && <p class="error-message">{t(errorKey)}</p>}
+                </section>
+            </main>
+
+            <Footer />
         </>
     );
 }
