@@ -112,3 +112,32 @@
             name: '{{ ansible_user }}'
             groups: [docker]
             append: true
+
+      - name: clone or update the repo
+        tags: [app]
+        ansible.builtin.git:
+            repo: '{{ repo_url }}'
+            dest: '{{ deploy_dir }}'
+            version: '{{ repo_ref }}'
+            accept_new_hostkey: true
+
+      - name: render the app env file
+        tags: [app]
+        ansible.builtin.template:
+            src: env.j2
+            dest: '{{ deploy_dir }}/.env'
+            mode: '0600'
+
+      - name: render the Caddyfile
+        tags: [app]
+        ansible.builtin.template:
+            src: Caddyfile.j2
+            dest: '{{ deploy_dir }}/Caddyfile'
+            mode: '0644'
+
+      - name: build and start the stack
+        tags: [app]
+        community.docker.docker_compose_v2:
+            project_src: '{{ deploy_dir }}/deploy'
+            files: [compose.prod.yaml]
+            build: always
