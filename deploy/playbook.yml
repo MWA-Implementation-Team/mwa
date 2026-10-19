@@ -112,7 +112,7 @@
             repo: '{{ repo_url }}'
             dest: '{{ deploy_dir }}'
             version: '{{ repo_ref }}'
-            accept_new_hostkey: true
+            accept_newhostkey: true
 
       - name: render the app env file
         tags: [app]
