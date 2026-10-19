@@ -6,7 +6,8 @@ deploy_dir: /opt/mwa
 # Repo the VM clones + builds from. Private repo → the VM needs a
 # read-only GitHub deploy key (see deploy/README.md).
 repo_url: git@github.com:MWA-Implementation-Team/mwa-template.git
-repo_ref: main
+# deploy/ doesn't exist on main yet — flip back to main after this branch merges
+repo_ref: feature/deployments
 
 # Feature ids enabled in prod — SPEC-feature-gating.md
 mwa_features: landing
