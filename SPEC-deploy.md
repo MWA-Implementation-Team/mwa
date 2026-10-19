@@ -67,7 +67,7 @@ On the VM:
             env.j2             → MWA_* env vars → /opt/mwa/.env (mode 0600)
             Caddyfile.j2       → "<domain> { reverse_proxy app:3000 }"
         compose.prod.yaml      → app + caddy services (static file, not templated)
-        files/backup.sh        → nightly sqlite backup (see Backups)
+        backup.sh              → nightly sqlite backup; runs from the clone via cron
         README.md              → operator runbook: prereqs, first run, DNS step
 
 App change (lands as its own small commit, prerequisite for real SMTP):
@@ -115,10 +115,11 @@ Compose project `mwa` (deploy/compose.prod.yaml):
 
 ## Backups
 
-- cron.daily on the VM runs `files/backup.sh`: `docker compose exec` into
-  the app container and `node -e` a `VACUUM INTO '/data/backups/<ts>.sqlite'`
-  (node:sqlite is in the app image; no sqlite3 CLI needed). Writes under
-  /opt/mwa/backups, keeps the last 14.
+- Nightly cron on the VM runs `deploy/backup.sh` straight from the clone:
+  `docker compose exec` into the app container and `node -e` a
+  `VACUUM INTO '/backups/<ts>.sqlite'` (node:sqlite is in the app image; no
+  sqlite3 CLI needed). The `/backups` bind mount lands files under
+  /opt/mwa/backups; keeps the last 14.
 - Local-only for v1 — the VM is a single point of failure by design, but
   the DB survives a botched deploy or corrupted container.
 

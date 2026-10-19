@@ -141,3 +141,19 @@
             project_src: '{{ deploy_dir }}/deploy'
             files: [compose.prod.yaml]
             build: always
+
+      - name: create the backups dir
+        tags: [backup]
+        ansible.builtin.file:
+            path: '{{ deploy_dir }}/backups'
+            state: directory
+            mode: '0755'
+
+      - name: schedule the nightly sqlite backup
+        tags: [backup]
+        ansible.builtin.cron:
+            name: mwa sqlite backup
+            job: '{{ deploy_dir }}/deploy/backup.sh'
+            hour: 3
+            minute: 17
+            user: root

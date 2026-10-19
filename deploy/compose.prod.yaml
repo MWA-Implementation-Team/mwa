@@ -11,6 +11,7 @@ services:
         env_file: ../.env
         volumes:
             - mwa-data:/data
+            - ../backups:/backups
         restart: unless-stopped
         # no published ports — caddy reaches the app over this network
         healthcheck:
