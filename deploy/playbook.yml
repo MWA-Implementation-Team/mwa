@@ -2,6 +2,10 @@
   hosts: all
   become: true
 
+  vars:
+      # docker's apt repo names architectures differently than ansible_facts
+      docker_apt_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}.get(ansible_architecture, ansible_architecture) }}"
+
   handlers:
       - name: restart ssh
         ansible.builtin.service:
@@ -18,7 +22,7 @@
       - name: install base packages
         tags: [base]
         ansible.builtin.apt:
-            name: [ufw, git, curl, ca-certificates, cron]
+            name: [ufw, git, curl, ca-certificates, cron, python3-debian]
             state: present
 
       - name: allow ssh, http and https inbound
@@ -56,3 +60,55 @@
             mode: '0644'
         when: ssh_lockdown | bool
         notify: restart ssh
+
+      - name: create the apt keyrings dir
+        tags: [docker]
+        ansible.builtin.file:
+            path: /etc/apt/keyrings
+            state: directory
+            mode: '0755'
+
+      - name: add docker's gpg key
+        tags: [docker]
+        ansible.builtin.get_url:
+            url: https://download.docker.com/linux/ubuntu/gpg
+            dest: /etc/apt/keyrings/docker.asc
+            mode: '0644'
+
+      - name: add the docker apt repository
+        tags: [docker]
+        ansible.builtin.deb822_repository:
+            name: docker
+            types: [deb]
+            uris: https://download.docker.com/linux/ubuntu
+            suites: '{{ ansible_distribution_release }}'
+            components: stable
+            architectures: '{{ docker_apt_arch }}'
+            signed_by: /etc/apt/keyrings/docker.asc
+            state: present
+
+      - name: install docker engine and the compose plugin
+        tags: [docker]
+        ansible.builtin.apt:
+            name:
+                - docker-ce
+                - docker-ce-cli
+                - containerd.io
+                - docker-buildx-plugin
+                - docker-compose-plugin
+            state: present
+            update_cache: true
+
+      - name: ensure docker is running and enabled
+        tags: [docker]
+        ansible.builtin.service:
+            name: docker
+            state: started
+            enabled: true
+
+      - name: let the operator run docker without sudo
+        tags: [docker]
+        ansible.builtin.user:
+            name: '{{ ansible_user }}'
+            groups: [docker]
+            append: true
