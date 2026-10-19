@@ -15,9 +15,10 @@ services:
         restart: unless-stopped
         # no published ports — caddy reaches the app over this network
         healthcheck:
+            # distroless has no PATH entry for node — the binary is /nodejs/bin/node
             test:
                 - CMD
-                - node
+                - /nodejs/bin/node
                 - -e
                 - "fetch('http://localhost:3000/').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
             interval: 30s

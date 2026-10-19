@@ -10,8 +10,9 @@ mkdir -p backups
 name="db-$(date +%Y%m%d-%H%M%S).sqlite"
 
 # -u root: distroless runs the app as nonroot; the bind-mounted host dir is
-# root-owned, so the writer needs root inside the container.
+# root-owned, so the writer needs root inside the container. And the node
+# binary isn't on PATH in distroless — it's /nodejs/bin/node.
 docker compose -f deploy/compose.prod.yaml exec -T -u root app \
-    node -e "import('node:sqlite').then(({DatabaseSync}) => new DatabaseSync('/data/db.sqlite').exec(\"VACUUM INTO '/backups/$name'\"))"
+    /nodejs/bin/node -e "import('node:sqlite').then(({DatabaseSync}) => new DatabaseSync('/data/db.sqlite').exec(\"VACUUM INTO '/backups/$name'\"))"
 
 ls -1t backups/db-*.sqlite | tail -n +15 | xargs -r rm --
