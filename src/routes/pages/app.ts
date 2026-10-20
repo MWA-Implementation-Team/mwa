@@ -68,11 +68,4 @@ export function registerAppRoutes(app: MwaHono) {
             initialGroups: listUserGroups(ctx.var, user.id).map(serialize),
         });
     });
-
-    app.get('/app/gambling', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        return writePage(ctx, 'gambling', {});
-    });
 }

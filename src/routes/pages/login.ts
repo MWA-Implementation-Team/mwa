@@ -24,7 +24,7 @@ const allowedGotos = new Set<string>([
     '/app/account',
     '/app/leaderboard',
     '/app/group',
-    '/app/casino',
+    '/app/gambling',
     '/admin',
 ]);
 const allowedGotoPrefixes = ['/app/activities/'];
