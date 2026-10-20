@@ -69,10 +69,10 @@ export function registerAppRoutes(app: MwaHono) {
         });
     });
 
-    app.get('/app/casino', async (ctx) => {
+    app.get('/app/gambling', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        return writePage(ctx, 'casino', {});
+        return writePage(ctx, 'gambling', {});
     });
 }

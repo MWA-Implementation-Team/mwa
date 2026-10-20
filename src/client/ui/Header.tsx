@@ -82,8 +82,8 @@ export default function Header() {
                                     <a class="drawer-link" href="/app/group">
                                         {t('headerGroup')}
                                     </a>
-                                    <a class="drawer-link" href="/app/casino">
-                                        {t('headerCasino')}
+                                    <a class="drawer-link" href="/app/gambling">
+                                        {t('headerGambling')}
                                     </a>
                                     <a class="drawer-link" href="/app/account">
                                         {t('headerAccount')}

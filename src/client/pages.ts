@@ -8,7 +8,7 @@ import { activityPage } from '#src/client/pages/app/ActivityPage.js';
 import { accountPage } from '#src/client/pages/app/AccountPage.js';
 import { leaderboardPage } from '#src/client/pages/app/LeaderboardPage.js';
 import { groupPage } from '#src/client/pages/app/GroupPage.js';
-import { casinoPage } from '#src/client/pages/app/CasinoPage.js';
+import { gamblingPage } from '#src/client/pages/app/GamblingPage.js';
 import { adminPage } from '#src/client/pages/AdminPage.js';
 import { LanguageCode, TranslateFn } from './language.js';
 
@@ -22,7 +22,7 @@ export const registeredPages = {
     account: accountPage,
     leaderboard: leaderboardPage,
     group: groupPage,
-    casino: casinoPage,
+    gambling: gamblingPage,
     admin: adminPage,
     error: errorPage,
 } satisfies Record<string, Page<any>>;

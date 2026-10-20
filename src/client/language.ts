@@ -13,7 +13,7 @@ export type Language = {
     titleAccount: string;
     titleLeaderboard: string;
     titleGroup: string;
-    titleCasino: string;
+    titleGambling: string;
     titleAdmin: string;
     titleError: string;
 
@@ -23,7 +23,7 @@ export type Language = {
     headerActivities: string;
     headerLeaderboard: string;
     headerGroup: string;
-    headerCasino: string;
+    headerGambling: string;
     headerAccount: string;
     headerAdmin: string;
 
@@ -119,7 +119,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleAccount: 'MWA | Account',
         titleLeaderboard: 'MWA | Leaderboard',
         titleGroup: 'MWA | Group',
-        titleCasino: 'MWA | Casino',
+        titleGambling: 'MWA | Gambling',
         titleAdmin: 'MWA | Admin',
         titleError: 'MWA | {status}',
 
@@ -129,7 +129,7 @@ export const languages: Record<LanguageCode, Language> = {
         headerActivities: 'Activities',
         headerLeaderboard: 'Leaderboard',
         headerGroup: 'Group',
-        headerCasino: 'Casino',
+        headerGambling: 'Gambling',
         headerAccount: 'Account',
         headerAdmin: 'Admin',
 
@@ -224,7 +224,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleAccount: 'MWA | Paskyra',
         titleLeaderboard: 'MWA | Lyderių lentelė',
         titleGroup: 'MWA | Grupė',
-        titleCasino: 'MWA | Kazino',
+        titleGambling: 'MWA | Lošimai',
         titleAdmin: 'MWA | Administravimas',
         titleError: 'MWA | {status}',
 
@@ -234,7 +234,7 @@ export const languages: Record<LanguageCode, Language> = {
         headerActivities: 'Veiklos',
         headerLeaderboard: 'Lyderių lentelė',
         headerGroup: 'Grupė',
-        headerCasino: 'Kazino',
+        headerGambling: 'Lošimai',
         headerAccount: 'Paskyra',
         headerAdmin: 'Administravimas',
 
