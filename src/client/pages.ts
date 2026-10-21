@@ -8,9 +8,10 @@ import { activityPage } from '#src/client/pages/app/ActivityPage.js';
 import { accountPage } from '#src/client/pages/app/AccountPage.js';
 import { leaderboardPage } from '#src/client/pages/app/LeaderboardPage.js';
 import { groupPage } from '#src/client/pages/app/GroupPage.js';
-import { gamblingPage } from '#src/client/pages/app/GamblingPage.js';
+import { gamblingPage } from '#src/client/pages/app/gambling/GamblingHomePage.js';
 import { adminPage } from '#src/client/pages/AdminPage.js';
 import { LanguageCode, TranslateFn } from './language.js';
+import { gamblingSessionPagie } from './pages/app/gambling/GamblingSessionPage.js';
 
 export const registeredPages = {
     // These keys are used in the writePage function
@@ -23,6 +24,7 @@ export const registeredPages = {
     leaderboard: leaderboardPage,
     group: groupPage,
     gambling: gamblingPage,
+    game: gamblingSessionPagie,
     admin: adminPage,
     error: errorPage,
 } satisfies Record<string, Page<any>>;

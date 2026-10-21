@@ -14,6 +14,7 @@ export type Language = {
     titleLeaderboard: string;
     titleGroup: string;
     titleGambling: string;
+    titleGame: string;
     titleAdmin: string;
     titleError: string;
 
@@ -70,6 +71,8 @@ export type Language = {
     txTransfer: string;
     txPurchase: string;
     txSystem: string;
+    txGamblingDeduction: string;
+    txGamblingWinnings: string;
     dashQrTitle: string;
     dashQrHint: string;
     dashQrBody: string;
@@ -120,6 +123,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleLeaderboard: 'MWA | Leaderboard',
         titleGroup: 'MWA | Group',
         titleGambling: 'MWA | Gambling',
+        titleGame: 'MWA | Game',
         titleAdmin: 'MWA | Admin',
         titleError: 'MWA | {status}',
 
@@ -177,6 +181,8 @@ export const languages: Record<LanguageCode, Language> = {
         txTransfer: 'Transfer',
         txPurchase: 'Purchase',
         txSystem: 'System credit',
+        txGamblingDeduction: 'Gambling deduction',
+        txGamblingWinnings: 'Gambling winnings',
         dashQrTitle: 'Account QR code',
         dashQrHint: 'Use for admin access',
         dashQrBody: 'Show this code to an administrator to allow access to your account details.',
@@ -225,6 +231,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleLeaderboard: 'MWA | Lyderių lentelė',
         titleGroup: 'MWA | Grupė',
         titleGambling: 'MWA | Lošimai',
+        titleGame: 'MWA | Žaidimas',
         titleAdmin: 'MWA | Administravimas',
         titleError: 'MWA | {status}',
 
@@ -282,6 +289,8 @@ export const languages: Record<LanguageCode, Language> = {
         txTransfer: 'Pervedimas',
         txPurchase: 'Pirkimas',
         txSystem: 'Sisteminis įskaitymas',
+        txGamblingDeduction: 'Lošimo atsiskaitymas',
+        txGamblingWinnings: 'Lošimo laimėjimas',
         dashQrTitle: 'Paskyros QR kodas',
         dashQrHint: 'Naudok administratoriaus prieigai',
         dashQrBody:

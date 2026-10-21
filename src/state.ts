@@ -57,7 +57,6 @@ export function createTestMwaState(init: { mailer?: Mailer }): MwaState {
 
 function createDatabase(path: string) {
     const db = new DatabaseSync(path);
-    db.exec('PRAGMA foreign_keys = ON;');
     migrateDatabase(db);
     return db;
 }

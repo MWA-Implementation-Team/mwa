@@ -1,8 +1,10 @@
 import { MwaState } from '#src/state.js';
+import { findUserById } from './users.js';
 
 export type GameType = 'coin_flip';
 
-export type RunningGame = {
+export type SessionSummary = {
+    id: number;
     type: GameType;
     p1Name: string;
     p2Name: string;
@@ -14,15 +16,47 @@ export type CommonGameOpts = {
     betAmount: number;
 };
 
-export function queryGames(state: MwaState): RunningGame[] {
+export type RunningGame = {
+    type: GameType;
+    status: 'pending' | 'running' | 'ended',
+
+    p1: number;
+    p2: number;
+    p1Name: string;
+    p2Name: string;
+};
+
+export type Invitation = {
+    id: number;
+    type: GameType,
+    p1Name: string;
+};
+
+export function queryGamblingInvitations(state: MwaState, userId: number): Invitation[] {
     const query = state.prepare(`
-    SELECT game_type, p1u.username AS p1, p2u.username AS p2 FROM gambling_sessions
+    SELECT gambling_sessions.id, game_type, p1u.username AS p1 FROM gambling_sessions
+    LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
+    WHERE p2 = ? AND is_rejected = FALSE AND winner_tx IS NULL
+    `);
+    return query.all(userId).map(row => {
+        return {
+            id: row.id as number,
+            type: row.game_type as GameType,
+            p1Name: row.p1 as string,
+        };
+    });
+}
+
+export function queryGamblingSessions(state: MwaState): SessionSummary[] {
+    const query = state.prepare(`
+    SELECT gambling_sessions.id, game_type, p1u.username AS p1, p2u.username AS p2 FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
-    WHERE winner_tx IS NULL
+    WHERE is_rejected = FALSE AND winner_tx IS NULL
     `);
     return query.all().map((row) => {
         return {
+            id: row.id as number,
             type: row.game_type as GameType,
             p1Name: row.p1 as string,
             p2Name: row.p2 as string,
@@ -30,14 +64,140 @@ export function queryGames(state: MwaState): RunningGame[] {
     });
 }
 
-export function initGame(state: MwaState, type: GameType, opts: CommonGameOpts): number {
-    const insert = state.prepare(`
-    INSERT INTO gambling_sessions (p1, p2, bet_amount, game_type)
-    VALUES (?, ?, ?, ?)
+export function findGamblingSessionById(state: MwaState, sessionId: number): RunningGame | null {
+    const query = state.prepare(`
+    SELECT game_type, p2_deposit_tx, p1, p2, p1u.username AS p1_name, p2u.username AS p2_name FROM gambling_sessions
+    LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
+    LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
+    WHERE gambling_sessions.id = ? AND is_rejected = FALSE
+    `);
+    const row = query.get(sessionId);
+    if (!row) return null;
+
+    return {
+        type: row.game_type as GameType,
+        status: !row.p2_deposit_tx ? 'pending' : 'running',
+        p1: row.p1 as number,
+        p2: row.p2 as number,
+        p1Name: row.p1 as string,
+        p2Name: row.p2 as string,
+    };
+}
+
+export type AcceptGamblingSessionResult = 'success' | 'too_broke' | 'invalid_session';
+
+export function acceptGamblingSession(state: MwaState, sessionId: number, userId: number): AcceptGamblingSessionResult {
+    state.db.exec('BEGIN');
+
+    try {
+        const sessionQuery = state.prepare(`
+        SELECT bet_amount FROM gambling_sessions
+        WHERE id = ? AND p2 = ? AND is_rejected = FALSE AND winner_tx IS NULL
+        `);
+        const row = sessionQuery.get(sessionId, userId);
+        if (!row) {
+            return 'invalid_session';
+        }
+        const betAmount = row.bet_amount as number;
+
+        const deductResult = deductCoinsForGambling(state, userId, betAmount);
+        if (deductResult.type === 'too_broke') {
+            return 'too_broke';
+        }
+
+        const update = state.prepare(`
+        UPDATE gambling_sessions SET p2_deposit_tx = ? WHERE id = ?
+        `);
+        update.run(deductResult.parentId, sessionId);
+
+        state.db.exec('COMMIT');
+        return 'success';
+    } catch (err) {
+        state.db.exec('ROLLBACK');
+        throw err;
+    }
+}
+
+export function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOpts): number | null {
+    state.db.exec('BEGIN');
+
+    try {
+        const deductResult = deductCoinsForGambling(state, opts.p1, opts.betAmount);
+        if (deductResult.type === 'too_broke') {
+            return null;
+        }
+
+        const insert = state.prepare(`
+        INSERT INTO gambling_sessions (p1, p2, bet_amount, game_type, p1_deposit_tx)
+        VALUES (?, ?, ?, ?, ?)
+        RETURNING id
+        `);
+        const row = insert.get(opts.p1, opts.p2, opts.betAmount, type, deductResult.parentId);
+        state.db.exec('COMMIT');
+        return row!.id as number;
+    } catch (err) {
+        state.db.exec('ROLLBACK');
+        throw err;
+    }
+}
+
+// TEMPORARY
+export function giveCoins(state: MwaState, userId: number, amount: number) {
+    state.db.exec('BEGIN');
+
+    try {
+        const insertParentTx = state.prepare(`
+        INSERT INTO parent_transactions (kind) VALUES ('system')
+        RETURNING id
+        `);
+        const { id: parentId } = insertParentTx.get()!;
+
+        const insertChildTx = state.prepare(`
+        INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)
+        RETURNING id
+        `);
+        insertChildTx.run(parentId, userId, amount);
+        state.db.exec('COMMIT');
+    } catch (err) {
+        state.db.exec('ROLLBACK');
+        throw err;
+    }
+}
+
+export type DeductCoinsResult = {
+    type: 'success',
+    parentId: number,
+} | {
+    type: 'too_broke',
+};
+
+// this is expected to run in a transaction
+function deductCoinsForGambling(state: MwaState, userId: number, betAmount: number): DeductCoinsResult {
+    const user = findUserById(state, userId);
+    if (!user) {
+        throw new Error(`User ${userId} doesn't exist`);
+    }
+
+    if (user.currentBalance < betAmount) {
+        return { type: 'too_broke' };
+    }
+
+    const insertParentTx = state.prepare(`
+    INSERT INTO parent_transactions (kind) VALUES ('gambling_deduction')
     RETURNING id
     `);
-    const row = insert.get(opts.p1, opts.p2, opts.betAmount, type);
-    return row!.id as number;
+    const { id: parentId } = insertParentTx.get()!;
+
+    const insertChildTx = state.prepare(`
+    INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)
+    RETURNING id
+    `);
+    insertChildTx.run(parentId, userId, -betAmount);
+
+    return {
+        type: 'success',
+        parentId: parentId as number,
+    };
 }
 
 export type CoinSide = 'heads' | 'tails';

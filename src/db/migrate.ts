@@ -21,6 +21,10 @@ export function migrateDatabase(database: DatabaseSync) {
         .map((file) => [Number(file.split('_')[0]), file] satisfies [number, string])
         .sort(([a], [b]) => a - b);
 
+    // allow breaking foreign keys temporarily during migrations
+    // required when recreating tables and such
+    database.exec('PRAGMA foreign_keys = OFF');
+
     for (const [ver, file] of migrations) {
         if (currentVersion >= ver) {
             continue;
@@ -47,4 +51,6 @@ export function migrateDatabase(database: DatabaseSync) {
         }
         console.log(`[migrate] applied ${file}`);
     }
+
+    database.exec('PRAGMA foreign_keys = ON');
 }

@@ -1,6 +1,6 @@
 import { MwaState } from '#src/state.js';
 
-export type TransactionKind = 'transfer' | 'purchase' | 'system';
+export type TransactionKind = 'transfer' | 'purchase' | 'system' | 'gambling_deduction' | 'gambling_winnings';
 
 export type Transaction = {
     // kept as the ISO string stored in sqlite so SSR and hydration
@@ -29,3 +29,4 @@ export function listUserTransactions(state: MwaState, userId: number, limit = 10
         balanceDelta: row.balance_delta as number,
     }));
 }
+
