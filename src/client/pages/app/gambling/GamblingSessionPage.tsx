@@ -3,10 +3,12 @@ import { RunningGame } from '#src/db/gambling.js';
 
 type GamblingSessionPageProps = {
     type: 'confirm',
+    id: number,
     game: RunningGame,
     message?: string,
 } | {
     type: 'running',
+    id: number,
     game: RunningGame,
 };
 
@@ -25,20 +27,20 @@ export const gamblingSessionPagie: Page<GamblingSessionPageProps> = {
 function GamblingSessionPage(props: GamblingSessionPageProps) {
     switch (props.type) {
         case 'confirm': {
-            const { game, message } = props;
+            const { game, id, message } = props;
             return (
                 <>
                     <h1>Challenge request:</h1>
                     <span>{game.p1Name} has challenged you in a game of coin flip</span>
                     <form method="POST">
-                        <button type="submit">ACCEPT</button>
+                        <button formaction={`/app/gambling/sessions/${id}/accept`} type="submit">ACCEPT</button>
                     </form>
                     {message && <span>{message}</span>}
                 </>
             )
         }
         case 'running': {
-            const { game } = props;
+            const { id, game } = props;
             return (
                 <>
                     <h1>imagine coin flip here</h1>
@@ -46,6 +48,9 @@ function GamblingSessionPage(props: GamblingSessionPageProps) {
                         {game.p1Name} vs {game.p2Name}
                     </span>
                     <span>Type: {game.type}</span>
+                    <form method="POST">
+                        <button formaction={`/app/gambling/sessions/${id}/win`} type="submit">Win</button>
+                    </form>
                 </>
             )
         }

@@ -1,6 +1,6 @@
 import { requireUser } from '#src/auth.js';
 import { translate } from '#src/client/language.js';
-import { acceptGamblingSession, findGamblingSessionById, giveCoins, initGamblingSession, queryGamblingInvitations, queryGamblingSessions } from '#src/db/gambling.js';
+import { acceptGamblingSession, findGamblingSessionById, giveCoins, initGamblingSession, queryGamblingInvitations, queryGamblingSessions, winGamblingSession } from '#src/db/gambling.js';
 import { findUserByUsername } from '#src/db/users.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { MwaHono } from '#src/state.js';
@@ -81,20 +81,31 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 404);
         }
 
+        const error = ctx.req.query('error');
+        let message: string | undefined;
+        switch (error) {
+            case 'broke':
+                message = 'broke boy';
+                break;
+        }
+
         if (game.status === 'pending') {
             return writePage(ctx, 'game', {
                 type: 'confirm',
+                id: gameId,
                 game,
+                message,
             });
         }
 
         return writePage(ctx, 'game', {
             type: 'running',
+            id: gameId,
             game,
         });
     });
 
-    app.post('/app/gambling/sessions/:id', async (ctx) => {
+    app.post('/app/gambling/sessions/:id/accept', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
@@ -112,21 +123,33 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const result = acceptGamblingSession(ctx.var, gameId, user.id);
-        if (result === 'invalid_session') {
-            return writeErrorPage(ctx, 400);
-        }
         if (result === 'too_broke') {
-            return writePage(ctx, 'game', {
-                type: 'confirm',
-                game,
-                message: 'broke boy'
-            });
+            return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(gameId)}?error=broke`);
         }
 
-        return writePage(ctx, 'game', {
-            type: 'running',
-            game,
-        });
+        return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(gameId)}`);
+    });
+
+    app.post('/app/gambling/sessions/:id/win', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        //const lang = getRequestLanguage(ctx);
+
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) {
+            return writeErrorPage(ctx, 400);
+        }
+
+        const gameId = Number(ctx.req.param('id'));
+        const game = findGamblingSessionById(ctx.var, gameId);
+        if (!game) {
+            return writeErrorPage(ctx, 404);
+        }
+
+        winGamblingSession(ctx.var, gameId, user.id);
+
+        return ctx.redirect('/app/gambling');
     });
 }
 
