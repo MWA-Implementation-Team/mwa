@@ -6,6 +6,24 @@ CREATE TABLE parent_transactions (
   kind TEXT NOT NULL CHECK (kind IN ('transfer', 'purchase', 'system', 'gambling_deduction', 'gambling_winnings'))
 ) STRICT;
 
+-- adding ON DELETE CASCADE on parent_id
+DROP table child_transactions;
+CREATE TABLE child_transactions (
+  id INTEGER PRIMARY KEY,
+  parent_id INTEGER NOT NULL REFERENCES parent_transactions(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  balance_delta INTEGER NOT NULL,
+  -- if not null, parent_transactions kind must be 'system'
+  system_qr_code_id INTEGER REFERENCES system_qr_codes(id),
+  CHECK (balance_delta <> 0),
+  UNIQUE (parent_id, user_id)
+) STRICT;
+
+CREATE INDEX child_transactions_index_system_qr_code_id ON child_transactions (system_qr_code_id)
+WHERE system_qr_code_id IS NOT NULL;
+
+CREATE INDEX child_transactions_index_user_id ON child_transactions (user_id);
+
 CREATE TABLE IF NOT EXISTS gambling_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
@@ -18,11 +36,9 @@ CREATE TABLE IF NOT EXISTS gambling_sessions (
     bet_amount INTEGER NOT NULL,
     game_type TEXT NOT NULL,
 
-    -- p2 rejected the challenge
-    is_rejected BOOLEAN DEFAULT FALSE,
-
     -- transaction where bet amount is deducted from p1
-    p1_deposit_tx INTEGER NOT NULL REFERENCES parent_transactions (id) ON DELETE CASCADE,
+    -- null = p2 rejected the challenge
+    p1_deposit_tx INTEGER REFERENCES parent_transactions (id) ON DELETE SET NULL,
     -- transaction where bet amount is deducted from p2,
     -- null = p2 didn't accept the challenge yet
     p2_deposit_tx INTEGER REFERENCES parent_transactions (id) ON DELETE CASCADE DEFAULT NULL,
@@ -34,7 +50,7 @@ CREATE TABLE IF NOT EXISTS gambling_sessions (
       p1 != p2
     ),
     CHECK (
-      is_rejected = FALSE
+      p1_deposit_tx IS NOT NULL
       OR p2_deposit_tx IS NULL
     ),
     CHECK (

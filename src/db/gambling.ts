@@ -36,7 +36,7 @@ export function queryGamblingInvitations(state: MwaState, userId: number): Invit
     const query = state.prepare(`
     SELECT gambling_sessions.id, game_type, p1u.username AS p1_name FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
-    WHERE p2 = ? AND is_rejected = FALSE AND p2_deposit_tx IS NULL
+    WHERE p2 = ? AND p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NULL
     `);
     return query.all(userId).map(row => {
         return {
@@ -52,7 +52,7 @@ export function queryGamblingSessions(state: MwaState): SessionSummary[] {
     SELECT gambling_sessions.id, game_type, p1u.username AS p1_name, p2u.username AS p2_name FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
-    WHERE is_rejected = FALSE AND p2_deposit_tx IS NOT NULL AND winner_tx IS NULL
+    WHERE p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NOT NULL AND winner_tx IS NULL
     `);
     return query.all().map((row) => {
         return {
@@ -69,7 +69,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
     SELECT game_type, p2_deposit_tx, p1, p2, p1u.username AS p1_name, p2u.username AS p2_name FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
-    WHERE gambling_sessions.id = ? AND is_rejected = FALSE
+    WHERE gambling_sessions.id = ? AND p1_deposit_tx IS NOT NULL
     `);
     const row = query.get(sessionId);
     if (!row) return null;
@@ -92,7 +92,7 @@ export function acceptGamblingSession(state: MwaState, sessionId: number, userId
     try {
         const sessionQuery = state.prepare(`
         SELECT bet_amount FROM gambling_sessions
-        WHERE id = ? AND p2 = ? AND is_rejected = FALSE AND winner_tx IS NULL
+        WHERE id = ? AND p2 = ? AND p1_deposit_tx IS NOT NULL AND winner_tx IS NULL
         `);
         const row = sessionQuery.get(sessionId, userId);
         if (!row) {
@@ -116,6 +116,21 @@ export function acceptGamblingSession(state: MwaState, sessionId: number, userId
         state.db.exec('ROLLBACK');
         throw err;
     }
+}
+
+export function rejectGamblingSession(state: MwaState, sessionId: number, userId: number) {
+    // Delete p1 deposit transaction to return money to p1.
+    // The balance delta should be negative so this should be fine.
+    // At the same time, p1_deposit_tx is cascaded to null and that marks the session as rejected.
+    const del = state.prepare(`
+    DELETE FROM parent_transactions
+    WHERE id IN (
+      SELECT p1_deposit_tx
+      FROM gambling_sessions
+      WHERE id = ? AND p2 = ?
+    );
+    `);
+    del.run(sessionId, userId);
 }
 
 export function winGamblingSession(state: MwaState, sessionId: number, userId: number) {

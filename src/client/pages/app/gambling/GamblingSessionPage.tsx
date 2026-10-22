@@ -34,6 +34,7 @@ function GamblingSessionPage(props: GamblingSessionPageProps) {
                     <span>{game.p1Name} has challenged you in a game of coin flip</span>
                     <form method="POST">
                         <button formaction={`/app/gambling/sessions/${id}/accept`} type="submit">ACCEPT</button>
+                        <button formaction={`/app/gambling/sessions/${id}/reject`} type="submit">REJECT</button>
                     </form>
                     {message && <span>{message}</span>}
                 </>
