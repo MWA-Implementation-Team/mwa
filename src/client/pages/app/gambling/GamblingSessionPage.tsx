@@ -15,6 +15,7 @@ type GamblingSessionPageProps = {
     type: 'running',
     id: number,
     game: RunningGame,
+    winner?: 'p1' | 'p2',
 };
 
 export const gamblingSessionPagie: Page<GamblingSessionPageProps> = {
@@ -70,7 +71,7 @@ function GamblingSessionPage(props: GamblingSessionPageProps) {
             )
         }
         case 'running': {
-            const { id, game } = props;
+            const { id, game, winner } = props;
             return (
                 <>
                     <h1>imagine coin flip here</h1>
@@ -78,9 +79,11 @@ function GamblingSessionPage(props: GamblingSessionPageProps) {
                         {game.p1Name} vs {game.p2Name}
                     </span>
                     <span>Type: {game.type}</span>
-                    <form method="POST">
-                        <button formaction={`/app/gambling/sessions/${id}/win`} type="submit">Win</button>
-                    </form>
+                    {winner ? <h1>WINNER: {winner}</h1> : (
+                        <form method="POST">
+                            <button formaction={`/app/gambling/sessions/${id}/win`} type="submit">Win</button>
+                        </form>
+                    )}
                 </>
             )
         }

@@ -46,11 +46,20 @@ export function registerGamblingRoutes(app: MwaHono) {
         const opponentUsername = String(form.get('opponent') ?? '');
 
         const opponent = findUserByUsername(ctx.var, opponentUsername);
+        // TODO: query errors
         if (!opponent) {
             return writePage(ctx, 'gambling', {
                 sessions,
                 invitations,
                 message: 'no user',
+            });
+        }
+
+        if (user.id === opponent.id) {
+            return writePage(ctx, 'gambling', {
+                sessions,
+                invitations,
+                message: 'idiot',
             });
         }
 
@@ -68,7 +77,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
         console.log('game id', id);
 
-        return ctx.redirect('/app/gambling');
+        return ctx.redirect(`/app/gambling/sessions/${id}`);
     });
 
     app.get('/app/gambling/sessions/:id', async (ctx) => {
@@ -89,7 +98,7 @@ export function registerGamblingRoutes(app: MwaHono) {
                 break;
         }
 
-        switch (game.status) {
+        switch (game.status.type) {
             case 'pending':
                 return writePage(ctx, 'game', {
                     type: 'confirm',
@@ -103,11 +112,17 @@ export function registerGamblingRoutes(app: MwaHono) {
                     game,
                 });
             case 'running':
+                return writePage(ctx, 'game', {
+                    type: 'running',
+                    id: gameId,
+                    game,
+                });
             case 'ended':
                 return writePage(ctx, 'game', {
                     type: 'running',
                     id: gameId,
                     game,
+                    winner: game.status.winner
                 });
         }
     });

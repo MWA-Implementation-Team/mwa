@@ -19,7 +19,10 @@ export type CommonGameOpts = {
 
 export type RunningGame = {
     type: GameType;
-    status: 'pending' | 'rejected' | 'running' | 'ended',
+    status: { type: 'pending' } | { type: 'rejected' } | { type: 'running' } | {
+        type: 'ended',
+        winner: 'p1' | 'p2',
+    }
 
     p1: number;
     p2: number;
@@ -68,10 +71,11 @@ export function queryGamblingSessions(state: MwaState): SessionSummary[] {
 export function findGamblingSessionById(state: MwaState, sessionId: number): RunningGame | null {
     const query = state.prepare(`
     SELECT
-        game_type, p1_deposit_tx, p2_deposit_tx, p1, p2, p1u.username AS p1_name, p2u.username AS p2_name
+        game_type, p1_deposit_tx, p2_deposit_tx, trans.user_id AS winner_user, p1, p2, p1u.username AS p1_name, p2u.username AS p2_name
     FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
+    LEFT JOIN child_transactions AS trans ON gambling_sessions.winner_tx = trans.parent_id
     WHERE gambling_sessions.id = ?
     `);
     const row = query.get(sessionId);
@@ -79,11 +83,16 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
 
     let status: RunningGame['status'];
     if (!row.p1_deposit_tx) {
-        status = 'rejected';
+        status = { type: 'rejected' };
     } else if (!row.p2_deposit_tx) {
-        status = 'pending';
+        status = { type: 'pending' };
+    } else if (!row.winner_user) {
+        status = { type: 'running' };
     } else {
-        status = 'running';
+        status = {
+            type: 'ended',
+            winner: row.winner_user === row.p1 ? 'p1' : 'p2',
+        };
     }
 
     return {
