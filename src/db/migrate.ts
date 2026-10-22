@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { readdirSync, readFileSync } from 'fs';
 import path from 'path';
+import { runTransaction } from './transaction.js';
 
 export function migrateDatabase(database: DatabaseSync) {
     database.exec(`
@@ -31,24 +32,17 @@ export function migrateDatabase(database: DatabaseSync) {
         }
 
         const sql = readFileSync(path.join(dir, file), 'utf8');
-        database.exec('BEGIN');
-        try {
+        runTransaction(database, () => {
             database.exec(sql);
             database
-                .prepare(
-                    `
+                .prepare(`
                 INSERT INTO migration_status (id, current_version)
                 VALUES (1, ?)
                 ON CONFLICT(id) DO UPDATE
                 SET current_version = excluded.current_version;
-                `,
-                )
+                `)
                 .run(ver);
-            database.exec('COMMIT');
-        } catch (err) {
-            database.exec('ROLLBACK');
-            throw err;
-        }
+        });
         console.log(`[migrate] applied ${file}`);
     }
 

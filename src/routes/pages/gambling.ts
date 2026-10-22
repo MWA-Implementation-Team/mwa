@@ -89,20 +89,27 @@ export function registerGamblingRoutes(app: MwaHono) {
                 break;
         }
 
-        if (game.status === 'pending') {
-            return writePage(ctx, 'game', {
-                type: 'confirm',
-                id: gameId,
-                game,
-                message,
-            });
+        switch (game.status) {
+            case 'pending':
+                return writePage(ctx, 'game', {
+                    type: 'confirm',
+                    id: gameId,
+                    game,
+                    message,
+                });
+            case 'rejected':
+                return writePage(ctx, 'game', {
+                    type: 'rejected',
+                    game,
+                });
+            case 'running':
+            case 'ended':
+                return writePage(ctx, 'game', {
+                    type: 'running',
+                    id: gameId,
+                    game,
+                });
         }
-
-        return writePage(ctx, 'game', {
-            type: 'running',
-            id: gameId,
-            game,
-        });
     });
 
     app.post('/app/gambling/sessions/:id/accept', async (ctx) => {
@@ -143,7 +150,7 @@ export function registerGamblingRoutes(app: MwaHono) {
 
         const gameId = Number(ctx.req.param('id'));
         rejectGamblingSession(ctx.var, gameId, user.id);
-        return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(gameId)}`);
+        return ctx.redirect('/app/gambling');
     });
 
     app.post('/app/gambling/sessions/:id/win', async (ctx) => {

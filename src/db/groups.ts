@@ -1,5 +1,6 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
+import { runTransaction } from './transaction.js';
 
 export const MIN_GROUP_MEMBERS = 2;
 export const MAX_GROUP_MEMBERS = 6;
@@ -59,16 +60,11 @@ export function createGroup(
         VALUES (?, ?)
     `);
 
-    state.db.exec('BEGIN');
-    try {
+    return runTransaction(state.db, () => {
         const row = createGroupQuery.get(name, ownerId, phone_number);
         addMemberQuery.run(row!.id, ownerId);
-        state.db.exec('COMMIT');
         return mapGroup(row!);
-    } catch (error) {
-        state.db.exec('ROLLBACK');
-        throw error;
-    }
+    });
 }
 
 export function findGroupById(state: MwaState, group_id: number): Group | null {
