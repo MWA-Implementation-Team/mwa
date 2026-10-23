@@ -1,7 +1,7 @@
-import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
+import PageShell from './PageShell.js';
 
 // Extra target fields shown only to elevated roles — the route populates
 // this solely for host/admin scanners, so `detail` being non-null is the gate.
@@ -27,39 +27,54 @@ function InteractPage({ self, target, detail }: InteractPageProps) {
 
     if (self) {
         return (
-            <>
-                <Header />
-                <h1>{t('interactSelfJoke')}</h1>
-            </>
+            <PageShell section="interact" title={t('titleInteract')}>
+                <section class="mwa-wiki-panel">
+                    <div class="mwa-wiki-panel-body">
+                        <p class="mwa-wiki-muted">{t('interactSelfJoke')}</p>
+                    </div>
+                </section>
+            </PageShell>
         );
     }
 
     return (
-        <>
-            <Header />
-
-            <h1>{t('interactHeading', { name: target.username })}</h1>
-
+        <PageShell section="interact" title={t('interactHeading', { name: target.username })}>
             {/* Stub — real transfers land with the pending/confirm flow. */}
-            <section>
-                <h2>{t('interactSendMoneyTitle')}</h2>
-                <button disabled>{t('interactSendMoneyTitle')}</button>
-                <p>{t('interactComingSoon')}</p>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('interactSendMoneyTitle')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <div class="mwa-wiki-actions">
+                        <button disabled>{t('interactSendMoneyTitle')}</button>
+                    </div>
+                    <p class="mwa-wiki-muted">{t('interactComingSoon')}</p>
+                </div>
             </section>
 
             {detail && (
-                <section>
-                    <h2>{t('interactProfileDetailTitle')}</h2>
-                    <dl>
-                        <dt>{t('interactDetailEmail')}</dt>
-                        <dd>{detail.email}</dd>
-                        <dt>{t('interactDetailBalance')}</dt>
-                        <dd>{detail.currentBalance}</dd>
-                        <dt>{t('interactDetailJoined')}</dt>
-                        <dd>{detail.joinedAt.slice(0, 10)}</dd>
-                    </dl>
+                <section class="mwa-wiki-panel">
+                    <div class="mwa-wiki-panel-head">
+                        <h2>{t('interactProfileDetailTitle')}</h2>
+                    </div>
+                    <div class="mwa-wiki-panel-body">
+                        <ul class="mwa-wiki-rows">
+                            <li class="mwa-wiki-row">
+                                <span>{t('interactDetailEmail')}</span>
+                                <strong>{detail.email}</strong>
+                            </li>
+                            <li class="mwa-wiki-row">
+                                <span>{t('interactDetailBalance')}</span>
+                                <strong>{detail.currentBalance}</strong>
+                            </li>
+                            <li class="mwa-wiki-row">
+                                <span>{t('interactDetailJoined')}</span>
+                                <strong>{detail.joinedAt.slice(0, 10)}</strong>
+                            </li>
+                        </ul>
+                    </div>
                 </section>
             )}
-        </>
+        </PageShell>
     );
 }

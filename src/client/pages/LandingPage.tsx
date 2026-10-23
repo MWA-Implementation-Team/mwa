@@ -1,9 +1,8 @@
 import { useContext } from 'preact/hooks';
-import Header from '#src/client/ui/Header.js';
-import Footer from '#src/client/ui/Footer.js';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
 import { FacebookIcon, InstagramIcon, LinkedinIcon, TwitterIcon } from '#src/client/ui/icons.js';
+import PageShell from './app/PageShell.js';
 
 type LandingPageProps = {};
 
@@ -28,30 +27,30 @@ function LandingPage({}: LandingPageProps) {
     ];
 
     return (
-        <>
-            <Header />
-
-            <main class="page">
-                <section class="card hero">
-                    <div>
-                        <h1>{t('landingHeroTitle')}</h1>
-                        <p class="muted">{t('landingHeroBody')}</p>
+        <PageShell section="landing" title={t('landingHeroTitle')} subtitle={t('landingHeroBody')}>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-body">
+                    <p class="mwa-wiki-intro">{t('landingHeroBody')}</p>
+                    <div class="mwa-wiki-actions">
                         {user ? (
-                            <a href="/app" class="btn btn-primary btn-lg">
+                            <a href="/app" class="mwa-wiki-button mwa-wiki-button--primary">
                                 {t('headerHome')}
                             </a>
                         ) : (
-                            <a href="/login" class="btn btn-primary btn-lg">
+                            <a href="/login" class="mwa-wiki-button mwa-wiki-button--primary">
                                 {t('landingRegister')}
                             </a>
                         )}
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <section class="card">
-                    <h2 class="section-title">{t('landingSocialTitle')}</h2>
-
-                    <div class="social-row divider-bottom">
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('landingSocialTitle')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <div class="social-row">
                         {socials.map(({ Icon, name }) => (
                             <a key={name} href="#" class="social-button" aria-label={name}>
                                 <Icon />
@@ -59,27 +58,32 @@ function LandingPage({}: LandingPageProps) {
                         ))}
                     </div>
 
-                    <div class="news-list">
+                    <ul class="mwa-wiki-rows">
                         {news.map((item) => (
-                            <article key={item.title} class="news-item">
-                                <h3>{item.title}</h3>
-                                <p class="muted">{item.body}</p>
-                            </article>
+                            <li key={item.title}>
+                                <strong>{item.title}</strong>
+                                <p class="mwa-wiki-muted">{item.body}</p>
+                            </li>
                         ))}
-                    </div>
-                </section>
+                    </ul>
+                </div>
+            </section>
 
-                <section class="card">
-                    <h2 class="section-title">{t('landingMapTitle')}</h2>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('landingMapTitle')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
                     <div class="wireframe-box map-box">{t('mapPlaceholder')}</div>
-                </section>
+                </div>
+            </section>
 
-                <section class="card">
-                    <div class="feed-header divider-bottom">
-                        <span class="feed-title">{t('landingFeedTitle')}</span>
-                        <span class="muted">{t('landingFeedActive')}</span>
-                    </div>
-
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('landingFeedTitle')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <p class="mwa-wiki-muted">{t('landingFeedActive')}</p>
                     <div class="activity-list">
                         {[1, 2].map((n) => (
                             <div key={n} class="activity-card">
@@ -106,11 +110,15 @@ function LandingPage({}: LandingPageProps) {
                             </div>
                         ))}
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <section class="card">
-                    <h2 class="section-title">{t('sponsorsTitle')}</h2>
-                    <p class="muted sponsor-subtitle">{t('sponsorsSubtitle')}</p>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('sponsorsTitle')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <p class="mwa-wiki-muted">{t('sponsorsSubtitle')}</p>
                     <div class="sponsor-grid cols-4">
                         {[1, 2, 3, 4].map((n) => (
                             <div key={n} class="sponsor">
@@ -118,10 +126,8 @@ function LandingPage({}: LandingPageProps) {
                             </div>
                         ))}
                     </div>
-                </section>
-            </main>
-
-            <Footer />
-        </>
+                </div>
+            </section>
+        </PageShell>
     );
 }

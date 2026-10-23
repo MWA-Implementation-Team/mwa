@@ -1,15 +1,17 @@
-import Header from '#src/client/ui/Header.js';
-import Footer from '#src/client/ui/Footer.js';
 import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { Transaction } from '#src/client/api/transactions.js';
+import { joinQueue, leaveQueue } from '#src/client/api/queue.js';
 import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
+import PageShell from './PageShell.js';
 
 type HomePageProps = {
     qrSvg: string;
     interactUrl: string;
     transactions: Transaction[];
+    groupName: string | null;
+    queuePosition: number | null;
 };
 
 export const homePage: Page<HomePageProps> = {
@@ -23,98 +25,158 @@ const transactionKindKey = {
     system: 'txSystem',
 } as const;
 
-function HomePage({ qrSvg, interactUrl, transactions }: HomePageProps) {
+function HomePage({
+    qrSvg,
+    interactUrl,
+    transactions,
+    groupName,
+    queuePosition: initialQueuePosition,
+}: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
+    const [queuePosition, setQueuePosition] = useState(initialQueuePosition);
+    const [queueError, setQueueError] = useState<string | null>(null);
+
+    const handleJoinQueue = async () => {
+        setQueueError(null);
+        try {
+            const { position } = await joinQueue();
+            setQueuePosition(position);
+        } catch {
+            setQueueError(t('queueJoinFailed'));
+        }
+    };
+
+    const handleLeaveQueue = async () => {
+        setQueueError(null);
+        try {
+            await leaveQueue();
+            setQueuePosition(null);
+        } catch {
+            setQueueError(t('queueLeaveFailed'));
+        }
+    };
 
     return (
-        <>
-            <Header />
-
-            <main class="page page-narrow">
-                <h1 class="page-title">{t('homeWelcome', { name: user!.username })}</h1>
-
-                <section class="card">
-                    <h2 class="section-title">{t('dashFinances')}</h2>
-
-                    <div class="balance">
-                        <div class="balance-label">{t('dashBalance')}</div>
-                        <div class="balance-value">
+        <PageShell
+            section="home"
+            title={t('homeWelcome', { name: user!.username })}
+            subtitle={t('homeSubtitle')}
+        >
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('dashFinances')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <p class="mwa-wiki-intro">
+                        {t('dashBalance')}:{' '}
+                        <strong>
                             {user!.currentBalance.toFixed(2)} {t('currencyName')}
-                        </div>
-                    </div>
+                        </strong>
+                    </p>
 
-                    <div class="transaction-title">{t('dashTransactions')}</div>
+                    <h3>{t('dashTransactions')}</h3>
+                    {transactions.length === 0 ? (
+                        <p class="mwa-wiki-muted">{t('dashNoTransactions')}</p>
+                    ) : (
+                        <ul class="mwa-wiki-rows">
+                            {transactions.map((tx, i) => (
+                                <li key={i} class="mwa-wiki-row">
+                                    <span>
+                                        <strong>{t(transactionKindKey[tx.kind])}</strong>
+                                        <small>
+                                            {new Date(tx.createdAt).toLocaleDateString(lang)}
+                                        </small>
+                                    </span>
+                                    <strong>
+                                        {tx.balanceDelta > 0 ? '+' : ''}
+                                        {tx.balanceDelta.toFixed(2)}
+                                    </strong>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </section>
 
-                    <div class="transactions">
-                        {transactions.length === 0 && (
-                            <p class="muted">{t('dashNoTransactions')}</p>
-                        )}
-                        {transactions.map((tx, i) => (
-                            <div key={i} class="transaction">
-                                <div class="transaction-icon">
-                                    {tx.balanceDelta > 0 ? '↑' : '↓'}
-                                </div>
-                                <div class="transaction-info">
-                                    <div class="transaction-name">
-                                        {t(transactionKindKey[tx.kind])}
-                                    </div>
-                                    <div class="transaction-date">
-                                        {new Date(tx.createdAt).toLocaleDateString(lang)}
-                                    </div>
-                                </div>
-                                <div
-                                    class={`transaction-value ${tx.balanceDelta > 0 ? 'positive' : 'negative'}`}
-                                >
-                                    {tx.balanceDelta > 0 ? '+' : ''}
-                                    {tx.balanceDelta.toFixed(2)}
-                                </div>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('queueTitle')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    {queueError && (
+                        <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+                            {queueError}
+                        </p>
+                    )}
+
+                    {queuePosition !== null ? (
+                        <>
+                            <p class="mwa-wiki-intro">
+                                {t('queuePositionLabel')}: <strong>#{queuePosition}</strong>
+                            </p>
+                            <div class="mwa-wiki-actions">
+                                <button type="button" onClick={handleLeaveQueue}>
+                                    {t('queueLeave')}
+                                </button>
                             </div>
-                        ))}
-                    </div>
-                </section>
+                        </>
+                    ) : groupName ? (
+                        <div class="mwa-wiki-actions">
+                            <button type="button" class="btn-primary" onClick={handleJoinQueue}>
+                                {t('queueJoinAs', { group: groupName })}
+                            </button>
+                        </div>
+                    ) : (
+                        <p class="mwa-wiki-muted">
+                            {t('queueNeedGroup')} <a href="/app/group">{t('queueGoGroup')}</a>
+                        </p>
+                    )}
+                </div>
+            </section>
 
-                <section class="card">
-                    <h2 class="section-title">{t('dashQrTitle')}</h2>
-                    <div class="qr-description">
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('dashQrTitle')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <p class="mwa-wiki-muted">
                         <strong>{t('dashQrHint')}</strong>
                         <br />
                         {t('dashQrBody')}
-                    </div>
+                    </p>
                     <div class="qr-code" dangerouslySetInnerHTML={{ __html: qrSvg }} />
-                    <a class="muted" href={interactUrl}>
-                        {interactUrl}
-                    </a>
-                </section>
+                    <a href={interactUrl}>{interactUrl}</a>
+                </div>
+            </section>
 
-                <section class="card">
-                    <h2 class="section-title">{t('dashSupport')}</h2>
-
-                    <div class="support-options">
-                        <button class="support-button">
-                            <div class="support-icon">
-                                <PhoneIcon />
-                            </div>
-                            <div class="support-label">{t('dashCall')}</div>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('dashSupport')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <div class="mwa-wiki-actions">
+                        <button type="button">
+                            <PhoneIcon /> {t('dashCall')}
                         </button>
                         <button
-                            class="support-button alt"
+                            type="button"
                             aria-expanded={guideOpen}
                             onClick={() => setGuideOpen(!guideOpen)}
                         >
-                            <div class="support-icon">
-                                <BookIcon />
-                            </div>
-                            <div class="support-label">{t('dashGuide')}</div>
+                            <BookIcon /> {t('dashGuide')}
                         </button>
                     </div>
+                    {guideOpen && <p class="mwa-wiki-muted">{t('dashGuideBody')}</p>}
+                </div>
+            </section>
 
-                    {guideOpen && <div class="guide-box">{t('dashGuideBody')}</div>}
-                </section>
-
-                <section class="card">
-                    <h2 class="section-title">{t('sponsorsTitle')}</h2>
-                    <p class="muted sponsor-subtitle">{t('sponsorsSubtitle')}</p>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('sponsorsTitle')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <p class="mwa-wiki-muted">{t('sponsorsSubtitle')}</p>
                     <div class="sponsor-grid">
                         {[1, 2, 3, 4, 5, 6].map((n) => (
                             <div key={n} class="sponsor">
@@ -122,10 +184,8 @@ function HomePage({ qrSvg, interactUrl, transactions }: HomePageProps) {
                             </div>
                         ))}
                     </div>
-                </section>
-            </main>
-
-            <Footer />
-        </>
+                </div>
+            </section>
+        </PageShell>
     );
 }

@@ -21,3 +21,6 @@
 /* Pages */
 @import './pages/landing.css';
 @import './pages/dashboard.css';
+
+/* Scoped MWA wiki-styled pages; loaded last so it wins over the base theme */
+@import './wiki.css';

@@ -88,6 +88,54 @@ export type Language = {
     dashGuide: string;
     dashGuideBody: string;
 
+    homeSubtitle: string;
+
+    wikiSkip: string;
+    wikiTopline: string;
+    wikiTaglineRight: string;
+    wikiTagline: string;
+    wikiLogoAlt: string;
+    wikiNavLabel: string;
+    wikiControls: string;
+    wikiFooter: string;
+    wikiBackTop: string;
+
+    subActivities: string;
+    subActivity: string;
+    subGroup: string;
+    subLeaderboard: string;
+    subAccount: string;
+
+    activitiesDirectory: string;
+    activitiesEmpty: string;
+    activityInfoTitle: string;
+    activityBack: string;
+
+    leaderboardTypeLabel: string;
+    leaderboardTeam: string;
+    leaderboardGroup: string;
+    leaderboardRankings: string;
+    leaderboardTodo: string;
+
+    casinoUnavailableTitle: string;
+    casinoUnavailableSub: string;
+    casinoNoticeHead: string;
+    casinoNotice: string;
+
+    accountProfile: string;
+    accountUsername: string;
+    accountEmail: string;
+    accountRole: string;
+    accountJoined: string;
+    accountLifetimeEarned: string;
+    accountSettings: string;
+    accountSettingsTodo: string;
+
+    adminPanelTitle: string;
+    adminPanelSubtitle: string;
+    adminPanelHead: string;
+    adminPanelTodo: string;
+
     groupManagement: string;
     groupName: string;
     groupPhone: string;
@@ -204,6 +252,54 @@ export const languages: Record<LanguageCode, Language> = {
         dashGuide: 'Guide & explanations',
         dashGuideBody: 'This section can contain explanations of the dashboard features.',
 
+        homeSubtitle: 'your corner of the event ✦',
+
+        wikiSkip: 'Skip to content',
+        wikiTopline: '✦ MWA EVENT ✦',
+        wikiTaglineRight: '~ connected to the mifverse ~',
+        wikiTagline: 'the event corner of the internet ☆',
+        wikiLogoAlt: 'MWA Event home',
+        wikiNavLabel: 'Main navigation',
+        wikiControls: 'site controls +',
+        wikiFooter: '✦ made for the MWA event ✦',
+        wikiBackTop: 'back to top ↑',
+
+        subActivities: 'all the event stuff, in one place ✦',
+        subActivity: 'event activity detail',
+        subGroup: 'create a group and manage the ones you own',
+        subLeaderboard: 'standings & rankings ✦',
+        subAccount: 'your corner of the event ✧',
+
+        activitiesDirectory: 'activity directory',
+        activitiesEmpty: 'No activities listed yet.',
+        activityInfoTitle: 'activity information',
+        activityBack: '← back to activities',
+
+        leaderboardTypeLabel: 'Leaderboard type',
+        leaderboardTeam: 'team',
+        leaderboardGroup: 'group',
+        leaderboardRankings: '{type} rankings',
+        leaderboardTodo: 'TODO: {type} leaderboard.',
+
+        casinoUnavailableTitle: 'page unavailable',
+        casinoUnavailableSub: "this section isn't available",
+        casinoNoticeHead: 'notice',
+        casinoNotice: 'This page is not available.',
+
+        accountProfile: 'Profile',
+        accountUsername: 'Username',
+        accountEmail: 'Email',
+        accountRole: 'Role',
+        accountJoined: 'Joined',
+        accountLifetimeEarned: 'Lifetime earned',
+        accountSettings: 'Profile settings',
+        accountSettingsTodo: 'TODO: change username, avatar, and other account-related settings.',
+
+        adminPanelTitle: 'admin panel',
+        adminPanelSubtitle: 'control panel · under construction',
+        adminPanelHead: 'administration',
+        adminPanelTodo: 'TODO: admin panel.',
+
         groupManagement: 'Group Management',
         groupName: 'Group Name',
         groupPhone: 'Enter emergency phone Number',
@@ -317,6 +413,54 @@ export const languages: Record<LanguageCode, Language> = {
         dashCall: 'Skambinti pagalbai',
         dashGuide: 'Vadovas ir paaiškinimai',
         dashGuideBody: 'Šiame skyriuje gali būti pateikiami prietaisų skydelio paaiškinimai.',
+
+        homeSubtitle: 'tavo renginio kampelis ✦',
+
+        wikiSkip: 'Pereiti prie turinio',
+        wikiTopline: '✦ MWA RENGINYS ✦',
+        wikiTaglineRight: '~ prisijungta prie mifverse ~',
+        wikiTagline: 'renginio kampelis internete ☆',
+        wikiLogoAlt: 'MWA renginio pradžia',
+        wikiNavLabel: 'Pagrindinė navigacija',
+        wikiControls: 'svetainės valdikliai +',
+        wikiFooter: '✦ sukurta MWA renginiui ✦',
+        wikiBackTop: 'atgal į viršų ↑',
+
+        subActivities: 'visos renginio veiklos vienoje vietoje ✦',
+        subActivity: 'renginio veiklos informacija',
+        subGroup: 'sukurk grupę ir valdyk jas',
+        subLeaderboard: 'rezultatai ir įvertinimai ✦',
+        subAccount: 'tavo renginio kampelis ✧',
+
+        activitiesDirectory: 'veiklų katalogas',
+        activitiesEmpty: 'Veiklų dar nėra.',
+        activityInfoTitle: 'veiklos informacija',
+        activityBack: '← atgal į veiklas',
+
+        leaderboardTypeLabel: 'Lentelės tipas',
+        leaderboardTeam: 'komanda',
+        leaderboardGroup: 'grupė',
+        leaderboardRankings: '{type} įvertinimai',
+        leaderboardTodo: 'TODO: {type} lyderių lentelė.',
+
+        casinoUnavailableTitle: 'puslapis nepasiekiamas',
+        casinoUnavailableSub: 'šis skyrius nepasiekiamas',
+        casinoNoticeHead: 'pranešimas',
+        casinoNotice: 'Šis puslapis nepasiekiamas.',
+
+        accountProfile: 'Profilis',
+        accountUsername: 'Vartotojo vardas',
+        accountEmail: 'El. paštas',
+        accountRole: 'Rolė',
+        accountJoined: 'Prisijungė',
+        accountLifetimeEarned: 'Viso uždirbta',
+        accountSettings: 'Profilio nustatymai',
+        accountSettingsTodo: 'TODO: vartotojo vardo, avataro ir kitų paskyros nustatymų keitimas.',
+
+        adminPanelTitle: 'administravimo skydelis',
+        adminPanelSubtitle: 'valdymo skydelis · kuriama',
+        adminPanelHead: 'administravimas',
+        adminPanelTodo: 'TODO: administravimo skydelis.',
 
         groupManagement: 'Grupių valdymas',
         groupName: 'Grupės pavadinimas',
