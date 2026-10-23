@@ -21,8 +21,10 @@ export type CommonGameOpts = {
 export type Gambler = 'p1' | 'p2';
 
 export type RunningGame = {
-    type: GameType;
-    status: { type: 'pending' } | { type: 'rejected' } | { type: 'running' } | {
+    status: { type: 'pending' }
+    | { type: 'rejected' }
+    | { type: 'running' }
+    | {
         type: 'ended',
         winner: Gambler,
     }
@@ -31,7 +33,10 @@ export type RunningGame = {
     p2: number;
     p1Name: string;
     p2Name: string;
-};
+} & ({
+    gameType: 'coin_flip',
+    p1Guess: CoinSide,
+});
 
 export type Invitation = {
     id: number;
@@ -74,11 +79,22 @@ export function queryGamblingSessions(state: MwaState): SessionSummary[] {
 export function findGamblingSessionById(state: MwaState, sessionId: number): RunningGame | null {
     const query = state.prepare(`
     SELECT
-        game_type, p1_deposit_tx, p2_deposit_tx, trans.user_id AS winner_user, p1, p2, p1u.username AS p1_name, p2u.username AS p2_name
+        game_type,
+        p1_deposit_tx,
+        p2_deposit_tx,
+        trans.user_id
+        AS
+        winner_user,
+        p1,
+        p2,
+        p1u.username AS p1_name,
+        p2u.username AS p2_name,
+        cf.p1_bet AS cf_p1_bet
     FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
     LEFT JOIN child_transactions AS trans ON gambling_sessions.winner_tx = trans.parent_id
+    LEFT JOIN coin_flip_games AS cf ON gambling_sessions.winner_tx = trans.parent_id
     WHERE gambling_sessions.id = ?
     `);
     const row = query.get(sessionId);
@@ -99,7 +115,8 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
     }
 
     return {
-        type: row.game_type as GameType,
+        gameType: 'coin_flip',
+        p1Guess: row.cf_p1_bet as CoinSide,
         status,
         p1: row.p1 as number,
         p2: row.p2 as number,

@@ -4,40 +4,34 @@ import { RunningGame } from '#src/db/gambling.js';
 import { useContext } from 'preact/hooks';
 
 type GamblingSessionPageProps = {
-    type: 'confirm',
     id: number,
     game: RunningGame,
     message?: string,
-} | {
-    type: 'rejected',
-    game: RunningGame,
-} | {
-    type: 'running',
-    id: number,
-    game: RunningGame,
-    winner?: 'p1' | 'p2',
 };
 
 export const gamblingSessionPagie: Page<GamblingSessionPageProps> = {
     Component: GamblingSessionPage,
     title: (_, props) => {
-        switch (props.type) {
-            case 'confirm':
+        switch (props.game.status.type) {
+            case 'pending':
                 return 'MWA | Challenge Request';
             case 'rejected':
                 return 'MWA | Rejected';
             case 'running':
-                return 'MWA | Coin Flip';
+            case 'ended':
+                switch (props.game.gameType) {
+                    case 'coin_flip':
+                        return 'MWA | Coin Flip';
+                }
         }
     },
 };
 
-function GamblingSessionPage(props: GamblingSessionPageProps) {
+function GamblingSessionPage({ id, game, message }: GamblingSessionPageProps) {
     const { user } = useContext(ClientContext);
 
-    switch (props.type) {
-        case 'confirm': {
-            const { game, id, message } = props;
+    switch (game.status.type) {
+        case 'pending': {
             if (game.p2 === user!.id) {
                 return (
                     <>
@@ -60,7 +54,6 @@ function GamblingSessionPage(props: GamblingSessionPageProps) {
             }
         }
         case 'rejected': {
-            const { game } = props;
             return (
                 <>
                     <h1>Rejected</h1>
@@ -70,16 +63,18 @@ function GamblingSessionPage(props: GamblingSessionPageProps) {
                 </>
             )
         }
-        case 'running': {
-            const { game, winner } = props;
+        case 'running':
+        case 'ended': {
             return (
                 <>
                     <h1>imagine coin flip here</h1>
                     <span>
                         {game.p1Name} vs {game.p2Name}
                     </span>
-                    <span>Type: {game.type}</span>
-                    {winner ? <h1>WINNER: {winner}</h1> : (
+                    <span>Type: {game.gameType}</span>
+                    {game.status.type === 'ended' ? (
+                        <h1>WINNER: {game.status.winner}</h1>
+                    ) : (
                         <h1>FLIPPING COIN</h1>
                     )}
                 </>
