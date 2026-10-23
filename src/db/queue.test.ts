@@ -9,7 +9,9 @@ import {
     getWaitingEntry,
     joinQueue,
     leaveQueue,
+    listStationGroups,
     listWaitingQueue,
+    markEntryDone,
 } from './queue.js';
 import { createTestMwaState } from '#src/state.js';
 
@@ -135,6 +137,57 @@ describe('db/queue', () => {
         joinQueue(state, only);
         const called = callNextGroups(state, 5, 'test-station');
         assert.equal(called.length, 1);
+    });
+
+    it('listStationGroups shows called groups until they are marked done', () => {
+        const a = queuedGroup([]);
+        const b = queuedGroup([]);
+        joinQueue(state, a);
+        joinQueue(state, b);
+
+        state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('test-station')`).run();
+        const [ea, eb] = callNextGroups(state, 2, 'test-station');
+
+        assert.deepEqual(
+            listStationGroups(state, 'test-station').map((r) => r.id),
+            [ea.id, eb.id],
+        );
+        // a different station sees nothing
+        assert.equal(listStationGroups(state, 'other-station').length, 0);
+
+        assert.equal(markEntryDone(state, ea.id), true);
+        assert.deepEqual(
+            listStationGroups(state, 'test-station').map((r) => r.id),
+            [eb.id],
+        );
+
+        // the row is kept, with done_at set
+        const row = state
+            .prepare(`SELECT status, done_at FROM queue_entries WHERE id = ?`)
+            .get(ea.id);
+        assert.equal(row?.status, 'called');
+        assert.equal(typeof row?.done_at, 'string');
+    });
+
+    it('markEntryDone refuses entries that are not at a station', () => {
+        const groupId = queuedGroup([]);
+        const { entry } = joinQueue(state, groupId);
+        assert.equal(markEntryDone(state, entry!.id), false);
+        assert.equal(markEntryDone(state, 999999), false);
+    });
+
+    it('a station can hold several called groups — calling more is not gated', () => {
+        const a = queuedGroup([]);
+        const b = queuedGroup([]);
+        joinQueue(state, a);
+        joinQueue(state, b);
+
+        state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('test-station')`).run();
+        callNextGroups(state, 1, 'test-station');
+        const second = callNextGroups(state, 1, 'test-station');
+
+        assert.equal(second.length, 1);
+        assert.equal(listStationGroups(state, 'test-station').length, 2);
     });
 
     it('listWaitingQueue returns group names in join order', () => {
