@@ -34,7 +34,7 @@ npm run check:migrations    # migration numbering/immutability check
 ## Project Structure
 
 ```
-migrations/07_*.sql          schema change (see below)
+migrations/06_queue.sql      done_at column folded into the queue schema
 src/db/queue.ts              extend with mark-done + station queries
 src/routes/api/host.ts       new — host-only JSON endpoints
 src/routes/pages/app.ts      register GET /app/host
@@ -68,16 +68,11 @@ the owner decides.
 
 ## Schema
 
-One additive change — `ALTER TABLE`, no rebuild:
-
-```sql
-ALTER TABLE queue_entries ADD COLUMN done_at TEXT;
-```
-
-Status semantics become: `waiting` (in line) → `called` (at station,
-`activity_slug` + `closed_at` set) → `called` with `done_at` set (finished).
-`left` is unchanged (bailed while waiting). The status CHECK constraint is
-untouched, so this works as a plain `ADD COLUMN` — no `07_*` table rebuild.
+`done_at TEXT` on `queue_entries` — folded into `06_queue.sql` directly since
+the queue migration isn't merged anywhere yet. Status semantics: `waiting`
+(in line) → `called` (at station, `activity_slug` + `closed_at` set) →
+`called` with `done_at` set (finished). `left` is unchanged (bailed while
+waiting).
 
 ## Testing Strategy
 
@@ -115,7 +110,8 @@ untouched, so this works as a plain `ADD COLUMN` — no `07_*` table rebuild.
 
 1. The dropdown selects the **activity/station** the host is staffing;
    matchmaking stays strict FIFO — hosts never pick specific groups.
-2. `done_at` lands as `07_*.sql` on this branch — `06_queue.sql` stays as-is.
+2. `done_at` lives in `06_queue.sql` — both migrations were unmerged branch
+   work, so they're folded into one file.
 3. The nav link goes in the drawer menu next to the admin link, gated to
    host/admin.
 
