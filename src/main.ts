@@ -8,6 +8,7 @@ import { registerLandingRoutes } from '#src/routes/pages/landing.js';
 import { registerUsersRoutes } from '#src/routes/api/users.js';
 import { registerGroupsRoutes } from '#src/routes/api/groups.js';
 import { registerQueueRoutes } from '#src/routes/api/queue.js';
+import { registerHostRoutes } from '#src/routes/api/host.js';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
@@ -44,6 +45,7 @@ registerAdminRoutes(app);
 registerUsersRoutes(app);
 registerGroupsRoutes(app);
 registerQueueRoutes(app);
+registerHostRoutes(app);
 
 registerNodeModulesRoutes(app);
 
