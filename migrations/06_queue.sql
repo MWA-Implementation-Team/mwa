@@ -6,13 +6,12 @@ CREATE TABLE queue_entries (
   -- history shows who queued, bailed, or was assigned to a station
   status TEXT NOT NULL DEFAULT 'waiting' CHECK (status IN ('waiting', 'left', 'called')),
   closed_at TEXT,
+  -- set when a called group finishes its station; stays 'called' in status
+  done_at TEXT,
   -- the station that called the group (host tools set this)
   activity_slug TEXT REFERENCES activities (slug)
 ) STRICT;
-
 -- a group holds at most one spot in line at a time
 CREATE UNIQUE INDEX queue_entries_one_waiting_per_group ON queue_entries (group_id)
-WHERE
-  status = 'waiting';
-
+WHERE status = 'waiting';
 CREATE INDEX queue_entries_status_joined_at ON queue_entries (status, joined_at);
