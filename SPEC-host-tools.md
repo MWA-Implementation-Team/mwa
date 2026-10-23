@@ -62,8 +62,9 @@ app.post('/api/host/call', async (ctx) => {
 ```
 
 Commits: short, lowercase, imperative; one concern per commit. No agent
-trailers. Branch: `feature/host-tools`, currently stacked on `feature/queue`
-— it must merge after the queue PR (or be rebased once that lands).
+trailers. Branch: `feature/host-tools` — contains the queue work locally;
+the remote `feature/queue` branch was deleted and nothing is pushed until
+the owner decides.
 
 ## Schema
 
@@ -110,14 +111,14 @@ untouched, so this works as a plain `ADD COLUMN` — no `07_*` table rebuild.
 - Queue positions on `/app` are unaffected by called/done rows.
 - `npm run lint`, `npm test`, `npm run check:migrations` all green.
 
-## Open Questions
+## Decisions
 
-1. "Dropdown to what group you'd like to request groups" — spec assumes this
-   means the **activity/station** dropdown and FIFO order decides which groups.
-   If hosts should pick specific groups, the matchmaking model changes.
-2. Migration placement: this spec lands `done_at` as `07_*.sql` on
-   `feature/host-tools` so the in-review queue PR stays untouched. If
-   `feature/queue` merges first unchanged, this still applies cleanly.
-3. Where the nav link lives — drawer next to the admin link, gated to
-   host/admin, unless design says otherwise.
+1. The dropdown selects the **activity/station** the host is staffing;
+   matchmaking stays strict FIFO — hosts never pick specific groups.
+2. `done_at` lands as `07_*.sql` on this branch — `06_queue.sql` stays as-is.
+3. The nav link goes in the drawer menu next to the admin link, gated to
+   host/admin.
+
+```
+
 ```
