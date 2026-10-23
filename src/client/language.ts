@@ -51,7 +51,6 @@ export type Language = {
     interactDetailJoined: string;
 
     landingHeroTitle: string;
-    landingHeroBody: string;
     landingFormLink: string;
     landingSocialTitle: string;
     landingFeedTitle: string;
@@ -226,8 +225,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailJoined: 'Joined',
 
         landingHeroTitle: 'first years event registration',
-        landingHeroBody:
-            'Sign up for the event, explore the activities and get in line for your favorites.',
         landingFormLink: 'link to google forms',
         landingSocialTitle: 'Follow us here!',
         landingFeedTitle: 'Activities',
@@ -401,7 +398,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailJoined: 'Prisijungė',
 
         landingHeroTitle: 'pirmakursiu renginio registracija',
-        landingHeroBody: 'Užsiregistruok į renginį, apžiūrėk veiklas ir užimk vietą eilėje.',
         landingFormLink: 'nuoroda į google formą',
         landingSocialTitle: 'Sekite mus čia!',
         landingFeedTitle: 'Veiklos',

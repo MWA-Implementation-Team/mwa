@@ -411,7 +411,7 @@
     padding: 0 14px;
 }
 .landing-section + .landing-section {
-    margin-top: 26px;
+    margin-top: 46px;
 }
 .landing-section > h2 {
     color: var(--wiki-white);
@@ -529,7 +529,6 @@
 .mwa-wiki-directory a {
     text-decoration: none;
     display: block;
-    padding: 13px 12px;
     border: 1px solid #6b4ea2;
     background: var(--wiki-panel-light);
 }
