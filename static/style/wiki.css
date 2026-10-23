@@ -63,7 +63,6 @@
 }
 .mwa-wiki a:hover {
     color: #fff;
-    text-shadow: 0 0 9px #9eeaff;
 }
 .mwa-wiki :is(a, button, input, select, textarea, summary):focus-visible {
     outline: 3px solid var(--wiki-orange);
@@ -125,14 +124,6 @@
     max-height: 112px;
     height: auto;
     object-fit: contain;
-    filter: drop-shadow(0 0 12px rgba(174, 93, 255, 0.62));
-}
-.mwa-wiki-brand p {
-    font-size: 12px;
-    letter-spacing: 0.025em;
-    color: var(--wiki-pink);
-    text-shadow: 0 0 8px #8a3cad;
-    margin-top: 7px;
 }
 .mwa-wiki-nav {
     display: flex;
@@ -143,7 +134,6 @@
     padding: 8px 3px;
     background: rgba(14, 7, 28, 0.54);
     border-block: 2px solid rgba(170, 111, 225, 0.85);
-    box-shadow: 0 0 12px rgba(140, 60, 209, 0.2);
 }
 .mwa-wiki-nav a {
     display: inline-flex;
@@ -155,7 +145,6 @@
     color: #d2eaff;
     font-weight: 700;
     text-decoration: none;
-    text-shadow: 0 0 6px rgba(118, 179, 255, 0.7);
 }
 .mwa-wiki-nav a + a::before {
     content: '|';
@@ -222,8 +211,7 @@
     letter-spacing: -0.035em;
     text-shadow:
         2px 2px 0 #4a1378,
-        -2px -1px 0 #152c88,
-        0 0 13px #bf8bff;
+        -2px -1px 0 #152c88;
     overflow-wrap: anywhere;
 }
 .mwa-wiki-subtitle {
@@ -241,15 +229,11 @@
     min-width: 0;
     border: 2px solid rgba(138, 71, 210, 0.9);
     background: var(--wiki-panel);
-    box-shadow:
-        4px 4px 0 rgba(2, 0, 10, 0.65),
-        0 0 15px rgba(109, 50, 174, 0.25);
+    box-shadow: 4px 4px 0 rgba(2, 0, 10, 0.65);
 }
 .mwa-wiki-panel--warm {
     border-color: #c69b4a;
-    box-shadow:
-        4px 4px 0 rgba(2, 0, 10, 0.65),
-        0 0 16px rgba(240, 170, 72, 0.18);
+    box-shadow: 4px 4px 0 rgba(2, 0, 10, 0.65);
 }
 .mwa-wiki-panel-head {
     display: flex;
@@ -264,7 +248,6 @@
 .mwa-wiki-panel-head h3 {
     color: var(--wiki-white);
     font-size: 15px;
-    text-shadow: 0 0 7px #cfacff;
     overflow-wrap: anywhere;
 }
 .mwa-wiki-panel-body {
@@ -430,7 +413,6 @@
 .landing-section > h2 {
     color: var(--wiki-white);
     font-size: 15px;
-    text-shadow: 0 0 7px #cfacff;
     border-bottom: 1px dashed #8b5db0;
     padding-bottom: 8px;
     margin-bottom: 12px;
