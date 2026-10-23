@@ -4,12 +4,15 @@ import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { Transaction } from '#src/client/api/transactions.js';
+import { joinQueue, leaveQueue } from '#src/client/api/queue.js';
 import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
 
 type HomePageProps = {
     qrSvg: string;
     interactUrl: string;
     transactions: Transaction[];
+    groupName: string | null;
+    queuePosition: number | null;
 };
 
 export const homePage: Page<HomePageProps> = {
@@ -23,9 +26,37 @@ const transactionKindKey = {
     system: 'txSystem',
 } as const;
 
-function HomePage({ qrSvg, interactUrl, transactions }: HomePageProps) {
+function HomePage({
+    qrSvg,
+    interactUrl,
+    transactions,
+    groupName,
+    queuePosition: initialQueuePosition,
+}: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
+    const [queuePosition, setQueuePosition] = useState(initialQueuePosition);
+    const [queueError, setQueueError] = useState<string | null>(null);
+
+    const handleJoinQueue = async () => {
+        setQueueError(null);
+        try {
+            const { position } = await joinQueue();
+            setQueuePosition(position);
+        } catch {
+            setQueueError(t('queueJoinFailed'));
+        }
+    };
+
+    const handleLeaveQueue = async () => {
+        setQueueError(null);
+        try {
+            await leaveQueue();
+            setQueuePosition(null);
+        } catch {
+            setQueueError(t('queueLeaveFailed'));
+        }
+    };
 
     return (
         <>
@@ -72,6 +103,32 @@ function HomePage({ qrSvg, interactUrl, transactions }: HomePageProps) {
                             </div>
                         ))}
                     </div>
+                </section>
+
+                <section class="card">
+                    <h2 class="section-title">{t('queueTitle')}</h2>
+
+                    {queueError && <p class="queue-error">{queueError}</p>}
+
+                    {queuePosition !== null ? (
+                        <>
+                            <div class="queue-position">
+                                <div class="queue-position-label">{t('queuePositionLabel')}</div>
+                                <div class="queue-position-value">#{queuePosition}</div>
+                            </div>
+                            <button class="btn btn-outline btn-block" onClick={handleLeaveQueue}>
+                                {t('queueLeave')}
+                            </button>
+                        </>
+                    ) : groupName ? (
+                        <button class="btn btn-primary btn-block" onClick={handleJoinQueue}>
+                            {t('queueJoinAs', { group: groupName })}
+                        </button>
+                    ) : (
+                        <p class="muted queue-empty">
+                            {t('queueNeedGroup')} <a href="/app/group">{t('queueGoGroup')}</a>
+                        </p>
+                    )}
                 </section>
 
                 <section class="card">

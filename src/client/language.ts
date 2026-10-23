@@ -83,6 +83,16 @@ export type Language = {
     dashQrTitle: string;
     dashQrHint: string;
     dashQrBody: string;
+
+    queueTitle: string;
+    queuePositionLabel: string;
+    queueJoinAs: string;
+    queueLeave: string;
+    queueNeedGroup: string;
+    queueGoGroup: string;
+    queueJoinFailed: string;
+    queueLeaveFailed: string;
+
     dashSupport: string;
     dashCall: string;
     dashGuide: string;
@@ -199,6 +209,16 @@ export const languages: Record<LanguageCode, Language> = {
         dashQrTitle: 'Account QR code',
         dashQrHint: 'Let another user scan this code',
         dashQrBody: 'Scanning it opens a page where they can interact with your account.',
+
+        queueTitle: 'Event queue',
+        queuePositionLabel: 'Your position',
+        queueJoinAs: 'Join the queue as {group}',
+        queueLeave: 'Leave the queue',
+        queueNeedGroup: 'You need a group to join the queue.',
+        queueGoGroup: 'Go to your group',
+        queueJoinFailed: 'Could not join the queue',
+        queueLeaveFailed: 'Could not leave the queue',
+
         dashSupport: 'Support',
         dashCall: 'Call support',
         dashGuide: 'Guide & explanations',
@@ -313,6 +333,16 @@ export const languages: Record<LanguageCode, Language> = {
         dashQrTitle: 'Paskyros QR kodas',
         dashQrHint: 'Leisk kitam naudotojui nuskamuoti šį kodą',
         dashQrBody: 'Nuskanavus atidaromas puslapis, kuriame galima sąveikauti su tavo paskyra.',
+
+        queueTitle: 'Renginio eilė',
+        queuePositionLabel: 'Tavo pozicija',
+        queueJoinAs: 'Stoti į eilę kaip {group}',
+        queueLeave: 'Palikti eilę',
+        queueNeedGroup: 'Norint stoti į eilę, reikia grupės.',
+        queueGoGroup: 'Eiti į grupę',
+        queueJoinFailed: 'Nepavyko stoti į eilę',
+        queueLeaveFailed: 'Nepavyko palikti eilės',
+
         dashSupport: 'Pagalba',
         dashCall: 'Skambinti pagalbai',
         dashGuide: 'Vadovas ir paaiškinimai',

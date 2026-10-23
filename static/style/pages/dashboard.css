@@ -104,6 +104,38 @@
     line-height: 1.4;
 }
 
+/* Queue */
+.queue-position {
+    padding: var(--space-xl);
+    margin-bottom: var(--space-lg);
+
+    text-align: center;
+
+    background: var(--accent-bg);
+    border: 0.1875rem solid var(--accent-dark);
+    border-radius: var(--radius-xl);
+}
+
+.queue-position-label {
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-lg);
+}
+
+.queue-position-value {
+    font-size: var(--text-balance);
+    font-weight: 800;
+}
+
+.queue-error {
+    margin: 0 0 var(--space-lg);
+    color: var(--value-negative);
+    text-align: center;
+}
+
+.queue-empty {
+    text-align: center;
+}
+
 /* Support */
 .support-options {
     display: grid;

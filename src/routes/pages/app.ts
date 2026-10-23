@@ -1,6 +1,7 @@
 import { requireUser } from '#src/auth.js';
 import { listUserTransactions } from '#src/db/transactions.js';
-import { listUserGroups } from '#src/db/groups.js';
+import { findUserGroup, listUserGroups } from '#src/db/groups.js';
+import { getQueuePosition, getUserWaitingEntry } from '#src/db/queue.js';
 import { serialize } from '#src/client/serialize.js';
 import { isActivitySlug } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
@@ -20,10 +21,15 @@ export function registerAppRoutes(app: MwaHono) {
         const token = getOrCreateInteractToken(ctx.var, user.id);
         const interactUrl = new URL(`/app/interact/${token}`, ctx.req.url).toString();
 
+        const group = findUserGroup(ctx.var, user.id);
+        const queueEntry = getUserWaitingEntry(ctx.var, user.id);
+
         return writePage(ctx, 'home', {
             qrSvg: renderSVG(interactUrl),
             interactUrl,
             transactions: listUserTransactions(ctx.var, user.id),
+            groupName: group?.name ?? null,
+            queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
         });
     });
 
