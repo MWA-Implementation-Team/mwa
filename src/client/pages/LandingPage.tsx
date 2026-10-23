@@ -45,67 +45,53 @@ function LandingPage({}: LandingPageProps) {
                 )
             }
         >
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-body">
-                    <div class="landing-register">
-                        <FormsIcon class="landing-register-icon" aria-hidden="true" />
-                        <div class="landing-register-body">
-                            <p class="landing-register-text">{t('landingFormTitle')}</p>
-                            <a href="#" class="landing-register-link">
-                                {t('landingFormLink')}
+            <section class="landing-section">
+                <div class="landing-register">
+                    <FormsIcon class="landing-register-icon" aria-hidden="true" />
+                    <div class="landing-register-body">
+                        <p class="landing-register-text">{t('landingFormTitle')}</p>
+                        <a href="#" class="landing-register-link">
+                            {t('landingFormLink')}
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="landing-section">
+                <h2>{t('landingSocialTitle')}</h2>
+                <ul class="landing-socials">
+                    {socials.map(({ Icon, name }) => (
+                        <li key={name}>
+                            <a href="#">
+                                <Icon /> <span>{name}</span>
                             </a>
+                        </li>
+                    ))}
+                </ul>
+            </section>
+
+            <section class="landing-section">
+                <h2>{t('landingFeedTitle')}</h2>
+                <ul class="mwa-wiki-directory">
+                    {activities.map(([slug, { Card }]) => (
+                        <li key={slug}>
+                            <a href={`/app/activities/${slug}`}>
+                                <Card slug={slug} />
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </section>
+
+            <section class="landing-section">
+                <h2>{t('sponsorsTitle')}</h2>
+                <p class="mwa-wiki-muted">{t('sponsorsSubtitle')}</p>
+                <div class="mwa-wiki-grid">
+                    {[1, 2, 3, 4].map((n) => (
+                        <div key={n} class="mwa-wiki-mini">
+                            <span class="mwa-wiki-mini-title">LOGO</span>
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
-                    <h2>{t('landingSocialTitle')}</h2>
-                </div>
-                <div class="mwa-wiki-panel-body">
-                    <ul class="landing-socials">
-                        {socials.map(({ Icon, name }) => (
-                            <li key={name}>
-                                <a href="#">
-                                    <Icon /> <span>{name}</span>
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </section>
-
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
-                    <h2>{t('landingFeedTitle')}</h2>
-                </div>
-                <div class="mwa-wiki-panel-body">
-                    <ul class="mwa-wiki-directory">
-                        {activities.map(([slug, { Card }]) => (
-                            <li key={slug}>
-                                <a href={`/app/activities/${slug}`}>
-                                    <Card slug={slug} />
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </section>
-
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
-                    <h2>{t('sponsorsTitle')}</h2>
-                </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-muted">{t('sponsorsSubtitle')}</p>
-                    <div class="mwa-wiki-grid">
-                        {[1, 2, 3, 4].map((n) => (
-                            <div key={n} class="mwa-wiki-mini">
-                                <span class="mwa-wiki-mini-title">LOGO</span>
-                            </div>
-                        ))}
-                    </div>
+                    ))}
                 </div>
             </section>
         </PageShell>

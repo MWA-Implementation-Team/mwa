@@ -424,6 +424,14 @@
 .mwa-wiki input::placeholder {
     color: #afa4cb;
 }
+.landing-section > h2 {
+    color: var(--wiki-white);
+    font-size: 15px;
+    text-shadow: 0 0 7px #cfacff;
+    border-bottom: 1px dashed #8b5db0;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
 .landing-register {
     display: flex;
     align-items: center;
