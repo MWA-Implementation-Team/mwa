@@ -181,10 +181,11 @@
     margin-bottom: 10px;
     overflow: hidden;
     white-space: nowrap;
-    font-size: 13px;
+    font-size: 17px;
     line-height: 1;
     letter-spacing: 1px;
     transform: scaleX(-1);
+    filter: drop-shadow(0 0 3px rgba(221, 173, 255, 0.6));
 }
 .mwa-wiki-divider::before {
     content: '🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛';
@@ -407,6 +408,7 @@
 }
 .landing-section {
     padding: 0 14px;
+    min-width: 0;
 }
 .landing-section + .landing-section {
     margin-top: 40px;
@@ -417,10 +419,11 @@
     margin-bottom: 14px;
     overflow: hidden;
     white-space: nowrap;
-    font-size: 13px;
+    font-size: 17px;
     line-height: 1;
     letter-spacing: 1px;
     transform: scaleX(-1);
+    filter: drop-shadow(0 0 3px rgba(221, 173, 255, 0.6));
 }
 .landing-section > h2 {
     color: var(--wiki-white);
