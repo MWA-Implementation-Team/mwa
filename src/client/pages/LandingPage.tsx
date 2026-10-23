@@ -50,10 +50,10 @@ function LandingPage({}: LandingPageProps) {
                     <h2>{t('landingSocialTitle')}</h2>
                 </div>
                 <div class="mwa-wiki-panel-body">
-                    <div class="social-row">
+                    <div class="mwa-wiki-actions">
                         {socials.map(({ Icon, name }) => (
-                            <a key={name} href="#" class="social-button" aria-label={name}>
-                                <Icon />
+                            <a key={name} href="#" class="mwa-wiki-button" aria-label={name}>
+                                <Icon /> {name}
                             </a>
                         ))}
                     </div>
@@ -74,7 +74,7 @@ function LandingPage({}: LandingPageProps) {
                     <h2>{t('landingMapTitle')}</h2>
                 </div>
                 <div class="mwa-wiki-panel-body">
-                    <div class="wireframe-box map-box">{t('mapPlaceholder')}</div>
+                    <div class="mwa-wiki-note">{t('mapPlaceholder')}</div>
                 </div>
             </section>
 
@@ -84,32 +84,20 @@ function LandingPage({}: LandingPageProps) {
                 </div>
                 <div class="mwa-wiki-panel-body">
                     <p class="mwa-wiki-muted">{t('landingFeedActive')}</p>
-                    <div class="activity-list">
+                    <ul class="mwa-wiki-rows">
                         {[1, 2].map((n) => (
-                            <div key={n} class="activity-card">
-                                <div class="activity-badge">{n}</div>
-                                <div class="wireframe-box activity-image">IMG</div>
-                                <div class="activity-body">
-                                    <div class="activity-head">
-                                        <h4 class="activity-name">
-                                            {t('activitySlot', { n: String(n) })}
-                                        </h4>
-                                        <span
-                                            class={`status-pill ${n === 1 ? 'status-open' : 'status-busy'}`}
-                                        >
-                                            {n === 1 ? t('statusOpen') : t('statusBusy')}
-                                        </span>
-                                    </div>
-                                    <p class="muted activity-desc">{t('activityDesc')}</p>
-                                    <div class="activity-actions">
-                                        <button class="btn btn-primary btn-sm">
-                                            {t('getInLine')}
-                                        </button>
-                                    </div>
+                            <li key={n}>
+                                <div class="mwa-wiki-row">
+                                    <span>
+                                        <strong>{t('activitySlot', { n: String(n) })}</strong>
+                                        <small>{n === 1 ? t('statusOpen') : t('statusBusy')}</small>
+                                    </span>
+                                    <button class="btn-primary">{t('getInLine')}</button>
                                 </div>
-                            </div>
+                                <p class="mwa-wiki-muted">{t('activityDesc')}</p>
+                            </li>
                         ))}
-                    </div>
+                    </ul>
                 </div>
             </section>
 
@@ -119,10 +107,10 @@ function LandingPage({}: LandingPageProps) {
                 </div>
                 <div class="mwa-wiki-panel-body">
                     <p class="mwa-wiki-muted">{t('sponsorsSubtitle')}</p>
-                    <div class="sponsor-grid cols-4">
+                    <div class="mwa-wiki-grid">
                         {[1, 2, 3, 4].map((n) => (
-                            <div key={n} class="sponsor">
-                                LOGO
+                            <div key={n} class="mwa-wiki-mini">
+                                <span class="mwa-wiki-mini-title">LOGO</span>
                             </div>
                         ))}
                     </div>

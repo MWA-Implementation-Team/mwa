@@ -177,10 +177,10 @@ function HomePage({
                 </div>
                 <div class="mwa-wiki-panel-body">
                     <p class="mwa-wiki-muted">{t('sponsorsSubtitle')}</p>
-                    <div class="sponsor-grid">
+                    <div class="mwa-wiki-grid">
                         {[1, 2, 3, 4, 5, 6].map((n) => (
-                            <div key={n} class="sponsor">
-                                LOGO
+                            <div key={n} class="mwa-wiki-mini">
+                                <span class="mwa-wiki-mini-title">LOGO</span>
                             </div>
                         ))}
                     </div>

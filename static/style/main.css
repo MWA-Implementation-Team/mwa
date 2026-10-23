@@ -11,17 +11,9 @@
 @import './base.css';
 
 /* Components */
-@import './components/header.css';
-@import './components/button.css';
 @import './components/card.css';
 @import './components/form.css';
-@import './components/sponsors.css';
 @import './components/qr-code.css';
-
-/* Pages */
-@import './pages/landing.css';
-@import './pages/dashboard.css';
-@import './pages/host.css';
 
 /* Scoped MWA wiki-styled pages; loaded last so it wins over the base theme */
 @import './wiki.css';

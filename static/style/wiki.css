@@ -20,6 +20,8 @@
     overflow: clip;
     color-scheme: dark;
     color: var(--wiki-white);
+    /* the base theme's hard black text-shadow must not leak into the wiki skin */
+    text-shadow: none;
     font:
         400 15px/1.55 'Lucida Console',
         'Courier New',
@@ -410,6 +412,7 @@
     color: white;
     padding: 10px 12px;
     min-height: 46px;
+    text-shadow: none;
     font:
         16px/1.5 'Lucida Console',
         'Courier New',
