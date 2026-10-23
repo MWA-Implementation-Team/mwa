@@ -51,7 +51,9 @@ function LandingPage({}: LandingPageProps) {
                         <FormsIcon class="landing-register-icon" aria-hidden="true" />
                         <div class="landing-register-body">
                             <p class="landing-register-text">{t('landingFormTitle')}</p>
-                            <a href="#">{t('landingFormLink')}</a>
+                            <a href="#" class="landing-register-link">
+                                {t('landingFormLink')}
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -66,7 +68,7 @@ function LandingPage({}: LandingPageProps) {
                         {socials.map(({ Icon, name }) => (
                             <li key={name}>
                                 <a href="#">
-                                    <Icon /> {name.toLowerCase()}
+                                    <Icon /> {name}
                                 </a>
                             </li>
                         ))}
