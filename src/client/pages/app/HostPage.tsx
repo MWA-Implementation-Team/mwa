@@ -1,9 +1,8 @@
-import Header from '#src/client/ui/Header.js';
-import Footer from '#src/client/ui/Footer.js';
 import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { callGroups, markDone, type WaitingQueueRow } from '#src/client/api/host.js';
+import PageShell from './PageShell.js';
 
 type HostPageProps = {
     activities: { slug: string; name: string }[];
@@ -53,17 +52,14 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
     };
 
     return (
-        <>
-            <Header />
-
-            <main class="page page-narrow">
-                <h1 class="page-title">{t('hostTitle')}</h1>
-
-                <section class="card">
-                    <h2 class="section-title">{t('hostCallTitle')}</h2>
-
-                    <div class="form-stack host-form">
-                        <div>
+        <PageShell section="host" title={t('hostTitle')} subtitle={t('subHost')}>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('hostCallTitle')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <div class="mwa-wiki-form">
+                        <div class="mwa-wiki-field">
                             <label for="host-station">{t('hostStation')}</label>
                             <select
                                 id="host-station"
@@ -78,7 +74,7 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
                             </select>
                         </div>
 
-                        <div>
+                        <div class="mwa-wiki-field">
                             <label for="host-count">{t('hostCount')}</label>
                             <input
                                 id="host-count"
@@ -101,59 +97,64 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
                         </div>
                     </div>
 
-                    <p class="muted host-waiting">
-                        {t('hostWaiting', { n: String(waiting.length) })}
-                    </p>
+                    <p class="mwa-wiki-muted">{t('hostWaiting', { n: String(waiting.length) })}</p>
 
-                    {error && <p class="queue-error">{error}</p>}
+                    {error && (
+                        <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+                            {error}
+                        </p>
+                    )}
 
-                    <button
-                        class="btn btn-primary btn-block"
-                        onClick={handleCall}
-                        disabled={waiting.length === 0}
-                    >
-                        {t('hostRequest')}
-                    </button>
-                </section>
+                    <div class="mwa-wiki-actions">
+                        <button
+                            class="btn-primary"
+                            onClick={handleCall}
+                            disabled={waiting.length === 0}
+                        >
+                            {t('hostRequest')}
+                        </button>
+                    </div>
+                </div>
+            </section>
 
-                <section class="card">
-                    <h2 class="section-title">{t('hostAtStation')}</h2>
-
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('hostAtStation')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
                     {onStation.length === 0 ? (
-                        <p class="muted queue-empty">{t('hostStationEmpty')}</p>
+                        <p class="mwa-wiki-muted">{t('hostStationEmpty')}</p>
                     ) : (
-                        <div class="station-groups">
+                        <ul class="mwa-wiki-rows">
                             {onStation.map((entry) => (
-                                <div key={entry.id} class="station-group">
-                                    <span class="station-group-name">{entry.groupName}</span>
-                                    <button
-                                        class="btn btn-outline btn-sm"
-                                        onClick={() => handleDone(entry.id)}
-                                    >
+                                <li key={entry.id} class="mwa-wiki-row">
+                                    <strong>{entry.groupName}</strong>
+                                    <button onClick={() => handleDone(entry.id)}>
                                         {t('hostDone')}
                                     </button>
-                                </div>
+                                </li>
                             ))}
-                        </div>
+                        </ul>
                     )}
-                </section>
+                </div>
+            </section>
 
-                <section class="card">
-                    <h2 class="section-title">{t('hostNextUp')}</h2>
-
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>{t('hostNextUp')}</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
                     {waiting.length === 0 ? (
-                        <p class="muted queue-empty">{t('hostQueueEmpty')}</p>
+                        <p class="mwa-wiki-muted">{t('hostQueueEmpty')}</p>
                     ) : (
-                        <ol class="queue-preview">
+                        <ol>
                             {waiting.map((entry) => (
                                 <li key={entry.id}>{entry.groupName}</li>
                             ))}
                         </ol>
                     )}
-                </section>
-            </main>
-
-            <Footer />
-        </>
+                </div>
+            </section>
+        </PageShell>
     );
 }

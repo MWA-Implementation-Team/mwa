@@ -1,10 +1,73 @@
+// Card.tsx
+
 import type { ActivityProps } from '#src/client/activities.js';
 
 export function EgyptCard({}: ActivityProps) {
     return (
-        <article class="card">
-            <h2>Egiptas</h2>
-            <p>TODO: card pitch.</p>
+        <article
+            class="card1"
+            style={{
+                position: 'relative',
+                overflow: 'hidden',
+                minHeight: 180,
+                padding: 24,
+                borderRadius: 14,
+                color: '#513b2a',
+                background: 'linear-gradient(135deg, #f2dfb8, #d7ad75)',
+                border: '2px solid #b78b52',
+            }}
+        >
+            <div
+                aria-hidden="true"
+                style={{
+                    position: 'absolute',
+                    top: 12,
+                    left: 15,
+                    right: 15,
+                    borderTop: '1px solid #987044',
+                    opacity: 0.65,
+                }}
+            />
+
+            <span
+                aria-hidden="true"
+                style={{
+                    position: 'absolute',
+                    right: 23,
+                    top: 22,
+                    fontSize: 65,
+                    lineHeight: 1,
+                    opacity: 0.55,
+                }}
+            >
+                𓂀
+            </span>
+
+            <span
+                aria-hidden="true"
+                style={{
+                    position: 'absolute',
+                    bottom: -13,
+                    right: 6,
+                    fontSize: 85,
+                    color: '#b88e58',
+                    opacity: 0.6,
+                }}
+            >
+                △
+            </span>
+
+            <h2
+                style={{
+                    position: 'relative',
+                    margin: '82px 0 0',
+                    fontFamily: 'Georgia, serif',
+                    fontSize: 34,
+                    letterSpacing: 1,
+                }}
+            >
+                Egiptas
+            </h2>
         </article>
     );
 }

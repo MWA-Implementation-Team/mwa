@@ -1,8 +1,7 @@
-import Header from '#src/client/ui/Header.js';
-import Footer from '#src/client/ui/Footer.js';
 import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
+import PageShell from './app/PageShell.js';
 
 export type LoginErrorKey =
     | 'loginInvalidEmail'
@@ -26,58 +25,60 @@ export const loginPage: Page<LoginPageProps> = {
 function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
     const { t } = useContext(ClientContext);
     return (
-        <>
-            <Header />
-
-            <main class="page page-narrow">
-                <section class="card">
-                    <h1 class="section-title">{t('loginTitle')}</h1>
-
+        <PageShell section="login" title={t('loginTitle')}>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-body">
                     {sentTo ? (
                         <>
-                            <p class="muted">
+                            <p class="mwa-wiki-muted">
                                 {sentKind === 'signup'
                                     ? t('loginSentSignup', { email: sentTo })
                                     : t('loginSentLogin', { email: sentTo })}
                             </p>
-                            <form method="POST" action="/auth/verify" class="form-stack">
+                            <form method="POST" action="/auth/verify" class="mwa-wiki-form">
                                 <input type="hidden" name="email" value={sentTo} />
                                 {goto && <input type="hidden" name="goto" value={goto} />}
-                                <label for="code">{t('loginCode')}</label>
-                                <input
-                                    type="text"
-                                    id="code"
-                                    name="code"
-                                    placeholder={t('loginCode')}
-                                    autoComplete="one-time-code"
-                                    required
-                                />
-                                <button type="submit" class="btn btn-primary btn-block">
+                                <div class="mwa-wiki-field">
+                                    <label for="code">{t('loginCode')}</label>
+                                    <input
+                                        type="text"
+                                        id="code"
+                                        name="code"
+                                        placeholder={t('loginCode')}
+                                        autoComplete="one-time-code"
+                                        required
+                                    />
+                                </div>
+                                <button type="submit" class="btn btn-primary">
                                     {t('loginVerify')}
                                 </button>
                             </form>
                         </>
                     ) : (
-                        <form method="POST" class="form-stack">
-                            <label for="email">{t('loginEmail')}</label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                placeholder={t('loginEmail')}
-                                required
-                            />
-                            <button type="submit" class="btn btn-primary btn-block">
+                        <form method="POST" class="mwa-wiki-form">
+                            <div class="mwa-wiki-field">
+                                <label for="email">{t('loginEmail')}</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    placeholder={t('loginEmail')}
+                                    required
+                                />
+                            </div>
+                            <button type="submit" class="btn btn-primary">
                                 {t('loginSendLink')}
                             </button>
                         </form>
                     )}
 
-                    {errorKey && <p class="error-message">{t(errorKey)}</p>}
-                </section>
-            </main>
-
-            <Footer />
-        </>
+                    {errorKey && (
+                        <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+                            {t(errorKey)}
+                        </p>
+                    )}
+                </div>
+            </section>
+        </PageShell>
     );
 }
