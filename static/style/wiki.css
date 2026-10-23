@@ -455,7 +455,7 @@
 .landing-socials {
     list-style: none;
     margin: 4px 0 0;
-    padding: 0 0 0 min(45%, 240px);
+    padding: 0;
     display: grid;
     gap: 8px;
 }

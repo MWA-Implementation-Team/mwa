@@ -77,23 +77,15 @@ function LandingPage({}: LandingPageProps) {
 
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
-                    <h2>{t('landingMapTitle')}</h2>
-                </div>
-                <div class="mwa-wiki-panel-body">
-                    <div class="mwa-wiki-note">{t('mapPlaceholder')}</div>
-                </div>
-            </section>
-
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
                     <h2>{t('landingFeedTitle')}</h2>
                 </div>
                 <div class="mwa-wiki-panel-body">
-                    <ul class="mwa-wiki-rows">
-                        {activities.map(([slug, { name }]) => (
-                            <li key={slug} class="mwa-wiki-row">
-                                <strong>{name}</strong>
-                                <a href={`/app/activities/${slug}`}>{t('landingViewActivity')}</a>
+                    <ul class="mwa-wiki-directory">
+                        {activities.map(([slug, { Card }]) => (
+                            <li key={slug}>
+                                <a href={`/app/activities/${slug}`}>
+                                    <Card slug={slug} />
+                                </a>
                             </li>
                         ))}
                     </ul>

@@ -54,11 +54,8 @@ export type Language = {
     landingHeroBody: string;
     landingRegister: string;
     landingSocialTitle: string;
-    landingMapTitle: string;
-    mapPlaceholder: string;
     landingFeedTitle: string;
     landingGoApp: string;
-    landingViewActivity: string;
     landingPath: string;
     landingFormTitle: string;
     sponsorsTitle: string;
@@ -233,11 +230,8 @@ export const languages: Record<LanguageCode, Language> = {
             'Sign up for the event, explore the activities and get in line for your favorites.',
         landingRegister: 'Register now',
         landingSocialTitle: 'Follow us here!',
-        landingMapTitle: 'Event map',
-        mapPlaceholder: 'Map placeholder',
         landingFeedTitle: 'Activities',
         landingGoApp: 'Go to the app',
-        landingViewActivity: 'view →',
         landingPath: 'Our small home~',
         landingFormTitle: 'Fill our form to participate!',
         sponsorsTitle: 'Sponsors',
@@ -410,11 +404,8 @@ export const languages: Record<LanguageCode, Language> = {
         landingHeroBody: 'Užsiregistruok į renginį, apžiūrėk veiklas ir užimk vietą eilėje.',
         landingRegister: 'Registruotis',
         landingSocialTitle: 'Sekite mus čia!',
-        landingMapTitle: 'Renginio žemėlapis',
-        mapPlaceholder: 'Žemėlapio vieta',
         landingFeedTitle: 'Veiklos',
         landingGoApp: 'Į programą',
-        landingViewActivity: 'peržiūrėti →',
         landingPath: 'Mūsų mažas namelis~',
         landingFormTitle: 'Užpildyk formą ir dalyvauk!',
         sponsorsTitle: 'Rėmėjai',
