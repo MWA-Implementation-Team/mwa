@@ -110,7 +110,9 @@ One row in `queue_entries` — a group's spot in the single event-wide queue
 `DELETE /api/queue`; both go through the caller's own group, any member may act.
 Status is `waiting` while in line and stays on the row afterwards — `left` for
 a bail, `called` when a host pulls the group to a station (`activity_slug`
-records which one). Order is by row id, so a rejoined group lands at the back
-and a partial unique index guarantees at most one waiting spot per group. The
-dashboard shows the caller's 1-based position; hosts read `listWaitingQueue`
+records which one). A called group finishing its station is marked by
+`done_at` rather than a new status — it drops out of `listStationGroups`, which
+is what `/app/host` shows. Order is by row id, so a rejoined group lands at the
+back and a partial unique index guarantees at most one waiting spot per group.
+The dashboard shows the caller's 1-based position; hosts read `listWaitingQueue`
 and call `callNextGroups` when a station frees up.

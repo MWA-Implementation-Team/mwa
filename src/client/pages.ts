@@ -10,6 +10,7 @@ import { leaderboardPage } from '#src/client/pages/app/LeaderboardPage.js';
 import { groupPage } from '#src/client/pages/app/GroupPage.js';
 import { casinoPage } from '#src/client/pages/app/CasinoPage.js';
 import { interactPage } from '#src/client/pages/app/InteractPage.js';
+import { hostPage } from '#src/client/pages/app/HostPage.js';
 import { adminPage } from '#src/client/pages/AdminPage.js';
 import { LanguageCode, TranslateFn } from './language.js';
 
@@ -25,6 +26,7 @@ export const registeredPages = {
     group: groupPage,
     casino: casinoPage,
     interact: interactPage,
+    host: hostPage,
     admin: adminPage,
     error: errorPage,
 } satisfies Record<string, Page<any>>;

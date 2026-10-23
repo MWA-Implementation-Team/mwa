@@ -88,6 +88,11 @@ export default function Header() {
                                     <a class="drawer-link" href="/app/account">
                                         {t('headerAccount')}
                                     </a>
+                                    {(user.role === 'host' || user.role === 'admin') && (
+                                        <a class="drawer-link" href="/app/host">
+                                            {t('headerHost')}
+                                        </a>
+                                    )}
                                     {user.role === 'admin' && (
                                         <a class="drawer-link" href="/admin">
                                             {t('headerAdmin')}

@@ -15,6 +15,7 @@ export type Language = {
     titleGroup: string;
     titleCasino: string;
     titleInteract: string;
+    titleHost: string;
     titleAdmin: string;
     titleError: string;
 
@@ -26,6 +27,7 @@ export type Language = {
     headerGroup: string;
     headerCasino: string;
     headerAccount: string;
+    headerHost: string;
     headerAdmin: string;
 
     menuTitle: string;
@@ -93,6 +95,20 @@ export type Language = {
     queueJoinFailed: string;
     queueLeaveFailed: string;
 
+    hostTitle: string;
+    hostCallTitle: string;
+    hostStation: string;
+    hostCount: string;
+    hostRequest: string;
+    hostWaiting: string;
+    hostAtStation: string;
+    hostStationEmpty: string;
+    hostDone: string;
+    hostNextUp: string;
+    hostQueueEmpty: string;
+    hostRequestFailed: string;
+    hostDoneFailed: string;
+
     dashSupport: string;
     dashCall: string;
     dashGuide: string;
@@ -140,6 +156,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleGroup: 'MWA | Group',
         titleCasino: 'MWA | Casino',
         titleInteract: 'MWA | Interact',
+        titleHost: 'MWA | Host',
         titleAdmin: 'MWA | Admin',
         titleError: 'MWA | {status}',
 
@@ -151,6 +168,7 @@ export const languages: Record<LanguageCode, Language> = {
         headerGroup: 'Group',
         headerCasino: 'Casino',
         headerAccount: 'Account',
+        headerHost: 'Host tools',
         headerAdmin: 'Admin',
 
         menuTitle: 'Menu',
@@ -219,6 +237,20 @@ export const languages: Record<LanguageCode, Language> = {
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
 
+        hostTitle: 'Host tools',
+        hostCallTitle: 'Send groups to a station',
+        hostStation: 'Station',
+        hostCount: 'Groups to call',
+        hostRequest: 'Request from queue',
+        hostWaiting: '{n} group(s) waiting in the queue',
+        hostAtStation: 'At the station',
+        hostStationEmpty: 'No groups at this station',
+        hostDone: 'Done',
+        hostNextUp: 'Next in line',
+        hostQueueEmpty: 'The queue is empty',
+        hostRequestFailed: 'Could not request groups',
+        hostDoneFailed: 'Could not mark the group done',
+
         dashSupport: 'Support',
         dashCall: 'Call support',
         dashGuide: 'Guide & explanations',
@@ -264,6 +296,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleGroup: 'MWA | Grupė',
         titleCasino: 'MWA | Kazino',
         titleInteract: 'MWA | Sąveika',
+        titleHost: 'MWA | Vedėjas',
         titleAdmin: 'MWA | Administravimas',
         titleError: 'MWA | {status}',
 
@@ -275,6 +308,7 @@ export const languages: Record<LanguageCode, Language> = {
         headerGroup: 'Grupė',
         headerCasino: 'Kazino',
         headerAccount: 'Paskyra',
+        headerHost: 'Vedėjo įrankiai',
         headerAdmin: 'Administravimas',
 
         menuTitle: 'Meniu',
@@ -342,6 +376,20 @@ export const languages: Record<LanguageCode, Language> = {
         queueGoGroup: 'Eiti į grupę',
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
+
+        hostTitle: 'Vedėjo įrankiai',
+        hostCallTitle: 'Siųsti grupes į stotį',
+        hostStation: 'Stotis',
+        hostCount: 'Kiek grupių kviesti',
+        hostRequest: 'Paimti iš eilės',
+        hostWaiting: 'Eilėje laukia grupių: {n}',
+        hostAtStation: 'Prie stoties',
+        hostStationEmpty: 'Prie šios stoties grupių nėra',
+        hostDone: 'Atlikta',
+        hostNextUp: 'Eilėje toliau',
+        hostQueueEmpty: 'Eilė tuščia',
+        hostRequestFailed: 'Nepavyko pakviesti grupių',
+        hostDoneFailed: 'Nepavyko pažymėti grupės kaip atliktos',
 
         dashSupport: 'Pagalba',
         dashCall: 'Skambinti pagalbai',

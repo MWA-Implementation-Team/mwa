@@ -1,9 +1,14 @@
-import { requireUser } from '#src/auth.js';
+import { requireRole, requireUser } from '#src/auth.js';
 import { listUserTransactions } from '#src/db/transactions.js';
 import { findUserGroup, listUserGroups } from '#src/db/groups.js';
-import { getQueuePosition, getUserWaitingEntry } from '#src/db/queue.js';
+import {
+    getQueuePosition,
+    getUserWaitingEntry,
+    listWaitingQueue,
+    listStationGroups,
+} from '#src/db/queue.js';
 import { serialize } from '#src/client/serialize.js';
-import { isActivitySlug } from '#src/client/activities.js';
+import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
 import { findUserByInteractToken, getOrCreateInteractToken } from '#src/db/interactions.js';
 import { deleteSession } from '#src/db/sessions.js';
@@ -90,6 +95,28 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         return writePage(ctx, 'casino', {});
+    });
+
+    // One host page serves every station — the host picks which activity
+    // they're staffing from a dropdown, so there's no host↔station binding.
+    app.get('/app/host', async (ctx) => {
+        const user = requireRole(ctx, 'host', 'admin');
+        if (user instanceof Response) return user;
+
+        const activities = (Object.keys(registeredActivities) as ActivitySlug[]).map((slug) => ({
+            slug,
+            name: registeredActivities[slug].name,
+        }));
+
+        // called-and-not-done rows across all stations; the page filters
+        // client-side by the selected activity
+        const atStation = activities.flatMap(({ slug }) => listStationGroups(ctx.var, slug));
+
+        return writePage(ctx, 'host', {
+            activities,
+            waiting: listWaitingQueue(ctx.var),
+            atStation,
+        });
     });
 
     app.get('/app/interact/:token', async (ctx) => {
