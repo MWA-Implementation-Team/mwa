@@ -1,4 +1,5 @@
 import { MwaState } from '#src/state.js';
+import { secureRandom } from '#src/utils.js';
 import { runTransaction } from './transaction.js';
 import { findUserById } from './users.js';
 
@@ -17,11 +18,13 @@ export type CommonGameOpts = {
     betAmount: number;
 };
 
+export type Gambler = 'p1' | 'p2';
+
 export type RunningGame = {
     type: GameType;
     status: { type: 'pending' } | { type: 'rejected' } | { type: 'running' } | {
         type: 'ended',
-        winner: 'p1' | 'p2',
+        winner: Gambler,
     }
 
     p1: number;
@@ -148,17 +151,18 @@ export function rejectGamblingSession(state: MwaState, sessionId: number, userId
     del.run(sessionId, userId);
 }
 
-export function winGamblingSession(state: MwaState, sessionId: number, userId: number) {
+export function winGamblingSession(state: MwaState, sessionId: number, winner: Gambler) {
     runTransaction(state.db, () => {
         const sessionQuery = state.prepare(`
-        SELECT bet_amount FROM gambling_sessions
-        WHERE id = ? AND (p1 = ? OR p2 = ?) AND p2_deposit_tx IS NOT NULL AND winner_tx IS NULL
+        SELECT p1, p2, bet_amount FROM gambling_sessions
+        WHERE id = ? AND p2_deposit_tx IS NOT NULL AND winner_tx IS NULL
         `);
-        const row = sessionQuery.get(sessionId, userId, userId);
+        const row = sessionQuery.get(sessionId);
         if (!row) {
             throw new Error(`Unknown gambling session ${sessionId}`);
         }
         const betAmount = row.bet_amount as number;
+        const userId = winner === 'p1' ? row.p1 : row.p2;
 
         const insertParentTx = state.prepare(`
         INSERT INTO parent_transactions (kind) VALUES ('gambling_winnings')
@@ -179,21 +183,19 @@ export function winGamblingSession(state: MwaState, sessionId: number, userId: n
     });
 }
 
-export function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOpts): number | null {
-    return runTransaction(state.db, () => {
-        const deductResult = deductCoinsForGambling(state, opts.p1, opts.betAmount);
-        if (deductResult.type === 'too_broke') {
-            return null;
-        }
+function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOpts): number | null {
+    const deductResult = deductCoinsForGambling(state, opts.p1, opts.betAmount);
+    if (deductResult.type === 'too_broke') {
+        return null;
+    }
 
-        const insert = state.prepare(`
-        INSERT INTO gambling_sessions (p1, p2, bet_amount, game_type, p1_deposit_tx)
-        VALUES (?, ?, ?, ?, ?)
-        RETURNING id
-        `);
-        const row = insert.get(opts.p1, opts.p2, opts.betAmount, type, deductResult.parentId);
-        return row!.id as number;
-    });
+    const insert = state.prepare(`
+    INSERT INTO gambling_sessions (p1, p2, bet_amount, game_type, p1_deposit_tx)
+    VALUES (?, ?, ?, ?, ?)
+    RETURNING id
+    `);
+    const row = insert.get(opts.p1, opts.p2, opts.betAmount, type, deductResult.parentId);
+    return row!.id as number;
 }
 
 // TEMPORARY
@@ -249,10 +251,33 @@ function deductCoinsForGambling(state: MwaState, userId: number, betAmount: numb
     };
 }
 
+// --- COIN FLIP GAME ---
+
 export type CoinSide = 'heads' | 'tails';
 
-//export function initCoinFlip(state: MwaState, bet: CoinSide, opts: CommonGameOpts) {
-//    state.db.exec('BEGIN');
-//    initGame(state, 'coin_flip', opts);
-//    state.db.exec('COMMIT');
-//}
+export function initCoinFlip(state: MwaState, p1Bet: CoinSide, opts: CommonGameOpts): number | null {
+    return runTransaction(state.db, () => {
+        const sessionId = initGamblingSession(state, 'coin_flip', opts);
+        if (sessionId === null) return null;
+
+        const insert = state.prepare(`
+        INSERT INTO coin_flip_games (session, p1_bet, actual_result) VALUES (?, ?, ?)
+        `);
+
+        const actualResult: CoinSide = secureRandom() > 0.5 ? 'heads' : 'tails';
+        insert.run(sessionId, p1Bet, actualResult);
+
+        return sessionId;
+    });
+}
+
+export function winCoinFlip(state: MwaState, sessionId: number) {
+    const select = state.prepare(`
+    SELECT p1_bet, actual_result FROM coin_flip_games WHERE session = ?
+    `);
+
+    const row = select.get(sessionId)!;
+    const winner: Gambler = row.p1_bet === row.actual_result ? 'p1' : 'p2';
+
+    winGamblingSession(state, sessionId, winner);
+}

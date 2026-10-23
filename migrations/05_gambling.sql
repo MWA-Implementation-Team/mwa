@@ -24,6 +24,8 @@ WHERE system_qr_code_id IS NOT NULL;
 
 CREATE INDEX child_transactions_index_user_id ON child_transactions (user_id);
 
+--
+
 CREATE TABLE IF NOT EXISTS gambling_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
@@ -63,7 +65,7 @@ CREATE TABLE IF NOT EXISTS coin_flip_games (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session INTEGER NOT NULL UNIQUE REFERENCES gambling_sessions (id) ON DELETE CASCADE,
 
-    p1_bet TEXT NOT NULL,
-    actual_result TEXT NOT NULL
+    p1_bet TEXT NOT NULL CHECK (p1_bet IN ('heads', 'tails')),
+    actual_result TEXT NOT NULL CHECK (actual_result IN ('heads', 'tails'))
 );
 

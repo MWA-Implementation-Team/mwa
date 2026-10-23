@@ -1,6 +1,6 @@
 import { requireUser } from '#src/auth.js';
 import { translate } from '#src/client/language.js';
-import { acceptGamblingSession, findGamblingSessionById, giveCoins, initGamblingSession, queryGamblingInvitations, queryGamblingSessions, rejectGamblingSession, winGamblingSession } from '#src/db/gambling.js';
+import { acceptGamblingSession, findGamblingSessionById, giveCoins, initCoinFlip, queryGamblingInvitations, queryGamblingSessions, rejectGamblingSession, winCoinFlip, winGamblingSession } from '#src/db/gambling.js';
 import { findUserByUsername } from '#src/db/users.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { MwaHono } from '#src/state.js';
@@ -60,7 +60,7 @@ export function registerGamblingRoutes(app: MwaHono) {
             return ctx.redirect(`/app/gambling?error=no_user`);
         }
 
-        const id = initGamblingSession(ctx.var, 'coin_flip', {
+        const id = initCoinFlip(ctx.var, 'heads', {
             p1: user.id,
             p2: opponent.id,
             betAmount: 500,
@@ -131,18 +131,20 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 400);
         }
 
-        const gameId = Number(ctx.req.param('id'));
-        const game = findGamblingSessionById(ctx.var, gameId);
+        const sessionId = Number(ctx.req.param('id'));
+        const game = findGamblingSessionById(ctx.var, sessionId);
         if (!game) {
             return writeErrorPage(ctx, 404);
         }
 
-        const result = acceptGamblingSession(ctx.var, gameId, user.id);
+        const result = acceptGamblingSession(ctx.var, sessionId, user.id);
         if (result === 'too_broke') {
-            return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(gameId)}?error=broke`);
+            return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(sessionId)}?error=broke`);
         }
 
-        return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(gameId)}`);
+        winCoinFlip(ctx.var, sessionId);
+
+        return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(sessionId)}`);
     });
 
     app.post('/app/gambling/sessions/:id/reject', async (ctx) => {
@@ -178,7 +180,7 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 404);
         }
 
-        winGamblingSession(ctx.var, gameId, user.id);
+        winGamblingSession(ctx.var, gameId, game.p1 === user.id ? 'p1' : 'p2');
 
         return ctx.redirect('/app/gambling');
     });
