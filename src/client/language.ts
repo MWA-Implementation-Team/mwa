@@ -14,6 +14,7 @@ export type Language = {
     titleLeaderboard: string;
     titleGroup: string;
     titleCasino: string;
+    titleInteract: string;
     titleAdmin: string;
     titleError: string;
 
@@ -41,6 +42,15 @@ export type Language = {
     loginVerify: string;
 
     homeWelcome: string;
+
+    interactHeading: string;
+    interactSelfJoke: string;
+    interactSendMoneyTitle: string;
+    interactComingSoon: string;
+    interactProfileDetailTitle: string;
+    interactDetailEmail: string;
+    interactDetailBalance: string;
+    interactDetailJoined: string;
 
     landingHeroTitle: string;
     landingHeroBody: string;
@@ -73,7 +83,6 @@ export type Language = {
     dashQrTitle: string;
     dashQrHint: string;
     dashQrBody: string;
-    qrPlaceholder: string;
     dashSupport: string;
     dashCall: string;
     dashGuide: string;
@@ -120,6 +129,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleLeaderboard: 'MWA | Leaderboard',
         titleGroup: 'MWA | Group',
         titleCasino: 'MWA | Casino',
+        titleInteract: 'MWA | Interact',
         titleAdmin: 'MWA | Admin',
         titleError: 'MWA | {status}',
 
@@ -147,6 +157,15 @@ export const languages: Record<LanguageCode, Language> = {
         loginVerify: 'Verify code',
 
         homeWelcome: 'Welcome back, {name}',
+
+        interactHeading: 'Interact with {name}',
+        interactSelfJoke: "That's you! Scan someone else's code instead.",
+        interactSendMoneyTitle: 'Send money',
+        interactComingSoon: 'Coming soon',
+        interactProfileDetailTitle: 'Profile details',
+        interactDetailEmail: 'Email',
+        interactDetailBalance: 'Balance',
+        interactDetailJoined: 'Joined',
 
         landingHeroTitle: 'MWA event registration',
         landingHeroBody:
@@ -178,9 +197,8 @@ export const languages: Record<LanguageCode, Language> = {
         txPurchase: 'Purchase',
         txSystem: 'System credit',
         dashQrTitle: 'Account QR code',
-        dashQrHint: 'Use for admin access',
-        dashQrBody: 'Show this code to an administrator to allow access to your account details.',
-        qrPlaceholder: 'QR code placeholder',
+        dashQrHint: 'Let another user scan this code',
+        dashQrBody: 'Scanning it opens a page where they can interact with your account.',
         dashSupport: 'Support',
         dashCall: 'Call support',
         dashGuide: 'Guide & explanations',
@@ -225,6 +243,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleLeaderboard: 'MWA | Lyderių lentelė',
         titleGroup: 'MWA | Grupė',
         titleCasino: 'MWA | Kazino',
+        titleInteract: 'MWA | Sąveika',
         titleAdmin: 'MWA | Administravimas',
         titleError: 'MWA | {status}',
 
@@ -253,6 +272,15 @@ export const languages: Record<LanguageCode, Language> = {
         loginVerify: 'Patvirtinti kodą',
 
         homeWelcome: 'Sveiki sugrįžę, {name}',
+
+        interactHeading: 'Sąveika su {name}',
+        interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
+        interactSendMoneyTitle: 'Siųsti pinigus',
+        interactComingSoon: 'Netrukus',
+        interactProfileDetailTitle: 'Profilio detalės',
+        interactDetailEmail: 'El. paštas',
+        interactDetailBalance: 'Balansas',
+        interactDetailJoined: 'Prisijungė',
 
         landingHeroTitle: 'MWA renginio registracija',
         landingHeroBody: 'Užsiregistruok į renginį, apžiūrėk veiklas ir užimk vietą eilėje.',
@@ -283,10 +311,8 @@ export const languages: Record<LanguageCode, Language> = {
         txPurchase: 'Pirkimas',
         txSystem: 'Sisteminis įskaitymas',
         dashQrTitle: 'Paskyros QR kodas',
-        dashQrHint: 'Naudok administratoriaus prieigai',
-        dashQrBody:
-            'Parodyk šį kodą administratoriui, kad jis galėtų peržiūrėti tavo paskyros duomenis.',
-        qrPlaceholder: 'QR kodo vieta',
+        dashQrHint: 'Leisk kitam naudotojui nuskamuoti šį kodą',
+        dashQrBody: 'Nuskanavus atidaromas puslapis, kuriame galima sąveikauti su tavo paskyra.',
         dashSupport: 'Pagalba',
         dashCall: 'Skambinti pagalbai',
         dashGuide: 'Vadovas ir paaiškinimai',

@@ -16,6 +16,7 @@
 @import './components/card.css';
 @import './components/form.css';
 @import './components/sponsors.css';
+@import './components/qr-code.css';
 
 /* Pages */
 @import './pages/landing.css';

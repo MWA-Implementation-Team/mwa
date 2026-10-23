@@ -1,0 +1,12 @@
+/* Personal QR on /app — uqr emits a viewBox-only <svg>, which would
+   otherwise stretch to the full container width. */
+.qr-code {
+    width: min(15rem, 80%);
+    margin: var(--space-md) auto;
+}
+
+.qr-code svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}

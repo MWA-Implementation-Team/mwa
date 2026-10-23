@@ -7,6 +7,8 @@ import { Transaction } from '#src/client/api/transactions.js';
 import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
 
 type HomePageProps = {
+    qrSvg: string;
+    interactUrl: string;
     transactions: Transaction[];
 };
 
@@ -21,7 +23,7 @@ const transactionKindKey = {
     system: 'txSystem',
 } as const;
 
-function HomePage({ transactions }: HomePageProps) {
+function HomePage({ qrSvg, interactUrl, transactions }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
 
@@ -79,7 +81,10 @@ function HomePage({ transactions }: HomePageProps) {
                         <br />
                         {t('dashQrBody')}
                     </div>
-                    <div class="wireframe-box qr-placeholder">{t('qrPlaceholder')}</div>
+                    <div class="qr-code" dangerouslySetInnerHTML={{ __html: qrSvg }} />
+                    <a class="muted" href={interactUrl}>
+                        {interactUrl}
+                    </a>
                 </section>
 
                 <section class="card">
