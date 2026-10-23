@@ -59,11 +59,6 @@ export default function PageShell({
                 {t('wikiSkip')}
             </a>
             <div class="mwa-wiki-frame">
-                <div class="mwa-wiki-topline">
-                    <span>{t('wikiTopline')}</span>
-                    <span class="mwa-wiki-topline-right">{t('wikiTaglineRight')}</span>
-                </div>
-
                 <header class="mwa-wiki-brand">
                     <a href="/" class="mwa-wiki-logo" aria-label={t('wikiLogoAlt')}>
                         <img src="/3Logotipas.png" alt={t('wikiLogoAlt')} />

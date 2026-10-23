@@ -38,7 +38,7 @@ function LandingPage({}: LandingPageProps) {
             title={t('landingHeroTitle')}
             cta={
                 user && (
-                    <a href="/app" class="mwa-wiki-button mwa-wiki-button--primary">
+                    <a href="/app" class="landing-cta">
                         {t('landingGoApp')}
                     </a>
                 )

@@ -86,22 +86,6 @@
     margin: 0 auto;
     padding: 12px 12px 42px;
 }
-.mwa-wiki-topline {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding: 4px 0 7px;
-    border-bottom: 1px dashed rgba(221, 173, 255, 0.65);
-    color: var(--wiki-orange);
-    text-align: center;
-    font-size: 11px;
-    letter-spacing: 0.04em;
-}
-.mwa-wiki-topline-right {
-    display: none;
-    color: var(--wiki-soft);
-}
 .mwa-wiki-brand {
     padding: 21px 8px 4px;
     text-align: center;
@@ -471,7 +455,8 @@
     line-height: 1.35;
     font-weight: 700;
 }
-.landing-register-link {
+.landing-register-link,
+.landing-cta {
     text-transform: uppercase;
     font-size: 16px;
     font-weight: 700;
@@ -629,12 +614,6 @@
 @media (min-width: 580px) {
     .mwa-wiki-frame {
         padding: 18px 24px 60px;
-    }
-    .mwa-wiki-topline {
-        justify-content: space-between;
-    }
-    .mwa-wiki-topline-right {
-        display: inline;
     }
     .mwa-wiki-brand {
         padding-block: 26px 18px;

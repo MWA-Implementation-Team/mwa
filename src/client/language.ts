@@ -103,8 +103,6 @@ export type Language = {
     homeSubtitle: string;
 
     wikiSkip: string;
-    wikiTopline: string;
-    wikiTaglineRight: string;
     wikiLogoAlt: string;
     wikiNavLabel: string;
     wikiFooter: string;
@@ -228,7 +226,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingFormLink: 'link to google forms',
         landingSocialTitle: 'Follow us here!',
         landingFeedTitle: 'Activities',
-        landingGoApp: 'Go to the app',
+        landingGoApp: 'Launch',
         landingPath: 'Our small home~',
         landingFormTitle: 'Fill our form to participate!',
         sponsorsTitle: 'Sponsors',
@@ -277,8 +275,6 @@ export const languages: Record<LanguageCode, Language> = {
         homeSubtitle: 'your corner of the event ✦',
 
         wikiSkip: 'Skip to content',
-        wikiTopline: '✦ FIRST YEARS EVENT ✦',
-        wikiTaglineRight: '~ connected to the mifverse ~',
         wikiLogoAlt: 'first years Event home',
         wikiNavLabel: 'Main navigation',
         wikiFooter: '✦ made for the first years event ✦',
@@ -401,7 +397,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingFormLink: 'nuoroda į google formą',
         landingSocialTitle: 'Sekite mus čia!',
         landingFeedTitle: 'Veiklos',
-        landingGoApp: 'Į programą',
+        landingGoApp: 'Prisijungti į sistemą',
         landingPath: 'Mūsų mažas namelis~',
         landingFormTitle: 'Užpildyk formą ir dalyvauk!',
         sponsorsTitle: 'Rėmėjai',
@@ -450,8 +446,6 @@ export const languages: Record<LanguageCode, Language> = {
         homeSubtitle: 'tavo renginio kampelis ✦',
 
         wikiSkip: 'Pereiti prie turinio',
-        wikiTopline: '✦ PIRMAKURSIŲ RENGINYS ✦',
-        wikiTaglineRight: '~ prisijungta prie mifverse ~',
         wikiLogoAlt: 'pirmakursiu renginio pradžia',
         wikiNavLabel: 'Pagrindinė navigacija',
         wikiFooter: '✦ sukurta pirmakursiu renginiui ✦',
