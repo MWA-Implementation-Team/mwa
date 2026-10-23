@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
-import Header from '#src/client/ui/Header.js';
+import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 
 export type Section =
     | 'home'
@@ -20,12 +20,18 @@ type PageShellProps = {
     title: string;
     section: Section;
     subtitle?: string;
+    nav?: boolean;
     children: ComponentChildren;
 };
 
-// Wiki-inspired presentation, while the existing Header retains the original app controls.
-// The visual styles live in wiki.css, imported by the project's main.css.
-export default function PageShell({ title, section, subtitle, children }: PageShellProps) {
+// Wiki-inspired presentation; the visual styles live in wiki.css.
+export default function PageShell({
+    title,
+    section,
+    subtitle,
+    nav = true,
+    children,
+}: PageShellProps) {
     const { t, user } = useContext(ClientContext);
 
     const navigation = [
@@ -55,30 +61,25 @@ export default function PageShell({ title, section, subtitle, children }: PageSh
                 </div>
 
                 <header class="mwa-wiki-brand">
-                    <a href="/app" class="mwa-wiki-logo" aria-label={t('wikiLogoAlt')}>
+                    <a href="/" class="mwa-wiki-logo" aria-label={t('wikiLogoAlt')}>
                         <img src="/3Logotipas.png" alt={t('wikiLogoAlt')} />
                     </a>
                     <p>{t('wikiTagline')}</p>
                 </header>
 
-                <nav class="mwa-wiki-nav" aria-label={t('wikiNavLabel')}>
-                    {navigation.map((item) => (
-                        <a
-                            key={item.section}
-                            href={item.href}
-                            aria-current={item.section === section ? 'page' : undefined}
-                        >
-                            {item.label}
-                        </a>
-                    ))}
-                </nav>
-
-                <details class="mwa-wiki-existing-menu">
-                    <summary>{t('wikiControls')}</summary>
-                    <div class="mwa-wiki-existing-menu-content">
-                        <Header />
-                    </div>
-                </details>
+                {nav && (
+                    <nav class="mwa-wiki-nav" aria-label={t('wikiNavLabel')}>
+                        {navigation.map((item) => (
+                            <a
+                                key={item.section}
+                                href={item.href}
+                                aria-current={item.section === section ? 'page' : undefined}
+                            >
+                                {item.label}
+                            </a>
+                        ))}
+                    </nav>
+                )}
 
                 <main id="mwa-wiki-main" class="mwa-wiki-main">
                     <div class="mwa-wiki-heading">
@@ -91,6 +92,7 @@ export default function PageShell({ title, section, subtitle, children }: PageSh
 
                 <footer class="mwa-wiki-footer">
                     <span>{t('wikiFooter')}</span>
+                    <LanguageToggle />
                     <a href="#mwa-wiki-main">{t('wikiBackTop')}</a>
                 </footer>
             </div>

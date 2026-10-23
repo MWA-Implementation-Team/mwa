@@ -83,6 +83,13 @@ function AccountPage({}: AccountPageProps) {
                 </div>
                 <div class="mwa-wiki-panel-body">
                     <p class="mwa-wiki-muted">{t('accountSettingsTodo')}</p>
+                    <form method="POST" action="/app">
+                        <div class="mwa-wiki-actions">
+                            <button type="submit" class="mwa-wiki-danger">
+                                {t('logOut')}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </section>
         </PageShell>

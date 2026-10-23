@@ -523,7 +523,9 @@
 .mwa-wiki-footer {
     margin-top: 22px;
     border-top: 1px dashed #8b5db0;
-    padding-top: 15px;
+    /* the base theme's global `footer` rule sets a green background and big padding */
+    background: transparent;
+    padding: 15px 0 0;
     text-align: center;
     font-size: 11px;
     color: var(--wiki-soft);
@@ -534,6 +536,11 @@
 }
 .mwa-wiki-footer a {
     color: var(--wiki-cyan);
+}
+.mwa-wiki-footer select {
+    width: auto;
+    min-height: 0;
+    padding: 4px 8px;
 }
 @media (min-width: 580px) {
     .mwa-wiki-frame {

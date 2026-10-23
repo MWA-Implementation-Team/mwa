@@ -25,7 +25,7 @@ export const loginPage: Page<LoginPageProps> = {
 function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
     const { t } = useContext(ClientContext);
     return (
-        <PageShell section="login" title={t('loginTitle')}>
+        <PageShell section="login" nav={false} title={t('loginTitle')}>
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-body">
                     {sentTo ? (

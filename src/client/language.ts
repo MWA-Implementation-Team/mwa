@@ -19,8 +19,6 @@ export type Language = {
     titleAdmin: string;
     titleError: string;
 
-    headerLanding: string;
-    headerLogin: string;
     headerHome: string;
     headerActivities: string;
     headerLeaderboard: string;
@@ -30,8 +28,6 @@ export type Language = {
     headerHost: string;
     headerAdmin: string;
 
-    menuTitle: string;
-    menuClose: string;
     logOut: string;
     logInSignUp: string;
 
@@ -58,19 +54,11 @@ export type Language = {
     landingHeroBody: string;
     landingRegister: string;
     landingSocialTitle: string;
-    landingNews1Title: string;
-    landingNews1Body: string;
-    landingNews2Title: string;
-    landingNews2Body: string;
     landingMapTitle: string;
     mapPlaceholder: string;
     landingFeedTitle: string;
-    landingFeedActive: string;
-    activitySlot: string;
-    activityDesc: string;
-    statusOpen: string;
-    statusBusy: string;
-    getInLine: string;
+    landingGoApp: string;
+    landingViewActivity: string;
     sponsorsTitle: string;
     sponsorsSubtitle: string;
 
@@ -122,7 +110,6 @@ export type Language = {
     wikiTagline: string;
     wikiLogoAlt: string;
     wikiNavLabel: string;
-    wikiControls: string;
     wikiFooter: string;
     wikiBackTop: string;
 
@@ -209,8 +196,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleAdmin: 'MWA | Admin',
         titleError: 'MWA | {status}',
 
-        headerLanding: 'Home',
-        headerLogin: 'Login',
         headerHome: 'App',
         headerActivities: 'Activities',
         headerLeaderboard: 'Leaderboard',
@@ -220,8 +205,6 @@ export const languages: Record<LanguageCode, Language> = {
         headerHost: 'Host tools',
         headerAdmin: 'Admin',
 
-        menuTitle: 'Menu',
-        menuClose: 'Close menu',
         logOut: 'Log out',
         logInSignUp: 'Log in / sign up',
 
@@ -248,20 +231,12 @@ export const languages: Record<LanguageCode, Language> = {
         landingHeroBody:
             'Sign up for the event, explore the activities and get in line for your favorites.',
         landingRegister: 'Register now',
-        landingSocialTitle: 'Social links & news',
-        landingNews1Title: 'News headline item 1',
-        landingNews1Body: 'Brief summary placeholder for event updates and news feed.',
-        landingNews2Title: 'News headline item 2',
-        landingNews2Body: 'Another short placeholder for upcoming event news.',
+        landingSocialTitle: 'Social links',
         landingMapTitle: 'Event map',
         mapPlaceholder: 'Map placeholder',
-        landingFeedTitle: 'Activities feed',
-        landingFeedActive: 'Active items',
-        activitySlot: 'Activity slot {n}',
-        activityDesc: 'Short description of this activity, attraction or schedule item.',
-        statusOpen: 'Open',
-        statusBusy: 'Busy',
-        getInLine: 'Get in line',
+        landingFeedTitle: 'Activities',
+        landingGoApp: 'Go to the app',
+        landingViewActivity: 'view →',
         sponsorsTitle: 'Sponsors',
         sponsorsSubtitle: 'Our generous sponsors',
 
@@ -313,7 +288,6 @@ export const languages: Record<LanguageCode, Language> = {
         wikiTagline: 'the event corner of the internet ☆',
         wikiLogoAlt: 'MWA Event home',
         wikiNavLabel: 'Main navigation',
-        wikiControls: 'site controls +',
         wikiFooter: '✦ made for the MWA event ✦',
         wikiBackTop: 'back to top ↑',
 
@@ -398,8 +372,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleAdmin: 'MWA | Administravimas',
         titleError: 'MWA | {status}',
 
-        headerLanding: 'Pradžia',
-        headerLogin: 'Prisijungimas',
         headerHome: 'Programa',
         headerActivities: 'Veiklos',
         headerLeaderboard: 'Lyderių lentelė',
@@ -409,8 +381,6 @@ export const languages: Record<LanguageCode, Language> = {
         headerHost: 'Vedėjo įrankiai',
         headerAdmin: 'Administravimas',
 
-        menuTitle: 'Meniu',
-        menuClose: 'Uždaryti meniu',
         logOut: 'Atsijungti',
         logInSignUp: 'Prisijungti / registruotis',
 
@@ -437,20 +407,12 @@ export const languages: Record<LanguageCode, Language> = {
         landingHeroTitle: 'MWA renginio registracija',
         landingHeroBody: 'Užsiregistruok į renginį, apžiūrėk veiklas ir užimk vietą eilėje.',
         landingRegister: 'Registruotis',
-        landingSocialTitle: 'Socialiniai tinklai ir naujienos',
-        landingNews1Title: 'Naujienų antraštė 1',
-        landingNews1Body: 'Trumpas renginio naujienų ir atnaujinimų santraukos pavyzdys.',
-        landingNews2Title: 'Naujienų antraštė 2',
-        landingNews2Body: 'Dar vienas trumpas artėjančių renginio naujienų pavyzdys.',
+        landingSocialTitle: 'Socialiniai tinklai',
         landingMapTitle: 'Renginio žemėlapis',
         mapPlaceholder: 'Žemėlapio vieta',
-        landingFeedTitle: 'Veiklų srautas',
-        landingFeedActive: 'Aktyvios veiklos',
-        activitySlot: 'Veikla nr. {n}',
-        activityDesc: 'Trumpas šios veiklos, atrakcijos ar programos punkto aprašymas.',
-        statusOpen: 'Atvira',
-        statusBusy: 'Užimta',
-        getInLine: 'Stoti į eilę',
+        landingFeedTitle: 'Veiklos',
+        landingGoApp: 'Į programą',
+        landingViewActivity: 'peržiūrėti →',
         sponsorsTitle: 'Rėmėjai',
         sponsorsSubtitle: 'Mūsų dosnūs rėmėjai',
 
@@ -502,7 +464,6 @@ export const languages: Record<LanguageCode, Language> = {
         wikiTagline: 'renginio kampelis internete ☆',
         wikiLogoAlt: 'MWA renginio pradžia',
         wikiNavLabel: 'Pagrindinė navigacija',
-        wikiControls: 'svetainės valdikliai +',
         wikiFooter: '✦ sukurta MWA renginiui ✦',
         wikiBackTop: 'atgal į viršų ↑',
 
