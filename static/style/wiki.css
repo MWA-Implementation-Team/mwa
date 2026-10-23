@@ -104,7 +104,7 @@
     color: var(--wiki-soft);
 }
 .mwa-wiki-brand {
-    padding: 21px 8px 13px;
+    padding: 21px 8px 4px;
     text-align: center;
 }
 .mwa-wiki-logo {
@@ -428,10 +428,10 @@
     flex-wrap: wrap;
 }
 .landing-register-icon {
-    width: 96px;
+    width: clamp(120px, 28%, 180px);
     height: auto;
     flex: none;
-    filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.55));
 }
 .landing-register-body {
     flex: 1;

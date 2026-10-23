@@ -29,13 +29,23 @@ export function SunMoonIcon(props: IconProps) {
 
 export function FormsIcon(props: IconProps) {
     return (
-        // Simplified Google Forms mark — purple document with white rule lines
+        // Simplified Google Forms mark — deep purple document with a folded corner
         <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-            <rect x="4" y="1.5" width="16" height="21" rx="2.2" fill="#7248B9" />
-            <rect x="8" y="6" width="8" height="1.6" rx="0.8" fill="#fff" />
-            <rect x="8" y="10" width="8" height="1.6" rx="0.8" fill="#fff" />
-            <rect x="8" y="14" width="5" height="1.6" rx="0.8" fill="#fff" />
-            <rect x="8" y="18" width="6.5" height="1.6" rx="0.8" fill="#fff" />
+            <defs>
+                <linearGradient id="forms-body" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#5b2da0" />
+                    <stop offset="1" stop-color="#2c1252" />
+                </linearGradient>
+            </defs>
+            <path
+                d="M6.8 1.2h9l4.5 4.5v15.5a1.8 1.8 0 0 1-1.8 1.8H6.8a1.8 1.8 0 0 1-1.8-1.8V3a1.8 1.8 0 0 1 1.8-1.8z"
+                fill="url(#forms-body)"
+            />
+            <path d="M15.8 1.2v4.5h4.5z" fill="#8b5cd6" />
+            <rect x="8.4" y="9" width="7.6" height="1.6" rx="0.8" fill="#d9c6ff" />
+            <rect x="8.4" y="12.6" width="7.6" height="1.6" rx="0.8" fill="#d9c6ff" />
+            <rect x="8.4" y="16.2" width="5" height="1.6" rx="0.8" fill="#d9c6ff" />
+            <rect x="8.4" y="19.4" width="6.2" height="1.6" rx="0.8" fill="#d9c6ff" />
         </svg>
     );
 }
