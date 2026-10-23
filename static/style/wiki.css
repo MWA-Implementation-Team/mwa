@@ -452,6 +452,24 @@
     line-height: 1.35;
     font-weight: 700;
 }
+.landing-socials {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0 0 0 min(45%, 240px);
+    display: grid;
+    gap: 8px;
+}
+.landing-socials li::before {
+    content: '· ';
+    color: var(--wiki-pink);
+}
+.landing-socials svg {
+    display: inline;
+    width: 14px;
+    height: 14px;
+    vertical-align: -2px;
+    margin-right: 4px;
+}
 .mwa-wiki-rows {
     list-style: none;
     padding: 0;

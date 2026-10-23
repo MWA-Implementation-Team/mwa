@@ -232,7 +232,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingHeroBody:
             'Sign up for the event, explore the activities and get in line for your favorites.',
         landingRegister: 'Register now',
-        landingSocialTitle: 'Social links',
+        landingSocialTitle: 'Follow us here!',
         landingMapTitle: 'Event map',
         mapPlaceholder: 'Map placeholder',
         landingFeedTitle: 'Activities',
@@ -409,7 +409,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingHeroTitle: 'MWA renginio registracija',
         landingHeroBody: 'Užsiregistruok į renginį, apžiūrėk veiklas ir užimk vietą eilėje.',
         landingRegister: 'Registruotis',
-        landingSocialTitle: 'Socialiniai tinklai',
+        landingSocialTitle: 'Sekite mus čia!',
         landingMapTitle: 'Renginio žemėlapis',
         mapPlaceholder: 'Žemėlapio vieta',
         landingFeedTitle: 'Veiklos',

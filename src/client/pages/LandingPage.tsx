@@ -63,13 +63,15 @@ function LandingPage({}: LandingPageProps) {
                     <h2>{t('landingSocialTitle')}</h2>
                 </div>
                 <div class="mwa-wiki-panel-body">
-                    <div class="mwa-wiki-actions">
+                    <ul class="landing-socials">
                         {socials.map(({ Icon, name }) => (
-                            <a key={name} href="#" class="mwa-wiki-button" aria-label={name}>
-                                <Icon /> {name}
-                            </a>
+                            <li key={name}>
+                                <a href="#">
+                                    <Icon /> {name.toLowerCase()}
+                                </a>
+                            </li>
                         ))}
-                    </div>
+                    </ul>
                 </div>
             </section>
 
