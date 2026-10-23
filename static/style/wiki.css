@@ -410,12 +410,19 @@
 .landing-section {
     padding: 0 14px;
 }
+.landing-section + .landing-section {
+    margin-top: 26px;
+}
 .landing-section > h2 {
     color: var(--wiki-white);
     font-size: 15px;
     border-bottom: 1px dashed #8b5db0;
     padding-bottom: 8px;
     margin-bottom: 12px;
+}
+.landing-section > h2::before {
+    content: '✦ ';
+    color: var(--wiki-orange);
 }
 .landing-register {
     display: flex;
