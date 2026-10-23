@@ -21,6 +21,7 @@ type PageShellProps = {
     section: Section;
     subtitle?: string;
     nav?: boolean;
+    path?: string;
     children: ComponentChildren;
 };
 
@@ -30,6 +31,7 @@ export default function PageShell({
     section,
     subtitle,
     nav = true,
+    path,
     children,
 }: PageShellProps) {
     const { t, user } = useContext(ClientContext);
@@ -64,7 +66,6 @@ export default function PageShell({
                     <a href="/" class="mwa-wiki-logo" aria-label={t('wikiLogoAlt')}>
                         <img src="/3Logotipas.png" alt={t('wikiLogoAlt')} />
                     </a>
-                    <p>{t('wikiTagline')}</p>
                 </header>
 
                 {nav && (
@@ -83,7 +84,7 @@ export default function PageShell({
 
                 <main id="mwa-wiki-main" class="mwa-wiki-main">
                     <div class="mwa-wiki-heading">
-                        <p class="mwa-wiki-path">/mwa/{section}/</p>
+                        <p class="mwa-wiki-path">{path ?? `/mwa/${section}/`}</p>
                         <h1>{title}</h1>
                         {subtitle && <p class="mwa-wiki-subtitle">{subtitle}</p>}
                     </div>

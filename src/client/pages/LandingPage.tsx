@@ -2,7 +2,13 @@ import { useContext } from 'preact/hooks';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
 import { ActivitySlug, Activity, registeredActivities } from '#src/client/activities.js';
-import { FacebookIcon, InstagramIcon, LinkedinIcon, TwitterIcon } from '#src/client/ui/icons.js';
+import {
+    FacebookIcon,
+    FormsIcon,
+    InstagramIcon,
+    LinkedinIcon,
+    TwitterIcon,
+} from '#src/client/ui/icons.js';
 import PageShell from './app/PageShell.js';
 
 type LandingPageProps = {};
@@ -28,21 +34,26 @@ function LandingPage({}: LandingPageProps) {
         <PageShell
             section="landing"
             nav={false}
+            path={t('landingPath')}
             title={t('landingHeroTitle')}
             subtitle={t('landingHeroBody')}
         >
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-body">
-                    <div class="mwa-wiki-actions">
-                        {user ? (
-                            <a href="/app" class="mwa-wiki-button mwa-wiki-button--primary">
-                                {t('landingGoApp')}
-                            </a>
-                        ) : (
-                            <a href="/login" class="mwa-wiki-button mwa-wiki-button--primary">
-                                {t('logInSignUp')}
-                            </a>
-                        )}
+                    <div class="landing-register">
+                        <FormsIcon class="landing-register-icon" aria-hidden="true" />
+                        <div class="landing-register-body">
+                            <p class="landing-register-text">{t('landingFormTitle')}</p>
+                            {user ? (
+                                <a href="/app" class="mwa-wiki-button mwa-wiki-button--primary">
+                                    {t('landingGoApp')}
+                                </a>
+                            ) : (
+                                <a href="/login" class="mwa-wiki-button mwa-wiki-button--primary">
+                                    {t('landingRegister')}
+                                </a>
+                            )}
+                        </div>
                     </div>
                 </div>
             </section>

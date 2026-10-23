@@ -27,6 +27,19 @@ export function SunMoonIcon(props: IconProps) {
     );
 }
 
+export function FormsIcon(props: IconProps) {
+    return (
+        // Simplified Google Forms mark — purple document with white rule lines
+        <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+            <rect x="4" y="1.5" width="16" height="21" rx="2.2" fill="#7248B9" />
+            <rect x="8" y="6" width="8" height="1.6" rx="0.8" fill="#fff" />
+            <rect x="8" y="10" width="8" height="1.6" rx="0.8" fill="#fff" />
+            <rect x="8" y="14" width="5" height="1.6" rx="0.8" fill="#fff" />
+            <rect x="8" y="18" width="6.5" height="1.6" rx="0.8" fill="#fff" />
+        </svg>
+    );
+}
+
 function strokeIcon(props: IconProps, children: ComponentChildren) {
     return (
         <svg

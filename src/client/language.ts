@@ -59,6 +59,8 @@ export type Language = {
     landingFeedTitle: string;
     landingGoApp: string;
     landingViewActivity: string;
+    landingPath: string;
+    landingFormTitle: string;
     sponsorsTitle: string;
     sponsorsSubtitle: string;
 
@@ -107,7 +109,6 @@ export type Language = {
     wikiSkip: string;
     wikiTopline: string;
     wikiTaglineRight: string;
-    wikiTagline: string;
     wikiLogoAlt: string;
     wikiNavLabel: string;
     wikiFooter: string;
@@ -237,6 +238,8 @@ export const languages: Record<LanguageCode, Language> = {
         landingFeedTitle: 'Activities',
         landingGoApp: 'Go to the app',
         landingViewActivity: 'view →',
+        landingPath: 'Our small home~',
+        landingFormTitle: 'Fill our form to participate!',
         sponsorsTitle: 'Sponsors',
         sponsorsSubtitle: 'Our generous sponsors',
 
@@ -285,7 +288,6 @@ export const languages: Record<LanguageCode, Language> = {
         wikiSkip: 'Skip to content',
         wikiTopline: '✦ MWA EVENT ✦',
         wikiTaglineRight: '~ connected to the mifverse ~',
-        wikiTagline: 'the event corner of the internet ☆',
         wikiLogoAlt: 'MWA Event home',
         wikiNavLabel: 'Main navigation',
         wikiFooter: '✦ made for the MWA event ✦',
@@ -413,6 +415,8 @@ export const languages: Record<LanguageCode, Language> = {
         landingFeedTitle: 'Veiklos',
         landingGoApp: 'Į programą',
         landingViewActivity: 'peržiūrėti →',
+        landingPath: 'Mūsų mažas namelis~',
+        landingFormTitle: 'Užpildyk formą ir dalyvauk!',
         sponsorsTitle: 'Rėmėjai',
         sponsorsSubtitle: 'Mūsų dosnūs rėmėjai',
 
@@ -461,7 +465,6 @@ export const languages: Record<LanguageCode, Language> = {
         wikiSkip: 'Pereiti prie turinio',
         wikiTopline: '✦ MWA RENGINYS ✦',
         wikiTaglineRight: '~ prisijungta prie mifverse ~',
-        wikiTagline: 'renginio kampelis internete ☆',
         wikiLogoAlt: 'MWA renginio pradžia',
         wikiNavLabel: 'Pagrindinė navigacija',
         wikiFooter: '✦ sukurta MWA renginiui ✦',

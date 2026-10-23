@@ -421,6 +421,31 @@
 .mwa-wiki input::placeholder {
     color: #afa4cb;
 }
+.landing-register {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+.landing-register-icon {
+    width: 96px;
+    height: auto;
+    flex: none;
+    filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.5));
+}
+.landing-register-body {
+    flex: 1;
+    min-width: 200px;
+    display: grid;
+    gap: 14px;
+    justify-items: start;
+}
+.landing-register-text {
+    color: var(--wiki-pink);
+    font-size: 20px;
+    line-height: 1.35;
+    font-weight: 700;
+}
 .mwa-wiki-rows {
     list-style: none;
     padding: 0;
