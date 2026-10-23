@@ -6,11 +6,14 @@ The app uses Oat as its base framework. App-specific styles live in
 ## Where styles go
 
 `static/style/main.css` is the entry point — it `@import`s `tokens.css`, `base.css`,
-and every file in `components/`.
+every file in `components/` and `pages/`, and `wiki.css` last.
 
 - `tokens.css` — shared colors, spacing, and other variables.
 - `base.css` — page-wide defaults and layout rules.
 - `components/` — styles for reusable components.
+- `pages/` — page-specific styles (landing, dashboard, host).
+- `wiki.css` — the `mwa-wiki-*` design system used by `PageShell`. Loaded last so
+  it wins over the base theme; it is scoped to elements inside `.mwa-wiki`.
 - `main.css` — imports the other style files.
 
 Use tokens instead of repeating values:
