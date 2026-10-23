@@ -23,9 +23,21 @@ export function registerGamblingRoutes(app: MwaHono) {
         const games = queryGamblingSessions(ctx.var);
         const invitations = queryGamblingInvitations(ctx.var, user.id);
 
+        const error = ctx.req.query('error');
+        let message: string | undefined;
+        switch (error) {
+            case 'no_user':
+                message = 'user not found';
+                break;
+            case 'broke':
+                message = 'broke boy';
+                break;
+        }
+
         return writePage(ctx, 'gambling', {
             sessions: games,
             invitations,
+            message,
         });
     });
 
@@ -40,27 +52,12 @@ export function registerGamblingRoutes(app: MwaHono) {
             return ctx.text(translate(lang)('badRequest'), 400);
         }
 
-        const sessions = queryGamblingSessions(ctx.var);
-        const invitations = queryGamblingInvitations(ctx.var, user.id);
-
         const opponentUsername = String(form.get('opponent') ?? '');
 
         const opponent = findUserByUsername(ctx.var, opponentUsername);
         // TODO: query errors
-        if (!opponent) {
-            return writePage(ctx, 'gambling', {
-                sessions,
-                invitations,
-                message: 'no user',
-            });
-        }
-
-        if (user.id === opponent.id) {
-            return writePage(ctx, 'gambling', {
-                sessions,
-                invitations,
-                message: 'idiot',
-            });
+        if (!opponent || user.id === opponent.id) {
+            return ctx.redirect(`/app/gambling?error=no_user`);
         }
 
         const id = initGamblingSession(ctx.var, 'coin_flip', {
@@ -69,11 +66,7 @@ export function registerGamblingRoutes(app: MwaHono) {
             betAmount: 500,
         });
         if (id === null) {
-            return writePage(ctx, 'gambling', {
-                sessions,
-                invitations,
-                message: 'ur too broke',
-            });
+            return ctx.redirect(`/app/gambling?error=broke`);
         }
         console.log('game id', id);
 
