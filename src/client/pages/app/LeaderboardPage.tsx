@@ -1,12 +1,9 @@
-import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 import PageShell from './PageShell.js';
 
 export type LeaderboardType = 'team' | 'group';
 
-type LeaderboardPageProps = {
-    type: LeaderboardType;
-};
+type LeaderboardPageProps = { type: LeaderboardType };
 
 export const leaderboardPage: Page<LeaderboardPageProps> = {
     Component: LeaderboardPage,
@@ -15,22 +12,17 @@ export const leaderboardPage: Page<LeaderboardPageProps> = {
 
 function LeaderboardPage({ type }: LeaderboardPageProps) {
     return (
-        <>
-            <Header />
-            <PageShell title="Leaderboard" subtitle="Switch between team and group rankings.">
-                <section class="mwa-panel">
-                    <nav class="mwa-tabbar" aria-label="Leaderboard type">
-                        <a class={type === 'team' ? 'is-active' : ''} href="/app/leaderboard?type=team" aria-current={type === 'team' ? 'page' : undefined}>Team</a>
-                        <a class={type === 'group' ? 'is-active' : ''} href="/app/leaderboard?type=group" aria-current={type === 'group' ? 'page' : undefined}>Group</a>
-                    </nav>
-                    <div class="mwa-panel-body">
-                        <div class="mwa-empty">
-                            <h3>{type === 'team' ? 'Team leaderboard' : 'Group leaderboard'}</h3>
-                            <p>TODO: {type} leaderboard.</p>
-                        </div>
-                    </div>
-                </section>
-            </PageShell>
-        </>
+        <PageShell section="leaderboard" title="leaderboard" subtitle="standingz & rankings ✦">
+            <nav class="mwa-wiki-tabbar" aria-label="Leaderboard type">
+                <a href="/app/leaderboard?type=team" aria-current={type === 'team' ? 'page' : undefined}>team</a>
+                <a href="/app/leaderboard?type=group" aria-current={type === 'group' ? 'page' : undefined}>group</a>
+            </nav>
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head"><h2>☆ {type} rankings</h2></div>
+                <div class="mwa-wiki-panel-body">
+                    <p class="mwa-wiki-muted">TODO: {type} leaderboard.</p>
+                </div>
+            </section>
+        </PageShell>
     );
 }

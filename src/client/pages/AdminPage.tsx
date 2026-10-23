@@ -1,4 +1,3 @@
-import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 import PageShell from './PageShell.js';
 
@@ -11,16 +10,11 @@ export const adminPage: Page<AdminPageProps> = {
 
 function AdminPage({}: AdminPageProps) {
     return (
-        <>
-            <Header />
-            <PageShell title="Admin" subtitle="Event administration and tools.">
-                <section class="mwa-panel">
-                    <div class="mwa-panel-heading"><h2>Administration</h2><span class="mwa-badge">Not configured</span></div>
-                    <div class="mwa-panel-body">
-                        <div class="mwa-empty"><h3>Admin panel</h3><p>TODO: admin panel.</p></div>
-                    </div>
-                </section>
-            </PageShell>
-        </>
+        <PageShell section="admin" title="admin panel" subtitle="control panel · under construction">
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head"><h2>☆ administration</h2></div>
+                <div class="mwa-wiki-panel-body"><p class="mwa-wiki-muted">TODO: admin panel.</p></div>
+            </section>
+        </PageShell>
     );
 }

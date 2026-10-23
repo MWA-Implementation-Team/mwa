@@ -8,6 +8,7 @@
     --card-foreground: light-dark(#000000, #f8fafc);
 
     --primary: #2563eb; /* Accent Blue (used for buttons & links) */
+    --secondary: #0034a4; /* Accent Blue (used for buttons & links) */
     --primary-foreground: #ffffff; /* Text on primary buttons: White */
 
     --muted-foreground: light-dark(#475569, #94a3b8); /* Muted text color */

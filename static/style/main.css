@@ -1,14 +1,9 @@
-/*
-    Design tokens and variables
-    Overrides oat.css (if needed), defaults and defines global constants
-*/
+/* Original tokens and Oat-compatible base rules */
 @import './tokens.css';
-
-/* 
-    Base styles and layout
-    Global element resets, body defaults and app wrapper layout
-*/
 @import './base.css';
 
-/* Components */
+/* Existing buttons stay blue and inherit your tokens */
 @import './components/button.css';
+
+/* Scoped MWA wiki-styled pages; load after existing components */
+@import './wiki.css';
