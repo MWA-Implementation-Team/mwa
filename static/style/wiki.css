@@ -178,18 +178,16 @@
     text-align: center;
 }
 .mwa-wiki-divider {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--wiki-pink);
     margin-bottom: 10px;
-    font-size: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: 1px;
+    transform: scaleX(-1);
 }
-.mwa-wiki-divider::before,
-.mwa-wiki-divider::after {
-    content: '';
-    flex: 1;
-    border-top: 1px dashed #8b5db0;
+.mwa-wiki-divider::before {
+    content: '🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛';
 }
 .mwa-wiki-path {
     color: #5c3f9a;
@@ -411,7 +409,18 @@
     padding: 0 14px;
 }
 .landing-section + .landing-section {
-    margin-top: 46px;
+    margin-top: 40px;
+}
+.landing-section + .landing-section::before {
+    content: '🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛🐈‍⬛';
+    display: block;
+    margin-bottom: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: 1px;
+    transform: scaleX(-1);
 }
 .landing-section > h2 {
     color: var(--wiki-white);
@@ -419,10 +428,6 @@
     border-bottom: 1px dashed #8b5db0;
     padding-bottom: 8px;
     margin-bottom: 12px;
-}
-.landing-section > h2::before {
-    content: '✦ ';
-    color: var(--wiki-orange);
 }
 .landing-register {
     display: flex;
@@ -530,12 +535,9 @@
 .mwa-wiki-directory a {
     text-decoration: none;
     display: block;
-    border: 1px solid #6b4ea2;
-    background: var(--wiki-panel-light);
 }
 .mwa-wiki-directory a:hover {
-    border-color: var(--wiki-pink);
-    background: rgba(84, 35, 131, 0.6);
+    filter: brightness(1.12);
 }
 .mwa-wiki-directory a > * {
     max-width: 100%;
