@@ -1,9 +1,9 @@
 import { requireUser } from '#src/auth.js';
 import { translate } from '#src/client/language.js';
-import { acceptGamblingSession, findGamblingSessionById, giveCoins, initCoinFlip, queryGamblingInvitations, queryGamblingSessions, rejectGamblingSession, winCoinFlip, winGamblingSession } from '#src/db/gambling.js';
+import { acceptGamblingSession, findGamblingSessionById, giveCoins, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
 import { findUserByUsername } from '#src/db/users.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
-import { MwaHono } from '#src/state.js';
+import { MwaHono, MwaState } from '#src/state.js';
 import { getRequestLanguage } from '#src/utils.js';
 
 export function registerGamblingRoutes(app: MwaHono) {
@@ -142,7 +142,10 @@ export function registerGamblingRoutes(app: MwaHono) {
             return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(sessionId)}?error=broke`);
         }
 
-        winCoinFlip(ctx.var, sessionId);
+        scheduleCoinFlipWinner(ctx.var, {
+            sessionId,
+            acceptedTime: new Date(),
+        });
 
         return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(sessionId)}`);
     });
@@ -162,27 +165,18 @@ export function registerGamblingRoutes(app: MwaHono) {
         rejectGamblingSession(ctx.var, gameId, user.id);
         return ctx.redirect('/app/gambling');
     });
-
-    app.post('/app/gambling/sessions/:id/win', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        //const lang = getRequestLanguage(ctx);
-
-        const form = await ctx.req.formData().catch(() => null);
-        if (!form) {
-            return writeErrorPage(ctx, 400);
-        }
-
-        const gameId = Number(ctx.req.param('id'));
-        const game = findGamblingSessionById(ctx.var, gameId);
-        if (!game) {
-            return writeErrorPage(ctx, 404);
-        }
-
-        winGamblingSession(ctx.var, gameId, game.p1 === user.id ? 'p1' : 'p2');
-
-        return ctx.redirect('/app/gambling');
-    });
 }
 
+export function scheduleGamblingTimers(state: MwaState) {
+    const coinFlips = queryPendingCoinFlips(state);
+    coinFlips.forEach(flip => scheduleCoinFlipWinner(state, flip));
+}
+
+function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
+    const flipTimeMs = pending.acceptedTime.getTime() + 10000;
+    const remainingMs = flipTimeMs - Date.now();
+
+    setTimeout(() => {
+        winCoinFlip(state, pending.sessionId);
+    }, remainingMs);
+}

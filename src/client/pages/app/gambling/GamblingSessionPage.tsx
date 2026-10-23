@@ -71,7 +71,7 @@ function GamblingSessionPage(props: GamblingSessionPageProps) {
             )
         }
         case 'running': {
-            const { id, game, winner } = props;
+            const { game, winner } = props;
             return (
                 <>
                     <h1>imagine coin flip here</h1>
@@ -80,9 +80,7 @@ function GamblingSessionPage(props: GamblingSessionPageProps) {
                     </span>
                     <span>Type: {game.type}</span>
                     {winner ? <h1>WINNER: {winner}</h1> : (
-                        <form method="POST">
-                            <button formaction={`/app/gambling/sessions/${id}/win`} type="submit">Win</button>
-                        </form>
+                        <h1>FLIPPING COIN</h1>
                     )}
                 </>
             )

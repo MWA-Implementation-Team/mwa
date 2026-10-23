@@ -13,7 +13,7 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import { csrf } from 'hono/csrf';
 import { HTTPException } from 'hono/http-exception';
 import { MwaHono, createDefaultMwaState, setupHonoState } from './state.js';
-import { registerGamblingRoutes } from './routes/pages/gambling.js';
+import { registerGamblingRoutes, scheduleGamblingTimers } from './routes/pages/gambling.js';
 
 const isDevMode: boolean = process.argv[2] === '--dev';
 if (isDevMode) {
@@ -26,6 +26,8 @@ const state = createDefaultMwaState(isDevMode);
 
 // Insert the registry's activity slugs so queue/badge rows can foreign-key them
 syncActivities(state);
+
+scheduleGamblingTimers(state);
 
 const app: MwaHono = new Hono();
 setupHonoState(app, state);

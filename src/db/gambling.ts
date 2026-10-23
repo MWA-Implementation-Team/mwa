@@ -281,3 +281,23 @@ export function winCoinFlip(state: MwaState, sessionId: number) {
 
     winGamblingSession(state, sessionId, winner);
 }
+
+export type PendingCoinFlip = {
+    sessionId: number,
+    acceptedTime: Date,
+};
+
+export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
+    const select = state.prepare(`
+    SELECT sessions.id AS session_id, tx.created_at AS accepted_at FROM coin_flip_games
+    LEFT JOIN gambling_sessions AS sessions ON sessions.id = coin_flip_games.session
+    LEFT JOIN parent_transactions AS tx ON tx.id = sessions.p2_deposit_tx
+    WHERE sessions.winner_tx IS NULL
+    `);
+    return select.all().map(row => {
+        return {
+            sessionId: row.session_id as number,
+            acceptedTime: new Date(row.accepted_at as string),
+        };
+    });
+}
