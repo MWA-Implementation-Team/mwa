@@ -6,6 +6,7 @@ import { createSession } from '#src/db/sessions.js';
 import { createGroup } from '#src/db/groups.js';
 import { joinQueue } from '#src/db/queue.js';
 import { registerHostRoutes } from './host.js';
+import { registerAppRoutes } from '../pages/app.js';
 import { createTestMwaState, MwaHono, setupHonoState } from '#src/state.js';
 
 const state = createTestMwaState({});
@@ -13,6 +14,7 @@ const state = createTestMwaState({});
 const app: MwaHono = new Hono();
 setupHonoState(app, state);
 registerHostRoutes(app);
+registerAppRoutes(app);
 
 state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('cells')`).run();
 
@@ -124,5 +126,31 @@ describe('/api/host', () => {
             body: JSON.stringify({ entryId: called[0].id }),
         });
         assert.equal(again.status, 404);
+    });
+});
+
+describe('GET /app/host', () => {
+    it('redirects anonymous visitors to login', async () => {
+        const res = await app.request('/app/host');
+        assert.equal(res.status, 303);
+        assert.match(res.headers.get('location') ?? '', /\/login\?goto=%2Fapp%2Fhost/);
+    });
+
+    it('403s regular users', async () => {
+        const user = createUser(state, 'puser@example.com', 'puser');
+        const res = await app.request('/app/host', { headers: authCookie(user.id) });
+        assert.equal(res.status, 403);
+    });
+
+    it('renders the station picker and queue for hosts', async () => {
+        const h = host();
+        queuedGroup();
+
+        const res = await app.request('/app/host', { headers: authCookie(h.id) });
+        assert.equal(res.status, 200);
+        const html = await res.text();
+        assert.match(html, /Host tools/);
+        assert.match(html, /<select/);
+        assert.match(html, /host queue group/);
     });
 });
