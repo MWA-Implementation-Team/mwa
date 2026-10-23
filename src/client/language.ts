@@ -114,14 +114,6 @@ export type Language = {
     emailLoginCode: string;
     emailLoginFallback: string;
     emailLoginExpiry: string;
-
-    loginHeading: string;
-    loginSent: string;
-    signupSent: string;
-    loginCodePlaceholder: string;
-    loginVerifyCode: string;
-    logout: string;
-    usersLoginRequired: string;
 };
 
 export const languages: Record<LanguageCode, Language> = {
@@ -238,14 +230,6 @@ export const languages: Record<LanguageCode, Language> = {
         emailLoginCode: 'Or enter this code on the login page:',
         emailLoginFallback: "If the button doesn't work, paste this link into your browser:",
         emailLoginExpiry: 'The link and code expire in 15 minutes.',
-
-        loginHeading: 'Login with email',
-        loginSent: 'We sent a login link to {email}.',
-        signupSent: 'We sent a signup link to {email} — click it to create your account.',
-        loginCodePlaceholder: 'Code from the email',
-        loginVerifyCode: 'Verify code',
-        logout: 'Logout',
-        usersLoginRequired: 'Log in to see users.',
     },
     lt: {
         displayName: 'Lietuvių',
@@ -362,15 +346,6 @@ export const languages: Record<LanguageCode, Language> = {
         emailLoginCode: 'Arba prisijungimo puslapyje įveskite šį kodą:',
         emailLoginFallback: 'Jei mygtukas neveikia, įklijuokite šią nuorodą į naršyklę:',
         emailLoginExpiry: 'Nuoroda ir kodas galioja 15 minučių.',
-
-        loginHeading: 'Prisijungti el. paštu',
-        loginSent: 'Prisijungimo nuorodą išsiuntėme adresu {email}.',
-        signupSent:
-            'Registracijos nuorodą išsiuntėme adresu {email} — spustelėkite ją, kad sukurtumėte paskyrą.',
-        loginCodePlaceholder: 'Kodas iš el. laiško',
-        loginVerifyCode: 'Patvirtinti kodą',
-        logout: 'Atsijungti',
-        usersLoginRequired: 'Prisijunkite, kad matytumėte naudotojus.',
     },
 };
 
