@@ -82,7 +82,6 @@ export default function PageShell({
 
                 <main id="mwa-wiki-main" class="mwa-wiki-main">
                     <div class="mwa-wiki-heading">
-                        <div class="mwa-wiki-divider" aria-hidden="true" />
                         <h1>{title}</h1>
                         {subtitle && <p class="mwa-wiki-subtitle">{subtitle}</p>}
                     </div>
