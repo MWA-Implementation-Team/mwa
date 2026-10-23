@@ -428,14 +428,20 @@
     flex-wrap: wrap;
 }
 .landing-register-icon {
-    width: clamp(120px, 28%, 180px);
+    width: 45%;
+    max-width: 220px;
     height: auto;
     flex: none;
     filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.55));
 }
+@media (min-width: 580px) {
+    .landing-register-icon {
+        width: 220px;
+    }
+}
 .landing-register-body {
     flex: 1;
-    min-width: 200px;
+    min-width: 150px;
     display: grid;
     gap: 14px;
     justify-items: start;

@@ -42,10 +42,12 @@ export function FormsIcon(props: IconProps) {
                 fill="url(#forms-body)"
             />
             <path d="M15.8 1.2v4.5h4.5z" fill="#8b5cd6" />
-            <rect x="8.4" y="9" width="7.6" height="1.6" rx="0.8" fill="#d9c6ff" />
-            <rect x="8.4" y="12.6" width="7.6" height="1.6" rx="0.8" fill="#d9c6ff" />
-            <rect x="8.4" y="16.2" width="5" height="1.6" rx="0.8" fill="#d9c6ff" />
-            <rect x="8.4" y="19.4" width="6.2" height="1.6" rx="0.8" fill="#d9c6ff" />
+            <g fill="#d9c6ff" opacity="0.45">
+                <rect x="8.4" y="9" width="7.6" height="1.6" rx="0.8" />
+                <rect x="8.4" y="12.6" width="7.6" height="1.6" rx="0.8" />
+                <rect x="8.4" y="16.2" width="5" height="1.6" rx="0.8" />
+                <rect x="8.4" y="19.4" width="6.2" height="1.6" rx="0.8" />
+            </g>
         </svg>
     );
 }
