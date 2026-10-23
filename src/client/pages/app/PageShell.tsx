@@ -87,7 +87,9 @@ export default function PageShell({
 
                 <main id="mwa-wiki-main" class="mwa-wiki-main">
                     <div class="mwa-wiki-heading">
-                        <p class="mwa-wiki-path">{path ?? `/mwa/${section}/`}</p>
+                        <div class="mwa-wiki-divider" aria-hidden="true">
+                            ✦
+                        </div>
                         <h1>{title}</h1>
                         {subtitle && <p class="mwa-wiki-subtitle">{subtitle}</p>}
                     </div>
@@ -99,6 +101,7 @@ export default function PageShell({
                     <LanguageToggle />
                     <a href="#mwa-wiki-main">{t('wikiBackTop')}</a>
                 </footer>
+                <p class="mwa-wiki-path">{path ?? `/mwa/${section}/`}</p>
             </div>
         </div>
     );

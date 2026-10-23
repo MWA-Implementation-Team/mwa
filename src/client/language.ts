@@ -224,7 +224,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailBalance: 'Balance',
         interactDetailJoined: 'Joined',
 
-        landingHeroTitle: 'first years event registration',
+        landingHeroTitle: 'First years event registration',
         landingFormLink: 'link to google forms',
         landingSocialTitle: 'Follow us here!',
         landingFeedTitle: 'Activities',
@@ -397,7 +397,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailBalance: 'Balansas',
         interactDetailJoined: 'Prisijungė',
 
-        landingHeroTitle: 'pirmakursiu renginio registracija',
+        landingHeroTitle: 'Pirmakursiu renginio registracija',
         landingFormLink: 'nuoroda į google formą',
         landingSocialTitle: 'Sekite mus čia!',
         landingFeedTitle: 'Veiklos',
