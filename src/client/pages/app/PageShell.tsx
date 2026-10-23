@@ -22,6 +22,7 @@ type PageShellProps = {
     subtitle?: string;
     nav?: boolean;
     path?: string;
+    cta?: ComponentChildren;
     children: ComponentChildren;
 };
 
@@ -32,6 +33,7 @@ export default function PageShell({
     subtitle,
     nav = true,
     path,
+    cta,
     children,
 }: PageShellProps) {
     const { t, user } = useContext(ClientContext);
@@ -66,6 +68,7 @@ export default function PageShell({
                     <a href="/" class="mwa-wiki-logo" aria-label={t('wikiLogoAlt')}>
                         <img src="/3Logotipas.png" alt={t('wikiLogoAlt')} />
                     </a>
+                    {cta && <div class="mwa-wiki-brand-cta">{cta}</div>}
                 </header>
 
                 {nav && (

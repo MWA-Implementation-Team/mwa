@@ -115,6 +115,9 @@
     max-width: min(100%, 350px);
     text-decoration: none !important;
 }
+.mwa-wiki-brand-cta {
+    margin-top: 12px;
+}
 .mwa-wiki-logo img {
     display: block;
     width: auto;

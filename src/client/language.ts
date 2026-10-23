@@ -52,7 +52,7 @@ export type Language = {
 
     landingHeroTitle: string;
     landingHeroBody: string;
-    landingRegister: string;
+    landingFormLink: string;
     landingSocialTitle: string;
     landingFeedTitle: string;
     landingGoApp: string;
@@ -228,7 +228,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingHeroTitle: 'MWA event registration',
         landingHeroBody:
             'Sign up for the event, explore the activities and get in line for your favorites.',
-        landingRegister: 'Register now',
+        landingFormLink: 'link to google forms',
         landingSocialTitle: 'Follow us here!',
         landingFeedTitle: 'Activities',
         landingGoApp: 'Go to the app',
@@ -402,7 +402,7 @@ export const languages: Record<LanguageCode, Language> = {
 
         landingHeroTitle: 'MWA renginio registracija',
         landingHeroBody: 'Užsiregistruok į renginį, apžiūrėk veiklas ir užimk vietą eilėje.',
-        landingRegister: 'Registruotis',
+        landingFormLink: 'nuoroda į google formą',
         landingSocialTitle: 'Sekite mus čia!',
         landingFeedTitle: 'Veiklos',
         landingGoApp: 'Į programą',

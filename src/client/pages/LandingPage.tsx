@@ -37,6 +37,13 @@ function LandingPage({}: LandingPageProps) {
             path={t('landingPath')}
             title={t('landingHeroTitle')}
             subtitle={t('landingHeroBody')}
+            cta={
+                user && (
+                    <a href="/app" class="mwa-wiki-button mwa-wiki-button--primary">
+                        {t('landingGoApp')}
+                    </a>
+                )
+            }
         >
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-body">
@@ -44,15 +51,7 @@ function LandingPage({}: LandingPageProps) {
                         <FormsIcon class="landing-register-icon" aria-hidden="true" />
                         <div class="landing-register-body">
                             <p class="landing-register-text">{t('landingFormTitle')}</p>
-                            {user ? (
-                                <a href="/app" class="mwa-wiki-button mwa-wiki-button--primary">
-                                    {t('landingGoApp')}
-                                </a>
-                            ) : (
-                                <a href="/login" class="mwa-wiki-button mwa-wiki-button--primary">
-                                    {t('landingRegister')}
-                                </a>
-                            )}
+                            <a href="#">{t('landingFormLink')}</a>
                         </div>
                     </div>
                 </div>
