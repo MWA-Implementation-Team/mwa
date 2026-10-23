@@ -68,7 +68,7 @@ function LandingPage({}: LandingPageProps) {
                         {socials.map(({ Icon, name }) => (
                             <li key={name}>
                                 <a href="#">
-                                    <Icon /> {name}
+                                    <Icon /> <span>{name}</span>
                                 </a>
                             </li>
                         ))}

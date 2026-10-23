@@ -469,8 +469,19 @@
     gap: 8px;
 }
 .landing-socials li::before {
-    content: '· ';
+    content: '•';
     color: var(--wiki-pink);
+    font-size: 22px;
+    line-height: 0;
+    margin-right: 8px;
+    vertical-align: -2px;
+}
+.landing-socials a {
+    text-decoration: none;
+}
+.landing-socials a span {
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 .landing-socials svg {
     display: inline;
