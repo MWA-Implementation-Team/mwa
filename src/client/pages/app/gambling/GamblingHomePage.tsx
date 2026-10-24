@@ -4,7 +4,6 @@ import { Invitation, SessionSummary } from '#src/db/gambling.js';
 type GamblingPageProps = {
     sessions: SessionSummary[];
     invitations: Invitation[],
-    message?: string;
 };
 
 export const gamblingPage: Page<GamblingPageProps> = {
@@ -12,7 +11,7 @@ export const gamblingPage: Page<GamblingPageProps> = {
     title: (t) => t('titleGambling'),
 };
 
-function GamblingPage({ sessions, invitations, message }: GamblingPageProps) {
+function GamblingPage({ sessions, invitations }: GamblingPageProps) {
     return (
         <>
             <h1>Invitations</h1>
@@ -34,13 +33,6 @@ function GamblingPage({ sessions, invitations, message }: GamblingPageProps) {
                     <span>Type: {session.type}</span>
                 </div>
             ))}
-
-            {message && <span>{message}</span>}
-
-            <form action="/app/gambling" method="POST">
-                <input type="text" name="opponent" placeholder="Opponent username" />
-                <button type="submit">Invite</button>
-            </form>
         </>
     );
 }

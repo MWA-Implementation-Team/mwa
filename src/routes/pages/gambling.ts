@@ -1,11 +1,9 @@
 import { requireUser } from '#src/auth.js';
-import { translate } from '#src/client/language.js';
-import { acceptGamblingSession, findGamblingSessionById, giveCoins, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
-import { findUserByUsername } from '#src/db/users.js';
+import { acceptGamblingSession, CoinSide, findGamblingSessionById, GameType, giveCoins, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
+import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { publish, subscribe } from '#src/pubsub.js';
 import { MwaHono, MwaState } from '#src/state.js';
-import { getRequestLanguage } from '#src/utils.js';
 import { streamSSE } from 'hono/streaming';
 
 export function registerGamblingRoutes(app: MwaHono) {
@@ -25,52 +23,67 @@ export function registerGamblingRoutes(app: MwaHono) {
         const games = queryGamblingSessions(ctx.var);
         const invitations = queryGamblingInvitations(ctx.var, user.id);
 
-        const error = ctx.req.query('error');
-        let message: string | undefined;
-        switch (error) {
-            case 'no_user':
-                message = 'user not found';
-                break;
-            case 'broke':
-                message = 'broke boy';
-                break;
-        }
-
         return writePage(ctx, 'gambling', {
             sessions: games,
             invitations,
-            message,
         });
     });
 
-    app.post('/app/gambling', async (ctx) => {
+    app.get('/app/interact/:token/gamble', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        const lang = getRequestLanguage(ctx);
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+
+        const error = ctx.req.query('error');
+        let errorMessage: string | undefined;
+        switch (error) {
+            case 'broke':
+                errorMessage = 'broke boy';
+                break;
+        }
+
+        return writePage(ctx, 'inviteToGamble', {
+            targetUsername: target.username,
+            errorMessage,
+        });
+    });
+
+    app.post('/app/interact/:token/gamble', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
 
         const form = await ctx.req.formData().catch(() => null);
-        if (!form) {
-            return ctx.text(translate(lang)('badRequest'), 400);
+        if (!form) return writeErrorPage(ctx, 400);
+
+        const betAmount = Number(form.get('bet_amount'));
+        if (isNaN(betAmount) || betAmount <= 0) return writeErrorPage(ctx, 400);
+
+        const gameType = form.get('game_type') as GameType;
+        switch (gameType) {
+            case 'coin_flip': {
+                const coinFlipBet = form.get('cf_bet') as CoinSide;
+                if (coinFlipBet !== 'heads' && coinFlipBet !== 'tails') return writeErrorPage(ctx, 400);
+
+                const id = initCoinFlip(ctx.var, coinFlipBet, {
+                    p1: user.id,
+                    p2: target.id,
+                    betAmount,
+                });
+                if (id === null) {
+                    return ctx.redirect(`/app/interact/${encodeURIComponent(token)}/gamble?error=broke`);
+                }
+                return ctx.redirect(`/app/gambling/sessions/${id}`);
+            }
+            default:
+                return writeErrorPage(ctx, 400);
         }
-
-        const opponentUsername = String(form.get('opponent') ?? '');
-
-        const opponent = findUserByUsername(ctx.var, opponentUsername);
-        if (!opponent || user.id === opponent.id) {
-            return ctx.redirect(`/app/gambling?error=no_user`);
-        }
-
-        const id = initCoinFlip(ctx.var, 'heads', {
-            p1: user.id,
-            p2: opponent.id,
-            betAmount: 500,
-        });
-        if (id === null) {
-            return ctx.redirect(`/app/gambling?error=broke`);
-        }
-
-        return ctx.redirect(`/app/gambling/sessions/${id}`);
     });
 
     app.get('/app/gambling/sessions/:id', async (ctx) => {

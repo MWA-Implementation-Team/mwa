@@ -12,6 +12,7 @@ export type InteractProfileDetail = {
 };
 
 type InteractPageProps = {
+    token: string;
     self: boolean;
     target: { username: string };
     detail: InteractProfileDetail | null;
@@ -22,7 +23,7 @@ export const interactPage: Page<InteractPageProps> = {
     title: (t) => t('titleInteract'),
 };
 
-function InteractPage({ self, target, detail }: InteractPageProps) {
+function InteractPage({ token, self, target, detail }: InteractPageProps) {
     const { t } = useContext(ClientContext);
 
     if (self) {
@@ -45,6 +46,10 @@ function InteractPage({ self, target, detail }: InteractPageProps) {
                 <h2>{t('interactSendMoneyTitle')}</h2>
                 <button disabled>{t('interactSendMoneyTitle')}</button>
                 <p>{t('interactComingSoon')}</p>
+            </section>
+
+            <section>
+                <a class="btn btn-primary" href={`/app/interact/${encodeURIComponent(token)}/gamble`}>GAMBLE 💲🤑🎰🤑💲</a>
             </section>
 
             {detail && (

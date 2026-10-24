@@ -83,7 +83,8 @@ export function registerAppRoutes(app: MwaHono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        const target = findUserByInteractToken(ctx.var, ctx.req.param('token'));
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
         if (!target) return writeErrorPage(ctx, 404);
 
         const self = target.id === user.id;
@@ -99,6 +100,7 @@ export function registerAppRoutes(app: MwaHono) {
                 : null;
 
         return writePage(ctx, 'interact', {
+            token,
             self,
             target: { username: target.username },
             detail,
