@@ -26,8 +26,10 @@ export function registerUsersRoutes(app: MwaHono) {
 
             let lastJson = '';
             while (!stream.aborted) {
-                const signal = await sub.recv();
-                if (signal === null) break;
+                if (lastJson !== '') {
+                    const signal = await sub.recv();
+                    if (signal === null) break;
+                }
 
                 const notification = queryUserNotification(ctx.var, user.id);
                 const json = JSON.stringify(notification);

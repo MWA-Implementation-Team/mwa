@@ -116,7 +116,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
     LEFT JOIN child_transactions AS trans ON gambling_sessions.winner_tx = trans.parent_id
-    LEFT JOIN coin_flip_games AS cf ON gambling_sessions.winner_tx = trans.parent_id
+    LEFT JOIN coin_flip_games AS cf ON gambling_sessions.id = cf.session
     WHERE gambling_sessions.id = ?
     `);
     const row = query.get(sessionId);
@@ -153,7 +153,7 @@ export function acceptGamblingSession(state: MwaState, sessionId: number, userId
     return runTransaction(state.db, () => {
         const sessionQuery = state.prepare(`
         SELECT bet_amount FROM gambling_sessions
-        WHERE id = ? AND p2 = ? AND p1_deposit_tx IS NOT NULL AND winner_tx IS NULL
+        WHERE id = ? AND p2 = ? AND p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NULL AND winner_tx IS NULL
         `);
         const row = sessionQuery.get(sessionId, userId);
         if (!row) {

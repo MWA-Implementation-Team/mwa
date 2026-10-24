@@ -139,6 +139,13 @@ export function registerGamblingRoutes(app: MwaHono) {
         return streamSSE(ctx, async (stream) => {
             const sub = subscribe(sessionChannel(sessionId));
             stream.onAbort(() => sub.close());
+
+            const session = findGamblingSessionById(ctx.var, sessionId);
+            if (!session) return;
+            await stream.writeSSE({
+                data: JSON.stringify(session),
+            })
+
             while (!stream.aborted) {
                 const json = await sub.recv();
                 if (!json) break;
@@ -168,9 +175,13 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const result = acceptGamblingSession(ctx.var, sessionId, user.id);
-        if (result === 'too_broke') {
-            return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(sessionId)}?error=broke`);
+        switch (result) {
+            case 'too_broke':
+                return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(sessionId)}?error=broke`);
+            case 'invalid_session':
+                return ctx.redirect('/app/gambling');
         }
+
         broadcastSessionUpdate(ctx.var, sessionId);
 
         scheduleCoinFlipWinner(ctx.var, {

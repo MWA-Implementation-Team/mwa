@@ -1,14 +1,18 @@
 -- adding new kinds for parent transaction: gambling_deduction, gambling_winnings
-DROP TABLE parent_transactions;
-CREATE TABLE parent_transactions (
+CREATE TABLE parent_transactions_new (
   id INTEGER PRIMARY KEY,
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
   kind TEXT NOT NULL CHECK (kind IN ('transfer', 'purchase', 'system', 'gambling_deduction', 'gambling_winnings'))
 ) STRICT;
 
+INSERT INTO parent_transactions_new (id, created_at, kind)
+SELECT id, created_at, kind FROM parent_transactions;
+
+DROP TABLE parent_transactions;
+ALTER TABLE parent_transactions_new RENAME TO parent_transactions;
+
 -- adding ON DELETE CASCADE on parent_id
-DROP table child_transactions;
-CREATE TABLE child_transactions (
+CREATE TABLE child_transactions_new (
   id INTEGER PRIMARY KEY,
   parent_id INTEGER NOT NULL REFERENCES parent_transactions(id) ON DELETE CASCADE,
   user_id INTEGER NOT NULL REFERENCES users(id),
@@ -18,6 +22,12 @@ CREATE TABLE child_transactions (
   CHECK (balance_delta <> 0),
   UNIQUE (parent_id, user_id)
 ) STRICT;
+
+INSERT INTO child_transactions_new (id, parent_id, user_id, balance_delta, system_qr_code_id)
+SELECT id, parent_id, user_id, balance_delta, system_qr_code_id FROM child_transactions;
+
+DROP TABLE child_transactions;
+ALTER TABLE child_transactions_new RENAME TO child_transactions;
 
 CREATE INDEX child_transactions_index_system_qr_code_id ON child_transactions (system_qr_code_id)
 WHERE system_qr_code_id IS NOT NULL;
@@ -68,4 +78,3 @@ CREATE TABLE IF NOT EXISTS coin_flip_games (
     p1_bet TEXT NOT NULL CHECK (p1_bet IN ('heads', 'tails')),
     actual_result TEXT NOT NULL CHECK (actual_result IN ('heads', 'tails'))
 );
-
