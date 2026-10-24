@@ -80,7 +80,7 @@ export function queryActiveGamblingSession(state: MwaState, userId: number): Act
     SELECT gambling_sessions.id, p1, p1u.username AS p1_name, p2, p2u.username AS p2_name FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
-    WHERE (p1 = ? OR p2 = ?) AND p2_deposit_tx IS NOT NULL AND winner_tx IS NULL
+    WHERE (p1 = ? OR p2 = ?) AND p2_deposit_tx IS NOT NULL AND winner IS NULL
     `);
     const row = query.get(userId, userId);
     if (!row) return null;
@@ -96,7 +96,7 @@ export function queryGamblingSessions(state: MwaState): SessionSummary[] {
     SELECT gambling_sessions.id, game_type, p1u.username AS p1_name, p2u.username AS p2_name FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
-    WHERE p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NOT NULL AND winner_tx IS NULL
+    WHERE p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NOT NULL AND winner IS NULL
     `);
     return query.all().map((row) => {
         return {
@@ -114,9 +114,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
         game_type,
         p1_deposit_tx,
         p2_deposit_tx,
-        trans.user_id
-        AS
-        winner_user,
+        winner,
         p1,
         p2,
         p1u.username AS p1_name,
@@ -126,7 +124,6 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
     FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
-    LEFT JOIN child_transactions AS trans ON gambling_sessions.winner_tx = trans.parent_id
     LEFT JOIN coin_flip_games AS cf ON gambling_sessions.id = cf.session
     WHERE gambling_sessions.id = ?
     `);
@@ -140,12 +137,12 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
         status = { type: 'rejected' };
     } else if (!row.p2_deposit_tx) {
         status = { type: 'pending' };
-    } else if (!row.winner_user) {
+    } else if (!row.winner) {
         status = { type: 'running' };
     } else {
         status = {
             type: 'ended',
-            winner: row.winner_user === row.p1 ? 'p1' : 'p2',
+            winner: row.winner as Gambler, // draw not possible in coin flip
             flipResult: row.winner_user === row.p1 ? p1Guess : (p1Guess === 'heads' ? 'tails' : 'heads')
         };
     }
@@ -168,7 +165,7 @@ export function acceptGamblingSession(state: MwaState, sessionId: number, userId
     return runTransaction(state.db, () => {
         const sessionQuery = state.prepare(`
         SELECT bet_amount FROM gambling_sessions
-        WHERE id = ? AND p2 = ? AND p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NULL AND winner_tx IS NULL
+        WHERE id = ? AND p2 = ? AND p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NULL AND winner IS NULL
         `);
         const row = sessionQuery.get(sessionId, userId);
         if (!row) {
@@ -209,7 +206,7 @@ export function winGamblingSession(state: MwaState, sessionId: number, winner: G
     runTransaction(state.db, () => {
         const sessionQuery = state.prepare(`
         SELECT p1, p2, bet_amount FROM gambling_sessions
-        WHERE id = ? AND p2_deposit_tx IS NOT NULL AND winner_tx IS NULL
+        WHERE id = ? AND p2_deposit_tx IS NOT NULL AND winner IS NULL
         `);
         const row = sessionQuery.get(sessionId);
         if (!row) {
@@ -231,9 +228,9 @@ export function winGamblingSession(state: MwaState, sessionId: number, winner: G
         insertChildTx.run(parentId, userId, betAmount * 2);
 
         const update = state.prepare(`
-        UPDATE gambling_sessions SET winner_tx = ? WHERE id = ?
+        UPDATE gambling_sessions SET winner = ?, winner_tx = ? WHERE id = ?
         `);
-        update.run(parentId, sessionId);
+        update.run(winner, parentId, sessionId);
     });
 }
 
@@ -346,7 +343,7 @@ export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
     SELECT sessions.id AS session_id, tx.created_at AS accepted_at FROM coin_flip_games
     LEFT JOIN gambling_sessions AS sessions ON sessions.id = coin_flip_games.session
     LEFT JOIN parent_transactions AS tx ON tx.id = sessions.p2_deposit_tx
-    WHERE sessions.p2_deposit_tx IS NOT NULL AND sessions.winner_tx IS NULL
+    WHERE sessions.p2_deposit_tx IS NOT NULL AND sessions.winner IS NULL
     `);
     return select.all().map(row => {
         return {

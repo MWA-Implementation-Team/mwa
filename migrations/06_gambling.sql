@@ -55,11 +55,18 @@ CREATE TABLE IF NOT EXISTS gambling_sessions (
     -- null = p2 didn't accept the challenge yet
     p2_deposit_tx INTEGER REFERENCES parent_transactions (id) ON DELETE CASCADE DEFAULT NULL,
 
-    -- winner funds transaction, null = not yet won by anyone
+    winner TEXT DEFAULT NULL CHECK (winner IN ('p1', 'p2', 'draw')),
+    -- winner funds transaction, null = not yet won by anyone or draw
     winner_tx INTEGER REFERENCES parent_transactions (id) ON DELETE CASCADE DEFAULT NULL,
 
     CHECK (
       p1 != p2
+    ),
+    CHECK (
+      (winner != 'p1' AND winner != 'p2') OR winner_tx IS NOT NULL
+    ),
+    CHECK (
+      winner != 'draw' OR winner_tx IS NULL
     ),
     CHECK (
       p1_deposit_tx IS NOT NULL
@@ -67,7 +74,10 @@ CREATE TABLE IF NOT EXISTS gambling_sessions (
     ),
     CHECK (
       p2_deposit_tx IS NOT NULL
-      OR winner_tx IS NULL
+      OR winner IS NULL
+    ),
+    CHECK (
+      game_type != 'coin_flip' OR winner != 'draw'
     )
 );
 
