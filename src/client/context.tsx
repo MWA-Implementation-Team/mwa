@@ -10,6 +10,17 @@ export type ClientContextType = {
     updateLang: (lang: LanguageCode) => void;
     t: TranslateFn;
     user: User | null; // logged-in user, else null
+    notification: Notification | null,
+};
+
+export type Notification = {
+    type: 'gambling_invite';
+    inviterName: string;
+    sessionId: number;
+} | {
+    type: 'return_to_gambling';
+    opponentName: string;
+    sessionId: number;
 };
 
 export const ClientContext = createContext<ClientContextType>({
@@ -17,6 +28,7 @@ export const ClientContext = createContext<ClientContextType>({
     updateLang: () => {},
     t: translate(defaultLanguage),
     user: null,
+    notification: null,
 });
 
 // ---
@@ -24,6 +36,7 @@ export const ClientContext = createContext<ClientContextType>({
 export type ClientContextWrapperInit = {
     lang: LanguageCode;
     user: UserJson | null;
+    notification: Notification | null;
 };
 
 export type ClientContextWrapperProps<P extends RegisteredPageId> = {
@@ -41,6 +54,7 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
     content,
 }: ClientContextWrapperProps<P>) {
     let [lang, setLang] = useState(init.lang);
+    let [notification, setNotification] = useState(init.notification);
 
     const value: ClientContextType = useMemo(
         () => ({
@@ -48,8 +62,9 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
             updateLang: (newLang) => setLang(newLang),
             t: translate(lang),
             user: init.user && reviveUser(init.user),
+            notification,
         }),
-        [lang, init.user],
+        [lang, init.user, notification],
     );
 
     useEffect(() => {
@@ -57,6 +72,14 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
         const title = page.title(value.t, pageProps, lang);
         document.title = title;
     }, [pageId, pageProps, value]);
+
+    useEffect(() => {
+        const updates = new EventSource('/api/notifications');
+        updates.onerror = (err) => console.error(err); // TODO
+        updates.onmessage = (msg) => {
+            setNotification(JSON.parse(msg.data as string));
+        };
+    }, [init.user?.id])
 
     return <ClientContext value={value}>{content}</ClientContext>;
 }

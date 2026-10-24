@@ -49,6 +49,7 @@ export function queryGamblingInvitations(state: MwaState, userId: number): Invit
     SELECT gambling_sessions.id, game_type, p1u.username AS p1_name FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     WHERE p2 = ? AND p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NULL
+    ORDER BY gambling_sessions.created_at ASC
     `);
     return query.all(userId).map(row => {
         return {

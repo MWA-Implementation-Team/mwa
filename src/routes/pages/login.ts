@@ -15,20 +15,6 @@ import { getRequestLanguage } from '#src/utils.js';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Login redirects are limited to known app pages so ?goto= can't be used
-// as an open redirect. Exact paths cover static routes; prefixes cover
-// routes with dynamic segments (e.g. /app/activities/:id).
-const allowedGotos = new Set<string>([
-    '/app',
-    '/app/activities',
-    '/app/account',
-    '/app/leaderboard',
-    '/app/group',
-    '/app/gambling',
-    '/admin',
-]);
-const allowedGotoPrefixes = ['/app/activities/'];
-
 // Normalize goto before checking: a raw startsWith lets `..` escape the
 // prefix (browsers resolve it), and absolute URLs on other origins must be
 // rejected outright. Only the normalized path is used as the redirect target.
@@ -42,10 +28,7 @@ export function safeGoto(ctx: MwaContext, raw: string | undefined): string | nul
         if (url.origin !== origin) {
             return null;
         }
-        const allowed =
-            allowedGotos.has(url.pathname) ||
-            allowedGotoPrefixes.some((p) => url.pathname.startsWith(p));
-        return allowed ? url.pathname + url.search : null;
+        return url.pathname + url.search;
     } catch {
         return null;
     }

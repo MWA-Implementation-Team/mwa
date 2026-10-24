@@ -18,6 +18,14 @@ export function subscribe(channel: string): Subscription {
     return new SubscriptionImpl(channel);
 }
 
+export function sessionChannel(id: number): string {
+    return `gambling_session:${id}`;
+}
+
+export function notificationsChannel(userId: number): string {
+    return `user_notifications:${userId}`;
+}
+
 class SubscriptionImpl {
     #channel: string;
     #isClosed = false;

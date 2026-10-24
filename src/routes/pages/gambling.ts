@@ -3,9 +3,10 @@ import { InviteToGamblePageProps } from '#src/client/pages/app/gambling/InviteTo
 import { acceptGamblingSession, CoinSide, findGamblingSessionById, GameType, giveCoins, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
-import { publish, subscribe } from '#src/pubsub.js';
+import { notificationsChannel, publish, sessionChannel, subscribe } from '#src/pubsub.js';
 import { MwaHono, MwaState } from '#src/state.js';
 import { streamSSE } from 'hono/streaming';
+import { safeGoto } from './login.js';
 
 export function registerGamblingRoutes(app: MwaHono) {
     app.get('/app/give-coins', async (ctx) => {
@@ -80,24 +81,31 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (isNaN(betAmount) || betAmount <= 0) return writeErrorPage(ctx, 400);
 
         const gameType = form.get('game_type') as GameType;
+
+        let sessionId: number | null = null;
         switch (gameType) {
             case 'coin_flip': {
                 const coinFlipBet = form.get('cf_bet') as CoinSide;
                 if (coinFlipBet !== 'heads' && coinFlipBet !== 'tails') return writeErrorPage(ctx, 400);
 
-                const id = initCoinFlip(ctx.var, coinFlipBet, {
+                sessionId = initCoinFlip(ctx.var, coinFlipBet, {
                     p1: user.id,
                     p2: target.id,
                     betAmount,
                 });
-                if (id === null) {
-                    return ctx.redirect(`/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=broke`);
-                }
-                return ctx.redirect(`/app/gambling/sessions/${id}`);
+                break;
             }
             default:
                 return writeErrorPage(ctx, 400);
         }
+
+        if (sessionId === null) {
+            return ctx.redirect(`/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=broke`);
+        }
+        // signal for /api/notifications to update notification
+        publish(notificationsChannel(target.id), '');
+
+        return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
     });
 
     app.get('/app/gambling/sessions/:id', async (ctx) => {
@@ -184,10 +192,21 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 400);
         }
 
+        let goto: string | undefined;
+        const ref = ctx.req.header('Referer');
+        if (ref) {
+            goto = new URL(ref).pathname;
+        }
+
+        const gotoQuery = ctx.req.query('goto');
+        if (gotoQuery) {
+            goto = gotoQuery;
+        }
+
         const sessionId = Number(ctx.req.param('id'));
         rejectGamblingSession(ctx.var, sessionId, user.id);
         broadcastSessionUpdate(ctx.var, sessionId);
-        return ctx.redirect('/app/gambling');
+        return ctx.redirect(safeGoto(ctx, goto) ?? '/app');
     });
 }
 
@@ -204,10 +223,6 @@ function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
         winCoinFlip(state, pending.sessionId);
         broadcastSessionUpdate(state, pending.sessionId);
     }, remainingMs);
-}
-
-function sessionChannel(id: number): string {
-    return `gambling_session:${id}`;
 }
 
 function broadcastSessionUpdate(state: MwaState, sessionId: number) {

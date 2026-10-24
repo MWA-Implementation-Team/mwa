@@ -45,12 +45,12 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
             if (currentGame.p2 === user!.id) {
                 return (
                     <>
-                        <Header />
+                        <Header hideNotifications={true} />
                         <h1>Challenge request:</h1>
                         <span>{currentGame.p1Name} has challenged you in a game of coin flip</span>
                         <form method="POST">
                             <button formaction={`/app/gambling/sessions/${sessionId}/accept`} type="submit">ACCEPT</button>
-                            <button formaction={`/app/gambling/sessions/${sessionId}/reject`} type="submit">REJECT</button>
+                            <button formaction={`/app/gambling/sessions/${sessionId}/reject?goto=${encodeURIComponent('/app')}`} type="submit">REJECT</button>
                         </form>
                         {message && <span>{message}</span>}
                     </>
@@ -58,7 +58,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
             } else {
                 return (
                     <>
-                        <Header />
+                        <Header hideNotifications={true} />
                         <h1>Waiting for confirmation</h1>
                         <span>Waiting for {currentGame.p2Name} to accept the request</span>
                     </>
@@ -68,7 +68,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         case 'rejected': {
             return (
                 <>
-                    <Header />
+                    <Header hideNotifications={true} />
                     <h1>Rejected</h1>
                     <span>
                         {currentGame.p2Name} has rejected this challenge
@@ -80,7 +80,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         case 'ended': {
             return (
                 <>
-                    <Header />
+                    <Header hideNotifications={true} />
                     <h1>imagine coin flip here</h1>
                     <span>
                         {currentGame.p1Name} vs {currentGame.p2Name}

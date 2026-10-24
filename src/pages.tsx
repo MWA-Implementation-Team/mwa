@@ -11,6 +11,7 @@ import { StatusCode } from 'hono/utils/http-status';
 import { BootData } from './client/bootstrap.js';
 import { getRequestLanguage } from './utils.js';
 import { MwaContext, MwaHono } from './state.js';
+import { queryUserNotification } from './db/users.js';
 
 export function writePage<P extends RegisteredPageId>(
     ctx: MwaContext,
@@ -18,9 +19,11 @@ export function writePage<P extends RegisteredPageId>(
     props: RegisteredPageProps<P>,
 ): Response {
     const user = currentUser(ctx);
+
     const ctxInit: ClientContextWrapperInit = {
         lang: getRequestLanguage(ctx),
         user: user && serialize(user),
+        notification: queryUserNotification(ctx.var, user?.id),
     };
 
     const root = Root({

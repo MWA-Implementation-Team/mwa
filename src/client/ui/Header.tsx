@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from 'preact/hooks';
-import { ClientContext } from '../context.js';
+import { ClientContext, Notification } from '../context.js';
 import ThemeToggle from './ThemeToggle.js';
 import LanguageToggle from './LanguageToggle.js';
 import { CloseIcon, MenuIcon } from './icons.js';
 
-export default function Header() {
-    const { t, user } = useContext(ClientContext);
+export default function Header({ hideNotifications }: { hideNotifications?: boolean }) {
+    const { t, user, notification } = useContext(ClientContext);
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     useEffect(() => {
@@ -31,10 +31,16 @@ export default function Header() {
                         <MenuIcon />
                     </button>
 
-                    <a href="/" class="site-logo">
-                        <span class="logo-box">M</span>
-                        <span class="logo-text">MWA</span>
-                    </a>
+                    {(notification && !hideNotifications) ? (
+                        <div>
+                            <NotificationDisplay notif={notification} />
+                        </div>
+                    ) : (
+                        <a href="/" class="site-logo">
+                            <span class="logo-box">M</span>
+                            <span class="logo-text">MWA</span>
+                        </a>
+                    )}
 
                     {user ? (
                         <a href="/app" class="btn btn-outline btn-sm">
@@ -124,4 +130,26 @@ export default function Header() {
             </div>
         </>
     );
+}
+
+function NotificationDisplay({ notif }: { notif: Notification }) {
+    switch (notif.type) {
+        case 'gambling_invite':
+            return (
+                <>
+                    <span>{notif.inviterName} has invited you to gamble!</span>
+                    <form method="POST" action={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}/reject`}>
+                        <a class="btn btn-primary" href={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}`}>Open</a>
+                        <button type="submit">Reject</button>
+                    </form>
+                </>
+            )
+        case 'return_to_gambling':
+            return (
+                <>
+                    <span>You are currently gambling</span>
+                    <a class="btn btn-primary" href={`/app/gambling/${encodeURIComponent(notif.sessionId)}`}>Return</a>
+                </>
+            )
+    }
 }

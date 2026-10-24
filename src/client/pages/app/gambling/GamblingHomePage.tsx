@@ -1,4 +1,5 @@
 import { Page } from '#src/client/pages.js';
+import Header from '#src/client/ui/Header.js';
 import { Invitation, SessionSummary } from '#src/db/gambling.js';
 
 type GamblingPageProps = {
@@ -14,6 +15,8 @@ export const gamblingPage: Page<GamblingPageProps> = {
 function GamblingPage({ sessions, invitations }: GamblingPageProps) {
     return (
         <>
+            <Header />
+
             <h1>Invitations</h1>
             {invitations.map((invite) => (
                 <div>
