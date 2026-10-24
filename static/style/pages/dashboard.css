@@ -104,16 +104,6 @@
     line-height: 1.4;
 }
 
-.qr-placeholder {
-    width: min(17.5rem, 80%);
-    aspect-ratio: 1 / 1;
-    margin: 0 auto;
-
-    border-width: 0.25rem;
-    border-radius: var(--radius-card);
-    font-size: var(--text-2xl);
-}
-
 /* Support */
 .support-options {
     display: grid;
