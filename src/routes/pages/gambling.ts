@@ -1,4 +1,5 @@
 import { requireUser } from '#src/auth.js';
+import { InviteToGamblePageProps } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
 import { acceptGamblingSession, CoinSide, findGamblingSessionById, GameType, giveCoins, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
@@ -37,17 +38,30 @@ export function registerGamblingRoutes(app: MwaHono) {
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
 
-        const error = ctx.req.query('error');
+        let errorDialog = ctx.req.query('error_game');
+        if (errorDialog !== 'coin_flip') {
+            errorDialog = '';
+        }
+
+        const errorType = ctx.req.query('error_type');
         let errorMessage: string | undefined;
-        switch (error) {
+        switch (errorType) {
             case 'broke':
                 errorMessage = 'broke boy';
                 break;
         }
 
+        let error: InviteToGamblePageProps['error'] | undefined;
+        if (errorMessage && errorDialog) {
+            error = {
+                dialog: errorDialog as GameType,
+                message: errorMessage,
+            };
+        }
+
         return writePage(ctx, 'inviteToGamble', {
             targetUsername: target.username,
-            errorMessage,
+            error,
         });
     });
 
@@ -77,7 +91,7 @@ export function registerGamblingRoutes(app: MwaHono) {
                     betAmount,
                 });
                 if (id === null) {
-                    return ctx.redirect(`/app/interact/${encodeURIComponent(token)}/gamble?error=broke`);
+                    return ctx.redirect(`/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=broke`);
                 }
                 return ctx.redirect(`/app/gambling/sessions/${id}`);
             }

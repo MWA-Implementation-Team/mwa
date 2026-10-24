@@ -1,5 +1,6 @@
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
+import Header from '#src/client/ui/Header.js';
 import { RunningGame } from '#src/db/gambling.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 
@@ -35,7 +36,6 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         const updates = new EventSource(`/app/gambling/sessions/${sessionId}/watch`);
         updates.onerror = (err) => console.error(err); // TODO
         updates.onmessage = (msg) => {
-            console.log('message:', msg);
             setCurrentGame(JSON.parse(msg.data as string));
         };
     }, [sessionId])
@@ -45,6 +45,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
             if (currentGame.p2 === user!.id) {
                 return (
                     <>
+                        <Header />
                         <h1>Challenge request:</h1>
                         <span>{currentGame.p1Name} has challenged you in a game of coin flip</span>
                         <form method="POST">
@@ -57,6 +58,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
             } else {
                 return (
                     <>
+                        <Header />
                         <h1>Waiting for confirmation</h1>
                         <span>Waiting for {currentGame.p2Name} to accept the request</span>
                     </>
@@ -66,6 +68,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         case 'rejected': {
             return (
                 <>
+                    <Header />
                     <h1>Rejected</h1>
                     <span>
                         {currentGame.p2Name} has rejected this challenge
@@ -77,6 +80,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         case 'ended': {
             return (
                 <>
+                    <Header />
                     <h1>imagine coin flip here</h1>
                     <span>
                         {currentGame.p1Name} vs {currentGame.p2Name}
