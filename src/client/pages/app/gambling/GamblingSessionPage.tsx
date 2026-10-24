@@ -68,7 +68,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         case 'rejected': {
             return (
                 <>
-                    <Header hideNotifications={true} />
+                    <Header />
                     <h1>Rejected</h1>
                     <span>
                         {currentGame.p2Name} has rejected this challenge
@@ -80,7 +80,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         case 'ended': {
             return (
                 <>
-                    <Header hideNotifications={true} />
+                    <Header hideNotifications={currentGame.status.type === 'running'} />
                     <h1>imagine coin flip here</h1>
                     <span>
                         {currentGame.p1Name} vs {currentGame.p2Name}

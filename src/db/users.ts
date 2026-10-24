@@ -1,6 +1,6 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
-import { queryGamblingInvitations } from './gambling.js';
+import { queryActiveGamblingSession, queryGamblingInvitations } from './gambling.js';
 import { Notification } from '#src/client/context.js';
 
 export type UserRole = 'admin' | 'host' | 'user';
@@ -115,16 +115,23 @@ function mapUser(row: Record<string, SQLOutputValue>): User {
 export function queryUserNotification(state: MwaState, userId?: number): Notification | null {
     if (userId === undefined) return null;
 
-    let notification: Notification | null = null;
+    const active = queryActiveGamblingSession(state, userId);
+    if (active !== null) {
+        return {
+            type: 'return_to_gambling',
+            opponentName: active.opponentName,
+            sessionId: active.id,
+        };
+    }
 
     const invitations = queryGamblingInvitations(state, userId);
     if (invitations.length > 0) {
-        notification = {
+        return {
             type: 'gambling_invite',
             inviterName: invitations[0].p1Name,
             sessionId: invitations[0].id,
         };
     }
 
-    return notification;
+    return null;
 }

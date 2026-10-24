@@ -230,4 +230,7 @@ function broadcastSessionUpdate(state: MwaState, sessionId: number) {
     if (!session) return;
 
     publish(sessionChannel(sessionId), JSON.stringify(session));
+
+    publish(notificationsChannel(session.p1), '');
+    publish(notificationsChannel(session.p2), '');
 }

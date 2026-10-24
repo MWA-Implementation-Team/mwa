@@ -44,6 +44,11 @@ export type Invitation = {
     p1Name: string;
 };
 
+export type ActiveSession = {
+    id: number;
+    opponentName: string;
+};
+
 export function queryGamblingInvitations(state: MwaState, userId: number): Invitation[] {
     const query = state.prepare(`
     SELECT gambling_sessions.id, game_type, p1u.username AS p1_name FROM gambling_sessions
@@ -58,6 +63,22 @@ export function queryGamblingInvitations(state: MwaState, userId: number): Invit
             p1Name: row.p1_name as string,
         };
     });
+}
+
+export function queryActiveGamblingSession(state: MwaState, userId: number): ActiveSession | null {
+    const query = state.prepare(`
+    SELECT gambling_sessions.id, p1, p1u.username AS p1_name, p2, p2u.username AS p2_name FROM gambling_sessions
+    LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
+    LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
+    WHERE (p1 = ? OR p2 = ?) AND p2_deposit_tx IS NOT NULL AND winner_tx IS NULL
+    `);
+    const row = query.get(userId, userId);
+    if (!row) return null;
+
+    return {
+        id: row.id as number,
+        opponentName: row.p1 === userId ? row.p2_name as string : row.p1_name as string,
+    };
 }
 
 export function queryGamblingSessions(state: MwaState): SessionSummary[] {

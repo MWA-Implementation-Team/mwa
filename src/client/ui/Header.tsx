@@ -148,7 +148,7 @@ function NotificationDisplay({ notif }: { notif: Notification }) {
             return (
                 <>
                     <span>You are currently gambling</span>
-                    <a class="btn btn-primary" href={`/app/gambling/${encodeURIComponent(notif.sessionId)}`}>Return</a>
+                    <a class="btn btn-primary" href={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}`}>Return</a>
                 </>
             )
     }
