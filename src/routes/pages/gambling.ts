@@ -3,8 +3,10 @@ import { translate } from '#src/client/language.js';
 import { acceptGamblingSession, findGamblingSessionById, giveCoins, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
 import { findUserByUsername } from '#src/db/users.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
+import { publish, subscribe } from '#src/pubsub.js';
 import { MwaHono, MwaState } from '#src/state.js';
 import { getRequestLanguage } from '#src/utils.js';
+import { streamSSE } from 'hono/streaming';
 
 export function registerGamblingRoutes(app: MwaHono) {
     app.get('/app/give-coins', async (ctx) => {
@@ -55,7 +57,6 @@ export function registerGamblingRoutes(app: MwaHono) {
         const opponentUsername = String(form.get('opponent') ?? '');
 
         const opponent = findUserByUsername(ctx.var, opponentUsername);
-        // TODO: query errors
         if (!opponent || user.id === opponent.id) {
             return ctx.redirect(`/app/gambling?error=no_user`);
         }
@@ -68,7 +69,6 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (id === null) {
             return ctx.redirect(`/app/gambling?error=broke`);
         }
-        console.log('game id', id);
 
         return ctx.redirect(`/app/gambling/sessions/${id}`);
     });
@@ -92,9 +92,27 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         return writePage(ctx, 'game', {
-            id: gameId,
+            sessionId: gameId,
             game,
+            message,
         });
+    });
+
+    app.get('/app/gambling/sessions/:id/watch', async (ctx) => {
+        const sessionId = Number(ctx.req.param('id'));
+
+        return streamSSE(ctx, async (stream) => {
+            const sub = subscribe(sessionChannel(sessionId));
+            stream.onAbort(() => sub.close());
+            while (!stream.aborted) {
+                const json = await sub.recv();
+                if (!json) break;
+
+                await stream.writeSSE({
+                    data: json,
+                })
+            }
+        })
     });
 
     app.post('/app/gambling/sessions/:id/accept', async (ctx) => {
@@ -118,6 +136,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (result === 'too_broke') {
             return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(sessionId)}?error=broke`);
         }
+        broadcastSessionUpdate(ctx.var, sessionId);
 
         scheduleCoinFlipWinner(ctx.var, {
             sessionId,
@@ -138,8 +157,9 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 400);
         }
 
-        const gameId = Number(ctx.req.param('id'));
-        rejectGamblingSession(ctx.var, gameId, user.id);
+        const sessionId = Number(ctx.req.param('id'));
+        rejectGamblingSession(ctx.var, sessionId, user.id);
+        broadcastSessionUpdate(ctx.var, sessionId);
         return ctx.redirect('/app/gambling');
     });
 }
@@ -150,10 +170,22 @@ export function scheduleGamblingTimers(state: MwaState) {
 }
 
 function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
-    const flipTimeMs = pending.acceptedTime.getTime() + 10000;
-    const remainingMs = flipTimeMs - Date.now();
+    const flipTimeMs = pending.acceptedTime.getTime() + 5000;
+    const remainingMs = Math.max(0, flipTimeMs - Date.now());
 
     setTimeout(() => {
         winCoinFlip(state, pending.sessionId);
+        broadcastSessionUpdate(state, pending.sessionId);
     }, remainingMs);
+}
+
+function sessionChannel(id: number): string {
+    return `gambling_session:${id}`;
+}
+
+function broadcastSessionUpdate(state: MwaState, sessionId: number) {
+    const session = findGamblingSessionById(state, sessionId);
+    if (!session) return;
+
+    publish(sessionChannel(sessionId), JSON.stringify(session));
 }

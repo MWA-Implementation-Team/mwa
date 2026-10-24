@@ -1,10 +1,10 @@
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
 import { RunningGame } from '#src/db/gambling.js';
-import { useContext } from 'preact/hooks';
+import { useContext, useEffect, useState } from 'preact/hooks';
 
 type GamblingSessionPageProps = {
-    id: number,
+    sessionId: number,
     game: RunningGame,
     message?: string,
 };
@@ -27,19 +27,29 @@ export const gamblingSessionPagie: Page<GamblingSessionPageProps> = {
     },
 };
 
-function GamblingSessionPage({ id, game, message }: GamblingSessionPageProps) {
+function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPageProps) {
     const { user } = useContext(ClientContext);
+    const [currentGame, setCurrentGame] = useState(game);
 
-    switch (game.status.type) {
+    useEffect(() => {
+        const updates = new EventSource(`/app/gambling/sessions/${sessionId}/watch`);
+        updates.onerror = (err) => console.error(err); // TODO
+        updates.onmessage = (msg) => {
+            console.log('message:', msg);
+            setCurrentGame(JSON.parse(msg.data as string));
+        };
+    }, [sessionId])
+
+    switch (currentGame.status.type) {
         case 'pending': {
-            if (game.p2 === user!.id) {
+            if (currentGame.p2 === user!.id) {
                 return (
                     <>
                         <h1>Challenge request:</h1>
-                        <span>{game.p1Name} has challenged you in a game of coin flip</span>
+                        <span>{currentGame.p1Name} has challenged you in a game of coin flip</span>
                         <form method="POST">
-                            <button formaction={`/app/gambling/sessions/${id}/accept`} type="submit">ACCEPT</button>
-                            <button formaction={`/app/gambling/sessions/${id}/reject`} type="submit">REJECT</button>
+                            <button formaction={`/app/gambling/sessions/${sessionId}/accept`} type="submit">ACCEPT</button>
+                            <button formaction={`/app/gambling/sessions/${sessionId}/reject`} type="submit">REJECT</button>
                         </form>
                         {message && <span>{message}</span>}
                     </>
@@ -48,7 +58,7 @@ function GamblingSessionPage({ id, game, message }: GamblingSessionPageProps) {
                 return (
                     <>
                         <h1>Waiting for confirmation</h1>
-                        <span>Waiting for {game.p2Name} to accept the request</span>
+                        <span>Waiting for {currentGame.p2Name} to accept the request</span>
                     </>
                 )
             }
@@ -58,7 +68,7 @@ function GamblingSessionPage({ id, game, message }: GamblingSessionPageProps) {
                 <>
                     <h1>Rejected</h1>
                     <span>
-                        {game.p2Name} has rejected this challenge
+                        {currentGame.p2Name} has rejected this challenge
                     </span>
                 </>
             )
@@ -69,11 +79,11 @@ function GamblingSessionPage({ id, game, message }: GamblingSessionPageProps) {
                 <>
                     <h1>imagine coin flip here</h1>
                     <span>
-                        {game.p1Name} vs {game.p2Name}
+                        {currentGame.p1Name} vs {currentGame.p2Name}
                     </span>
-                    <span>Type: {game.gameType}</span>
-                    {game.status.type === 'ended' ? (
-                        <h1>WINNER: {game.status.winner}</h1>
+                    <span>Type: {currentGame.gameType}</span>
+                    {currentGame.status.type === 'ended' ? (
+                        <h1>WINNER: {currentGame.status.winner}</h1>
                     ) : (
                         <h1>FLIPPING COIN</h1>
                     )}
@@ -82,3 +92,4 @@ function GamblingSessionPage({ id, game, message }: GamblingSessionPageProps) {
         }
     }
 }
+

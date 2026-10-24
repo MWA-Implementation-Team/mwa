@@ -309,7 +309,7 @@ export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
     SELECT sessions.id AS session_id, tx.created_at AS accepted_at FROM coin_flip_games
     LEFT JOIN gambling_sessions AS sessions ON sessions.id = coin_flip_games.session
     LEFT JOIN parent_transactions AS tx ON tx.id = sessions.p2_deposit_tx
-    WHERE sessions.winner_tx IS NULL
+    WHERE sessions.p2_deposit_tx IS NOT NULL AND sessions.winner_tx IS NULL
     `);
     return select.all().map(row => {
         return {
