@@ -33,8 +33,18 @@ export type RunningGame = {
     p2: number;
     p1Name: string;
     p2Name: string;
+    betAmount: number;
 } & ({
     gameType: 'coin_flip',
+    status: { type: 'pending' }
+    | { type: 'rejected' }
+    | { type: 'running' }
+    | {
+        type: 'ended',
+        winner: Gambler,
+        flipResult: CoinSide,
+    }
+
     p1Guess: CoinSide,
 });
 
@@ -111,6 +121,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
         p2,
         p1u.username AS p1_name,
         p2u.username AS p2_name,
+        bet_amount,
         cf.p1_bet AS cf_p1_bet
     FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
@@ -121,6 +132,8 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
     `);
     const row = query.get(sessionId);
     if (!row) return null;
+
+    const p1Guess = row.cf_p1_bet as CoinSide;
 
     let status: RunningGame['status'];
     if (!row.p1_deposit_tx) {
@@ -133,17 +146,19 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
         status = {
             type: 'ended',
             winner: row.winner_user === row.p1 ? 'p1' : 'p2',
+            flipResult: row.winner_user === row.p1 ? p1Guess : (p1Guess === 'heads' ? 'tails' : 'heads')
         };
     }
 
     return {
         gameType: 'coin_flip',
-        p1Guess: row.cf_p1_bet as CoinSide,
+        p1Guess,
         status,
         p1: row.p1 as number,
         p2: row.p2 as number,
         p1Name: row.p1_name as string,
         p2Name: row.p2_name as string,
+        betAmount: row.bet_amount as number,
     };
 }
 

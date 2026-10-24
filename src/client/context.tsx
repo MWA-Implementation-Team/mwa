@@ -75,10 +75,10 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
 
     useEffect(() => {
         const updates = new EventSource('/api/notifications');
-        updates.onerror = (err) => console.error(err); // TODO
         updates.onmessage = (msg) => {
             setNotification(JSON.parse(msg.data as string));
         };
+        return () => updates.close();
     }, [init.user?.id])
 
     return <ClientContext value={value}>{content}</ClientContext>;
