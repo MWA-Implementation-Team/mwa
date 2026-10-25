@@ -4,12 +4,13 @@ import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import Dialog from '#src/client/ui/Dialog.js';
 import { GameType } from '#src/db/gambling.js';
+import { Language } from '#src/client/language.js';
 
 export type InviteToGamblePageProps = {
     targetUsername: string;
     error?: {
         dialog: GameType;
-        message: 'gamblingInsufficientCoins';
+        message: keyof Language;
     };
 };
 

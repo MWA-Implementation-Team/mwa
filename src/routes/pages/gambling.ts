@@ -22,6 +22,7 @@ import { MwaHono, MwaState } from '#src/state.js';
 import { streamSSE } from 'hono/streaming';
 import { safeGoto } from './login.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
+import { Language } from '#src/client/language.js';
 
 export function registerGamblingRoutes(app: MwaHono) {
     app.get('/app/gambling', async (ctx) => {
@@ -51,7 +52,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const errorType = ctx.req.query('error_type');
-        let errorMessage: 'gamblingInsufficientCoins' | undefined;
+        let errorMessage: keyof Language | undefined;
         switch (errorType) {
             case 'broke':
                 errorMessage = 'gamblingInsufficientCoins';
@@ -135,14 +136,14 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const error = ctx.req.query('error');
-        let message: 'gamblingInsufficientCoins' | undefined;
+        let message: keyof Language | undefined;
         switch (error) {
             case 'broke':
                 message = 'gamblingInsufficientCoins';
                 break;
         }
 
-        return writePage(ctx, 'game', {
+        return writePage(ctx, 'gamblingSession', {
             sessionId: gameId,
             game,
             message,

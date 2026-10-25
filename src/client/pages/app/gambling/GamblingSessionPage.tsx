@@ -5,32 +5,36 @@ import { Page } from '#src/client/pages.js';
 import Header from '#src/client/ui/Header.js';
 import { CoinSide, Gambler, RunningGame } from '#src/db/gambling.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
+import { Language, TranslateFn } from '#src/client/language.js';
 
 type GamblingSessionPageProps = {
     sessionId: number;
     game: RunningGame;
-    message?: 'gamblingInsufficientCoins';
+    message?: keyof Language;
 };
 
 export const gamblingSessionPagie: Page<GamblingSessionPageProps> = {
     Component: GamblingSessionPage,
-    title: (t, props) => {
-        switch (props.game.status.type) {
-            case 'pending':
-                return t('titleGamblingRequest');
-            case 'expired':
-                return t('titleGamblingExpired');
-            case 'rejected':
-                return t('titleGamblingRejected');
-            case 'running':
-            case 'ended':
-                switch (props.game.gameType) {
-                    case 'coin_flip':
-                        return t('titleGamblingCoinFlip');
-                }
-        }
-    },
+    title: (t, props) => title(t, props.game),
+    customTitle: true,
 };
+
+function title(t: TranslateFn, game: RunningGame): string {
+    switch (game.status.type) {
+        case 'pending':
+            return t('titleGamblingRequest');
+        case 'expired':
+            return t('titleGamblingExpired');
+        case 'rejected':
+            return t('titleGamblingRejected');
+        case 'running':
+        case 'ended':
+            switch (game.gameType) {
+                case 'coin_flip':
+                    return t('titleGamblingCoinFlip');
+            }
+    }
+}
 
 function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPageProps) {
     const { user, t } = useContext(ClientContext);
@@ -51,6 +55,10 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         return () => updates.close();
     }, [sessionId]);
 
+    useEffect(() => {
+        document.title = title(t, currentGame);
+    }, [currentGame]);
+
     switch (currentGame.status.type) {
         case 'pending': {
             if (currentGame.p2 === user!.id) {
@@ -64,9 +72,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                 id="gamblingCoinFlipBetDetails"
                                 values={{
                                     amount: <strong>{game.betAmount}</strong>,
-                                    side: (
-                                        <strong>{t(coinSideTrans(game.p1Guess))}</strong>
-                                    ),
+                                    side: <strong>{t(coinSideTrans(game.p1Guess))}</strong>,
                                 }}
                             />
                         </p>

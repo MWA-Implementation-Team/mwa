@@ -26,7 +26,7 @@ export const registeredPages = {
     leaderboard: leaderboardPage,
     group: groupPage,
     gambling: gamblingPage,
-    game: gamblingSessionPagie,
+    gamblingSession: gamblingSessionPagie,
     interact: interactPage,
     inviteToGamble: inviteToGamblePage,
     admin: adminPage,
@@ -36,6 +36,7 @@ export const registeredPages = {
 export type Page<P> = {
     Component: ComponentType<P>;
     title: (t: TranslateFn, props: P, lang: LanguageCode) => string;
+    customTitle?: boolean;
 };
 
 export type RegisteredPageId = keyof typeof registeredPages;

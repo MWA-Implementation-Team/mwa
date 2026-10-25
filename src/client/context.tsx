@@ -71,6 +71,7 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
 
     useEffect(() => {
         const page = registeredPages[pageId] as Page<RegisteredPageProps<P>>;
+        if (page.customTitle) return;
         const title = page.title(value.t, pageProps, lang);
         document.title = title;
     }, [pageId, pageProps, value]);
