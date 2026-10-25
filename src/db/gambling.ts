@@ -63,7 +63,7 @@ export function queryGamblingInvitations(state: MwaState, userId: number): Invit
     const query = state.prepare(`
     SELECT gambling_sessions.id, game_type, p1u.username AS p1_name FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
-    WHERE p2 = ? AND p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NULL
+    WHERE p2 = ? AND status = 'pending'
     ORDER BY gambling_sessions.created_at ASC
     `);
     return query.all(userId).map(row => {
@@ -80,7 +80,7 @@ export function queryActiveGamblingSession(state: MwaState, userId: number): Act
     SELECT gambling_sessions.id, p1, p1u.username AS p1_name, p2, p2u.username AS p2_name FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
-    WHERE (p1 = ? OR p2 = ?) AND p2_deposit_tx IS NOT NULL AND winner IS NULL
+    WHERE (p1 = ? OR p2 = ?) AND status = 'running'
     `);
     const row = query.get(userId, userId);
     if (!row) return null;
@@ -96,7 +96,7 @@ export function queryGamblingSessions(state: MwaState): SessionSummary[] {
     SELECT gambling_sessions.id, game_type, p1u.username AS p1_name, p2u.username AS p2_name FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
-    WHERE p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NOT NULL AND winner IS NULL
+    WHERE status = 'running'
     `);
     return query.all().map((row) => {
         return {
@@ -165,7 +165,7 @@ export function acceptGamblingSession(state: MwaState, sessionId: number, userId
     return runTransaction(state.db, () => {
         const sessionQuery = state.prepare(`
         SELECT bet_amount FROM gambling_sessions
-        WHERE id = ? AND p2 = ? AND p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NULL AND winner IS NULL
+        WHERE id = ? AND p2 = ? AND status = 'pending'
         `);
         const row = sessionQuery.get(sessionId, userId);
         if (!row) {
@@ -179,7 +179,7 @@ export function acceptGamblingSession(state: MwaState, sessionId: number, userId
         }
 
         const update = state.prepare(`
-        UPDATE gambling_sessions SET p2_deposit_tx = ? WHERE id = ?
+        UPDATE gambling_sessions SET status = 'running', p2_deposit_tx = ? WHERE id = ?
         `);
         update.run(deductResult.parentId, sessionId);
 
@@ -188,25 +188,32 @@ export function acceptGamblingSession(state: MwaState, sessionId: number, userId
 }
 
 export function rejectGamblingSession(state: MwaState, sessionId: number, userId: number) {
-    // Delete p1 deposit transaction to return money to p1.
-    // The balance delta should be negative so this should be fine.
-    // At the same time, p1_deposit_tx is cascaded to null and that marks the session as rejected.
-    const del = state.prepare(`
-    DELETE FROM parent_transactions
-    WHERE id IN (
-      SELECT p1_deposit_tx
-      FROM gambling_sessions
-      WHERE id = ? AND p2 = ? AND p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NULL
-    );
-    `);
-    del.run(sessionId, userId);
+    runTransaction(state.db, () => {
+        const row = state.prepare(`
+        SELECT p1_deposit_tx FROM gambling_sessions
+        WHERE id = ? AND p2 = ? AND status = 'pending'
+        `).get(sessionId, userId);
+        if (!row) return;
+
+        state.prepare(`
+        UPDATE gambling_sessions SET status = 'rejected', p1_deposit_tx = NULL
+        WHERE id = ?
+        `).run(sessionId);
+
+        // Delete p1 deposit transaction to return money to p1.
+        // The balance delta is supposed to be negative so this should be fine.
+        // At the same time, p1_deposit_tx is cascaded to null and that marks the session as rejected.
+        state.prepare(`
+        DELETE FROM parent_transactions WHERE id = ?
+        `).run(row.p1_deposit_tx);
+    });
 }
 
 export function winGamblingSession(state: MwaState, sessionId: number, winner: Gambler) {
     runTransaction(state.db, () => {
         const sessionQuery = state.prepare(`
         SELECT p1, p2, bet_amount FROM gambling_sessions
-        WHERE id = ? AND p2_deposit_tx IS NOT NULL AND winner IS NULL
+        WHERE id = ? AND status = 'running'
         `);
         const row = sessionQuery.get(sessionId);
         if (!row) {
@@ -228,7 +235,7 @@ export function winGamblingSession(state: MwaState, sessionId: number, winner: G
         insertChildTx.run(parentId, userId, betAmount * 2);
 
         const update = state.prepare(`
-        UPDATE gambling_sessions SET winner = ?, winner_tx = ? WHERE id = ?
+        UPDATE gambling_sessions SET status = 'ended', winner = ?, winner_tx = ? WHERE id = ?
         `);
         update.run(winner, parentId, sessionId);
     });
@@ -343,7 +350,7 @@ export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
     SELECT sessions.id AS session_id, tx.created_at AS accepted_at FROM coin_flip_games
     LEFT JOIN gambling_sessions AS sessions ON sessions.id = coin_flip_games.session
     LEFT JOIN parent_transactions AS tx ON tx.id = sessions.p2_deposit_tx
-    WHERE sessions.p2_deposit_tx IS NOT NULL AND sessions.winner IS NULL
+    WHERE status = 'running'
     `);
     return select.all().map(row => {
         return {

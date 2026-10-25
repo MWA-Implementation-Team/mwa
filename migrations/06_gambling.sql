@@ -48,6 +48,12 @@ CREATE TABLE IF NOT EXISTS gambling_sessions (
     bet_amount INTEGER NOT NULL,
     game_type TEXT NOT NULL,
 
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'expired', 'rejected', 'running', 'ended')),
+    -- pending          : p1_deposit_tx != null, p2_deposit_tx == null, winner_tx == null
+    -- expired/rejected : p1_deposit_tx == null, p2_deposit_tx == null, winner_tx == null
+    -- running          : p1_deposit_tx != null, p2_deposit_tx != null, winner_tx == null
+    -- ended            : p1_deposit_tx != null, p2_deposit_tx != null, winner_tx != null
+
     -- transaction where bet amount is deducted from p1
     -- null = p2 rejected the challenge
     p1_deposit_tx INTEGER REFERENCES parent_transactions (id) ON DELETE SET NULL,
@@ -63,21 +69,25 @@ CREATE TABLE IF NOT EXISTS gambling_sessions (
       p1 != p2
     ),
     CHECK (
-      (winner != 'p1' AND winner != 'p2') OR winner_tx IS NOT NULL
+      NOT ( status == 'pending' AND (p1_deposit_tx IS NULL OR p2_deposit_tx IS NOT NULL OR winner IS NOT NULL) )
     ),
     CHECK (
-      winner != 'draw' OR winner_tx IS NULL
+      NOT ( (status == 'expired' OR status == 'rejected') AND (p1_deposit_tx IS NOT NULL OR p2_deposit_tx IS NOT NULL OR winner IS NOT NULL) )
     ),
     CHECK (
-      p1_deposit_tx IS NOT NULL
-      OR p2_deposit_tx IS NULL
+      NOT ( (status == 'running') AND (p1_deposit_tx IS NULL OR p2_deposit_tx IS NULL OR winner IS NOT NULL) )
     ),
     CHECK (
-      p2_deposit_tx IS NOT NULL
-      OR winner IS NULL
+      NOT ( (status == 'ended') AND (p1_deposit_tx IS NULL OR p2_deposit_tx IS NULL OR winner IS NULL) )
     ),
     CHECK (
-      game_type != 'coin_flip' OR winner != 'draw'
+      NOT ( (winner == 'p1' OR winner == 'p2') AND winner_tx IS NULL )
+    ),
+    CHECK (
+      NOT ( winner == 'draw' AND winner_tx IS NOT NULL )
+    ),
+    CHECK (
+      NOT ( game_type == 'coin_flip' AND winner == 'draw' )
     )
 );
 
