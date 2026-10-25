@@ -1,6 +1,6 @@
 import { requireApiUser, requireUser } from '#src/auth.js';
 import { InviteToGamblePageProps } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
-import { acceptGamblingSession, CoinSide, findGamblingSessionById, GameType, giveCoins, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
+import { acceptGamblingSession, CoinSide, findGamblingSessionById, GameType, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { notificationsChannel, publish, sessionChannel, subscribe } from '#src/pubsub.js';
@@ -9,15 +9,6 @@ import { streamSSE } from 'hono/streaming';
 import { safeGoto } from './login.js';
 
 export function registerGamblingRoutes(app: MwaHono) {
-    app.get('/app/give-coins', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        const amount = Number(ctx.req.query('amount'));
-        giveCoins(ctx.var, user.id, amount);
-        return ctx.text('ok');
-    });
-
     app.get('/app/gambling', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
@@ -78,7 +69,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (!form) return writeErrorPage(ctx, 400);
 
         const betAmount = Number(form.get('bet_amount'));
-        if (isNaN(betAmount) || betAmount <= 0 || !Number.isInteger(betAmount)) return writeErrorPage(ctx, 400);
+        if (isNaN(betAmount) || betAmount <= 0 || !Number.isSafeInteger(betAmount)) return writeErrorPage(ctx, 400);
 
         const gameType = form.get('game_type') as GameType;
 

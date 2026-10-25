@@ -256,23 +256,6 @@ function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOp
     return row!.id as number;
 }
 
-// TEMPORARY
-export function giveCoins(state: MwaState, userId: number, amount: number) {
-    return runTransaction(state.db, () => {
-        const insertParentTx = state.prepare(`
-        INSERT INTO parent_transactions (kind) VALUES ('system')
-        RETURNING id
-        `);
-        const { id: parentId } = insertParentTx.get()!;
-
-        const insertChildTx = state.prepare(`
-        INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)
-        RETURNING id
-        `);
-        insertChildTx.run(parentId, userId, amount);
-    });
-}
-
 export type DeductCoinsResult = {
     type: 'success',
     parentId: number,

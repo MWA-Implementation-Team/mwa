@@ -1,6 +1,8 @@
 import { MwaState } from '#src/state.js';
+import { runTransaction } from './transaction.js';
 
-export type TransactionKind = 'transfer' | 'purchase' | 'system' | 'gambling_deduction' | 'gambling_winnings';
+export type TransactionKind =
+    'transfer' | 'purchase' | 'system' | 'gambling_deduction' | 'gambling_winnings';
 
 export type Transaction = {
     // kept as the ISO string stored in sqlite so SSR and hydration
@@ -30,3 +32,18 @@ export function listUserTransactions(state: MwaState, userId: number, limit = 10
     }));
 }
 
+export function giveCoins(state: MwaState, userId: number, amount: number) {
+    return runTransaction(state.db, () => {
+        const insertParentTx = state.prepare(`
+        INSERT INTO parent_transactions (kind) VALUES ('system')
+        RETURNING id
+        `);
+        const { id: parentId } = insertParentTx.get()!;
+
+        const insertChildTx = state.prepare(`
+        INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)
+        RETURNING id
+        `);
+        insertChildTx.run(parentId, userId, amount);
+    });
+}
