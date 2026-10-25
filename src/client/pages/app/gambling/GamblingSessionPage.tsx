@@ -63,8 +63,8 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                             will land on <strong>{game.p1Guess}</strong>
                         </p>
                         <p>
-                            If they are right, you <strong>lose {game.betAmount} coins</strong>. If
-                            they're wrong, you <strong>win {game.betAmount} coins</strong>
+                            If they are right, you lose <strong>{game.betAmount}</strong> coins. If
+                            they're wrong, you win <strong>{game.betAmount}</strong> coins
                         </p>
                         <p>Do you wish to accept this bet?</p>
                         <form method="POST">
