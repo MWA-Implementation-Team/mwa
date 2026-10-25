@@ -18,6 +18,11 @@ export type Language = {
     titleInteract: string;
     titleAdmin: string;
     titleError: string;
+    titleGamblingRequest: string;
+    titleGamblingExpired: string;
+    titleGamblingRejected: string;
+    titleGamblingCoinFlip: string;
+    titleGamblingInvite: string;
 
     headerLanding: string;
     headerLogin: string;
@@ -117,6 +122,42 @@ export type Language = {
     emailLoginCode: string;
     emailLoginFallback: string;
     emailLoginExpiry: string;
+
+    gamblingActiveGames: string;
+    gamblingVersus: string;
+    gamblingWith: string;
+    gamblingChallenge: string;
+    gamblingBetAmount: string;
+    gamblingSendInvite: string;
+    gamblingInsufficientCoins: string;
+    gamblingRequest: string;
+    gamblingAcceptQuestion: string;
+    gamblingAccept: string;
+    gamblingReject: string;
+    gamblingDisconnected: string;
+    gamblingRefreshQuestion: string;
+    gamblingWaiting: string;
+    gamblingWaitingHelp: string;
+    gamblingExpired: string;
+    gamblingExpiryDetails: string;
+    gamblingRejected: string;
+    gamblingRejectedDetails: string;
+    gamblingYouWin: string;
+    gamblingWinner: string;
+    gamblingNotificationInvite: string;
+    gamblingOpen: string;
+    gamblingInProgress: string;
+    gamblingReturn: string;
+    gamblingAction: string;
+
+    gamblingCoinFlip: string;
+    gamblingHeads: string;
+    gamblingTails: string;
+    gamblingCoinFlipDescription: string;
+    gamblingCoinFlipChallenged: string;
+    gamblingCoinFlipBetDetails: string;
+    gamblingCoinFlipBetOutcome: string;
+    gamblingCoinFlipping: string;
 };
 
 export const languages: Record<LanguageCode, Language> = {
@@ -136,6 +177,11 @@ export const languages: Record<LanguageCode, Language> = {
         titleInteract: 'MWA | Interact',
         titleAdmin: 'MWA | Admin',
         titleError: 'MWA | {status}',
+        titleGamblingRequest: 'MWA | Challenge request',
+        titleGamblingExpired: 'MWA | Expired',
+        titleGamblingRejected: 'MWA | Rejected',
+        titleGamblingCoinFlip: 'MWA | Coin flip',
+        titleGamblingInvite: 'MWA | Gamble with {name}',
 
         headerLanding: 'Home',
         headerLogin: 'Login',
@@ -236,6 +282,44 @@ export const languages: Record<LanguageCode, Language> = {
         emailLoginCode: 'Or enter this code on the login page:',
         emailLoginFallback: "If the button doesn't work, paste this link into your browser:",
         emailLoginExpiry: 'The link and code expire in 15 minutes.',
+
+        gamblingActiveGames: 'Active games',
+        gamblingVersus: '{p1} vs {p2}',
+        gamblingWith: 'Gamble with {name}',
+        gamblingChallenge: 'Challenge',
+        gamblingBetAmount: 'Bet amount',
+        gamblingSendInvite: 'Send invite',
+        gamblingInsufficientCoins: 'You do not have enough coins for this bet.',
+        gamblingRequest: 'Gambling request',
+        gamblingAcceptQuestion: 'Do you wish to accept this bet?',
+        gamblingAccept: 'Accept',
+        gamblingReject: 'Reject',
+        gamblingDisconnected: 'Disconnected from server.',
+        gamblingRefreshQuestion: 'Refresh?',
+        gamblingWaiting: 'Waiting for {player}',
+        gamblingWaitingHelp: 'Tell them to open MWA and accept the invitation.',
+        gamblingExpired: 'Expired',
+        gamblingExpiryDetails:
+            'This invitation expired because {player} did not accept it within {minutes} minutes.',
+        gamblingRejected: 'Rejected',
+        gamblingRejectedDetails: '{player} has rejected this challenge.',
+        gamblingYouWin: 'You win!',
+        gamblingWinner: '{player} won',
+        gamblingNotificationInvite: '{player} has invited you to gamble!',
+        gamblingOpen: 'Open',
+        gamblingInProgress: 'You are currently gambling.',
+        gamblingReturn: 'Return',
+        gamblingAction: 'Gamble',
+
+        gamblingCoinFlip: 'Coin flip',
+        gamblingHeads: 'Heads',
+        gamblingTails: 'Tails',
+        gamblingCoinFlipDescription: 'Guess which side the coin will land on.',
+        gamblingCoinFlipChallenged: '{player} has challenged you to a coin flip.',
+        gamblingCoinFlipBetDetails: 'They are betting {amount} coins on this coin side: {side}.',
+        gamblingCoinFlipBetOutcome:
+            'If they are right, you lose {amount} coins. If they are wrong, you win {amount} coins.',
+        gamblingCoinFlipping: 'Flipping the coin...',
     },
     lt: {
         displayName: 'Lietuvių',
@@ -253,6 +337,11 @@ export const languages: Record<LanguageCode, Language> = {
         titleInteract: 'MWA | Sąveika',
         titleAdmin: 'MWA | Administravimas',
         titleError: 'MWA | {status}',
+        titleGamblingRequest: 'MWA | Kvietimas lošti',
+        titleGamblingExpired: 'MWA | Kvietimas nebegalioja',
+        titleGamblingRejected: 'MWA | Kvietimas atmestas',
+        titleGamblingCoinFlip: 'MWA | Monetos metimas',
+        titleGamblingInvite: 'MWA | Lošk su {name}',
 
         headerLanding: 'Pradžia',
         headerLogin: 'Prisijungimas',
@@ -355,6 +444,44 @@ export const languages: Record<LanguageCode, Language> = {
         emailLoginCode: 'Arba prisijungimo puslapyje įveskite šį kodą:',
         emailLoginFallback: 'Jei mygtukas neveikia, įklijuokite šią nuorodą į naršyklę:',
         emailLoginExpiry: 'Nuoroda ir kodas galioja 15 minučių.',
+
+        gamblingActiveGames: 'Vykstantys žaidimai',
+        gamblingVersus: '{p1} prieš {p2}',
+        gamblingWith: 'Lošk su {name}',
+        gamblingChallenge: 'Siųsti iššūkį',
+        gamblingBetAmount: 'Statymo suma',
+        gamblingSendInvite: 'Pakviesti',
+        gamblingInsufficientCoins: 'Šiam statymui nepakanka monetų.',
+        gamblingRequest: 'Kvietimas lošti',
+        gamblingAcceptQuestion: 'Ar nori priimti šį statymą?',
+        gamblingAccept: 'Priimti',
+        gamblingReject: 'Atmesti',
+        gamblingDisconnected: 'Ryšys su serveriu nutrūko.',
+        gamblingRefreshQuestion: 'Atnaujinti?',
+        gamblingWaiting: 'Laukiama žaidėjo {player}',
+        gamblingWaitingHelp: 'Liepk atidaryti MWA ir priimti kvietimą.',
+        gamblingExpired: 'Kvietimas nebegalioja',
+        gamblingExpiryDetails:
+            'Šis kvietimas nebegalioja, nes {player} jo nepriėmė per {minutes} min.',
+        gamblingRejected: 'Kvietimas atmestas',
+        gamblingRejectedDetails: '{player} atmetė šį kvietimą.',
+        gamblingYouWin: 'Tu laimėjai!',
+        gamblingWinner: 'Laimėjo {player}',
+        gamblingNotificationInvite: '{player} kviečia tave lošti!',
+        gamblingOpen: 'Atidaryti',
+        gamblingInProgress: 'Šiuo metu dalyvauji lošime.',
+        gamblingReturn: 'Grįžti',
+        gamblingAction: 'Lošti',
+
+        gamblingCoinFlip: 'Monetos metimas',
+        gamblingHeads: 'Herbas',
+        gamblingTails: 'Skaičius',
+        gamblingCoinFlipDescription: 'Atspėk, kuria puse nukris moneta.',
+        gamblingCoinFlipChallenged: '{player} kviečia tave mesti monetą.',
+        gamblingCoinFlipBetDetails: 'Statoma {amount} monetų už šią monetos pusę: {side}.',
+        gamblingCoinFlipBetOutcome:
+            'Jei spėjimas teisingas, prarasi {amount} monetų. Jei klaidingas, laimėsi {amount} monetų.',
+        gamblingCoinFlipping: 'Metama moneta...',
     },
 };
 

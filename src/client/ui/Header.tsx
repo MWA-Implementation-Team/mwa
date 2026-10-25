@@ -133,11 +133,12 @@ export default function Header({ hideNotifications }: { hideNotifications?: bool
 }
 
 function NotificationDisplay({ notif }: { notif: Notification }) {
+    const { t } = useContext(ClientContext);
     switch (notif.type) {
         case 'gambling_invite':
             return (
                 <>
-                    <span>{notif.inviterName} has invited you to gamble!</span>
+                    <span>{t('gamblingNotificationInvite', { player: notif.inviterName })}</span>
                     <form
                         method="POST"
                         action={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}/reject`}
@@ -146,21 +147,21 @@ function NotificationDisplay({ notif }: { notif: Notification }) {
                             class="btn btn-primary"
                             href={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}`}
                         >
-                            Open
+                            {t('gamblingOpen')}
                         </a>
-                        <button type="submit">Reject</button>
+                        <button type="submit">{t('gamblingReject')}</button>
                     </form>
                 </>
             );
         case 'return_to_gambling':
             return (
                 <>
-                    <span>You are currently gambling</span>
+                    <span>{t('gamblingInProgress')}</span>
                     <a
                         class="btn btn-primary"
                         href={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}`}
                     >
-                        Return
+                        {t('gamblingReturn')}
                     </a>
                 </>
             );

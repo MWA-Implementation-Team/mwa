@@ -51,10 +51,10 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const errorType = ctx.req.query('error_type');
-        let errorMessage: string | undefined;
+        let errorMessage: 'gamblingInsufficientCoins' | undefined;
         switch (errorType) {
             case 'broke':
-                errorMessage = 'broke boy';
+                errorMessage = 'gamblingInsufficientCoins';
                 break;
         }
 
@@ -135,10 +135,10 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const error = ctx.req.query('error');
-        let message: string | undefined;
+        let message: 'gamblingInsufficientCoins' | undefined;
         switch (error) {
             case 'broke':
-                message = 'broke boy';
+                message = 'gamblingInsufficientCoins';
                 break;
         }
 
@@ -180,8 +180,6 @@ export function registerGamblingRoutes(app: MwaHono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        //const lang = getRequestLanguage(ctx);
-
         const form = await ctx.req.formData().catch(() => null);
         if (!form) {
             return writeErrorPage(ctx, 400);
@@ -216,8 +214,6 @@ export function registerGamblingRoutes(app: MwaHono) {
     app.post('/app/gambling/sessions/:id/reject', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
-
-        //const lang = getRequestLanguage(ctx);
 
         const form = await ctx.req.formData().catch(() => null);
         if (!form) {

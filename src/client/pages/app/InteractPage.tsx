@@ -53,7 +53,7 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
                     class="btn btn-primary"
                     href={`/app/interact/${encodeURIComponent(token)}/gamble`}
                 >
-                    GAMBLE 💲🤑🎰🤑💲
+                    {t('gamblingAction')} 💲🤑🎰🤑💲
                 </a>
             </section>
 

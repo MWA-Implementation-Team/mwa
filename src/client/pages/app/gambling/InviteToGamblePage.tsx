@@ -1,6 +1,7 @@
+import { ClientContext } from '#src/client/context.js';
 import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
-import { useState } from 'preact/hooks';
+import { useContext, useState } from 'preact/hooks';
 import Dialog from '#src/client/ui/Dialog.js';
 import { GameType } from '#src/db/gambling.js';
 
@@ -8,41 +9,48 @@ export type InviteToGamblePageProps = {
     targetUsername: string;
     error?: {
         dialog: GameType;
-        message: string;
+        message: 'gamblingInsufficientCoins';
     };
 };
 
 export const inviteToGamblePage: Page<InviteToGamblePageProps> = {
     Component: InviteToGamblePage,
-    title: (_, { targetUsername }) => `MWA | ${targetUsername} gambling`,
+    title: (t, { targetUsername }) => t('titleGamblingInvite', { name: targetUsername }),
 };
 
 function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) {
+    const { t } = useContext(ClientContext);
     const [openDialog, setOpenDialog] = useState<GameType | null>(error?.dialog ?? null);
 
     return (
         <>
             <Header />
 
-            <h1>Gamble with {targetUsername}</h1>
+            <h1>{t('gamblingWith', { name: targetUsername })}</h1>
 
             <section>
-                <h2>Coin flip</h2>
-                <span>Guess which side the coin will flip on</span>
-                <button onClick={() => setOpenDialog('coin_flip')}>Challenge</button>
+                <h2>{t('gamblingCoinFlip')}</h2>
+                <span>{t('gamblingCoinFlipDescription')}</span>
+                <button onClick={() => setOpenDialog('coin_flip')}>{t('gamblingChallenge')}</button>
             </section>
 
             <Dialog isOpen={openDialog === 'coin_flip'} onClose={() => setOpenDialog(null)}>
                 <form method="POST">
-                    <h2>Coin flip</h2>
+                    <h2>{t('gamblingCoinFlip')}</h2>
                     <input type="hidden" name="game_type" value="coin_flip" />
-                    <input type="number" min="1" name="bet_amount" placeholder="Bet amount" />
+                    <input
+                        type="number"
+                        min="1"
+                        name="bet_amount"
+                        placeholder={t('gamblingBetAmount')}
+                        aria-label={t('gamblingBetAmount')}
+                    />
                     <select name="cf_bet">
-                        <option value="heads">Heads</option>
-                        <option value="tails">Tails</option>
+                        <option value="heads">{t('gamblingHeads')}</option>
+                        <option value="tails">{t('gamblingTails')}</option>
                     </select>
-                    <button type="submit">Invite to flip the coin</button>
-                    {error?.message && <span>{error?.message}</span>}
+                    <button type="submit">{t('gamblingSendInvite')}</button>
+                    {error?.message && <span>{t(error.message)}</span>}
                 </form>
             </Dialog>
         </>

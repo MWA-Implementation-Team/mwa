@@ -1,38 +1,39 @@
+import { Trans } from '#src/client/ui/Trans.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
 import Header from '#src/client/ui/Header.js';
-import { Gambler, RunningGame } from '#src/db/gambling.js';
+import { CoinSide, Gambler, RunningGame } from '#src/db/gambling.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 
 type GamblingSessionPageProps = {
     sessionId: number;
     game: RunningGame;
-    message?: string;
+    message?: 'gamblingInsufficientCoins';
 };
 
 export const gamblingSessionPagie: Page<GamblingSessionPageProps> = {
     Component: GamblingSessionPage,
-    title: (_, props) => {
+    title: (t, props) => {
         switch (props.game.status.type) {
             case 'pending':
-                return 'MWA | Challenge Request';
+                return t('titleGamblingRequest');
             case 'expired':
-                return 'MWA | Expired';
+                return t('titleGamblingExpired');
             case 'rejected':
-                return 'MWA | Rejected';
+                return t('titleGamblingRejected');
             case 'running':
             case 'ended':
                 switch (props.game.gameType) {
                     case 'coin_flip':
-                        return 'MWA | Coin Flip';
+                        return t('titleGamblingCoinFlip');
                 }
         }
     },
 };
 
 function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPageProps) {
-    const { user } = useContext(ClientContext);
+    const { user, t } = useContext(ClientContext);
     const [currentGame, setCurrentGame] = useState(game);
     const [isDisconnected, setIsDisconnected] = useState(false);
 
@@ -56,32 +57,41 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                 return (
                     <>
                         <Header hideNotifications={true} />
-                        <h1>Gambling request:</h1>
-                        <p>{currentGame.p1Name} has challenged you in a game of coin flip</p>
+                        <h1>{t('gamblingRequest')}</h1>
+                        <p>{t('gamblingCoinFlipChallenged', { player: currentGame.p1Name })}</p>
                         <p>
-                            They are betting <strong>{game.betAmount}</strong> coins that the coin
-                            will land on <strong>{game.p1Guess}</strong>
+                            <Trans
+                                id="gamblingCoinFlipBetDetails"
+                                values={{
+                                    amount: <strong>{game.betAmount}</strong>,
+                                    side: (
+                                        <strong>{t(coinSideTrans(game.p1Guess))}</strong>
+                                    ),
+                                }}
+                            />
                         </p>
                         <p>
-                            If they are right, you lose <strong>{game.betAmount}</strong> coins. If
-                            they're wrong, you win <strong>{game.betAmount}</strong> coins
+                            <Trans
+                                id="gamblingCoinFlipBetOutcome"
+                                values={{ amount: <strong>{game.betAmount}</strong> }}
+                            />
                         </p>
-                        <p>Do you wish to accept this bet?</p>
+                        <p>{t('gamblingAcceptQuestion')}</p>
                         <form method="POST">
                             <button
                                 formaction={`/app/gambling/sessions/${sessionId}/accept`}
                                 type="submit"
                             >
-                                ACCEPT
+                                {t('gamblingAccept')}
                             </button>
                             <button
                                 formaction={`/app/gambling/sessions/${sessionId}/reject?goto=${encodeURIComponent('/app')}`}
                                 type="submit"
                             >
-                                REJECT
+                                {t('gamblingReject')}
                             </button>
                         </form>
-                        {message && <span>{message}</span>}
+                        {message && <span>{t(message)}</span>}
                     </>
                 );
             } else {
@@ -90,11 +100,12 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                         <Header hideNotifications={true} />
                         {isDisconnected ? (
                             <span>
-                                Disconnected from server. <a href="">Refresh?</a>
+                                {t('gamblingDisconnected')}.{' '}
+                                <a href="">{t('gamblingRefreshQuestion')}</a>
                             </span>
                         ) : null}
-                        <h1>Waiting for {game.p2Name}</h1>
-                        <span>Tell them to open MWA and accept the notification</span>
+                        <h1>{t('gamblingWaiting', { player: game.p2Name })}</h1>
+                        <span>{t('gamblingWaitingHelp')}</span>
                     </>
                 );
             }
@@ -103,10 +114,12 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
             return (
                 <>
                     <Header />
-                    <h1>Expired</h1>
+                    <h1>{t('gamblingExpired')}</h1>
                     <span>
-                        This session expired after {currentGame.p2Name} didn't accept within{' '}
-                        {gamblingPendingExpiryMinutes} minutes.
+                        {t('gamblingExpiryDetails', {
+                            player: currentGame.p2Name,
+                            minutes: String(gamblingPendingExpiryMinutes),
+                        })}
                     </span>
                 </>
             );
@@ -115,8 +128,8 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
             return (
                 <>
                     <Header />
-                    <h1>Rejected</h1>
-                    <span>{currentGame.p2Name} has rejected this challenge</span>
+                    <h1>{t('gamblingRejected')}</h1>
+                    <span>{t('gamblingRejectedDetails', { player: currentGame.p2Name })}</span>
                 </>
             );
         }
@@ -127,27 +140,35 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                     <Header hideNotifications={currentGame.status.type === 'running'} />
                     {isDisconnected ? (
                         <span>
-                            Disconnected from server. <a href="">Refresh?</a>
+                            {t('gamblingDisconnected')}.{' '}
+                            <a href="">{t('gamblingRefreshQuestion')}</a>
                         </span>
                     ) : null}
                     <h1>Coin flip duel</h1>
-                    <p>
-                        {currentGame.p1Name} vs {currentGame.p2Name}
-                    </p>
+                    <p>{t('gamblingVersus', { p1: currentGame.p1Name, p2: currentGame.p2Name })}</p>
                     {currentGame.status.type === 'ended' ? (
                         <>
-                            <h2>{currentGame.status.flipResult}</h2>
+                            <h2>{t(coinSideTrans(currentGame.status.flipResult))}</h2>
                             <h3>
                                 {side && side === currentGame.status.winner
-                                    ? 'YOU WIN'
-                                    : `${currentGame.status.winner === 'p1' ? currentGame.p1Name : currentGame.p2Name} won`}{' '}
+                                    ? t('gamblingYouWin')
+                                    : t('gamblingWinner', {
+                                          player:
+                                              currentGame.status.winner === 'p1'
+                                                  ? currentGame.p1Name
+                                                  : currentGame.p2Name,
+                                      })}{' '}
                             </h3>
                         </>
                     ) : (
-                        <h2>imagine coin flipping here</h2>
+                        <h2>{t('gamblingCoinFlipping')}</h2>
                     )}
                 </>
             );
         }
     }
+}
+
+function coinSideTrans(side: CoinSide) {
+    return side === 'heads' ? 'gamblingHeads' : 'gamblingTails';
 }
