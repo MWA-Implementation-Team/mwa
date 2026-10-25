@@ -143,7 +143,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
         status = {
             type: 'ended',
             winner: row.winner as Gambler, // draw not possible in coin flip
-            flipResult: row.winner_user === row.p1 ? p1Guess : (p1Guess === 'heads' ? 'tails' : 'heads')
+            flipResult: row.winner === 'p1' ? p1Guess : (p1Guess === 'heads' ? 'tails' : 'heads')
         };
     }
 
@@ -196,7 +196,7 @@ export function rejectGamblingSession(state: MwaState, sessionId: number, userId
     WHERE id IN (
       SELECT p1_deposit_tx
       FROM gambling_sessions
-      WHERE id = ? AND p2 = ?
+      WHERE id = ? AND p2 = ? AND p1_deposit_tx IS NOT NULL AND p2_deposit_tx IS NULL
     );
     `);
     del.run(sessionId, userId);

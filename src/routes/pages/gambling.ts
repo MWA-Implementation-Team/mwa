@@ -1,4 +1,4 @@
-import { requireUser } from '#src/auth.js';
+import { requireApiUser, requireUser } from '#src/auth.js';
 import { InviteToGamblePageProps } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
 import { acceptGamblingSession, CoinSide, findGamblingSessionById, GameType, giveCoins, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
@@ -78,7 +78,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (!form) return writeErrorPage(ctx, 400);
 
         const betAmount = Number(form.get('bet_amount'));
-        if (isNaN(betAmount) || betAmount <= 0) return writeErrorPage(ctx, 400);
+        if (isNaN(betAmount) || betAmount <= 0 || !Number.isInteger(betAmount)) return writeErrorPage(ctx, 400);
 
         const gameType = form.get('game_type') as GameType;
 
@@ -134,6 +134,9 @@ export function registerGamblingRoutes(app: MwaHono) {
     });
 
     app.get('/app/gambling/sessions/:id/watch', async (ctx) => {
+        const user = requireApiUser(ctx);
+        if (user instanceof Response) return user;
+
         const sessionId = Number(ctx.req.param('id'));
 
         return streamSSE(ctx, async (stream) => {
