@@ -7,9 +7,9 @@ import { GameType } from '#src/db/gambling.js';
 export type InviteToGamblePageProps = {
     targetUsername: string;
     error?: {
-        dialog: GameType,
-        message: string,
-    },
+        dialog: GameType;
+        message: string;
+    };
 };
 
 export const inviteToGamblePage: Page<InviteToGamblePageProps> = {

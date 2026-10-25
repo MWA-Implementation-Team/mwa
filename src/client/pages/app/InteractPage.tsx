@@ -49,7 +49,12 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
             </section>
 
             <section>
-                <a class="btn btn-primary" href={`/app/interact/${encodeURIComponent(token)}/gamble`}>GAMBLE 💲🤑🎰🤑💲</a>
+                <a
+                    class="btn btn-primary"
+                    href={`/app/interact/${encodeURIComponent(token)}/gamble`}
+                >
+                    GAMBLE 💲🤑🎰🤑💲
+                </a>
             </section>
 
             {detail && (

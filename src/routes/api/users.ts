@@ -40,6 +40,6 @@ export function registerUsersRoutes(app: MwaHono) {
                     data: json,
                 });
             }
-        })
+        });
     });
 }

@@ -12,6 +12,5 @@ export function getRequestLanguage(ctx: Context): LanguageCode {
 
 // [0, 1) like Math.random()
 export function secureRandom(): number {
-    return randomBytes(4).readUInt32BE(0) / (2 ** 32);
+    return randomBytes(4).readUInt32BE(0) / 2 ** 32;
 }
-

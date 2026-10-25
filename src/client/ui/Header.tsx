@@ -31,7 +31,7 @@ export default function Header({ hideNotifications }: { hideNotifications?: bool
                         <MenuIcon />
                     </button>
 
-                    {(notification && !hideNotifications) ? (
+                    {notification && !hideNotifications ? (
                         <div>
                             <NotificationDisplay notif={notification} />
                         </div>
@@ -138,18 +138,31 @@ function NotificationDisplay({ notif }: { notif: Notification }) {
             return (
                 <>
                     <span>{notif.inviterName} has invited you to gamble!</span>
-                    <form method="POST" action={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}/reject`}>
-                        <a class="btn btn-primary" href={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}`}>Open</a>
+                    <form
+                        method="POST"
+                        action={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}/reject`}
+                    >
+                        <a
+                            class="btn btn-primary"
+                            href={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}`}
+                        >
+                            Open
+                        </a>
                         <button type="submit">Reject</button>
                     </form>
                 </>
-            )
+            );
         case 'return_to_gambling':
             return (
                 <>
                     <span>You are currently gambling</span>
-                    <a class="btn btn-primary" href={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}`}>Return</a>
+                    <a
+                        class="btn btn-primary"
+                        href={`/app/gambling/sessions/${encodeURIComponent(notif.sessionId)}`}
+                    >
+                        Return
+                    </a>
                 </>
-            )
+            );
     }
 }

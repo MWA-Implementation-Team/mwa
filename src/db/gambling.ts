@@ -21,38 +21,40 @@ export type CommonGameOpts = {
 export type Gambler = 'p1' | 'p2';
 
 export type RunningGame = {
-    status: { type: 'pending' }
-    | { type: 'expired' }
-    | { type: 'rejected' }
-    | { type: 'running' }
-    | {
-        type: 'ended',
-        winner: Gambler,
-    }
+    status:
+        | { type: 'pending' }
+        | { type: 'expired' }
+        | { type: 'rejected' }
+        | { type: 'running' }
+        | {
+              type: 'ended';
+              winner: Gambler;
+          };
 
     p1: number;
     p2: number;
     p1Name: string;
     p2Name: string;
     betAmount: number;
-} & ({
-    gameType: 'coin_flip',
-    status: { type: 'pending' }
-    | { type: 'expired' }
-    | { type: 'rejected' }
-    | { type: 'running' }
-    | {
-        type: 'ended',
-        winner: Gambler,
-        flipResult: CoinSide,
-    }
+} & {
+    gameType: 'coin_flip';
+    status:
+        | { type: 'pending' }
+        | { type: 'expired' }
+        | { type: 'rejected' }
+        | { type: 'running' }
+        | {
+              type: 'ended';
+              winner: Gambler;
+              flipResult: CoinSide;
+          };
 
-    p1Guess: CoinSide,
-});
+    p1Guess: CoinSide;
+};
 
 export type Invitation = {
     id: number;
-    type: GameType,
+    type: GameType;
     p1Name: string;
 };
 
@@ -68,7 +70,7 @@ export function queryGamblingInvitations(state: MwaState, userId: number): Invit
     WHERE p2 = ? AND status = 'pending'
     ORDER BY gambling_sessions.created_at ASC
     `);
-    return query.all(userId).map(row => {
+    return query.all(userId).map((row) => {
         return {
             id: row.id as number,
             type: row.game_type as GameType,
@@ -89,7 +91,7 @@ export function queryActiveGamblingSession(state: MwaState, userId: number): Act
 
     return {
         id: row.id as number,
-        opponentName: row.p1 === userId ? row.p2_name as string : row.p1_name as string,
+        opponentName: row.p1 === userId ? (row.p2_name as string) : (row.p1_name as string),
     };
 }
 
@@ -153,7 +155,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
             status = {
                 type: 'ended',
                 winner: row.winner as Gambler, // draw not possible in coin flip
-                flipResult: row.winner === 'p1' ? p1Guess : (p1Guess === 'heads' ? 'tails' : 'heads')
+                flipResult: row.winner === 'p1' ? p1Guess : p1Guess === 'heads' ? 'tails' : 'heads',
             };
             break;
         default:
@@ -174,7 +176,11 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
 
 export type AcceptGamblingSessionResult = 'success' | 'too_broke' | 'invalid_session';
 
-export function acceptGamblingSession(state: MwaState, sessionId: number, userId: number): AcceptGamblingSessionResult {
+export function acceptGamblingSession(
+    state: MwaState,
+    sessionId: number,
+    userId: number,
+): AcceptGamblingSessionResult {
     return runTransaction(state.db, () => {
         const sessionQuery = state.prepare(`
         SELECT bet_amount FROM gambling_sessions
@@ -200,25 +206,42 @@ export function acceptGamblingSession(state: MwaState, sessionId: number, userId
     });
 }
 
-export function cancelGamblingSession(state: MwaState, sessionId: number, reason: 'expired' | 'rejected', userId?: number) {
+export function cancelGamblingSession(
+    state: MwaState,
+    sessionId: number,
+    reason: 'expired' | 'rejected',
+    userId?: number,
+) {
     runTransaction(state.db, () => {
-        const row = state.prepare(`
+        const row = state
+            .prepare(
+                `
         SELECT p1_deposit_tx FROM gambling_sessions
         WHERE id = ? AND (? IS NULL OR p2 = ?) AND status = 'pending'
-        `).get(sessionId, userId ?? null, userId ?? null);
+        `,
+            )
+            .get(sessionId, userId ?? null, userId ?? null);
         if (!row) return;
 
-        state.prepare(`
+        state
+            .prepare(
+                `
         UPDATE gambling_sessions SET status = ?, p1_deposit_tx = NULL
         WHERE id = ?
-        `).run(reason, sessionId);
+        `,
+            )
+            .run(reason, sessionId);
 
         // Delete p1 deposit transaction to return money to p1.
         // The balance delta is supposed to be negative so this should be fine.
         // At the same time, p1_deposit_tx is cascaded to null and that marks the session as rejected.
-        state.prepare(`
+        state
+            .prepare(
+                `
         DELETE FROM parent_transactions WHERE id = ?
-        `).run(row.p1_deposit_tx);
+        `,
+            )
+            .run(row.p1_deposit_tx);
     });
 }
 
@@ -255,8 +278,8 @@ export function winGamblingSession(state: MwaState, sessionId: number, winner: G
 }
 
 export type ExpiringGamblingSession = {
-    id: number,
-    creationTime: Date,
+    id: number;
+    creationTime: Date;
 };
 
 export function queryExpiringGamblingSessions(state: MwaState): ExpiringGamblingSession[] {
@@ -264,7 +287,7 @@ export function queryExpiringGamblingSessions(state: MwaState): ExpiringGambling
     SELECT id, created_at FROM gambling_sessions
     WHERE status = 'pending'
     `);
-    return select.all().map(row => {
+    return select.all().map((row) => {
         return {
             id: row.id as number,
             creationTime: new Date(row.created_at as string),
@@ -287,15 +310,21 @@ function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOp
     return row!.id as number;
 }
 
-export type DeductCoinsResult = {
-    type: 'success',
-    parentId: number,
-} | {
-    type: 'too_broke',
-};
+export type DeductCoinsResult =
+    | {
+          type: 'success';
+          parentId: number;
+      }
+    | {
+          type: 'too_broke';
+      };
 
 // this is expected to run in a transaction
-function deductCoinsForGambling(state: MwaState, userId: number, betAmount: number): DeductCoinsResult {
+function deductCoinsForGambling(
+    state: MwaState,
+    userId: number,
+    betAmount: number,
+): DeductCoinsResult {
     const user = findUserById(state, userId);
     if (!user) {
         throw new Error(`User ${userId} doesn't exist`);
@@ -327,7 +356,11 @@ function deductCoinsForGambling(state: MwaState, userId: number, betAmount: numb
 
 export type CoinSide = 'heads' | 'tails';
 
-export function initCoinFlip(state: MwaState, p1Bet: CoinSide, opts: CommonGameOpts): number | null {
+export function initCoinFlip(
+    state: MwaState,
+    p1Bet: CoinSide,
+    opts: CommonGameOpts,
+): number | null {
     return runTransaction(state.db, () => {
         const sessionId = initGamblingSession(state, 'coin_flip', opts);
         if (sessionId === null) return null;
@@ -355,8 +388,8 @@ export function winCoinFlip(state: MwaState, sessionId: number) {
 }
 
 export type PendingCoinFlip = {
-    sessionId: number,
-    acceptedTime: Date,
+    sessionId: number;
+    acceptedTime: Date;
 };
 
 export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
@@ -366,7 +399,7 @@ export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
     LEFT JOIN parent_transactions AS tx ON tx.id = sessions.p2_deposit_tx
     WHERE status = 'running'
     `);
-    return select.all().map(row => {
+    return select.all().map((row) => {
         return {
             sessionId: row.session_id as number,
             acceptedTime: new Date(row.accepted_at as string),

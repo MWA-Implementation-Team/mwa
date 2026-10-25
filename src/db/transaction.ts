@@ -1,4 +1,4 @@
-import { DatabaseSync } from "node:sqlite";
+import { DatabaseSync } from 'node:sqlite';
 
 export function runTransaction<T>(db: DatabaseSync, task: () => T): T {
     db.exec('BEGIN');

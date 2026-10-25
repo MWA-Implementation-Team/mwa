@@ -2,7 +2,7 @@ import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 
 type AdminPageProps = {
-    message?: string,
+    message?: string;
 };
 
 export const adminPage: Page<AdminPageProps> = {

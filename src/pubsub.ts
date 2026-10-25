@@ -1,7 +1,7 @@
 const subscriptions = new Map<string, SubscriptionImpl[]>();
 
 export function publish(channel: string, message: string) {
-    for (const sub of (subscriptions.get(channel) ?? [])) {
+    for (const sub of subscriptions.get(channel) ?? []) {
         sub.queue.push(message);
         sub.nextResolve?.();
         sub.nextPromise = undefined;
@@ -73,5 +73,4 @@ class SubscriptionImpl {
 
         this.nextResolve?.();
     }
-};
-
+}

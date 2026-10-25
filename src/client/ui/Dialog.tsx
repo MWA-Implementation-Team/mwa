@@ -1,5 +1,5 @@
-import { ReactNode } from "preact/compat";
-import { useEffect, useRef } from "preact/hooks";
+import { ReactNode } from 'preact/compat';
+import { useEffect, useRef } from 'preact/hooks';
 
 export type DialogProps = {
     isOpen: boolean;

@@ -6,9 +6,9 @@ import { Gambler, RunningGame } from '#src/db/gambling.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 
 type GamblingSessionPageProps = {
-    sessionId: number,
-    game: RunningGame,
-    message?: string,
+    sessionId: number;
+    game: RunningGame;
+    message?: string;
 };
 
 export const gamblingSessionPagie: Page<GamblingSessionPageProps> = {
@@ -58,25 +58,45 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                         <Header hideNotifications={true} />
                         <h1>Gambling request:</h1>
                         <p>{currentGame.p1Name} has challenged you in a game of coin flip</p>
-                        <p>They are betting <strong>{game.betAmount}</strong> coins that the coin will land on <strong>{game.p1Guess}</strong></p>
-                        <p>If they are right, you <strong>lose {game.betAmount} coins</strong>. If they're wrong, you <strong>win {game.betAmount} coins</strong></p>
+                        <p>
+                            They are betting <strong>{game.betAmount}</strong> coins that the coin
+                            will land on <strong>{game.p1Guess}</strong>
+                        </p>
+                        <p>
+                            If they are right, you <strong>lose {game.betAmount} coins</strong>. If
+                            they're wrong, you <strong>win {game.betAmount} coins</strong>
+                        </p>
                         <p>Do you wish to accept this bet?</p>
                         <form method="POST">
-                            <button formaction={`/app/gambling/sessions/${sessionId}/accept`} type="submit">ACCEPT</button>
-                            <button formaction={`/app/gambling/sessions/${sessionId}/reject?goto=${encodeURIComponent('/app')}`} type="submit">REJECT</button>
+                            <button
+                                formaction={`/app/gambling/sessions/${sessionId}/accept`}
+                                type="submit"
+                            >
+                                ACCEPT
+                            </button>
+                            <button
+                                formaction={`/app/gambling/sessions/${sessionId}/reject?goto=${encodeURIComponent('/app')}`}
+                                type="submit"
+                            >
+                                REJECT
+                            </button>
                         </form>
                         {message && <span>{message}</span>}
                     </>
-                )
+                );
             } else {
                 return (
                     <>
                         <Header hideNotifications={true} />
-                        {isDisconnected ? (<span>Disconnected from server. <a href="">Refresh?</a></span>) : null}
+                        {isDisconnected ? (
+                            <span>
+                                Disconnected from server. <a href="">Refresh?</a>
+                            </span>
+                        ) : null}
                         <h1>Waiting for {game.p2Name}</h1>
                         <span>Tell them to open MWA and accept the notification</span>
                     </>
-                )
+                );
             }
         }
         case 'expired': {
@@ -85,28 +105,31 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                     <Header />
                     <h1>Expired</h1>
                     <span>
-                        This session expired after {currentGame.p2Name} didn't accept within {gamblingPendingExpiryMinutes} minutes.
+                        This session expired after {currentGame.p2Name} didn't accept within{' '}
+                        {gamblingPendingExpiryMinutes} minutes.
                     </span>
                 </>
-            )
+            );
         }
         case 'rejected': {
             return (
                 <>
                     <Header />
                     <h1>Rejected</h1>
-                    <span>
-                        {currentGame.p2Name} has rejected this challenge
-                    </span>
+                    <span>{currentGame.p2Name} has rejected this challenge</span>
                 </>
-            )
+            );
         }
         case 'running':
         case 'ended': {
             return (
                 <>
                     <Header hideNotifications={currentGame.status.type === 'running'} />
-                    {isDisconnected ? (<span>Disconnected from server. <a href="">Refresh?</a></span>) : null}
+                    {isDisconnected ? (
+                        <span>
+                            Disconnected from server. <a href="">Refresh?</a>
+                        </span>
+                    ) : null}
                     <h1>Coin flip duel</h1>
                     <p>
                         {currentGame.p1Name} vs {currentGame.p2Name}
@@ -114,14 +137,17 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                     {currentGame.status.type === 'ended' ? (
                         <>
                             <h2>{currentGame.status.flipResult}</h2>
-                            <h3>{side && side === currentGame.status.winner ? 'YOU WIN' : (`${currentGame.status.winner === 'p1' ? currentGame.p1Name : currentGame.p2Name} won`)} </h3>
+                            <h3>
+                                {side && side === currentGame.status.winner
+                                    ? 'YOU WIN'
+                                    : `${currentGame.status.winner === 'p1' ? currentGame.p1Name : currentGame.p2Name} won`}{' '}
+                            </h3>
                         </>
                     ) : (
                         <h2>imagine coin flipping here</h2>
                     )}
                 </>
-            )
+            );
         }
     }
 }
-

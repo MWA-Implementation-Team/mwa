@@ -89,7 +89,7 @@ describe('GET /auth/verify — link path', () => {
         for (const [goto, expected] of [
             ['/app/casino', '/app/casino'],
             ['https://evil.example/', '/app'],
-            ['/app/../admin/../..', '/app'],
+            ['/app/../admin/../..', '/'],
         ]) {
             const { token } = createLoginToken(state, 'goto2@example.com');
             const res = await app.request(

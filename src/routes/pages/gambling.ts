@@ -1,6 +1,20 @@
 import { requireApiUser, requireUser } from '#src/auth.js';
 import { InviteToGamblePageProps } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
-import { acceptGamblingSession, CoinSide, findGamblingSessionById, GameType, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, cancelGamblingSession, winCoinFlip, ExpiringGamblingSession, queryExpiringGamblingSessions } from '#src/db/gambling.js';
+import {
+    acceptGamblingSession,
+    CoinSide,
+    findGamblingSessionById,
+    GameType,
+    initCoinFlip,
+    PendingCoinFlip,
+    queryGamblingInvitations,
+    queryGamblingSessions,
+    queryPendingCoinFlips,
+    cancelGamblingSession,
+    winCoinFlip,
+    ExpiringGamblingSession,
+    queryExpiringGamblingSessions,
+} from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { notificationsChannel, publish, sessionChannel, subscribe } from '#src/pubsub.js';
@@ -70,7 +84,8 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (!form) return writeErrorPage(ctx, 400);
 
         const betAmount = Number(form.get('bet_amount'));
-        if (isNaN(betAmount) || betAmount <= 0 || !Number.isSafeInteger(betAmount)) return writeErrorPage(ctx, 400);
+        if (isNaN(betAmount) || betAmount <= 0 || !Number.isSafeInteger(betAmount))
+            return writeErrorPage(ctx, 400);
 
         const gameType = form.get('game_type') as GameType;
 
@@ -78,7 +93,8 @@ export function registerGamblingRoutes(app: MwaHono) {
         switch (gameType) {
             case 'coin_flip': {
                 const coinFlipBet = form.get('cf_bet') as CoinSide;
-                if (coinFlipBet !== 'heads' && coinFlipBet !== 'tails') return writeErrorPage(ctx, 400);
+                if (coinFlipBet !== 'heads' && coinFlipBet !== 'tails')
+                    return writeErrorPage(ctx, 400);
 
                 sessionId = initCoinFlip(ctx.var, coinFlipBet, {
                     p1: user.id,
@@ -92,7 +108,9 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         if (sessionId === null) {
-            return ctx.redirect(`/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=broke`);
+            return ctx.redirect(
+                `/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=broke`,
+            );
         }
 
         scheduleExpiry(ctx.var, {
@@ -145,7 +163,7 @@ export function registerGamblingRoutes(app: MwaHono) {
             if (!session) return;
             await stream.writeSSE({
                 data: JSON.stringify(session),
-            })
+            });
 
             while (!stream.aborted) {
                 const json = await sub.recv();
@@ -153,9 +171,9 @@ export function registerGamblingRoutes(app: MwaHono) {
 
                 await stream.writeSSE({
                     data: json,
-                })
+                });
             }
-        })
+        });
     });
 
     app.post('/app/gambling/sessions/:id/accept', async (ctx) => {
@@ -178,7 +196,9 @@ export function registerGamblingRoutes(app: MwaHono) {
         const result = acceptGamblingSession(ctx.var, sessionId, user.id);
         switch (result) {
             case 'too_broke':
-                return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(sessionId)}?error=broke`);
+                return ctx.redirect(
+                    `/app/gambling/sessions/${encodeURIComponent(sessionId)}?error=broke`,
+                );
             case 'invalid_session':
                 return ctx.redirect('/app/gambling');
         }
@@ -224,10 +244,10 @@ export function registerGamblingRoutes(app: MwaHono) {
 
 export function scheduleGamblingTimers(state: MwaState) {
     const expiring = queryExpiringGamblingSessions(state);
-    expiring.forEach(exp => scheduleExpiry(state, exp));
+    expiring.forEach((exp) => scheduleExpiry(state, exp));
 
     const coinFlips = queryPendingCoinFlips(state);
-    coinFlips.forEach(flip => scheduleCoinFlipWinner(state, flip));
+    coinFlips.forEach((flip) => scheduleCoinFlipWinner(state, flip));
 }
 
 function scheduleExpiry(state: MwaState, expiring: ExpiringGamblingSession) {
@@ -241,7 +261,7 @@ function scheduleExpiry(state: MwaState, expiring: ExpiringGamblingSession) {
 }
 
 function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
-    const flipTimeMs = pending.acceptedTime.getTime() + (gamblingPendingExpiryMinutes * 60000);
+    const flipTimeMs = pending.acceptedTime.getTime() + gamblingPendingExpiryMinutes * 60000;
     const remainingMs = Math.max(0, flipTimeMs - Date.now());
 
     setTimeout(() => {

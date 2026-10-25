@@ -4,7 +4,7 @@ import { Invitation, SessionSummary } from '#src/db/gambling.js';
 
 type GamblingPageProps = {
     sessions: SessionSummary[];
-    invitations: Invitation[],
+    invitations: Invitation[];
 };
 
 export const gamblingPage: Page<GamblingPageProps> = {

@@ -10,18 +10,20 @@ export type ClientContextType = {
     updateLang: (lang: LanguageCode) => void;
     t: TranslateFn;
     user: User | null; // logged-in user, else null
-    notification: Notification | null,
+    notification: Notification | null;
 };
 
-export type Notification = {
-    type: 'gambling_invite';
-    inviterName: string;
-    sessionId: number;
-} | {
-    type: 'return_to_gambling';
-    opponentName: string;
-    sessionId: number;
-};
+export type Notification =
+    | {
+          type: 'gambling_invite';
+          inviterName: string;
+          sessionId: number;
+      }
+    | {
+          type: 'return_to_gambling';
+          opponentName: string;
+          sessionId: number;
+      };
 
 export const ClientContext = createContext<ClientContextType>({
     lang: defaultLanguage,
@@ -79,7 +81,7 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
             setNotification(JSON.parse(msg.data as string));
         };
         return () => updates.close();
-    }, [init.user?.id])
+    }, [init.user?.id]);
 
     return <ClientContext value={value}>{content}</ClientContext>;
 }
