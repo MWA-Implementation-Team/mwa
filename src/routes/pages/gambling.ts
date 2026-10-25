@@ -158,21 +158,25 @@ export function registerGamblingRoutes(app: MwaHono) {
 
         return streamSSE(ctx, async (stream) => {
             const sub = subscribe(sessionChannel(sessionId));
-            stream.onAbort(() => sub.close());
+            try {
+                stream.onAbort(() => sub.close());
 
-            const session = findGamblingSessionById(ctx.var, sessionId);
-            if (!session) return;
-            await stream.writeSSE({
-                data: JSON.stringify(session),
-            });
-
-            while (!stream.aborted) {
-                const json = await sub.recv();
-                if (!json) break;
-
+                const session = findGamblingSessionById(ctx.var, sessionId);
+                if (!session) return;
                 await stream.writeSSE({
-                    data: json,
+                    data: JSON.stringify(session),
                 });
+
+                while (!stream.aborted) {
+                    const json = await sub.recv();
+                    if (!json) break;
+
+                    await stream.writeSSE({
+                        data: json,
+                    });
+                }
+            } finally {
+                sub.close();
             }
         });
     });
@@ -248,7 +252,7 @@ export function scheduleGamblingTimers(state: MwaState) {
 }
 
 function scheduleExpiry(state: MwaState, expiring: ExpiringGamblingSession) {
-    const expireTimeMs = expiring.creationTime.getTime() + 5000;
+    const expireTimeMs = expiring.creationTime.getTime() + gamblingPendingExpiryMinutes * 60000;
     const remainingMs = Math.max(0, expireTimeMs - Date.now());
 
     setTimeout(() => {
@@ -258,7 +262,7 @@ function scheduleExpiry(state: MwaState, expiring: ExpiringGamblingSession) {
 }
 
 function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
-    const flipTimeMs = pending.acceptedTime.getTime() + gamblingPendingExpiryMinutes * 60000;
+    const flipTimeMs = pending.acceptedTime.getTime() + 5000;
     const remainingMs = Math.max(0, flipTimeMs - Date.now());
 
     setTimeout(() => {

@@ -22,23 +22,27 @@ export function registerUsersRoutes(app: MwaHono) {
 
         return streamSSE(ctx, async (stream) => {
             const sub = subscribe(notificationsChannel(user.id));
-            stream.onAbort(() => sub.close());
+            try {
+                stream.onAbort(() => sub.close());
 
-            let lastJson = '';
-            while (!stream.aborted) {
-                if (lastJson !== '') {
-                    const signal = await sub.recv();
-                    if (signal === null) break;
+                let lastJson = '';
+                while (!stream.aborted) {
+                    if (lastJson !== '') {
+                        const signal = await sub.recv();
+                        if (signal === null) break;
+                    }
+
+                    const notification = queryUserNotification(ctx.var, user.id);
+                    const json = JSON.stringify(notification);
+                    if (lastJson === json) continue;
+                    lastJson = json;
+
+                    await stream.writeSSE({
+                        data: json,
+                    });
                 }
-
-                const notification = queryUserNotification(ctx.var, user.id);
-                const json = JSON.stringify(notification);
-                if (lastJson === json) continue;
-                lastJson = json;
-
-                await stream.writeSSE({
-                    data: json,
-                });
+            } finally {
+                sub.close();
             }
         });
     });
