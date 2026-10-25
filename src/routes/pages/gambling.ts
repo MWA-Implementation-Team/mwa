@@ -1,12 +1,13 @@
 import { requireApiUser, requireUser } from '#src/auth.js';
 import { InviteToGamblePageProps } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
-import { acceptGamblingSession, CoinSide, findGamblingSessionById, GameType, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, rejectGamblingSession, winCoinFlip } from '#src/db/gambling.js';
+import { acceptGamblingSession, CoinSide, findGamblingSessionById, GameType, initCoinFlip, PendingCoinFlip, queryGamblingInvitations, queryGamblingSessions, queryPendingCoinFlips, cancelGamblingSession, winCoinFlip, ExpiringGamblingSession, queryExpiringGamblingSessions } from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { notificationsChannel, publish, sessionChannel, subscribe } from '#src/pubsub.js';
 import { MwaHono, MwaState } from '#src/state.js';
 import { streamSSE } from 'hono/streaming';
 import { safeGoto } from './login.js';
+import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 
 export function registerGamblingRoutes(app: MwaHono) {
     app.get('/app/gambling', async (ctx) => {
@@ -93,6 +94,12 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (sessionId === null) {
             return ctx.redirect(`/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=broke`);
         }
+
+        scheduleExpiry(ctx.var, {
+            id: sessionId,
+            creationTime: new Date(),
+        });
+
         // signal for /api/notifications to update notification
         publish(notificationsChannel(target.id), '');
 
@@ -209,19 +216,32 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const sessionId = Number(ctx.req.param('id'));
-        rejectGamblingSession(ctx.var, sessionId, user.id);
+        cancelGamblingSession(ctx.var, sessionId, 'rejected', user.id);
         broadcastSessionUpdate(ctx.var, sessionId);
         return ctx.redirect(safeGoto(ctx, goto) ?? '/app');
     });
 }
 
 export function scheduleGamblingTimers(state: MwaState) {
+    const expiring = queryExpiringGamblingSessions(state);
+    expiring.forEach(exp => scheduleExpiry(state, exp));
+
     const coinFlips = queryPendingCoinFlips(state);
     coinFlips.forEach(flip => scheduleCoinFlipWinner(state, flip));
 }
 
+function scheduleExpiry(state: MwaState, expiring: ExpiringGamblingSession) {
+    const expireTimeMs = expiring.creationTime.getTime() + 5000;
+    const remainingMs = Math.max(0, expireTimeMs - Date.now());
+
+    setTimeout(() => {
+        cancelGamblingSession(state, expiring.id, 'expired');
+        broadcastSessionUpdate(state, expiring.id);
+    }, remainingMs);
+}
+
 function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
-    const flipTimeMs = pending.acceptedTime.getTime() + 5000;
+    const flipTimeMs = pending.acceptedTime.getTime() + (gamblingPendingExpiryMinutes * 60000);
     const remainingMs = Math.max(0, flipTimeMs - Date.now());
 
     setTimeout(() => {

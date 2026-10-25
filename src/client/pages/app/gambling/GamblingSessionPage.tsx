@@ -1,7 +1,8 @@
+import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
 import Header from '#src/client/ui/Header.js';
-import { CoinSide, Gambler, RunningGame } from '#src/db/gambling.js';
+import { Gambler, RunningGame } from '#src/db/gambling.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 
 type GamblingSessionPageProps = {
@@ -16,6 +17,8 @@ export const gamblingSessionPagie: Page<GamblingSessionPageProps> = {
         switch (props.game.status.type) {
             case 'pending':
                 return 'MWA | Challenge Request';
+            case 'expired':
+                return 'MWA | Expired';
             case 'rejected':
                 return 'MWA | Rejected';
             case 'running':
@@ -69,12 +72,23 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                 return (
                     <>
                         <Header hideNotifications={true} />
-                        {isDisconnected ? (<span>Disconnected from server. <a>Refresh?</a></span>) : null}
+                        {isDisconnected ? (<span>Disconnected from server. <a href="">Refresh?</a></span>) : null}
                         <h1>Waiting for {game.p2Name}</h1>
                         <span>Tell them to open MWA and accept the notification</span>
                     </>
                 )
             }
+        }
+        case 'expired': {
+            return (
+                <>
+                    <Header />
+                    <h1>Expired</h1>
+                    <span>
+                        This session expired after {currentGame.p2Name} didn't accept within {gamblingPendingExpiryMinutes} minutes.
+                    </span>
+                </>
+            )
         }
         case 'rejected': {
             return (
@@ -92,7 +106,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
             return (
                 <>
                     <Header hideNotifications={currentGame.status.type === 'running'} />
-                    {isDisconnected ? (<span>Disconnected from server. <a>Refresh?</a></span>) : null}
+                    {isDisconnected ? (<span>Disconnected from server. <a href="">Refresh?</a></span>) : null}
                     <h1>Coin flip duel</h1>
                     <p>
                         {currentGame.p1Name} vs {currentGame.p2Name}
