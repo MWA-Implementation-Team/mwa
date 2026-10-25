@@ -48,7 +48,8 @@ There is no global transport setter.
   `markEmailVerified`; new email → `createUser` with a `deriveUsername`-derived
   name (local part sanitized to `[a-z0-9_-]`, deduped). A `sessions` row (30 days,
   sha256 at rest) becomes the `mwa-session` cookie (`HttpOnly`, `SameSite=Lax`,
-  `Secure` in prod). Redirect: `safeGoto` allowlist, else `/app` — **new accounts
+  `Secure` in prod). Redirect: `safeGoto` accepts normalized same-origin paths and
+  queries (no route allowlist), else `/app` — **new accounts
   default to `/app/account`** so the derived username can be fixed immediately.
 - **`currentUser(ctx)`** (`src/auth.ts`) resolves `mwa-session` → `sessions` →
   `User | null`. It's the only place "who is logged in" is decided.
@@ -73,13 +74,19 @@ sqlite3 db.sqlite "UPDATE users SET role = 'host' WHERE username = 'alice';"
 
 ## Route policy
 
-| Route                         | Guard                  |
-| ----------------------------- | ---------------------- |
-| `/`, `/login`, `/auth/verify` | public                 |
-| `GET /app`, `GET /app/*`      | `requireUser`          |
-| `POST /app` (logout)          | session cookie         |
-| `GET /admin`                  | `requireRole('admin')` |
-| `GET /api/users`              | `requireApiUser`       |
+| Route                                                            | Guard                                                   |
+| ---------------------------------------------------------------- | ------------------------------------------------------- |
+| `/`, `/login`, `/auth/verify`                                    | public                                                  |
+| `GET /app`, `GET /app/*`                                         | `requireUser`                                           |
+| `POST /app` (logout)                                             | session cookie                                          |
+| `GET /admin`, `POST /admin/mint-coins`                           | admin in production; user in dev                        |
+| `GET /api/users`                                                 | `requireApiUser`                                        |
+| `GET /api/notifications`, `GET /app/gambling/sessions/:id/watch` | `requireApiUser`                                        |
+| Gambling challenge/accept/reject POSTs                           | `requireUser`; accept/reject require the invited player |
+
+`POST /admin/mint-coins` takes `username` and a positive safe-integer `amount`,
+crediting a `system` transaction through `giveCoins`. In dev, visit `/admin`
+directly as a regular user; the navigation link remains admin-only.
 
 ## How to verify (dev)
 

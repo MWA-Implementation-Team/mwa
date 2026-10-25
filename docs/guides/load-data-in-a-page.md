@@ -1,13 +1,15 @@
 # Guide: load data in a page
 
-There are two ways to get server data onto a page:
+Server data reaches a page through:
 
 - **SSR props** — the route queries the db and passes data to `writePage`, which puts it
   in the HTML _and_ the `#ssr-data` JSON.
 - **Client fetch** — the page calls an `/api/*` endpoint from the browser (see
   [add-an-api-endpoint](add-an-api-endpoint.md)).
+- **SSE** — `EventSource` receives snapshots after the initial render; gambling
+  sessions and header notifications use this (see [architecture](../architecture.md#interactions-and-gambling)).
 
-Both end up as the same Preact props. The difference is _when_ the data arrives and
+These populate Preact props or state. The difference is _when_ the data arrives and
 _who pays_ the loading state.
 
 ## Decision rule
