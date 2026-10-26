@@ -435,8 +435,11 @@
     width: 100%;
     min-height: 0; /* undo the generic button's taller minimum */
     padding: 6px 14px;
+    border-radius: 0;
+    font-family: inherit;
     font-size: 13px;
     font-weight: 400;
+    line-height: normal;
     text-decoration: none;
     color: var(--wiki-soft);
     background: var(--wiki-panel-light);
