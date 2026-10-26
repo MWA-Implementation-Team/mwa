@@ -1,9 +1,21 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
 import { queryActiveGamblingSession, queryGamblingInvitations } from './gambling.js';
-import { Notification } from '#src/client/context.js';
 
 export type UserRole = 'admin' | 'host' | 'user';
+
+// Sent to the client over /api/notifications and embedded in page context.
+export type Notification =
+    | {
+          type: 'gambling_invite';
+          inviterName: string;
+          sessionId: number;
+      }
+    | {
+          type: 'return_to_gambling';
+          opponentName: string;
+          sessionId: number;
+      };
 
 export type User = {
     id: number;

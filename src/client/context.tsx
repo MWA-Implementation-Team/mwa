@@ -5,6 +5,9 @@ import { defaultLanguage, LanguageCode, translate, TranslateFn } from './languag
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
 import { reviveUser, User, UserJson } from '#src/client/api/users.js';
 
+import type { Notification } from '#src/db/users.js';
+export type { Notification };
+
 export type ClientContextType = {
     lang: LanguageCode;
     updateLang: (lang: LanguageCode) => void;
@@ -12,18 +15,6 @@ export type ClientContextType = {
     user: User | null; // logged-in user, else null
     notification: Notification | null;
 };
-
-export type Notification =
-    | {
-          type: 'gambling_invite';
-          inviterName: string;
-          sessionId: number;
-      }
-    | {
-          type: 'return_to_gambling';
-          opponentName: string;
-          sessionId: number;
-      };
 
 export const ClientContext = createContext<ClientContextType>({
     lang: defaultLanguage,
@@ -77,6 +68,7 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
     }, [pageId, pageProps, value]);
 
     useEffect(() => {
+        if (!init.user) return; // /api/notifications requires a session
         const updates = new EventSource('/api/notifications');
         updates.onmessage = (msg) => {
             setNotification(JSON.parse(msg.data as string));
