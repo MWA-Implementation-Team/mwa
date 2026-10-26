@@ -27,31 +27,6 @@ export function SunMoonIcon(props: IconProps) {
     );
 }
 
-export function FormsIcon(props: IconProps) {
-    return (
-        // Simplified Google Forms mark — deep purple document with a folded corner
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-            <defs>
-                <linearGradient id="forms-body" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="#3a63c9" />
-                    <stop offset="1" stop-color="#16285e" />
-                </linearGradient>
-            </defs>
-            <path
-                d="M6.8 1.2h9l4.5 4.5v15.5a1.8 1.8 0 0 1-1.8 1.8H6.8a1.8 1.8 0 0 1-1.8-1.8V3a1.8 1.8 0 0 1 1.8-1.8z"
-                fill="url(#forms-body)"
-            />
-            <path d="M15.8 1.2v4.5h4.5z" fill="#6b93dd" />
-            <g fill="#dbe4ff" opacity="0.45">
-                <rect x="8.4" y="9" width="7.6" height="1.6" rx="0.8" />
-                <rect x="8.4" y="12.6" width="7.6" height="1.6" rx="0.8" />
-                <rect x="8.4" y="16.2" width="5" height="1.6" rx="0.8" />
-                <rect x="8.4" y="19.4" width="6.2" height="1.6" rx="0.8" />
-            </g>
-        </svg>
-    );
-}
-
 function strokeIcon(props: IconProps, children: ComponentChildren) {
     return (
         <svg

@@ -1,3 +1,4 @@
+import { Fragment } from 'preact';
 import { useContext } from 'preact/hooks';
 import { LanguageCode, languages } from '#src/client/language.js';
 import { ClientContext } from '#src/client/context.js';
@@ -12,12 +13,20 @@ export default function LanguageToggle() {
     }
 
     return (
-        <select onChange={(e) => handleChange(e.currentTarget.value)}>
-            {Object.entries(languages).map(([iterCode, iterLang]) => (
-                <option key={iterCode} value={iterCode} selected={iterCode === lang}>
-                    {iterLang.displayName}
-                </option>
+        <span class="lang-links">
+            {Object.keys(languages).map((code, i) => (
+                <Fragment key={code}>
+                    {i > 0 && <span class="lang-links-sep">·</span>}
+                    <button
+                        type="button"
+                        class="lang-link"
+                        aria-pressed={code === lang}
+                        onClick={() => handleChange(code)}
+                    >
+                        {code.toUpperCase()}
+                    </button>
+                </Fragment>
             ))}
-        </select>
+        </span>
     );
 }

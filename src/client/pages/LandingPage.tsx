@@ -1,15 +1,10 @@
-import { useContext } from 'preact/hooks';
+import { useContext, useEffect, useState } from 'preact/hooks';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
 import { ActivitySlug, Activity, registeredActivities } from '#src/client/activities.js';
-import {
-    FacebookIcon,
-    FormsIcon,
-    InstagramIcon,
-    LinkedinIcon,
-    TwitterIcon,
-} from '#src/client/ui/icons.js';
+import { FacebookIcon, InstagramIcon, LinkedinIcon, TwitterIcon } from '#src/client/ui/icons.js';
 import PageShell from './app/PageShell.js';
+import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 
 type LandingPageProps = {};
 
@@ -20,6 +15,43 @@ export const landingPage: Page<LandingPageProps> = {
 
 const activities = Object.entries(registeredActivities) as [ActivitySlug, Activity][];
 
+function nextEventDate() {
+    const now = new Date();
+    let target = new Date(now.getFullYear(), 10, 4);
+    if (target.getTime() <= now.getTime()) {
+        target = new Date(now.getFullYear() + 1, 10, 4);
+    }
+    return target;
+}
+
+function Countdown() {
+    const { t } = useContext(ClientContext);
+    const [now, setNow] = useState(() => Date.now());
+    useEffect(() => {
+        const id = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(id);
+    }, []);
+
+    const diff = Math.max(0, nextEventDate().getTime() - now);
+    const parts = [
+        { value: Math.floor(diff / 86_400_000), label: t('countdownDays') },
+        { value: Math.floor(diff / 3_600_000) % 24, label: t('countdownHours') },
+        { value: Math.floor(diff / 60_000) % 60, label: t('countdownMinutes') },
+        { value: Math.floor(diff / 1_000) % 60, label: t('countdownSeconds') },
+    ];
+
+    return (
+        <div class="landing-countdown">
+            {parts.map(({ value, label }) => (
+                <div key={label} class="landing-countdown-part">
+                    <span class="landing-countdown-value">{String(value).padStart(2, '0')}</span>
+                    <span class="landing-countdown-label">{label}</span>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 const socials = [
     { Icon: FacebookIcon, name: 'Facebook' },
     { Icon: TwitterIcon, name: 'Twitter' },
@@ -28,48 +60,67 @@ const socials = [
 ];
 
 function LandingPage({}: LandingPageProps) {
-    const { t, user } = useContext(ClientContext);
+    const { t } = useContext(ClientContext);
 
     return (
         <PageShell
             section="landing"
-            nav={false}
-            path={t('landingPath')}
-            title={t('landingHeroTitle')}
-            cta={
-                user && (
-                    <a href="/app" class="landing-cta">
-                        {t('landingGoApp')}
-                    </a>
-                )
+            side={
+                <>
+                    <section class="landing-section landing-pane-welcome">
+                        <div class="landing-welcome">
+                            <img src="/3Logotipas.png" alt={t('wikiLogoAlt')} />
+                        </div>
+                    </section>
+
+                    <section class="landing-section landing-pane-login">
+                        <h2>{t('landingLoginTitle')}</h2>
+                        <div>
+                            <a href="/app" class="landing-login">
+                                {t('landingGoApp')}
+                            </a>
+                        </div>
+                    </section>
+
+                    <section class="landing-section landing-pane-socials">
+                        <h2>{t('landingSocialTitle')}</h2>
+                        <ul class="landing-socials">
+                            {socials.map(({ Icon, name }) => (
+                                <li key={name}>
+                                    <a href="#">
+                                        <Icon /> <span>{name}</span>
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+
+                    <section class="landing-section landing-pane-sponsors">
+                        <h2>{t('sponsorsTitle')}</h2>
+                        <ul class="landing-sponsors">
+                            {[1, 2, 3, 4].map((n) => (
+                                <li key={n} class="mwa-wiki-mini">
+                                    <span class="mwa-wiki-mini-title">LOGO</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+
+                    <section class="landing-section landing-pane-lang">
+                        <h2>{t('landingLangTitle')}</h2>
+                        <div class="landing-footer">
+                            <LanguageToggle />
+                        </div>
+                    </section>
+                </>
             }
         >
-            <section class="landing-section">
-                <div class="landing-register">
-                    <FormsIcon class="landing-register-icon" aria-hidden="true" />
-                    <div class="landing-register-body">
-                        <p class="landing-register-text">{t('landingFormTitle')}</p>
-                        <a href="#" class="landing-register-link">
-                            {t('landingFormLink')}
-                        </a>
-                    </div>
-                </div>
+            <section class="landing-section landing-pane-countdown">
+                <h2>{t('landingCountdownTitle')}</h2>
+                <Countdown />
             </section>
 
-            <section class="landing-section">
-                <h2>{t('landingSocialTitle')}</h2>
-                <ul class="landing-socials">
-                    {socials.map(({ Icon, name }) => (
-                        <li key={name}>
-                            <a href="#">
-                                <Icon /> <span>{name}</span>
-                            </a>
-                        </li>
-                    ))}
-                </ul>
-            </section>
-
-            <section class="landing-section">
+            <section class="landing-section landing-pane-activities">
                 <h2>{t('landingFeedTitle')}</h2>
                 <ul class="mwa-wiki-directory">
                     {activities.map(([slug, { Card }]) => (
@@ -80,18 +131,6 @@ function LandingPage({}: LandingPageProps) {
                         </li>
                     ))}
                 </ul>
-            </section>
-
-            <section class="landing-section">
-                <h2>{t('sponsorsTitle')}</h2>
-                <p class="mwa-wiki-muted">{t('sponsorsSubtitle')}</p>
-                <div class="mwa-wiki-grid">
-                    {[1, 2, 3, 4].map((n) => (
-                        <div key={n} class="mwa-wiki-mini">
-                            <span class="mwa-wiki-mini-title">LOGO</span>
-                        </div>
-                    ))}
-                </div>
             </section>
         </PageShell>
     );

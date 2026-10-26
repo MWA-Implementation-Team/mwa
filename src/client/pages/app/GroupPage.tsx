@@ -50,7 +50,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
     };
 
     return (
-        <PageShell section="group" title={t('groupManagement')} subtitle={t('subGroup')}>
+        <PageShell section="group">
             {error && (
                 <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
                     {error}
@@ -63,7 +63,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
             )}
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
-                    <h2>☆ {t('groupYourGroups')}</h2>
+                    <h2>{t('groupYourGroups')}</h2>
                 </div>
                 <div class="mwa-wiki-panel-body">
                     {groups === null || groups.length === 0 ? (
@@ -95,7 +95,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
             </section>
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
-                    <h2>✧ {t('groupCreate')}</h2>
+                    <h2>{t('groupCreate')}</h2>
                 </div>
                 <div class="mwa-wiki-panel-body">
                     <form class="mwa-wiki-form" onSubmit={handleCreateGroup}>

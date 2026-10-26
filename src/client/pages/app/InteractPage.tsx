@@ -27,7 +27,7 @@ function InteractPage({ self, target, detail }: InteractPageProps) {
 
     if (self) {
         return (
-            <PageShell section="interact" title={t('titleInteract')}>
+            <PageShell section="interact">
                 <section class="mwa-wiki-panel">
                     <div class="mwa-wiki-panel-body">
                         <p class="mwa-wiki-muted">{t('interactSelfJoke')}</p>
@@ -38,11 +38,11 @@ function InteractPage({ self, target, detail }: InteractPageProps) {
     }
 
     return (
-        <PageShell section="interact" title={t('interactHeading', { name: target.username })}>
+        <PageShell section="interact">
             {/* Stub — real transfers land with the pending/confirm flow. */}
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
-                    <h2>{t('interactSendMoneyTitle')}</h2>
+                    <h2>{t('interactHeading', { name: target.username })}</h2>
                 </div>
                 <div class="mwa-wiki-panel-body">
                     <div class="mwa-wiki-actions">

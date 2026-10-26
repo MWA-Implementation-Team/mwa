@@ -13,7 +13,7 @@ export const adminPage: Page<AdminPageProps> = {
 function AdminPage({}: AdminPageProps) {
     const { t } = useContext(ClientContext);
     return (
-        <PageShell section="admin" title={t('adminPanelTitle')} subtitle={t('adminPanelSubtitle')}>
+        <PageShell section="admin">
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
                     <h2>{t('adminPanelHead')}</h2>

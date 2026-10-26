@@ -11,6 +11,8 @@ import { StatusCode } from 'hono/utils/http-status';
 import { BootData } from './client/bootstrap.js';
 import { getRequestLanguage } from './utils.js';
 import { MwaContext, MwaHono } from './state.js';
+import { getOrCreateInteractToken } from '#src/db/interactions.js';
+import { renderSVG } from 'uqr';
 
 export function writePage<P extends RegisteredPageId>(
     ctx: MwaContext,
@@ -18,9 +20,21 @@ export function writePage<P extends RegisteredPageId>(
     props: RegisteredPageProps<P>,
 ): Response {
     const user = currentUser(ctx);
+    // Personal QR rides in the context init so the shared sidebar can show it
+    // on every page — the same stable link the interact flow scans.
+    const qr = user
+        ? (() => {
+              const url = new URL(
+                  `/app/interact/${getOrCreateInteractToken(ctx.var, user.id)}`,
+                  ctx.req.url,
+              ).toString();
+              return { svg: renderSVG(url), url };
+          })()
+        : null;
     const ctxInit: ClientContextWrapperInit = {
         lang: getRequestLanguage(ctx),
         user: user && serialize(user),
+        qr,
     };
 
     const root = Root({

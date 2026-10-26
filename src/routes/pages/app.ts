@@ -10,28 +10,21 @@ import {
 import { serialize } from '#src/client/serialize.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
-import { findUserByInteractToken, getOrCreateInteractToken } from '#src/db/interactions.js';
+import { findUserByInteractToken } from '#src/db/interactions.js';
 import { deleteSession } from '#src/db/sessions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';
-import { renderSVG } from 'uqr';
 
 export function registerAppRoutes(app: MwaHono) {
     app.get('/app', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        // Personal QR — a stable link others scan to reach the interact page.
-        const token = getOrCreateInteractToken(ctx.var, user.id);
-        const interactUrl = new URL(`/app/interact/${token}`, ctx.req.url).toString();
-
         const group = findUserGroup(ctx.var, user.id);
         const queueEntry = getUserWaitingEntry(ctx.var, user.id);
 
         return writePage(ctx, 'home', {
-            qrSvg: renderSVG(interactUrl),
-            interactUrl,
             transactions: listUserTransactions(ctx.var, user.id),
             groupName: group?.name ?? null,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,

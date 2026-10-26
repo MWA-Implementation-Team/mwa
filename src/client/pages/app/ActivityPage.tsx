@@ -15,11 +15,7 @@ function ActivityPage({ slug }: ActivityPageProps) {
     const { t } = useContext(ClientContext);
     const Detail = registeredActivities[slug].Detail;
     return (
-        <PageShell
-            section="activities"
-            title={registeredActivities[slug].name}
-            subtitle={t('subActivity')}
-        >
+        <PageShell section="activities">
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
                     <h2>{t('activityInfoTitle')}</h2>

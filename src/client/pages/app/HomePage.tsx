@@ -7,8 +7,6 @@ import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
 import PageShell from './PageShell.js';
 
 type HomePageProps = {
-    qrSvg: string;
-    interactUrl: string;
     transactions: Transaction[];
     groupName: string | null;
     queuePosition: number | null;
@@ -25,13 +23,7 @@ const transactionKindKey = {
     system: 'txSystem',
 } as const;
 
-function HomePage({
-    qrSvg,
-    interactUrl,
-    transactions,
-    groupName,
-    queuePosition: initialQueuePosition,
-}: HomePageProps) {
+function HomePage({ transactions, groupName, queuePosition: initialQueuePosition }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
     const [queuePosition, setQueuePosition] = useState(initialQueuePosition);
@@ -58,11 +50,7 @@ function HomePage({
     };
 
     return (
-        <PageShell
-            section="home"
-            title={t('homeWelcome', { name: user!.username })}
-            subtitle={t('homeSubtitle')}
-        >
+        <PageShell section="home">
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
                     <h2>{t('dashFinances')}</h2>
@@ -132,21 +120,6 @@ function HomePage({
                             {t('queueNeedGroup')} <a href="/app/group">{t('queueGoGroup')}</a>
                         </p>
                     )}
-                </div>
-            </section>
-
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
-                    <h2>{t('dashQrTitle')}</h2>
-                </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-muted">
-                        <strong>{t('dashQrHint')}</strong>
-                        <br />
-                        {t('dashQrBody')}
-                    </p>
-                    <div class="qr-code" dangerouslySetInnerHTML={{ __html: qrSvg }} />
-                    <a href={interactUrl}>{interactUrl}</a>
                 </div>
             </section>
 

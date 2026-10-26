@@ -13,11 +13,7 @@ export const casinoPage: Page<CasinoPageProps> = {
 function CasinoPage({}: CasinoPageProps) {
     const { t } = useContext(ClientContext);
     return (
-        <PageShell
-            section="casino"
-            title={t('casinoUnavailableTitle')}
-            subtitle={t('casinoUnavailableSub')}
-        >
+        <PageShell section="casino">
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
                     <h2>{t('casinoNoticeHead')}</h2>

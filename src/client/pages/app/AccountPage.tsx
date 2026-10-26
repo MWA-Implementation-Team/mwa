@@ -14,7 +14,7 @@ function AccountPage({}: AccountPageProps) {
     const { t, user, lang } = useContext(ClientContext);
 
     return (
-        <PageShell section="account" title={t('headerAccount')} subtitle={t('subAccount')}>
+        <PageShell section="account">
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
                     <h2>{t('accountProfile')}</h2>
@@ -62,17 +62,6 @@ function AccountPage({}: AccountPageProps) {
                     </ul>
                     <p class="mwa-wiki-muted">
                         {t('dashTransactions')} — <a href="/app">{t('headerHome')}</a>
-                    </p>
-                </div>
-            </section>
-
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
-                    <h2>{t('dashQrTitle')}</h2>
-                </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-muted">
-                        {t('dashQrBody')} <a href="/app">{t('headerHome')}</a>
                     </p>
                 </div>
             </section>

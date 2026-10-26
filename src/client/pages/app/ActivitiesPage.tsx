@@ -16,7 +16,7 @@ const activities = Object.entries(registeredActivities) as [ActivitySlug, Activi
 function ActivitiesPage({}: ActivitiesPageProps) {
     const { t } = useContext(ClientContext);
     return (
-        <PageShell section="activities" title={t('headerActivities')} subtitle={t('subActivities')}>
+        <PageShell section="activities">
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
                     <h2>{t('activitiesDirectory')}</h2>

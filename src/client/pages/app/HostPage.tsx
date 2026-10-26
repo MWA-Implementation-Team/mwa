@@ -52,7 +52,7 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
     };
 
     return (
-        <PageShell section="host" title={t('hostTitle')} subtitle={t('subHost')}>
+        <PageShell section="host">
             <section class="mwa-wiki-panel">
                 <div class="mwa-wiki-panel-head">
                     <h2>{t('hostCallTitle')}</h2>

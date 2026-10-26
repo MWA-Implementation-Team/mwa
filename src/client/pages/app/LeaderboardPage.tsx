@@ -20,11 +20,7 @@ const typeLabelKey = {
 function LeaderboardPage({ type }: LeaderboardPageProps) {
     const { t } = useContext(ClientContext);
     return (
-        <PageShell
-            section="leaderboard"
-            title={t('headerLeaderboard')}
-            subtitle={t('subLeaderboard')}
-        >
+        <PageShell section="leaderboard">
             <nav class="mwa-wiki-tabbar" aria-label={t('leaderboardTypeLabel')}>
                 <a
                     href="/app/leaderboard?type=team"

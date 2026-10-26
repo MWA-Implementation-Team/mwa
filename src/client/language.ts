@@ -31,15 +31,12 @@ export type Language = {
     logOut: string;
     logInSignUp: string;
 
-    loginTitle: string;
     loginEmail: string;
     loginSendLink: string;
     loginSentLogin: string;
     loginSentSignup: string;
     loginCode: string;
     loginVerify: string;
-
-    homeWelcome: string;
 
     interactHeading: string;
     interactSelfJoke: string;
@@ -50,13 +47,16 @@ export type Language = {
     interactDetailBalance: string;
     interactDetailJoined: string;
 
-    landingHeroTitle: string;
-    landingFormLink: string;
+    landingLangTitle: string;
+    landingLoginTitle: string;
+    landingCountdownTitle: string;
     landingSocialTitle: string;
     landingFeedTitle: string;
     landingGoApp: string;
-    landingPath: string;
-    landingFormTitle: string;
+    countdownDays: string;
+    countdownHours: string;
+    countdownMinutes: string;
+    countdownSeconds: string;
     sponsorsTitle: string;
     sponsorsSubtitle: string;
 
@@ -69,8 +69,8 @@ export type Language = {
     txPurchase: string;
     txSystem: string;
     dashQrTitle: string;
-    dashQrHint: string;
-    dashQrBody: string;
+    qrCopyLink: string;
+    qrCopied: string;
 
     queueTitle: string;
     queuePositionLabel: string;
@@ -81,7 +81,6 @@ export type Language = {
     queueJoinFailed: string;
     queueLeaveFailed: string;
 
-    hostTitle: string;
     hostCallTitle: string;
     hostStation: string;
     hostCount: string;
@@ -100,20 +99,10 @@ export type Language = {
     dashGuide: string;
     dashGuideBody: string;
 
-    homeSubtitle: string;
-
     wikiSkip: string;
     wikiLogoAlt: string;
     wikiNavLabel: string;
-    wikiFooter: string;
-    wikiBackTop: string;
-
-    subActivities: string;
-    subActivity: string;
-    subGroup: string;
-    subLeaderboard: string;
-    subAccount: string;
-    subHost: string;
+    navTitle: string;
 
     activitiesDirectory: string;
     activitiesEmpty: string;
@@ -126,8 +115,6 @@ export type Language = {
     leaderboardRankings: string;
     leaderboardTodo: string;
 
-    casinoUnavailableTitle: string;
-    casinoUnavailableSub: string;
     casinoNoticeHead: string;
     casinoNotice: string;
 
@@ -140,12 +127,9 @@ export type Language = {
     accountSettings: string;
     accountSettingsTodo: string;
 
-    adminPanelTitle: string;
-    adminPanelSubtitle: string;
     adminPanelHead: string;
     adminPanelTodo: string;
 
-    groupManagement: string;
     groupName: string;
     groupPhone: string;
     groupCreate: string;
@@ -203,15 +187,12 @@ export const languages: Record<LanguageCode, Language> = {
         logOut: 'Log out',
         logInSignUp: 'Log in / sign up',
 
-        loginTitle: 'Log in',
         loginEmail: 'Email',
         loginSendLink: 'Send login link',
         loginSentLogin: 'We sent a login link to {email}.',
         loginSentSignup: 'We sent a signup link to {email} — click it to create your account.',
         loginCode: 'Code from the email',
         loginVerify: 'Verify code',
-
-        homeWelcome: 'Welcome back, {name}',
 
         interactHeading: 'Interact with {name}',
         interactSelfJoke: "That's you! Scan someone else's code instead.",
@@ -222,13 +203,16 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailBalance: 'Balance',
         interactDetailJoined: 'Joined',
 
-        landingHeroTitle: 'First years event registration',
-        landingFormLink: 'link to google forms',
+        landingLangTitle: 'Language',
+        landingLoginTitle: 'System',
+        landingCountdownTitle: 'Until the event',
         landingSocialTitle: 'Follow us here!',
         landingFeedTitle: 'Activities',
-        landingGoApp: 'Launch',
-        landingPath: 'Our small home~',
-        landingFormTitle: 'Fill our form to participate!',
+        landingGoApp: 'Login',
+        countdownDays: 'days',
+        countdownHours: 'hours',
+        countdownMinutes: 'minutes',
+        countdownSeconds: 'seconds',
         sponsorsTitle: 'Sponsors',
         sponsorsSubtitle: 'Our generous sponsors',
 
@@ -241,8 +225,8 @@ export const languages: Record<LanguageCode, Language> = {
         txPurchase: 'Purchase',
         txSystem: 'System credit',
         dashQrTitle: 'Account QR code',
-        dashQrHint: 'Let another user scan this code',
-        dashQrBody: 'Scanning it opens a page where they can interact with your account.',
+        qrCopyLink: 'Copy link',
+        qrCopied: 'Copied!',
 
         queueTitle: 'Event queue',
         queuePositionLabel: 'Your position',
@@ -253,7 +237,6 @@ export const languages: Record<LanguageCode, Language> = {
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
 
-        hostTitle: 'Host tools',
         hostCallTitle: 'Send groups to a station',
         hostStation: 'Station',
         hostCount: 'Groups to call',
@@ -272,20 +255,10 @@ export const languages: Record<LanguageCode, Language> = {
         dashGuide: 'Guide & explanations',
         dashGuideBody: 'This section can contain explanations of the dashboard features.',
 
-        homeSubtitle: 'your corner of the event ✦',
-
         wikiSkip: 'Skip to content',
         wikiLogoAlt: 'first years Event home',
         wikiNavLabel: 'Main navigation',
-        wikiFooter: '✦ made for the first years event ✦',
-        wikiBackTop: 'back to top ↑',
-
-        subActivities: 'all the event stuff, in one place ✦',
-        subActivity: 'event activity detail',
-        subGroup: 'create a group and manage the ones you own',
-        subLeaderboard: 'standings & rankings ✦',
-        subAccount: 'your corner of the event ✧',
-        subHost: 'send waiting groups to a station',
+        navTitle: 'Menu',
 
         activitiesDirectory: 'activity directory',
         activitiesEmpty: 'No activities listed yet.',
@@ -298,8 +271,6 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardRankings: '{type} rankings',
         leaderboardTodo: 'TODO: {type} leaderboard.',
 
-        casinoUnavailableTitle: 'page unavailable',
-        casinoUnavailableSub: "this section isn't available",
         casinoNoticeHead: 'notice',
         casinoNotice: 'This page is not available.',
 
@@ -312,12 +283,9 @@ export const languages: Record<LanguageCode, Language> = {
         accountSettings: 'Profile settings',
         accountSettingsTodo: 'TODO: change username, avatar, and other account-related settings.',
 
-        adminPanelTitle: 'admin panel',
-        adminPanelSubtitle: 'control panel · under construction',
         adminPanelHead: 'administration',
         adminPanelTodo: 'TODO: admin panel.',
 
-        groupManagement: 'Group Management',
         groupName: 'Group Name',
         groupPhone: 'Enter emergency phone Number',
         groupCreate: 'Create Group',
@@ -373,7 +341,6 @@ export const languages: Record<LanguageCode, Language> = {
         logOut: 'Atsijungti',
         logInSignUp: 'Prisijungti / registruotis',
 
-        loginTitle: 'Prisijungti',
         loginEmail: 'El. paštas',
         loginSendLink: 'Siųsti prisijungimo nuorodą',
         loginSentLogin: 'Išsiuntėme prisijungimo nuorodą į {email}.',
@@ -381,8 +348,6 @@ export const languages: Record<LanguageCode, Language> = {
             'Išsiuntėme registracijos nuorodą į {email} — paspausk ją, kad sukurtum paskyrą.',
         loginCode: 'Kodas iš laiško',
         loginVerify: 'Patvirtinti kodą',
-
-        homeWelcome: 'Sveiki sugrįžę, {name}',
 
         interactHeading: 'Sąveika su {name}',
         interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
@@ -393,13 +358,16 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailBalance: 'Balansas',
         interactDetailJoined: 'Prisijungė',
 
-        landingHeroTitle: 'Pirmakursiu renginio registracija',
-        landingFormLink: 'nuoroda į google formą',
+        landingLangTitle: 'Kalba',
+        landingLoginTitle: 'Sistema',
+        landingCountdownTitle: 'Iki renginio',
         landingSocialTitle: 'Sekite mus čia!',
         landingFeedTitle: 'Veiklos',
-        landingGoApp: 'Prisijungti į sistemą',
-        landingPath: 'Mūsų mažas namelis~',
-        landingFormTitle: 'Užpildyk formą ir dalyvauk!',
+        landingGoApp: 'Prisijungti',
+        countdownDays: 'dienų',
+        countdownHours: 'valandų',
+        countdownMinutes: 'minučių',
+        countdownSeconds: 'sekundžių',
         sponsorsTitle: 'Rėmėjai',
         sponsorsSubtitle: 'Mūsų dosnūs rėmėjai',
 
@@ -412,8 +380,8 @@ export const languages: Record<LanguageCode, Language> = {
         txPurchase: 'Pirkimas',
         txSystem: 'Sisteminis įskaitymas',
         dashQrTitle: 'Paskyros QR kodas',
-        dashQrHint: 'Leisk kitam naudotojui nuskamuoti šį kodą',
-        dashQrBody: 'Nuskanavus atidaromas puslapis, kuriame galima sąveikauti su tavo paskyra.',
+        qrCopyLink: 'Kopijuoti nuorodą',
+        qrCopied: 'Nukopijuota!',
 
         queueTitle: 'Renginio eilė',
         queuePositionLabel: 'Tavo pozicija',
@@ -424,7 +392,6 @@ export const languages: Record<LanguageCode, Language> = {
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
 
-        hostTitle: 'Vedėjo įrankiai',
         hostCallTitle: 'Siųsti grupes į stotį',
         hostStation: 'Stotis',
         hostCount: 'Kiek grupių kviesti',
@@ -443,20 +410,10 @@ export const languages: Record<LanguageCode, Language> = {
         dashGuide: 'Vadovas ir paaiškinimai',
         dashGuideBody: 'Šiame skyriuje gali būti pateikiami prietaisų skydelio paaiškinimai.',
 
-        homeSubtitle: 'tavo renginio kampelis ✦',
-
         wikiSkip: 'Pereiti prie turinio',
         wikiLogoAlt: 'pirmakursiu renginio pradžia',
         wikiNavLabel: 'Pagrindinė navigacija',
-        wikiFooter: '✦ sukurta pirmakursiu renginiui ✦',
-        wikiBackTop: 'atgal į viršų ↑',
-
-        subActivities: 'visos renginio veiklos vienoje vietoje ✦',
-        subActivity: 'renginio veiklos informacija',
-        subGroup: 'sukurk grupę ir valdyk jas',
-        subLeaderboard: 'rezultatai ir įvertinimai ✦',
-        subAccount: 'tavo renginio kampelis ✧',
-        subHost: 'nukreipk laukiančias grupes į stotį',
+        navTitle: 'Meniu',
 
         activitiesDirectory: 'veiklų katalogas',
         activitiesEmpty: 'Veiklų dar nėra.',
@@ -469,8 +426,6 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardRankings: '{type} įvertinimai',
         leaderboardTodo: 'TODO: {type} lyderių lentelė.',
 
-        casinoUnavailableTitle: 'puslapis nepasiekiamas',
-        casinoUnavailableSub: 'šis skyrius nepasiekiamas',
         casinoNoticeHead: 'pranešimas',
         casinoNotice: 'Šis puslapis nepasiekiamas.',
 
@@ -483,12 +438,9 @@ export const languages: Record<LanguageCode, Language> = {
         accountSettings: 'Profilio nustatymai',
         accountSettingsTodo: 'TODO: vartotojo vardo, avataro ir kitų paskyros nustatymų keitimas.',
 
-        adminPanelTitle: 'administravimo skydelis',
-        adminPanelSubtitle: 'valdymo skydelis · kuriama',
         adminPanelHead: 'administravimas',
         adminPanelTodo: 'TODO: administravimo skydelis.',
 
-        groupManagement: 'Grupių valdymas',
         groupName: 'Grupės pavadinimas',
         groupPhone: 'Įveskite skubios pagalbos telefono numerį',
         groupCreate: 'Sukurti grupę',

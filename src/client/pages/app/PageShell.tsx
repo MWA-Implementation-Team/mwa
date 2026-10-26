@@ -2,6 +2,7 @@ import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import LanguageToggle from '#src/client/ui/LanguageToggle.js';
+import QrPane from '#src/client/ui/QrPane.js';
 
 export type Section =
     | 'home'
@@ -17,26 +18,16 @@ export type Section =
     | 'login';
 
 type PageShellProps = {
-    title: string;
     section: Section;
-    subtitle?: string;
     nav?: boolean;
-    path?: string;
-    cta?: ComponentChildren;
+    // replaces the default sidebar (logo + nav + qr + language panes)
+    side?: ComponentChildren;
     children: ComponentChildren;
 };
 
 // Wiki-inspired presentation; the visual styles live in wiki.css.
-export default function PageShell({
-    title,
-    section,
-    subtitle,
-    nav = true,
-    path,
-    cta,
-    children,
-}: PageShellProps) {
-    const { t, user } = useContext(ClientContext);
+export default function PageShell({ section, nav = true, side, children }: PageShellProps) {
+    const { t, user, qr } = useContext(ClientContext);
 
     const navigation = [
         { section: 'home', label: t('headerHome'), href: '/app' },
@@ -53,47 +44,56 @@ export default function PageShell({
             : []),
     ];
 
+    const sidebar = side ?? (
+        <>
+            <section class="landing-section landing-pane-brand">
+                <div class="landing-welcome">
+                    <a href="/" class="mwa-wiki-logo" aria-label={t('wikiLogoAlt')}>
+                        <img src="/3Logotipas.png" alt={t('wikiLogoAlt')} />
+                    </a>
+                </div>
+            </section>
+            {nav && (
+                <section class="landing-section landing-pane-nav">
+                    <h2>{t('navTitle')}</h2>
+                    <nav aria-label={t('wikiNavLabel')}>
+                        <ul class="landing-menu">
+                            {navigation.map((item) => (
+                                <li key={item.section}>
+                                    <a
+                                        href={item.href}
+                                        aria-current={item.section === section ? 'page' : undefined}
+                                    >
+                                        {item.label}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                </section>
+            )}
+            {qr && <QrPane />}
+            <section class="landing-section landing-pane-lang">
+                <h2>{t('landingLangTitle')}</h2>
+                <div class="landing-footer">
+                    <LanguageToggle />
+                </div>
+            </section>
+        </>
+    );
+
     return (
         <div class="mwa-wiki">
             <a class="mwa-wiki-skip" href="#mwa-wiki-main">
                 {t('wikiSkip')}
             </a>
-            <div class="mwa-wiki-frame">
-                <header class="mwa-wiki-brand">
-                    <a href="/" class="mwa-wiki-logo" aria-label={t('wikiLogoAlt')}>
-                        <img src="/3Logotipas.png" alt={t('wikiLogoAlt')} />
-                    </a>
-                    {cta && <div class="mwa-wiki-brand-cta">{cta}</div>}
-                </header>
-
-                {nav && (
-                    <nav class="mwa-wiki-nav" aria-label={t('wikiNavLabel')}>
-                        {navigation.map((item) => (
-                            <a
-                                key={item.section}
-                                href={item.href}
-                                aria-current={item.section === section ? 'page' : undefined}
-                            >
-                                {item.label}
-                            </a>
-                        ))}
-                    </nav>
-                )}
-
-                <main id="mwa-wiki-main" class="mwa-wiki-main">
-                    <div class="mwa-wiki-heading">
-                        <h1>{title}</h1>
-                        {subtitle && <p class="mwa-wiki-subtitle">{subtitle}</p>}
-                    </div>
-                    <div class="mwa-wiki-stack">{children}</div>
-                </main>
-
-                <footer class="mwa-wiki-footer">
-                    <span>{t('wikiFooter')}</span>
-                    <LanguageToggle />
-                    <a href="#mwa-wiki-main">{t('wikiBackTop')}</a>
-                </footer>
-                <p class="mwa-wiki-path">{path ?? `/mwa/${section}/`}</p>
+            <div class={`mwa-wiki-frame mwa-wiki-frame--${section}`}>
+                <div class="landing-grid">
+                    <div class="landing-col landing-col--side">{sidebar}</div>
+                    <main id="mwa-wiki-main" class="landing-col landing-col--main">
+                        {children}
+                    </main>
+                </div>
             </div>
         </div>
     );
