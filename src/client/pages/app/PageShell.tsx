@@ -49,10 +49,10 @@ export default function PageShell({
         },
         { section: 'gambling', label: t('headerGambling'), href: '/app/gambling' },
         { section: 'account', label: t('headerAccount'), href: '/app/account' },
-        ...(user && (user.role === 'host' || user.role === 'admin')
-            ? [{ section: 'host', label: t('headerHost'), href: '/app/host' }]
-            : []),
     ];
+    if (user && (user.role === 'host' || user.role === 'admin')) {
+        navigation.push({ section: 'host', label: t('headerHost'), href: '/app/host' });
+    }
 
     const sidebar = side ?? (
         <>

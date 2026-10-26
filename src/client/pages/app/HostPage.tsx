@@ -1,13 +1,16 @@
 import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
-import { callGroups, markDone, type WaitingQueueRow } from '#src/client/api/host.js';
+import type { WaitingQueueRow } from '#src/db/queue.js';
 import PageShell from './PageShell.js';
+import { Language } from '#src/client/language.js';
 
 type HostPageProps = {
     activities: { slug: string; name: string }[];
     waiting: WaitingQueueRow[];
     atStation: WaitingQueueRow[];
+    station: string;
+    error?: keyof Language;
 };
 
 export const hostPage: Page<HostPageProps> = {
@@ -17,39 +20,16 @@ export const hostPage: Page<HostPageProps> = {
 
 const MAX_CALL_COUNT = 20;
 
-function HostPage({ activities, waiting: initialWaiting, atStation }: HostPageProps) {
+function HostPage({
+    activities,
+    waiting,
+    atStation,
+    station: initialStation,
+    error,
+}: HostPageProps) {
     const { t } = useContext(ClientContext);
-    const [station, setStation] = useState(activities[0]?.slug ?? '');
-    const [count, setCount] = useState(1);
-    const [waiting, setWaiting] = useState(initialWaiting);
-    const [called, setCalled] = useState(atStation);
-    const [error, setError] = useState<string | null>(null);
-
-    const onStation = called.filter((entry) => entry.activitySlug === station);
-
-    const handleCall = async () => {
-        setError(null);
-        try {
-            const res = await callGroups(station, count);
-            setCalled((prev) => [
-                ...prev.filter((entry) => entry.activitySlug !== station),
-                ...res.atStation,
-            ]);
-            setWaiting((prev) => prev.slice(res.called.length));
-        } catch {
-            setError(t('hostRequestFailed'));
-        }
-    };
-
-    const handleDone = async (entryId: number) => {
-        setError(null);
-        try {
-            await markDone(entryId);
-            setCalled((prev) => prev.filter((entry) => entry.id !== entryId));
-        } catch {
-            setError(t('hostDoneFailed'));
-        }
-    };
+    const [station, setStation] = useState(initialStation);
+    const onStation = atStation.filter((entry) => entry.activitySlug === station);
 
     return (
         <PageShell section="host">
@@ -58,11 +38,12 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
                     <h2>{t('hostCallTitle')}</h2>
                 </div>
                 <div class="mwa-panel-body">
-                    <div class="mwa-form">
+                    <form id="host-call" method="post" action="/app/host/call" class="mwa-form">
                         <div class="mwa-field">
                             <label for="host-station">{t('hostStation')}</label>
                             <select
                                 id="host-station"
+                                name="activity_slug"
                                 value={station}
                                 onChange={(e) => setStation((e.target as HTMLSelectElement).value)}
                             >
@@ -81,34 +62,26 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
                                 type="number"
                                 min={1}
                                 max={MAX_CALL_COUNT}
-                                value={count}
-                                onInput={(e) =>
-                                    setCount(
-                                        Math.max(
-                                            1,
-                                            Math.min(
-                                                MAX_CALL_COUNT,
-                                                Number((e.target as HTMLInputElement).value) || 1,
-                                            ),
-                                        ),
-                                    )
-                                }
+                                name="count"
+                                defaultValue={1}
+                                required
                             />
                         </div>
-                    </div>
+                    </form>
 
                     <p class="mwa-muted">{t('hostWaiting', { n: String(waiting.length) })}</p>
 
                     {error && (
                         <p class="mwa-note mwa-note--error" role="alert">
-                            {error}
+                            {t(error)}
                         </p>
                     )}
 
                     <div class="mwa-actions">
                         <button
                             class="btn-primary"
-                            onClick={handleCall}
+                            type="submit"
+                            form="host-call"
                             disabled={waiting.length === 0}
                         >
                             {t('hostRequest')}
@@ -129,9 +102,11 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
                             {onStation.map((entry) => (
                                 <li key={entry.id} class="mwa-row">
                                     <strong>{entry.groupName}</strong>
-                                    <button onClick={() => handleDone(entry.id)}>
-                                        {t('hostDone')}
-                                    </button>
+                                    <form method="post" action="/app/host/done">
+                                        <input type="hidden" name="activity_slug" value={station} />
+                                        <input type="hidden" name="entry_id" value={entry.id} />
+                                        <button type="submit">{t('hostDone')}</button>
+                                    </form>
                                 </li>
                             ))}
                         </ul>

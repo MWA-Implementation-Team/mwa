@@ -2,6 +2,10 @@ import { requireRole, requireUser } from '#src/auth.js';
 import { listUserTransactions } from '#src/db/transactions.js';
 import { findUserGroup, listUserGroups } from '#src/db/groups.js';
 import {
+    callNextGroups,
+    markEntryDone,
+    joinQueue,
+    leaveQueue,
     getQueuePosition,
     getUserWaitingEntry,
     listWaitingQueue,
@@ -15,6 +19,7 @@ import { deleteSession } from '#src/db/sessions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';
+import { Language } from '#src/client/language.js';
 
 export function registerAppRoutes(app: MwaHono) {
     app.get('/app', async (ctx) => {
@@ -24,11 +29,41 @@ export function registerAppRoutes(app: MwaHono) {
         const group = findUserGroup(ctx.var, user.id);
         const queueEntry = getUserWaitingEntry(ctx.var, user.id);
 
+        let queueError: keyof Language | undefined = ctx.req.query('queueError') as keyof Language;
+        if (queueError !== 'queueJoinFailed' && queueError !== 'queueLeaveFailed') {
+            queueError = undefined;
+        }
+
         return writePage(ctx, 'home', {
             transactions: listUserTransactions(ctx.var, user.id),
             groupName: group?.name ?? null,
+            queueError,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
         });
+    });
+
+    app.post('/app/queue/join', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const group = findUserGroup(ctx.var, user.id);
+        if (!group || !joinQueue(ctx.var, group.id).success) {
+            return ctx.redirect('/app?queueError=queueJoinFailed', 303);
+        }
+
+        return ctx.redirect('/app', 303);
+    });
+
+    app.post('/app/queue/leave', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const group = findUserGroup(ctx.var, user.id);
+        if (!group || !leaveQueue(ctx.var, group.id)) {
+            return ctx.redirect('/app?queueError=queueLeaveFailed', 303);
+        }
+
+        return ctx.redirect('/app', 303);
     });
 
     app.post('/app', async (ctx) => {
@@ -98,11 +133,63 @@ export function registerAppRoutes(app: MwaHono) {
         // client-side by the selected activity
         const atStation = activities.flatMap(({ slug }) => listStationGroups(ctx.var, slug));
 
+        const requestedStation = ctx.req.query('station');
+        const station =
+            requestedStation && isActivitySlug(requestedStation)
+                ? requestedStation
+                : (activities[0]?.slug ?? '');
+
+        let error: keyof Language | undefined = ctx.req.query('error') as keyof Language;
+        if (error !== 'hostRequestFailed' && error !== 'hostDoneFailed') {
+            error = undefined;
+        }
+
         return writePage(ctx, 'host', {
+            station,
+            error,
             activities,
             waiting: listWaitingQueue(ctx.var),
             atStation,
         });
+    });
+
+    app.post('/app/host/call', async (ctx) => {
+        const user = requireRole(ctx, 'host', 'admin');
+        if (user instanceof Response) return user;
+
+        const form = await ctx.req.formData().catch(() => null);
+        const station = form?.get('activity_slug');
+        if (typeof station !== 'string' || !isActivitySlug(station)) {
+            return ctx.redirect('/app/host?error=hostRequestFailed', 303);
+        }
+
+        const target = `/app/host?station=${encodeURIComponent(station)}`;
+        const count = Number(form?.get('count'));
+        if (!Number.isInteger(count) || count < 1) {
+            return ctx.redirect(`${target}&error=hostRequestFailed`, 303);
+        }
+
+        callNextGroups(ctx.var, Math.min(count, 20), station);
+        return ctx.redirect(target, 303);
+    });
+
+    app.post('/app/host/done', async (ctx) => {
+        const user = requireRole(ctx, 'host', 'admin');
+        if (user instanceof Response) return user;
+
+        const form = await ctx.req.formData().catch(() => null);
+        const station = form?.get('activity_slug');
+        if (typeof station !== 'string' || !isActivitySlug(station)) {
+            return ctx.redirect('/app/host?error=hostDoneFailed', 303);
+        }
+
+        const target = `/app/host?station=${encodeURIComponent(station)}`;
+        const entryId = Number(form?.get('entry_id'));
+        if (!Number.isSafeInteger(entryId) || entryId < 1 || !markEntryDone(ctx.var, entryId)) {
+            return ctx.redirect(`${target}&error=hostDoneFailed`, 303);
+        }
+
+        return ctx.redirect(target, 303);
     });
 
     app.get('/app/interact/:token', async (ctx) => {

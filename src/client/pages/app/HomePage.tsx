@@ -2,7 +2,6 @@ import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { Transaction, TransactionKind } from '#src/client/api/transactions.js';
-import { joinQueue, leaveQueue } from '#src/client/api/queue.js';
 import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
 import PageShell from './PageShell.js';
 import { Language } from '#src/client/language.js';
@@ -11,6 +10,7 @@ type HomePageProps = {
     transactions: Transaction[];
     groupName: string | null;
     queuePosition: number | null;
+    queueError?: keyof Language;
 };
 
 export const homePage: Page<HomePageProps> = {
@@ -26,31 +26,9 @@ const transactionKindKey = {
     gambling_winnings: 'txGamblingWinnings',
 } as const satisfies Record<TransactionKind, keyof Language>;
 
-function HomePage({ transactions, groupName, queuePosition: initialQueuePosition }: HomePageProps) {
+function HomePage({ transactions, groupName, queuePosition, queueError }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
-    const [queuePosition, setQueuePosition] = useState(initialQueuePosition);
-    const [queueError, setQueueError] = useState<string | null>(null);
-
-    const handleJoinQueue = async () => {
-        setQueueError(null);
-        try {
-            const { position } = await joinQueue();
-            setQueuePosition(position);
-        } catch {
-            setQueueError(t('queueJoinFailed'));
-        }
-    };
-
-    const handleLeaveQueue = async () => {
-        setQueueError(null);
-        try {
-            await leaveQueue();
-            setQueuePosition(null);
-        } catch {
-            setQueueError(t('queueLeaveFailed'));
-        }
-    };
 
     return (
         <PageShell section="home">
@@ -97,7 +75,7 @@ function HomePage({ transactions, groupName, queuePosition: initialQueuePosition
                 <div class="mwa-panel-body">
                     {queueError && (
                         <p class="mwa-note mwa-note--error" role="alert">
-                            {queueError}
+                            {t(queueError)}
                         </p>
                     )}
 
@@ -106,18 +84,16 @@ function HomePage({ transactions, groupName, queuePosition: initialQueuePosition
                             <p class="mwa-intro">
                                 {t('queuePositionLabel')}: <strong>#{queuePosition}</strong>
                             </p>
-                            <div class="mwa-actions">
-                                <button type="button" onClick={handleLeaveQueue}>
-                                    {t('queueLeave')}
-                                </button>
-                            </div>
+                            <form method="post" action="/app/queue/leave" class="mwa-actions">
+                                <button type="submit">{t('queueLeave')}</button>
+                            </form>
                         </>
                     ) : groupName ? (
-                        <div class="mwa-actions">
-                            <button type="button" class="btn-primary" onClick={handleJoinQueue}>
+                        <form method="post" action="/app/queue/join" class="mwa-actions">
+                            <button type="submit" class="btn-primary">
                                 {t('queueJoinAs', { group: groupName })}
                             </button>
-                        </div>
+                        </form>
                     ) : (
                         <p class="mwa-muted">
                             {t('queueNeedGroup')} <a href="/app/group">{t('queueGoGroup')}</a>

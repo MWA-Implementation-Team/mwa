@@ -1,5 +1,6 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
+import { runTransaction } from './transaction.js';
 
 export type QueueStatus = 'waiting' | 'left' | 'called';
 
@@ -130,20 +131,15 @@ export function callNextGroups(state: MwaState, count: number, activitySlug: str
         WHERE id = ? AND status = 'waiting'
     `);
 
-    state.db.exec('BEGIN');
-    try {
+    return runTransaction(state.db, () => {
         const picked = pickQuery.all(count).map(mapQueueEntry);
         for (const entry of picked) {
             markCalledQuery.run(activitySlug, entry.id);
             entry.status = 'called';
             entry.activitySlug = activitySlug;
         }
-        state.db.exec('COMMIT');
         return picked;
-    } catch (error) {
-        state.db.exec('ROLLBACK');
-        throw error;
-    }
+    });
 }
 
 // Groups currently at a station — called there and not yet done, oldest
