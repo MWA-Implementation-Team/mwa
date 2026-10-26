@@ -1,3 +1,3 @@
 export default function Footer() {
-    return <footer>MWA</footer>;
+    return <footer>pirmakursiu</footer>;
 }

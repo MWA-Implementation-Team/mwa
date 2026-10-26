@@ -102,3 +102,22 @@ Role gating is data-driven, not renderer-driven: the route only serializes
 elevated fields (the `detail` prop) for host/admin scanners, so a section can
 never receive data its role shouldn't see. If interactions multiply, this can
 graduate to a registry like `registeredActivities`.
+
+## Queue entry
+
+One row in `queue_entries` — a group's spot in the single event-wide queue
+(`src/db/queue.ts`). The dashboard uses forms to join via
+`POST /app/queue/join` and leave via `POST /app/queue/leave`, redirecting
+back to `/app` with the updated position or a localized error.
+Both actions use the caller's own group; any member may act.
+Status is `waiting` while in line and stays on the row afterwards — `left` for
+a bail, `called` when a host pulls the group to a station (`activity_slug`
+records which one). A called group finishing its station is marked by
+`done_at` rather than a new status — it drops out of `listStationGroups`, which
+is what `/app/host` shows. Order is by row id, so a rejoined group lands at the
+back and a partial unique index guarantees at most one waiting spot per group.
+The dashboard shows the caller's 1-based position; hosts read `listWaitingQueue`
+and call `callNextGroups` when a station frees up. Host actions use
+POST forms at `/app/host/call` and `/app/host/done`, restricted to hosts and
+admins. Each redirects back to the selected station with fresh queue data
+and localized errors.

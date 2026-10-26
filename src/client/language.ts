@@ -15,6 +15,7 @@ export type Language = {
     titleGroup: string;
     titleGambling: string;
     titleInteract: string;
+    titleHost: string;
     titleAdmin: string;
     titleError: string;
     titleGamblingRequest: string;
@@ -23,30 +24,24 @@ export type Language = {
     titleGamblingCoinFlip: string;
     titleGamblingInvite: string;
 
-    headerLanding: string;
-    headerLogin: string;
     headerHome: string;
     headerActivities: string;
     headerLeaderboard: string;
     headerGroup: string;
     headerGambling: string;
     headerAccount: string;
+    headerHost: string;
     headerAdmin: string;
 
-    menuTitle: string;
-    menuClose: string;
     logOut: string;
     logInSignUp: string;
 
-    loginTitle: string;
     loginEmail: string;
     loginSendLink: string;
     loginSentLogin: string;
     loginSentSignup: string;
     loginCode: string;
     loginVerify: string;
-
-    homeWelcome: string;
 
     interactHeading: string;
     interactSelfJoke: string;
@@ -57,23 +52,17 @@ export type Language = {
     interactDetailBalance: string;
     interactDetailJoined: string;
 
-    landingHeroTitle: string;
-    landingHeroBody: string;
-    landingRegister: string;
+    landingLangTitle: string;
+    landingLoginTitle: string;
+    landingCountdownTitle: string;
     landingSocialTitle: string;
-    landingNews1Title: string;
-    landingNews1Body: string;
-    landingNews2Title: string;
-    landingNews2Body: string;
-    landingMapTitle: string;
-    mapPlaceholder: string;
     landingFeedTitle: string;
-    landingFeedActive: string;
-    activitySlot: string;
-    activityDesc: string;
-    statusOpen: string;
-    statusBusy: string;
-    getInLine: string;
+    landingGoApp: string;
+    landingLogin: string;
+    countdownDays: string;
+    countdownHours: string;
+    countdownMinutes: string;
+    countdownSeconds: string;
     sponsorsTitle: string;
     sponsorsSubtitle: string;
 
@@ -88,14 +77,62 @@ export type Language = {
     txGamblingDeduction: string;
     txGamblingWinnings: string;
     dashQrTitle: string;
-    dashQrHint: string;
-    dashQrBody: string;
+    qrCopyLink: string;
+    qrCopied: string;
+
+    queueTitle: string;
+    queuePositionLabel: string;
+    queueJoinAs: string;
+    queueLeave: string;
+    queueNeedGroup: string;
+    queueGoGroup: string;
+    queueJoinFailed: string;
+    queueLeaveFailed: string;
+
+    hostCallTitle: string;
+    hostStation: string;
+    hostCount: string;
+    hostRequest: string;
+    hostWaiting: string;
+    hostAtStation: string;
+    hostStationEmpty: string;
+    hostDone: string;
+    hostNextUp: string;
+    hostQueueEmpty: string;
+    hostRequestFailed: string;
+    hostDoneFailed: string;
+
     dashSupport: string;
     dashCall: string;
     dashGuide: string;
     dashGuideBody: string;
 
-    groupManagement: string;
+    shellSkip: string;
+    shellLogoAlt: string;
+    shellNavLabel: string;
+    navTitle: string;
+
+    activitiesDirectory: string;
+    activitiesEmpty: string;
+    activityInfoTitle: string;
+    activityBack: string;
+
+    leaderboardTypeLabel: string;
+    leaderboardTeam: string;
+    leaderboardGroup: string;
+    leaderboardRankings: string;
+    leaderboardTodo: string;
+
+    accountProfile: string;
+    accountUsername: string;
+    accountEdit: string;
+    accountEmail: string;
+    accountRole: string;
+    accountJoined: string;
+    accountLifetimeEarned: string;
+    adminPanelHead: string;
+    adminPanelTodo: string;
+
     groupName: string;
     groupPhone: string;
     groupCreate: string;
@@ -123,6 +160,9 @@ export type Language = {
     emailLoginExpiry: string;
 
     gamblingActiveGames: string;
+    gamblingInvitations: string;
+    gamblingNoInvitations: string;
+    gamblingNoActiveGames: string;
     gamblingVersus: string;
     gamblingWith: string;
     gamblingChallenge: string;
@@ -164,48 +204,43 @@ export const languages: Record<LanguageCode, Language> = {
     en: {
         displayName: 'English',
 
-        titleLanding: 'MWA | Home',
-        titleLogin: 'MWA | Login',
-        titleHome: 'MWA | App',
-        titleActivities: 'MWA | Activities',
-        titleActivity: 'MWA | {name}',
-        titleAccount: 'MWA | Account',
-        titleLeaderboard: 'MWA | Leaderboard',
-        titleGroup: 'MWA | Group',
-        titleGambling: 'MWA | Gambling',
-        titleInteract: 'MWA | Interact',
-        titleAdmin: 'MWA | Admin',
-        titleError: 'MWA | {status}',
-        titleGamblingRequest: 'MWA | Challenge request',
-        titleGamblingExpired: 'MWA | Expired',
-        titleGamblingRejected: 'MWA | Rejected',
-        titleGamblingCoinFlip: 'MWA | Coin flip',
-        titleGamblingInvite: 'MWA | Gamble with {name}',
+        titleLanding: 'first years | Home',
+        titleLogin: 'first years | Login',
+        titleHome: 'first years | App',
+        titleActivities: 'first years | Activities',
+        titleActivity: 'first years | {name}',
+        titleAccount: 'first years | Account',
+        titleLeaderboard: 'first years | Leaderboard',
+        titleGroup: 'first years | Group',
+        titleGambling: 'first years | Gambling',
+        titleInteract: 'first years | Interact',
+        titleHost: 'first years | Host',
+        titleAdmin: 'first years | Admin',
+        titleError: 'first years | {status}',
+        titleGamblingRequest: 'first years | Challenge request',
+        titleGamblingExpired: 'first years | Expired',
+        titleGamblingRejected: 'first years | Rejected',
+        titleGamblingCoinFlip: 'first years | Coin flip',
+        titleGamblingInvite: 'first years | Gamble with {name}',
 
-        headerLanding: 'Home',
-        headerLogin: 'Login',
         headerHome: 'App',
         headerActivities: 'Activities',
         headerLeaderboard: 'Leaderboard',
         headerGroup: 'Group',
         headerGambling: 'Gambling',
         headerAccount: 'Account',
+        headerHost: 'Host tools',
         headerAdmin: 'Admin',
 
-        menuTitle: 'Menu',
-        menuClose: 'Close menu',
         logOut: 'Log out',
         logInSignUp: 'Log in / sign up',
 
-        loginTitle: 'Log in',
         loginEmail: 'Email',
         loginSendLink: 'Send login link',
         loginSentLogin: 'We sent a login link to {email}.',
         loginSentSignup: 'We sent a signup link to {email} — click it to create your account.',
         loginCode: 'Code from the email',
         loginVerify: 'Verify code',
-
-        homeWelcome: 'Welcome back, {name}',
 
         interactHeading: 'Interact with {name}',
         interactSelfJoke: "That's you! Scan someone else's code instead.",
@@ -216,24 +251,17 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailBalance: 'Balance',
         interactDetailJoined: 'Joined',
 
-        landingHeroTitle: 'MWA event registration',
-        landingHeroBody:
-            'Sign up for the event, explore the activities and get in line for your favorites.',
-        landingRegister: 'Register now',
-        landingSocialTitle: 'Social links & news',
-        landingNews1Title: 'News headline item 1',
-        landingNews1Body: 'Brief summary placeholder for event updates and news feed.',
-        landingNews2Title: 'News headline item 2',
-        landingNews2Body: 'Another short placeholder for upcoming event news.',
-        landingMapTitle: 'Event map',
-        mapPlaceholder: 'Map placeholder',
-        landingFeedTitle: 'Activities feed',
-        landingFeedActive: 'Active items',
-        activitySlot: 'Activity slot {n}',
-        activityDesc: 'Short description of this activity, attraction or schedule item.',
-        statusOpen: 'Open',
-        statusBusy: 'Busy',
-        getInLine: 'Get in line',
+        landingLangTitle: 'Language',
+        landingLoginTitle: 'System',
+        landingCountdownTitle: 'Until the event',
+        landingSocialTitle: 'Follow us here!',
+        landingFeedTitle: 'Activities',
+        landingGoApp: 'Go',
+        landingLogin: 'Login',
+        countdownDays: 'days',
+        countdownHours: 'hours',
+        countdownMinutes: 'minutes',
+        countdownSeconds: 'seconds',
         sponsorsTitle: 'Sponsors',
         sponsorsSubtitle: 'Our generous sponsors',
 
@@ -248,14 +276,62 @@ export const languages: Record<LanguageCode, Language> = {
         txGamblingDeduction: 'Gambling deduction',
         txGamblingWinnings: 'Gambling winnings',
         dashQrTitle: 'Account QR code',
-        dashQrHint: 'Let another user scan this code',
-        dashQrBody: 'Scanning it opens a page where they can interact with your account.',
+        qrCopyLink: 'Copy link',
+        qrCopied: 'Copied!',
+
+        queueTitle: 'Event queue',
+        queuePositionLabel: 'Your position',
+        queueJoinAs: 'Join the queue as {group}',
+        queueLeave: 'Leave the queue',
+        queueNeedGroup: 'You need a group to join the queue.',
+        queueGoGroup: 'Go to your group',
+        queueJoinFailed: 'Could not join the queue',
+        queueLeaveFailed: 'Could not leave the queue',
+
+        hostCallTitle: 'Send groups to a station',
+        hostStation: 'Station',
+        hostCount: 'Groups to call',
+        hostRequest: 'Request from queue',
+        hostWaiting: '{n} group(s) waiting in the queue',
+        hostAtStation: 'At the station',
+        hostStationEmpty: 'No groups at this station',
+        hostDone: 'Done',
+        hostNextUp: 'Next in line',
+        hostQueueEmpty: 'The queue is empty',
+        hostRequestFailed: 'Could not request groups',
+        hostDoneFailed: 'Could not mark the group done',
+
         dashSupport: 'Support',
         dashCall: 'Call support',
         dashGuide: 'Guide & explanations',
         dashGuideBody: 'This section can contain explanations of the dashboard features.',
 
-        groupManagement: 'Group Management',
+        shellSkip: 'Skip to content',
+        shellLogoAlt: 'first years Event home',
+        shellNavLabel: 'Main navigation',
+        navTitle: 'Menu',
+
+        activitiesDirectory: 'activity directory',
+        activitiesEmpty: 'No activities listed yet.',
+        activityInfoTitle: 'activity information',
+        activityBack: '← back to activities',
+
+        leaderboardTypeLabel: 'Leaderboard type',
+        leaderboardTeam: 'team',
+        leaderboardGroup: 'group',
+        leaderboardRankings: '{type} rankings',
+        leaderboardTodo: 'TODO: {type} leaderboard.',
+
+        accountProfile: 'Profile',
+        accountUsername: 'Username',
+        accountEdit: 'Edit',
+        accountEmail: 'Email',
+        accountRole: 'Role',
+        accountJoined: 'Joined',
+        accountLifetimeEarned: 'Lifetime earned',
+        adminPanelHead: 'administration',
+        adminPanelTodo: 'TODO: admin panel.',
+
         groupName: 'Group Name',
         groupPhone: 'Enter emergency phone Number',
         groupCreate: 'Create Group',
@@ -274,8 +350,8 @@ export const languages: Record<LanguageCode, Language> = {
         loginWrongCode: 'Wrong code — check the email and try again',
         loginCodeExpired: 'That code is expired or already used — request a new one',
         badRequest: 'Bad Request',
-        emailLoginSubject: 'Your MWA sign-in link',
-        emailLoginHeading: 'Sign in to MWA',
+        emailLoginSubject: 'Your first years sign-in link',
+        emailLoginHeading: 'Sign in to first years',
         emailLoginIntro: 'Click the button below to sign in. The link expires in 15 minutes.',
         emailLoginAction: 'Sign in',
         emailLoginCode: 'Or enter this code on the login page:',
@@ -283,6 +359,9 @@ export const languages: Record<LanguageCode, Language> = {
         emailLoginExpiry: 'The link and code expire in 15 minutes.',
 
         gamblingActiveGames: 'Active games',
+        gamblingInvitations: 'Invitations',
+        gamblingNoInvitations: 'No invitations yet.',
+        gamblingNoActiveGames: 'No games running.',
         gamblingVersus: '{p1} vs {p2}',
         gamblingWith: 'Gamble with {name}',
         gamblingChallenge: 'Challenge',
@@ -324,40 +403,37 @@ export const languages: Record<LanguageCode, Language> = {
     lt: {
         displayName: 'Lietuvių',
 
-        titleLanding: 'MWA | Pradžia',
-        titleLogin: 'MWA | Prisijungimas',
-        titleHome: 'MWA | Programa',
-        titleActivities: 'MWA | Veiklos',
-        titleActivity: 'MWA | {name}',
-        titleAccount: 'MWA | Paskyra',
-        titleLeaderboard: 'MWA | Lyderių lentelė',
-        titleGroup: 'MWA | Grupė',
-        titleGambling: 'MWA | Lošimai',
-        titleInteract: 'MWA | Sąveika',
-        titleAdmin: 'MWA | Administravimas',
-        titleError: 'MWA | {status}',
-        titleGamblingRequest: 'MWA | Kvietimas lošti',
-        titleGamblingExpired: 'MWA | Kvietimas nebegalioja',
-        titleGamblingRejected: 'MWA | Kvietimas atmestas',
-        titleGamblingCoinFlip: 'MWA | Monetos metimas',
-        titleGamblingInvite: 'MWA | Lošk su {name}',
+        titleLanding: 'pirmakursiu | Pradžia',
+        titleLogin: 'pirmakursiu | Prisijungimas',
+        titleHome: 'pirmakursiu | Programa',
+        titleActivities: 'pirmakursiu | Veiklos',
+        titleActivity: 'pirmakursiu | {name}',
+        titleAccount: 'pirmakursiu | Paskyra',
+        titleLeaderboard: 'pirmakursiu | Lyderių lentelė',
+        titleGroup: 'pirmakursiu | Grupė',
+        titleGambling: 'pirmakursiu | Lošimai',
+        titleInteract: 'pirmakursiu | Sąveika',
+        titleHost: 'pirmakursiu | Vedėjas',
+        titleAdmin: 'pirmakursiu | Administravimas',
+        titleError: 'pirmakursiu | {status}',
+        titleGamblingRequest: 'pirmakursiu | Kvietimas lošti',
+        titleGamblingExpired: 'pirmakursiu | Kvietimas nebegalioja',
+        titleGamblingRejected: 'pirmakursiu | Kvietimas atmestas',
+        titleGamblingCoinFlip: 'pirmakursiu | Monetos metimas',
+        titleGamblingInvite: 'pirmakursiu | Lošk su {name}',
 
-        headerLanding: 'Pradžia',
-        headerLogin: 'Prisijungimas',
         headerHome: 'Programa',
         headerActivities: 'Veiklos',
         headerLeaderboard: 'Lyderių lentelė',
         headerGroup: 'Grupė',
         headerGambling: 'Lošimai',
         headerAccount: 'Paskyra',
+        headerHost: 'Vedėjo įrankiai',
         headerAdmin: 'Administravimas',
 
-        menuTitle: 'Meniu',
-        menuClose: 'Uždaryti meniu',
         logOut: 'Atsijungti',
         logInSignUp: 'Prisijungti / registruotis',
 
-        loginTitle: 'Prisijungti',
         loginEmail: 'El. paštas',
         loginSendLink: 'Siųsti prisijungimo nuorodą',
         loginSentLogin: 'Išsiuntėme prisijungimo nuorodą į {email}.',
@@ -365,8 +441,6 @@ export const languages: Record<LanguageCode, Language> = {
             'Išsiuntėme registracijos nuorodą į {email} — paspausk ją, kad sukurtum paskyrą.',
         loginCode: 'Kodas iš laiško',
         loginVerify: 'Patvirtinti kodą',
-
-        homeWelcome: 'Sveiki sugrįžę, {name}',
 
         interactHeading: 'Sąveika su {name}',
         interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
@@ -377,23 +451,17 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailBalance: 'Balansas',
         interactDetailJoined: 'Prisijungė',
 
-        landingHeroTitle: 'MWA renginio registracija',
-        landingHeroBody: 'Užsiregistruok į renginį, apžiūrėk veiklas ir užimk vietą eilėje.',
-        landingRegister: 'Registruotis',
-        landingSocialTitle: 'Socialiniai tinklai ir naujienos',
-        landingNews1Title: 'Naujienų antraštė 1',
-        landingNews1Body: 'Trumpas renginio naujienų ir atnaujinimų santraukos pavyzdys.',
-        landingNews2Title: 'Naujienų antraštė 2',
-        landingNews2Body: 'Dar vienas trumpas artėjančių renginio naujienų pavyzdys.',
-        landingMapTitle: 'Renginio žemėlapis',
-        mapPlaceholder: 'Žemėlapio vieta',
-        landingFeedTitle: 'Veiklų srautas',
-        landingFeedActive: 'Aktyvios veiklos',
-        activitySlot: 'Veikla nr. {n}',
-        activityDesc: 'Trumpas šios veiklos, atrakcijos ar programos punkto aprašymas.',
-        statusOpen: 'Atvira',
-        statusBusy: 'Užimta',
-        getInLine: 'Stoti į eilę',
+        landingLangTitle: 'Kalba',
+        landingLoginTitle: 'Sistema',
+        landingCountdownTitle: 'Iki renginio',
+        landingSocialTitle: 'Sekite mus čia!',
+        landingFeedTitle: 'Veiklos',
+        landingGoApp: 'Eiti',
+        landingLogin: 'Prisijungti',
+        countdownDays: 'dienų',
+        countdownHours: 'valandų',
+        countdownMinutes: 'minučių',
+        countdownSeconds: 'sekundžių',
         sponsorsTitle: 'Rėmėjai',
         sponsorsSubtitle: 'Mūsų dosnūs rėmėjai',
 
@@ -408,14 +476,63 @@ export const languages: Record<LanguageCode, Language> = {
         txGamblingDeduction: 'Lošimo atsiskaitymas',
         txGamblingWinnings: 'Lošimo laimėjimas',
         dashQrTitle: 'Paskyros QR kodas',
-        dashQrHint: 'Leisk kitam naudotojui nuskamuoti šį kodą',
-        dashQrBody: 'Nuskanavus atidaromas puslapis, kuriame galima sąveikauti su tavo paskyra.',
+        qrCopyLink: 'Kopijuoti nuorodą',
+        qrCopied: 'Nukopijuota!',
+
+        queueTitle: 'Renginio eilė',
+        queuePositionLabel: 'Tavo pozicija',
+        queueJoinAs: 'Stoti į eilę kaip {group}',
+        queueLeave: 'Palikti eilę',
+        queueNeedGroup: 'Norint stoti į eilę, reikia grupės.',
+        queueGoGroup: 'Eiti į grupę',
+        queueJoinFailed: 'Nepavyko stoti į eilę',
+        queueLeaveFailed: 'Nepavyko palikti eilės',
+
+        hostCallTitle: 'Siųsti grupes į stotį',
+        hostStation: 'Stotis',
+        hostCount: 'Kiek grupių kviesti',
+        hostRequest: 'Paimti iš eilės',
+        hostWaiting: 'Eilėje laukia grupių: {n}',
+        hostAtStation: 'Prie stoties',
+        hostStationEmpty: 'Prie šios stoties grupių nėra',
+        hostDone: 'Atlikta',
+        hostNextUp: 'Eilėje toliau',
+        hostQueueEmpty: 'Eilė tuščia',
+        hostRequestFailed: 'Nepavyko pakviesti grupių',
+        hostDoneFailed: 'Nepavyko pažymėti grupės kaip atliktos',
+
         dashSupport: 'Pagalba',
         dashCall: 'Skambinti pagalbai',
         dashGuide: 'Vadovas ir paaiškinimai',
         dashGuideBody: 'Šiame skyriuje gali būti pateikiami prietaisų skydelio paaiškinimai.',
 
-        groupManagement: 'Grupių valdymas',
+        shellSkip: 'Pereiti prie turinio',
+        shellLogoAlt: 'pirmakursiu renginio pradžia',
+        shellNavLabel: 'Pagrindinė navigacija',
+        navTitle: 'Meniu',
+
+        activitiesDirectory: 'veiklų katalogas',
+        activitiesEmpty: 'Veiklų dar nėra.',
+        activityInfoTitle: 'veiklos informacija',
+        activityBack: '← atgal į veiklas',
+
+        leaderboardTypeLabel: 'Lentelės tipas',
+        leaderboardTeam: 'komanda',
+        leaderboardGroup: 'grupė',
+        leaderboardRankings: '{type} įvertinimai',
+        leaderboardTodo: 'TODO: {type} lyderių lentelė.',
+
+        accountProfile: 'Profilis',
+        accountUsername: 'Vartotojo vardas',
+        accountEdit: 'Redaguoti',
+        accountEmail: 'El. paštas',
+        accountRole: 'Rolė',
+        accountJoined: 'Prisijungė',
+        accountLifetimeEarned: 'Viso uždirbta',
+
+        adminPanelHead: 'administravimas',
+        adminPanelTodo: 'TODO: administravimo skydelis.',
+
         groupName: 'Grupės pavadinimas',
         groupPhone: 'Įveskite skubios pagalbos telefono numerį',
         groupCreate: 'Sukurti grupę',
@@ -435,8 +552,8 @@ export const languages: Record<LanguageCode, Language> = {
         loginWrongCode: 'Neteisingas kodas — patikrinkite el. laišką ir bandykite dar kartą',
         loginCodeExpired: 'Šis kodas nebegalioja arba jau panaudotas — paprašykite naujo',
         badRequest: 'Netinkama užklausa',
-        emailLoginSubject: 'Jūsų MWA prisijungimo nuoroda',
-        emailLoginHeading: 'Prisijunkite prie MWA',
+        emailLoginSubject: 'Jūsų pirmakursiu prisijungimo nuoroda',
+        emailLoginHeading: 'Prisijunkite prie pirmakursiu',
         emailLoginIntro:
             'Norėdami prisijungti, spustelėkite žemiau esantį mygtuką. Nuoroda galioja 15 minučių.',
         emailLoginAction: 'Prisijungti',
@@ -445,6 +562,9 @@ export const languages: Record<LanguageCode, Language> = {
         emailLoginExpiry: 'Nuoroda ir kodas galioja 15 minučių.',
 
         gamblingActiveGames: 'Vykstantys žaidimai',
+        gamblingInvitations: 'Kvietimai',
+        gamblingNoInvitations: 'Kvietimų kol kas nėra.',
+        gamblingNoActiveGames: 'Šiuo metu vykstančių žaidimų nėra.',
         gamblingVersus: '{p1} prieš {p2}',
         gamblingWith: 'Lošk su {name}',
         gamblingChallenge: 'Siųsti iššūkį',

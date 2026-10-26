@@ -1,7 +1,6 @@
-/* Outfit variable font (100–900), self-hosted subsets */
 @font-face {
-    font-family: 'outfit';
-    src: url('/fonts/outfit-latin.woff2') format('woff2');
+    font-family: 'montserrat';
+    src: url('/fonts/montserrat-latin.woff2') format('woff2');
     font-weight: 100 900;
     font-display: swap;
     unicode-range:
@@ -10,8 +9,8 @@
 }
 
 @font-face {
-    font-family: 'outfit';
-    src: url('/fonts/outfit-latin-ext.woff2') format('woff2');
+    font-family: 'montserrat';
+    src: url('/fonts/montserrat-latin-ext.woff2') format('woff2');
     font-weight: 100 900;
     font-display: swap;
     unicode-range:
@@ -32,7 +31,7 @@ body {
     position: relative;
     isolation: isolate;
 
-    font-family: 'outfit', sans-serif;
+    font-family: 'montserrat', sans-serif;
     background: var(--page-bg);
     color: var(--text);
     text-shadow: var(--text-shadow);
@@ -40,7 +39,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Ensure images and media don't break layouts */
 img,
 picture,
 video,
@@ -50,8 +48,6 @@ svg {
     max-width: 100%;
 }
 
-/* Animated texture above the page background but below the content.
-   Rendered as <div class="page-effect"> in the document shell. */
 .page-effect {
     position: fixed;
     top: var(--header-height);
@@ -78,7 +74,6 @@ svg {
     z-index: 1;
 }
 
-/* Page content column */
 main.page {
     position: relative;
     z-index: 2;

@@ -28,6 +28,7 @@ const insertGroup = state.prepare(
     `INSERT INTO groups (name, owner_id, phone_number) VALUES (?, ?, ?)`,
 );
 const insertMember = state.prepare(`INSERT INTO group_members (group_id, user_id) VALUES (?, ?)`);
+const insertQueueEntry = state.prepare(`INSERT INTO queue_entries (group_id) VALUES (?)`);
 
 function addUser(username: string, email: string, role: UserRole): number {
     return Number(insertUser.run(username, email, role).lastInsertRowid);
@@ -76,6 +77,8 @@ runTransaction(state.db, () => {
     member(groupId, aliceId);
     member(groupId, bobId);
     member(groupId, carolId);
+
+    insertQueueEntry.run(groupId);
 });
 
 const balances = state.db

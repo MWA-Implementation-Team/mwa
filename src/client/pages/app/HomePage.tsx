@@ -1,16 +1,16 @@
-import Header from '#src/client/ui/Header.js';
-import Footer from '#src/client/ui/Footer.js';
 import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { Transaction, TransactionKind } from '#src/client/api/transactions.js';
 import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
+import PageShell from './PageShell.js';
 import { Language } from '#src/client/language.js';
 
 type HomePageProps = {
-    qrSvg: string;
-    interactUrl: string;
     transactions: Transaction[];
+    groupName: string | null;
+    queuePosition: number | null;
+    queueError?: keyof Language;
 };
 
 export const homePage: Page<HomePageProps> = {
@@ -26,109 +26,102 @@ const transactionKindKey = {
     gambling_winnings: 'txGamblingWinnings',
 } as const satisfies Record<TransactionKind, keyof Language>;
 
-function HomePage({ qrSvg, interactUrl, transactions }: HomePageProps) {
+function HomePage({ transactions, groupName, queuePosition, queueError }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
 
     return (
-        <>
-            <Header />
-
-            <main class="page page-narrow">
-                <h1 class="page-title">{t('homeWelcome', { name: user!.username })}</h1>
-
-                <section class="card">
-                    <h2 class="section-title">{t('dashFinances')}</h2>
-
-                    <div class="balance">
-                        <div class="balance-label">{t('dashBalance')}</div>
-                        <div class="balance-value">
+        <PageShell section="home">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
+                    <h2>{t('dashFinances')}</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    <p class="mwa-intro">
+                        {t('dashBalance')}:{' '}
+                        <strong>
                             {user!.currentBalance.toFixed(2)} {t('currencyName')}
-                        </div>
-                    </div>
+                        </strong>
+                    </p>
 
-                    <div class="transaction-title">{t('dashTransactions')}</div>
+                    <h3>{t('dashTransactions')}</h3>
+                    {transactions.length === 0 ? (
+                        <p class="mwa-muted">{t('dashNoTransactions')}</p>
+                    ) : (
+                        <ul class="mwa-rows">
+                            {transactions.map((tx, i) => (
+                                <li key={i} class="mwa-row">
+                                    <span>
+                                        <strong>{t(transactionKindKey[tx.kind])}</strong>
+                                        <small>
+                                            {new Date(tx.createdAt).toLocaleDateString(lang)}
+                                        </small>
+                                    </span>
+                                    <strong>
+                                        {tx.balanceDelta > 0 ? '+' : ''}
+                                        {tx.balanceDelta.toFixed(2)}
+                                    </strong>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </section>
 
-                    <div class="transactions">
-                        {transactions.length === 0 && (
-                            <p class="muted">{t('dashNoTransactions')}</p>
-                        )}
-                        {transactions.map((tx, i) => (
-                            <div key={i} class="transaction">
-                                <div class="transaction-icon">
-                                    {tx.balanceDelta > 0 ? '↑' : '↓'}
-                                </div>
-                                <div class="transaction-info">
-                                    <div class="transaction-name">
-                                        {t(transactionKindKey[tx.kind])}
-                                    </div>
-                                    <div class="transaction-date">
-                                        {new Date(tx.createdAt).toLocaleDateString(lang)}
-                                    </div>
-                                </div>
-                                <div
-                                    class={`transaction-value ${tx.balanceDelta > 0 ? 'positive' : 'negative'}`}
-                                >
-                                    {tx.balanceDelta > 0 ? '+' : ''}
-                                    {tx.balanceDelta.toFixed(2)}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
+                    <h2>{t('queueTitle')}</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    {queueError && (
+                        <p class="mwa-note mwa-note--error" role="alert">
+                            {t(queueError)}
+                        </p>
+                    )}
 
-                <section class="card">
-                    <h2 class="section-title">{t('dashQrTitle')}</h2>
-                    <div class="qr-description">
-                        <strong>{t('dashQrHint')}</strong>
-                        <br />
-                        {t('dashQrBody')}
-                    </div>
-                    <div class="qr-code" dangerouslySetInnerHTML={{ __html: qrSvg }} />
-                    <a class="muted" href={interactUrl}>
-                        {interactUrl}
-                    </a>
-                </section>
+                    {queuePosition !== null ? (
+                        <>
+                            <p class="mwa-intro">
+                                {t('queuePositionLabel')}: <strong>#{queuePosition}</strong>
+                            </p>
+                            <form method="post" action="/app/queue/leave" class="mwa-actions">
+                                <button type="submit">{t('queueLeave')}</button>
+                            </form>
+                        </>
+                    ) : groupName ? (
+                        <form method="post" action="/app/queue/join" class="mwa-actions">
+                            <button type="submit" class="btn-primary">
+                                {t('queueJoinAs', { group: groupName })}
+                            </button>
+                        </form>
+                    ) : (
+                        <p class="mwa-muted">
+                            {t('queueNeedGroup')} <a href="/app/group">{t('queueGoGroup')}</a>
+                        </p>
+                    )}
+                </div>
+            </section>
 
-                <section class="card">
-                    <h2 class="section-title">{t('dashSupport')}</h2>
-
-                    <div class="support-options">
-                        <button class="support-button">
-                            <div class="support-icon">
-                                <PhoneIcon />
-                            </div>
-                            <div class="support-label">{t('dashCall')}</div>
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
+                    <h2>{t('dashSupport')}</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    <div class="mwa-actions">
+                        <button type="button">
+                            <PhoneIcon /> {t('dashCall')}
                         </button>
                         <button
-                            class="support-button alt"
+                            type="button"
                             aria-expanded={guideOpen}
                             onClick={() => setGuideOpen(!guideOpen)}
                         >
-                            <div class="support-icon">
-                                <BookIcon />
-                            </div>
-                            <div class="support-label">{t('dashGuide')}</div>
+                            <BookIcon /> {t('dashGuide')}
                         </button>
                     </div>
-
-                    {guideOpen && <div class="guide-box">{t('dashGuideBody')}</div>}
-                </section>
-
-                <section class="card">
-                    <h2 class="section-title">{t('sponsorsTitle')}</h2>
-                    <p class="muted sponsor-subtitle">{t('sponsorsSubtitle')}</p>
-                    <div class="sponsor-grid">
-                        {[1, 2, 3, 4, 5, 6].map((n) => (
-                            <div key={n} class="sponsor">
-                                LOGO
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            </main>
-
-            <Footer />
-        </>
+                    {guideOpen && <p class="mwa-muted">{t('dashGuideBody')}</p>}
+                </div>
+            </section>
+        </PageShell>
     );
 }

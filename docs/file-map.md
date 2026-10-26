@@ -60,8 +60,9 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
         ├── serialize.ts       Serialized<T> wire types + serialize()/revive() for Date fields
         ├── api/               fetch wrappers + Serialized<T> wire types + db type re-exports
         ├── activities/        one slug-named folder per station (Card + Detail + activity.ts)
-        ├── pages/             one component per page, each a Page<P> object
-        └── ui/                shared components (header, toggles, icons, Trans, controlled Dialog)
+        ├── pages/             one component per page, each a Page<P> object;
+        │                      app/PageShell.tsx wraps them in the shell layout
+        └── ui/                shared components (toggles, icons, Trans, controlled Dialog)
 
 Generated, gitignored:  dist/   tsc output — served to the browser at /client/*
                         db.sqlite   local database, created on first run

@@ -5,14 +5,14 @@ screen with static content; [load-data-in-a-page](load-data-in-a-page.md) puts r
 on it.
 
 A page needs four things: a component, a `registeredPages` entry, a route, and a nav
-link (plus translations and, for pages under `/app`, a `goto` allowlist entry).
+link (plus translations).
 
 ## 1. Create the component
 
 Create `src/client/pages/app/BadgesPage.tsx`:
 
 ```tsx
-import Header from '#src/client/ui/Header.js';
+import PageShell from '#src/client/pages/app/PageShell.js';
 import { Page } from '#src/client/pages.js';
 
 type BadgesPageProps = {};
@@ -24,12 +24,16 @@ export const badgesPage: Page<BadgesPageProps> = {
 
 function BadgesPage({}: BadgesPageProps) {
     return (
-        <>
-            <Header />
-
-            <h1>Badges</h1>
-            <p>TODO: list badges here.</p>
-        </>
+        <PageShell section="badges">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
+                    <h2>Badges</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    <p class="mwa-muted">TODO: list badges here.</p>
+                </div>
+            </section>
+        </PageShell>
     );
 }
 ```
@@ -72,13 +76,14 @@ page. See [auth](auth.md) for the full guard list and route policy.
 
 ## 4. Add a nav link
 
-In `src/client/ui/Header.tsx`, inside the `<ul>`:
+In `src/client/pages/app/PageShell.tsx`, add `'badges'` to the `Section` union
+type, then add an entry to the `navigation` array:
 
 ```tsx
-<li>
-    <a href="/app/badges">{t('headerBadges')}</a>
-</li>
+{ section: 'badges', label: t('headerBadges'), href: '/app/badges' },
 ```
+
+The `section` prop controls which link gets `aria-current="page"`.
 
 ## 5. Add translations
 
@@ -96,30 +101,27 @@ error):
 
 ```ts
 // en
-titleBadges: 'MWA | Badges',
+titleBadges: 'first years | Badges',
 headerBadges: 'Badges',
 
 // lt
-titleBadges: 'MWA | Ženkleliai',
+titleBadges: 'first years | Ženkleliai',
 headerBadges: 'Ženkleliai',
 ```
 
-## 6. Allow it as a login redirect
+## 6. Login redirect — nothing to do
 
-In `src/routes/pages/login.ts`, add the path to `allowedGotos`. If the route has a
-dynamic segment (like `/app/activities/:id`), add a prefix to `allowedGotoPrefixes`
-instead.
-
-Without this, a logged-out visitor who clicked `/app/badges` gets sent to `/login`, but
-the `goto` parameter is dropped — after logging in they'd land on `/app` instead of
-back on the badges page.
+`safeGoto` (`src/routes/pages/login.ts`) accepts any normalized same-origin path,
+so a logged-out visitor who clicked `/app/badges` is sent to `/login` with
+`?goto=/app/badges` and lands back on the page after logging in. There's no
+allowlist to update.
 
 ## How to verify
 
 1. `npm run lint` — catches unregistered ids, missing translation keys, unused imports.
 2. `npm run dev`, log in (see [auth](auth.md) — the link is in the server console),
    open http://localhost:3000/app/badges — the page renders and the browser tab
-   shows `MWA | Badges`.
+   shows `first years | Badges`.
 3. `curl -s -b cookies.txt http://localhost:3000/app/badges` (mint `cookies.txt` via
    the verify flow in [auth](auth.md)) and search the HTML for `"pageId":"badges"`
    inside the `<script id="ssr-data">` tag — that confirms the right page id was

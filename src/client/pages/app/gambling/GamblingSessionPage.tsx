@@ -2,10 +2,10 @@ import { Trans } from '#src/client/ui/Trans.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
-import Header from '#src/client/ui/Header.js';
 import { CoinSide, Gambler, RunningGame } from '#src/db/gambling.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import { Language, TranslateFn } from '#src/client/language.js';
+import PageShell from '../PageShell.js';
 
 type GamblingSessionPageProps = {
     sessionId: number;
@@ -54,117 +54,163 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         document.title = title(t, currentGame);
     }, [currentGame, t]);
 
+    const disconnected = isDisconnected ? (
+        <p class="mwa-note mwa-note--error" role="alert">
+            {t('gamblingDisconnected')}. <a href="">{t('gamblingRefreshQuestion')}</a>
+        </p>
+    ) : null;
+
     switch (currentGame.status.type) {
         case 'pending': {
             if (currentGame.p2 === user?.id) {
                 return (
-                    <>
-                        <Header hideNotifications={true} />
-                        <h1>{t('gamblingRequest')}</h1>
-                        <p>{t('gamblingCoinFlipChallenged', { player: currentGame.p1Name })}</p>
-                        <p>
-                            <Trans
-                                id="gamblingCoinFlipBetDetails"
-                                values={{
-                                    amount: <strong>{currentGame.betAmount}</strong>,
-                                    side: <strong>{t(coinSideTrans(currentGame.p1Guess))}</strong>,
-                                }}
-                            />
-                        </p>
-                        <p>
-                            <Trans
-                                id="gamblingCoinFlipBetOutcome"
-                                values={{ amount: <strong>{currentGame.betAmount}</strong> }}
-                            />
-                        </p>
-                        <p>{t('gamblingAcceptQuestion')}</p>
-                        <form method="POST">
-                            <button
-                                formaction={`/app/gambling/sessions/${sessionId}/accept`}
-                                type="submit"
-                            >
-                                {t('gamblingAccept')}
-                            </button>
-                            <button
-                                formaction={`/app/gambling/sessions/${sessionId}/reject?goto=${encodeURIComponent('/app')}`}
-                                type="submit"
-                            >
-                                {t('gamblingReject')}
-                            </button>
-                        </form>
-                        {message && <span>{t(message)}</span>}
-                    </>
+                    <PageShell section="gambling" hideNotification={true}>
+                        <section class="mwa-panel">
+                            <div class="mwa-panel-head">
+                                <h2>{t('gamblingRequest')}</h2>
+                            </div>
+                            <div class="mwa-panel-body">
+                                <p class="mwa-intro">
+                                    {t('gamblingCoinFlipChallenged', {
+                                        player: currentGame.p1Name,
+                                    })}
+                                </p>
+                                <p>
+                                    <Trans
+                                        id="gamblingCoinFlipBetDetails"
+                                        values={{
+                                            amount: <strong>{currentGame.betAmount}</strong>,
+                                            side: (
+                                                <strong>
+                                                    {t(coinSideTrans(currentGame.p1Guess))}
+                                                </strong>
+                                            ),
+                                        }}
+                                    />
+                                </p>
+                                <p>
+                                    <Trans
+                                        id="gamblingCoinFlipBetOutcome"
+                                        values={{
+                                            amount: <strong>{currentGame.betAmount}</strong>,
+                                        }}
+                                    />
+                                </p>
+                                <p>{t('gamblingAcceptQuestion')}</p>
+                                <form method="POST" class="mwa-actions">
+                                    <button
+                                        class="btn-primary"
+                                        formaction={`/app/gambling/sessions/${sessionId}/accept`}
+                                        type="submit"
+                                    >
+                                        {t('gamblingAccept')}
+                                    </button>
+                                    <button
+                                        formaction={`/app/gambling/sessions/${sessionId}/reject?goto=${encodeURIComponent('/app')}`}
+                                        type="submit"
+                                    >
+                                        {t('gamblingReject')}
+                                    </button>
+                                </form>
+                                {message && (
+                                    <p class="mwa-note mwa-note--error" role="alert">
+                                        {t(message)}
+                                    </p>
+                                )}
+                            </div>
+                        </section>
+                    </PageShell>
                 );
             } else {
                 return (
-                    <>
-                        <Header hideNotifications={true} />
-                        {isDisconnected ? (
-                            <span>
-                                {t('gamblingDisconnected')}.{' '}
-                                <a href="">{t('gamblingRefreshQuestion')}</a>
-                            </span>
-                        ) : null}
-                        <h1>{t('gamblingWaiting', { player: currentGame.p2Name })}</h1>
-                        <span>{t('gamblingWaitingHelp')}</span>
-                    </>
+                    <PageShell section="gambling" hideNotification={true}>
+                        {disconnected}
+                        <section class="mwa-panel">
+                            <div class="mwa-panel-head">
+                                <h2>{t('gamblingWaiting', { player: currentGame.p2Name })}</h2>
+                            </div>
+                            <div class="mwa-panel-body">
+                                <p class="mwa-muted">{t('gamblingWaitingHelp')}</p>
+                            </div>
+                        </section>
+                    </PageShell>
                 );
             }
         }
         case 'expired': {
             return (
-                <>
-                    <Header />
-                    <h1>{t('gamblingExpired')}</h1>
-                    <span>
-                        {t('gamblingExpiryDetails', {
-                            player: currentGame.p2Name,
-                            minutes: String(gamblingPendingExpiryMinutes),
-                        })}
-                    </span>
-                </>
+                <PageShell section="gambling">
+                    <section class="mwa-panel">
+                        <div class="mwa-panel-head">
+                            <h2>{t('gamblingExpired')}</h2>
+                        </div>
+                        <div class="mwa-panel-body">
+                            <p class="mwa-muted">
+                                {t('gamblingExpiryDetails', {
+                                    player: currentGame.p2Name,
+                                    minutes: String(gamblingPendingExpiryMinutes),
+                                })}
+                            </p>
+                        </div>
+                    </section>
+                </PageShell>
             );
         }
         case 'rejected': {
             return (
-                <>
-                    <Header />
-                    <h1>{t('gamblingRejected')}</h1>
-                    <span>{t('gamblingRejectedDetails', { player: currentGame.p2Name })}</span>
-                </>
+                <PageShell section="gambling">
+                    <section class="mwa-panel">
+                        <div class="mwa-panel-head">
+                            <h2>{t('gamblingRejected')}</h2>
+                        </div>
+                        <div class="mwa-panel-body">
+                            <p class="mwa-muted">
+                                {t('gamblingRejectedDetails', { player: currentGame.p2Name })}
+                            </p>
+                        </div>
+                    </section>
+                </PageShell>
             );
         }
         case 'running':
         case 'ended': {
             return (
-                <>
-                    <Header hideNotifications={currentGame.status.type === 'running'} />
-                    {isDisconnected ? (
-                        <span>
-                            {t('gamblingDisconnected')}.{' '}
-                            <a href="">{t('gamblingRefreshQuestion')}</a>
-                        </span>
-                    ) : null}
-                    <h1>Coin flip duel</h1>
-                    <p>{t('gamblingVersus', { p1: currentGame.p1Name, p2: currentGame.p2Name })}</p>
-                    {currentGame.status.type === 'ended' ? (
-                        <>
-                            <h2>{t(coinSideTrans(currentGame.status.flipResult))}</h2>
-                            <h3>
-                                {side && side === currentGame.status.winner
-                                    ? t('gamblingYouWin')
-                                    : t('gamblingWinner', {
-                                          player:
-                                              currentGame.status.winner === 'p1'
-                                                  ? currentGame.p1Name
-                                                  : currentGame.p2Name,
-                                      })}{' '}
-                            </h3>
-                        </>
-                    ) : (
-                        <h2>{t('gamblingCoinFlipping')}</h2>
-                    )}
-                </>
+                <PageShell
+                    section="gambling"
+                    hideNotification={currentGame.status.type === 'running'}
+                >
+                    {disconnected}
+                    <section class="mwa-panel">
+                        <div class="mwa-panel-head">
+                            <h2>{t('gamblingCoinFlip')}</h2>
+                        </div>
+                        <div class="mwa-panel-body">
+                            <p class="mwa-intro">
+                                {t('gamblingVersus', {
+                                    p1: currentGame.p1Name,
+                                    p2: currentGame.p2Name,
+                                })}
+                            </p>
+                            {currentGame.status.type === 'ended' ? (
+                                <>
+                                    <h3>{t(coinSideTrans(currentGame.status.flipResult))}</h3>
+                                    <p>
+                                        {side && side === currentGame.status.winner
+                                            ? t('gamblingYouWin')
+                                            : t('gamblingWinner', {
+                                                  player:
+                                                      currentGame.status.winner === 'p1'
+                                                          ? currentGame.p1Name
+                                                          : currentGame.p2Name,
+                                              })}
+                                    </p>
+                                </>
+                            ) : (
+                                <p class="mwa-muted">{t('gamblingCoinFlipping')}</p>
+                            )}
+                        </div>
+                    </section>
+                </PageShell>
             );
         }
     }

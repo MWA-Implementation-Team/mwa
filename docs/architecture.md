@@ -107,7 +107,8 @@ start so queue/badge rows can foreign-key them.
 
 ## Interactions and gambling
 
-`/app` renders a personal QR using `uqr`, linking to `/app/interact/:token`.
+The `PageShell` sidebar renders a personal QR using `uqr` on every page, linking
+to `/app/interact/:token`.
 Migration `05_interact_tokens.sql` stores one permanent random token per user;
 it identifies the target but grants no permissions. Any signed-in scanner can
 challenge another user; hosts/admins also see their email, balance, and join date.
@@ -139,6 +140,6 @@ Connect 4, and draw settlement are future work.
 `src/pubsub.ts` provides in-process channels for SSE: `/api/notifications` sends
 the user's current notification, and `/app/gambling/sessions/:id/watch` sends session
 snapshots. Both send initial state on connection and updates after changes. The
-client uses `EventSource`; the header prioritizes a running game over the oldest
-invitation. Multiple games per player are allowed, but only one notification is
+client uses `EventSource`; the notification banner in `PageShell` prioritizes a
+running game over the oldest invitation. Multiple games per player are allowed, but only one notification is
 shown. Timers and pubsub assume a single server process.

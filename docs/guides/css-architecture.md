@@ -6,18 +6,20 @@ The app uses Oat as its base framework. App-specific styles live in
 ## Where styles go
 
 `static/style/main.css` is the entry point — it `@import`s `tokens.css`, `base.css`,
-and every file in `components/`.
+every file in `components/`, and `shell.css` last.
 
 - `tokens.css` — shared colors, spacing, and other variables.
 - `base.css` — page-wide defaults and layout rules.
 - `components/` — styles for reusable components.
+- `shell.css` — the `mwa-*` design system used by `PageShell`. Loaded last so
+  it wins over the base theme; it is scoped to elements inside `.mwa`.
 - `main.css` — imports the other style files.
 
 Use tokens instead of repeating values:
 
 ```css
-.btn-primary {
-    background: var(--color-accent);
+.card {
+    background: var(--surface);
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-md);
 }
@@ -32,7 +34,7 @@ For a new component:
 Example:
 
 ```tsx
-<button class="btn-primary">Save</button>
+<button class="mwa-button">Save</button>
 ```
 
 ## Overriding Oat styles
@@ -55,16 +57,16 @@ This changes every Oat component that uses those variables.
 
 ### Change one component
 
-For example, the `.btn-primary` rule in `static/style/components/button.css` overrides
-Oat's default button styles. The class limits these changes to elements with
-`class="btn-primary"`.
-The values such as `--color-accent`, `--space-md`, and `--radius-md` come from
-`tokens.css`, so they can be changed without rewriting the button rule.
+For example, the `.card` rule in `static/style/components/card.css` overrides
+Oat's default surface styles. The class limits these changes to elements with
+`class="card"`.
+The values such as `--surface`, `--space-md`, and `--radius-md` come from
+`tokens.css`, so they can be changed without rewriting the rule.
 
 If Oat's selector is more specific, make the override more specific:
 
 ```css
-button.btn-primary {
+article.card {
     padding: var(--space-md) var(--space-md);
 }
 ```
@@ -74,7 +76,7 @@ does not, inspect the element in DevTools and use a more specific selector.
 Use `!important` only when the Oat rule also uses it:
 
 ```css
-button.btn-primary {
+article.card {
     width: auto !important;
 }
 ```

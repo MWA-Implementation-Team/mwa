@@ -10,6 +10,7 @@ import { leaderboardPage } from '#src/client/pages/app/LeaderboardPage.js';
 import { groupPage } from '#src/client/pages/app/GroupPage.js';
 import { gamblingPage } from '#src/client/pages/app/gambling/GamblingHomePage.js';
 import { interactPage } from '#src/client/pages/app/InteractPage.js';
+import { hostPage } from '#src/client/pages/app/HostPage.js';
 import { adminPage } from '#src/client/pages/AdminPage.js';
 import { gamblingSessionPage } from '#src/client/pages/app/gambling/GamblingSessionPage.js';
 import { inviteToGamblePage } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
@@ -28,6 +29,7 @@ export const registeredPages = {
     gambling: gamblingPage,
     gamblingSession: gamblingSessionPage,
     interact: interactPage,
+    host: hostPage,
     inviteToGamble: inviteToGamblePage,
     admin: adminPage,
     error: errorPage,

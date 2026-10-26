@@ -7,7 +7,7 @@ Server data reaches a page through:
 - **Client fetch** — the page calls an `/api/*` endpoint from the browser (see
   [add-an-api-endpoint](add-an-api-endpoint.md)).
 - **SSE** — `EventSource` receives snapshots after the initial render; gambling
-  sessions and header notifications use this (see [architecture](../architecture.md#interactions-and-gambling)).
+  sessions and the `PageShell` notification banner use this (see [architecture](../architecture.md#interactions-and-gambling)).
 
 These populate Preact props or state. The difference is _when_ the data arrives and
 _who pays_ the loading state.
@@ -48,7 +48,7 @@ app.get('/app/badges', async (ctx) => {
 In `src/client/pages/app/BadgesPage.tsx`:
 
 ```tsx
-import Header from '#src/client/ui/Header.js';
+import PageShell from '#src/client/pages/app/PageShell.js';
 import { Page } from '#src/client/pages.js';
 import { Badge } from '#src/client/api/badges.js';
 
@@ -63,18 +63,22 @@ export const badgesPage: Page<BadgesPageProps> = {
 
 function BadgesPage({ badges }: BadgesPageProps) {
     return (
-        <>
-            <Header />
-
-            <h1>Badges</h1>
-            <ul>
-                {badges.map((b) => (
-                    <li key={b.id}>
-                        {b.title} — {b.description}
-                    </li>
-                ))}
-            </ul>
-        </>
+        <PageShell section="badges">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
+                    <h2>Badges</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    <ul class="mwa-rows">
+                        {badges.map((b) => (
+                            <li key={b.id} class="mwa-row">
+                                {b.title} — {b.description}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </section>
+        </PageShell>
     );
 }
 ```

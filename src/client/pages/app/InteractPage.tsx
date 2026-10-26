@@ -1,7 +1,7 @@
-import Header from '#src/client/ui/Header.js';
 import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
+import PageShell from './PageShell.js';
 
 // Extra target fields shown only to elevated roles — the route populates
 // this solely for host/admin scanners, so `detail` being non-null is the gate.
@@ -28,48 +28,60 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
 
     if (self) {
         return (
-            <>
-                <Header />
-                <h1>{t('interactSelfJoke')}</h1>
-            </>
+            <PageShell section="interact">
+                <section class="mwa-panel">
+                    <div class="mwa-panel-body">
+                        <p class="mwa-muted">{t('interactSelfJoke')}</p>
+                    </div>
+                </section>
+            </PageShell>
         );
     }
 
     return (
-        <>
-            <Header />
-
-            <h1>{t('interactHeading', { name: target.username })}</h1>
-
+        <PageShell section="interact">
             {/* Stub — real transfers land with the pending/confirm flow. */}
-            <section>
-                <h2>{t('interactSendMoneyTitle')}</h2>
-                <button disabled>{t('interactSendMoneyTitle')}</button>
-                <p>{t('interactComingSoon')}</p>
-            </section>
-
-            <section>
-                <a
-                    class="btn btn-primary"
-                    href={`/app/interact/${encodeURIComponent(token)}/gamble`}
-                >
-                    {t('gamblingAction')} 💲🤑🎰🤑💲
-                </a>
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
+                    <h2>{t('interactHeading', { name: target.username })}</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    <div class="mwa-actions">
+                        <button disabled>{t('interactSendMoneyTitle')}</button>
+                        <a
+                            class="btn-primary"
+                            href={`/app/interact/${encodeURIComponent(token)}/gamble`}
+                        >
+                            {t('gamblingAction')} 💲🤑🎰🤑💲
+                        </a>
+                    </div>
+                    <p class="mwa-muted">{t('interactComingSoon')}</p>
+                </div>
             </section>
 
             {detail && (
-                <section>
-                    <h2>{t('interactProfileDetailTitle')}</h2>
-                    <dl>
-                        <dt>{t('interactDetailEmail')}</dt>
-                        <dd>{detail.email}</dd>
-                        <dt>{t('interactDetailBalance')}</dt>
-                        <dd>{detail.currentBalance}</dd>
-                        <dt>{t('interactDetailJoined')}</dt>
-                        <dd>{detail.joinedAt.slice(0, 10)}</dd>
-                    </dl>
+                <section class="mwa-panel">
+                    <div class="mwa-panel-head">
+                        <h2>{t('interactProfileDetailTitle')}</h2>
+                    </div>
+                    <div class="mwa-panel-body">
+                        <ul class="mwa-rows">
+                            <li class="mwa-row">
+                                <span>{t('interactDetailEmail')}</span>
+                                <strong>{detail.email}</strong>
+                            </li>
+                            <li class="mwa-row">
+                                <span>{t('interactDetailBalance')}</span>
+                                <strong>{detail.currentBalance}</strong>
+                            </li>
+                            <li class="mwa-row">
+                                <span>{t('interactDetailJoined')}</span>
+                                <strong>{detail.joinedAt.slice(0, 10)}</strong>
+                            </li>
+                        </ul>
+                    </div>
                 </section>
             )}
-        </>
+        </PageShell>
     );
 }

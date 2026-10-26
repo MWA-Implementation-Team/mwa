@@ -1,9 +1,10 @@
-import { useContext } from 'preact/hooks';
-import Header from '#src/client/ui/Header.js';
-import Footer from '#src/client/ui/Footer.js';
+import { useContext, useEffect, useState } from 'preact/hooks';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
+import { ActivitySlug, Activity, registeredActivities } from '#src/client/activities.js';
 import { FacebookIcon, InstagramIcon, LinkedinIcon, TwitterIcon } from '#src/client/ui/icons.js';
+import PageShell from './app/PageShell.js';
+import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 
 type LandingPageProps = {};
 
@@ -12,116 +13,138 @@ export const landingPage: Page<LandingPageProps> = {
     title: (t) => t('titleLanding'),
 };
 
-function LandingPage({}: LandingPageProps) {
-    const { t, user } = useContext(ClientContext);
+const activities = Object.entries(registeredActivities) as [ActivitySlug, Activity][];
 
-    const socials = [
-        { Icon: FacebookIcon, name: 'Facebook' },
-        { Icon: TwitterIcon, name: 'Twitter' },
-        { Icon: LinkedinIcon, name: 'LinkedIn' },
-        { Icon: InstagramIcon, name: 'Instagram' },
-    ];
+function nextEventDate() {
+    const now = new Date();
+    let target = new Date(now.getFullYear(), 10, 4);
+    if (target.getTime() <= now.getTime()) {
+        target = new Date(now.getFullYear() + 1, 10, 4);
+    }
+    return target;
+}
 
-    const news = [
-        { title: t('landingNews1Title'), body: t('landingNews1Body') },
-        { title: t('landingNews2Title'), body: t('landingNews2Body') },
+function Countdown() {
+    const { t } = useContext(ClientContext);
+    const [now, setNow] = useState(() => Date.now());
+    useEffect(() => {
+        const id = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(id);
+    }, []);
+
+    const diff = Math.max(0, nextEventDate().getTime() - now);
+    const parts = [
+        { value: Math.floor(diff / 86_400_000), label: t('countdownDays') },
+        { value: Math.floor(diff / 3_600_000) % 24, label: t('countdownHours') },
+        { value: Math.floor(diff / 60_000) % 60, label: t('countdownMinutes') },
+        { value: Math.floor(diff / 1_000) % 60, label: t('countdownSeconds') },
     ];
 
     return (
-        <>
-            <Header />
+        <div class="landing-countdown">
+            {parts.map(({ value, label }) => (
+                <div key={label} class="landing-countdown-part">
+                    <span class="landing-countdown-value">{String(value).padStart(2, '0')}</span>
+                    <span class="landing-countdown-label">{label}</span>
+                </div>
+            ))}
+        </div>
+    );
+}
 
-            <main class="page">
-                <section class="card hero">
-                    <div>
-                        <h1>{t('landingHeroTitle')}</h1>
-                        <p class="muted">{t('landingHeroBody')}</p>
-                        {user ? (
-                            <a href="/app" class="btn btn-primary btn-lg">
-                                {t('headerHome')}
-                            </a>
-                        ) : (
-                            <a href="/login" class="btn btn-primary btn-lg">
-                                {t('landingRegister')}
-                            </a>
-                        )}
-                    </div>
-                </section>
+const socials = [
+    { Icon: FacebookIcon, name: 'Facebook' },
+    { Icon: TwitterIcon, name: 'Twitter' },
+    { Icon: LinkedinIcon, name: 'LinkedIn' },
+    { Icon: InstagramIcon, name: 'Instagram' },
+];
 
-                <section class="card">
-                    <h2 class="section-title">{t('landingSocialTitle')}</h2>
+function LandingPage({}: LandingPageProps) {
+    const { t, user } = useContext(ClientContext);
 
-                    <div class="social-row divider-bottom">
-                        {socials.map(({ Icon, name }) => (
-                            <a key={name} href="#" class="social-button" aria-label={name}>
-                                <Icon />
-                            </a>
-                        ))}
-                    </div>
+    return (
+        <PageShell
+            section="landing"
+            side={
+                <>
+                    <section class="landing-section landing-pane-welcome">
+                        <div class="landing-welcome">
+                            <img src="/3Logotipas.png" alt={t('shellLogoAlt')} />
+                        </div>
+                    </section>
 
-                    <div class="news-list">
-                        {news.map((item) => (
-                            <article key={item.title} class="news-item">
-                                <h3>{item.title}</h3>
-                                <p class="muted">{item.body}</p>
-                            </article>
-                        ))}
-                    </div>
-                </section>
-
-                <section class="card">
-                    <h2 class="section-title">{t('landingMapTitle')}</h2>
-                    <div class="wireframe-box map-box">{t('mapPlaceholder')}</div>
-                </section>
-
-                <section class="card">
-                    <div class="feed-header divider-bottom">
-                        <span class="feed-title">{t('landingFeedTitle')}</span>
-                        <span class="muted">{t('landingFeedActive')}</span>
-                    </div>
-
-                    <div class="activity-list">
-                        {[1, 2].map((n) => (
-                            <div key={n} class="activity-card">
-                                <div class="activity-badge">{n}</div>
-                                <div class="wireframe-box activity-image">IMG</div>
-                                <div class="activity-body">
-                                    <div class="activity-head">
-                                        <h4 class="activity-name">
-                                            {t('activitySlot', { n: String(n) })}
-                                        </h4>
-                                        <span
-                                            class={`status-pill ${n === 1 ? 'status-open' : 'status-busy'}`}
-                                        >
-                                            {n === 1 ? t('statusOpen') : t('statusBusy')}
-                                        </span>
-                                    </div>
-                                    <p class="muted activity-desc">{t('activityDesc')}</p>
-                                    <div class="activity-actions">
-                                        <button class="btn btn-primary btn-sm">
-                                            {t('getInLine')}
+                    <section class="landing-section landing-pane-login">
+                        <h2>{t('landingLoginTitle')}</h2>
+                        <div class="landing-footer">
+                            {user ? (
+                                <>
+                                    <a href="/app" class="landing-login">
+                                        {t('landingGoApp')}
+                                    </a>
+                                    <form method="POST" action="/app" class="landing-login-form">
+                                        <button type="submit" class="landing-login">
+                                            {t('logOut')}
                                         </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                                    </form>
+                                </>
+                            ) : (
+                                <a href="/login" class="landing-login">
+                                    {t('landingLogin')}
+                                </a>
+                            )}
+                        </div>
+                    </section>
 
-                <section class="card">
-                    <h2 class="section-title">{t('sponsorsTitle')}</h2>
-                    <p class="muted sponsor-subtitle">{t('sponsorsSubtitle')}</p>
-                    <div class="sponsor-grid cols-4">
-                        {[1, 2, 3, 4].map((n) => (
-                            <div key={n} class="sponsor">
-                                LOGO
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            </main>
+                    <section class="landing-section landing-pane-socials">
+                        <h2>{t('landingSocialTitle')}</h2>
+                        <ul class="landing-socials">
+                            {socials.map(({ Icon, name }) => (
+                                <li key={name}>
+                                    <a href="#">
+                                        <Icon /> <span>{name}</span>
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
 
-            <Footer />
-        </>
+                    <section class="landing-section landing-pane-sponsors">
+                        <h2>{t('sponsorsTitle')}</h2>
+                        <ul class="landing-sponsors">
+                            {[1, 2, 3, 4].map((n) => (
+                                <li key={n} class="mwa-mini">
+                                    <span class="mwa-mini-title">LOGO</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+
+                    <section class="landing-section landing-pane-lang">
+                        <h2>{t('landingLangTitle')}</h2>
+                        <div class="landing-footer">
+                            <LanguageToggle />
+                        </div>
+                    </section>
+                </>
+            }
+        >
+            <section class="landing-section landing-pane-countdown">
+                <h2>{t('landingCountdownTitle')}</h2>
+                <Countdown />
+            </section>
+
+            <section class="landing-section landing-pane-activities">
+                <h2>{t('landingFeedTitle')}</h2>
+                <ul class="mwa-directory">
+                    {activities.map(([slug, { Card }]) => (
+                        <li key={slug}>
+                            <a href={`/app/activities/${slug}`}>
+                                <Card slug={slug} />
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </section>
+        </PageShell>
     );
 }

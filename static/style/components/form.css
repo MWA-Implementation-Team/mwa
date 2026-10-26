@@ -1,13 +1,10 @@
-/* ============================================================
-   FORM CONTROLS
-   ============================================================ */
 input,
 select,
 textarea {
     width: 100%;
     padding: 0.625rem;
 
-    font-family: 'outfit', sans-serif;
+    font-family: 'montserrat', sans-serif;
     font-size: var(--text-base);
     font-weight: 600;
 
@@ -48,7 +45,6 @@ label {
     font-size: var(--text-sm);
 }
 
-/* Vertical stack for standalone forms (login, verify…) */
 .form-stack {
     display: flex;
     flex-direction: column;
