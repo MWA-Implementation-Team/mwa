@@ -53,11 +53,13 @@ export type Language = {
     interactDetailJoined: string;
 
     landingLangTitle: string;
+    actionsTitle: string;
     landingLoginTitle: string;
     landingCountdownTitle: string;
     landingSocialTitle: string;
     landingFeedTitle: string;
     landingGoApp: string;
+    landingLogin: string;
     countdownDays: string;
     countdownHours: string;
     countdownMinutes: string;
@@ -124,13 +126,11 @@ export type Language = {
 
     accountProfile: string;
     accountUsername: string;
+    accountEdit: string;
     accountEmail: string;
     accountRole: string;
     accountJoined: string;
     accountLifetimeEarned: string;
-    accountSettings: string;
-    accountSettingsTodo: string;
-
     adminPanelHead: string;
     adminPanelTodo: string;
 
@@ -253,11 +253,13 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailJoined: 'Joined',
 
         landingLangTitle: 'Language',
+        actionsTitle: 'Actions',
         landingLoginTitle: 'System',
         landingCountdownTitle: 'Until the event',
         landingSocialTitle: 'Follow us here!',
         landingFeedTitle: 'Activities',
-        landingGoApp: 'Login',
+        landingGoApp: 'Go',
+        landingLogin: 'Login',
         countdownDays: 'days',
         countdownHours: 'hours',
         countdownMinutes: 'minutes',
@@ -324,13 +326,11 @@ export const languages: Record<LanguageCode, Language> = {
 
         accountProfile: 'Profile',
         accountUsername: 'Username',
+        accountEdit: 'Edit',
         accountEmail: 'Email',
         accountRole: 'Role',
         accountJoined: 'Joined',
         accountLifetimeEarned: 'Lifetime earned',
-        accountSettings: 'Profile settings',
-        accountSettingsTodo: 'TODO: change username, avatar, and other account-related settings.',
-
         adminPanelHead: 'administration',
         adminPanelTodo: 'TODO: admin panel.',
 
@@ -454,11 +454,13 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailJoined: 'Prisijungė',
 
         landingLangTitle: 'Kalba',
+        actionsTitle: 'Veiksmai',
         landingLoginTitle: 'Sistema',
         landingCountdownTitle: 'Iki renginio',
         landingSocialTitle: 'Sekite mus čia!',
         landingFeedTitle: 'Veiklos',
-        landingGoApp: 'Prisijungti',
+        landingGoApp: 'Eiti',
+        landingLogin: 'Prisijungti',
         countdownDays: 'dienų',
         countdownHours: 'valandų',
         countdownMinutes: 'minučių',
@@ -525,12 +527,11 @@ export const languages: Record<LanguageCode, Language> = {
 
         accountProfile: 'Profilis',
         accountUsername: 'Vartotojo vardas',
+        accountEdit: 'Redaguoti',
         accountEmail: 'El. paštas',
         accountRole: 'Rolė',
         accountJoined: 'Prisijungė',
         accountLifetimeEarned: 'Viso uždirbta',
-        accountSettings: 'Profilio nustatymai',
-        accountSettingsTodo: 'TODO: vartotojo vardo, avataro ir kitų paskyros nustatymų keitimas.',
 
         adminPanelHead: 'administravimas',
         adminPanelTodo: 'TODO: administravimo skydelis.',
