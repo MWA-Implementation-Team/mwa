@@ -1,5 +1,5 @@
 import { MwaState } from '#src/state.js';
-import { secureRandom } from '#src/utils.js';
+import { randomInt } from 'node:crypto';
 import { runTransaction } from './transaction.js';
 import { findUserById } from './users.js';
 
@@ -20,24 +20,11 @@ export type CommonGameOpts = {
 
 export type Gambler = 'p1' | 'p2';
 
+// The shape assumes coin_flip — the only game for now. A second game type
+// should turn this into a discriminated union on gameType.
 export type RunningGame = {
-    status:
-        | { type: 'pending' }
-        | { type: 'expired' }
-        | { type: 'rejected' }
-        | { type: 'running' }
-        | {
-              type: 'ended';
-              winner: Gambler;
-          };
-
-    p1: number;
-    p2: number;
-    p1Name: string;
-    p2Name: string;
-    betAmount: number;
-} & {
     gameType: 'coin_flip';
+
     status:
         | { type: 'pending' }
         | { type: 'expired' }
@@ -49,6 +36,11 @@ export type RunningGame = {
               flipResult: CoinSide;
           };
 
+    p1: number;
+    p2: number;
+    p1Name: string;
+    p2Name: string;
+    betAmount: number;
     p1Guess: CoinSide;
 };
 
@@ -125,7 +117,8 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
         p1u.username AS p1_name,
         p2u.username AS p2_name,
         bet_amount,
-        cf.p1_bet AS cf_p1_bet
+        cf.p1_bet AS cf_p1_bet,
+        cf.actual_result AS cf_actual_result
     FROM gambling_sessions
     LEFT JOIN users AS p1u ON gambling_sessions.p1 = p1u.id
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
@@ -155,7 +148,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
             status = {
                 type: 'ended',
                 winner: row.winner as Gambler, // draw not possible in coin flip
-                flipResult: row.winner === 'p1' ? p1Guess : p1Guess === 'heads' ? 'tails' : 'heads',
+                flipResult: row.cf_actual_result as CoinSide,
             };
             break;
         default:
@@ -163,7 +156,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
     }
 
     return {
-        gameType: 'coin_flip',
+        gameType: row.game_type as GameType,
         p1Guess,
         status,
         p1: row.p1 as number,
@@ -172,6 +165,18 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
         p2Name: row.p2_name as string,
         betAmount: row.bet_amount as number,
     };
+}
+
+// An open invitation from p1 to p2, if one exists — used to avoid stacking
+// duplicate invites on the same pair.
+export function findPendingGamblingSession(state: MwaState, p1: number, p2: number): number | null {
+    const query = state.prepare(`
+    SELECT id FROM gambling_sessions
+    WHERE p1 = ? AND p2 = ? AND status = 'pending'
+    ORDER BY created_at ASC
+    `);
+    const row = query.get(p1, p2);
+    return row ? (row.id as number) : null;
 }
 
 export type AcceptGamblingSessionResult = 'success' | 'too_broke' | 'invalid_session';
@@ -253,7 +258,10 @@ export function winGamblingSession(state: MwaState, sessionId: number, winner: G
         `);
         const row = sessionQuery.get(sessionId);
         if (!row) {
-            throw new Error(`Unknown gambling session ${sessionId}`);
+            // Called from a timer — the session may already be settled. A throw
+            // here would escape the setTimeout callback and crash the process.
+            console.warn(`[gambling] settle skipped for session ${sessionId}: not running`);
+            return;
         }
         const betAmount = row.bet_amount as number;
         const userId = winner === 'p1' ? row.p1 : row.p2;
@@ -369,7 +377,7 @@ export function initCoinFlip(
         INSERT INTO coin_flip_games (session, p1_bet, actual_result) VALUES (?, ?, ?)
         `);
 
-        const actualResult: CoinSide = secureRandom() > 0.5 ? 'heads' : 'tails';
+        const actualResult: CoinSide = randomInt(2) === 0 ? 'heads' : 'tails';
         insert.run(sessionId, p1Bet, actualResult);
 
         return sessionId;
@@ -381,7 +389,11 @@ export function winCoinFlip(state: MwaState, sessionId: number) {
     SELECT p1_bet, actual_result FROM coin_flip_games WHERE session = ?
     `);
 
-    const row = select.get(sessionId)!;
+    const row = select.get(sessionId);
+    if (!row) {
+        console.warn(`[gambling] no coin flip row for session ${sessionId}`);
+        return;
+    }
     const winner: Gambler = row.p1_bet === row.actual_result ? 'p1' : 'p2';
 
     winGamblingSession(state, sessionId, winner);
