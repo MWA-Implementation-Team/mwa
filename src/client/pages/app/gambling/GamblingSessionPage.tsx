@@ -55,7 +55,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
     }, [currentGame, t]);
 
     const disconnected = isDisconnected ? (
-        <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+        <p class="mwa-note mwa-note--error" role="alert">
             {t('gamblingDisconnected')}. <a href="">{t('gamblingRefreshQuestion')}</a>
         </p>
     ) : null;
@@ -65,12 +65,12 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
             if (currentGame.p2 === user?.id) {
                 return (
                     <PageShell section="gambling" hideNotification={true}>
-                        <section class="mwa-wiki-panel">
-                            <div class="mwa-wiki-panel-head">
+                        <section class="mwa-panel">
+                            <div class="mwa-panel-head">
                                 <h2>{t('gamblingRequest')}</h2>
                             </div>
-                            <div class="mwa-wiki-panel-body">
-                                <p class="mwa-wiki-intro">
+                            <div class="mwa-panel-body">
+                                <p class="mwa-intro">
                                     {t('gamblingCoinFlipChallenged', {
                                         player: currentGame.p1Name,
                                     })}
@@ -97,7 +97,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                     />
                                 </p>
                                 <p>{t('gamblingAcceptQuestion')}</p>
-                                <form method="POST" class="mwa-wiki-actions">
+                                <form method="POST" class="mwa-actions">
                                     <button
                                         class="btn-primary"
                                         formaction={`/app/gambling/sessions/${sessionId}/accept`}
@@ -113,7 +113,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                     </button>
                                 </form>
                                 {message && (
-                                    <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+                                    <p class="mwa-note mwa-note--error" role="alert">
                                         {t(message)}
                                     </p>
                                 )}
@@ -125,12 +125,12 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                 return (
                     <PageShell section="gambling" hideNotification={true}>
                         {disconnected}
-                        <section class="mwa-wiki-panel">
-                            <div class="mwa-wiki-panel-head">
+                        <section class="mwa-panel">
+                            <div class="mwa-panel-head">
                                 <h2>{t('gamblingWaiting', { player: currentGame.p2Name })}</h2>
                             </div>
-                            <div class="mwa-wiki-panel-body">
-                                <p class="mwa-wiki-muted">{t('gamblingWaitingHelp')}</p>
+                            <div class="mwa-panel-body">
+                                <p class="mwa-muted">{t('gamblingWaitingHelp')}</p>
                             </div>
                         </section>
                     </PageShell>
@@ -140,12 +140,12 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         case 'expired': {
             return (
                 <PageShell section="gambling">
-                    <section class="mwa-wiki-panel">
-                        <div class="mwa-wiki-panel-head">
+                    <section class="mwa-panel">
+                        <div class="mwa-panel-head">
                             <h2>{t('gamblingExpired')}</h2>
                         </div>
-                        <div class="mwa-wiki-panel-body">
-                            <p class="mwa-wiki-muted">
+                        <div class="mwa-panel-body">
+                            <p class="mwa-muted">
                                 {t('gamblingExpiryDetails', {
                                     player: currentGame.p2Name,
                                     minutes: String(gamblingPendingExpiryMinutes),
@@ -159,12 +159,12 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         case 'rejected': {
             return (
                 <PageShell section="gambling">
-                    <section class="mwa-wiki-panel">
-                        <div class="mwa-wiki-panel-head">
+                    <section class="mwa-panel">
+                        <div class="mwa-panel-head">
                             <h2>{t('gamblingRejected')}</h2>
                         </div>
-                        <div class="mwa-wiki-panel-body">
-                            <p class="mwa-wiki-muted">
+                        <div class="mwa-panel-body">
+                            <p class="mwa-muted">
                                 {t('gamblingRejectedDetails', { player: currentGame.p2Name })}
                             </p>
                         </div>
@@ -180,12 +180,12 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                     hideNotification={currentGame.status.type === 'running'}
                 >
                     {disconnected}
-                    <section class="mwa-wiki-panel">
-                        <div class="mwa-wiki-panel-head">
+                    <section class="mwa-panel">
+                        <div class="mwa-panel-head">
                             <h2>{t('gamblingCoinFlip')}</h2>
                         </div>
-                        <div class="mwa-wiki-panel-body">
-                            <p class="mwa-wiki-intro">
+                        <div class="mwa-panel-body">
+                            <p class="mwa-intro">
                                 {t('gamblingVersus', {
                                     p1: currentGame.p1Name,
                                     p2: currentGame.p2Name,
@@ -206,7 +206,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                     </p>
                                 </>
                             ) : (
-                                <p class="mwa-wiki-muted">{t('gamblingCoinFlipping')}</p>
+                                <p class="mwa-muted">{t('gamblingCoinFlipping')}</p>
                             )}
                         </div>
                     </section>

@@ -54,12 +54,12 @@ function HomePage({ transactions, groupName, queuePosition: initialQueuePosition
 
     return (
         <PageShell section="home">
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('dashFinances')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-intro">
+                <div class="mwa-panel-body">
+                    <p class="mwa-intro">
                         {t('dashBalance')}:{' '}
                         <strong>
                             {user!.currentBalance.toFixed(2)} {t('currencyName')}
@@ -68,11 +68,11 @@ function HomePage({ transactions, groupName, queuePosition: initialQueuePosition
 
                     <h3>{t('dashTransactions')}</h3>
                     {transactions.length === 0 ? (
-                        <p class="mwa-wiki-muted">{t('dashNoTransactions')}</p>
+                        <p class="mwa-muted">{t('dashNoTransactions')}</p>
                     ) : (
-                        <ul class="mwa-wiki-rows">
+                        <ul class="mwa-rows">
                             {transactions.map((tx, i) => (
-                                <li key={i} class="mwa-wiki-row">
+                                <li key={i} class="mwa-row">
                                     <span>
                                         <strong>{t(transactionKindKey[tx.kind])}</strong>
                                         <small>
@@ -90,48 +90,48 @@ function HomePage({ transactions, groupName, queuePosition: initialQueuePosition
                 </div>
             </section>
 
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('queueTitle')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
+                <div class="mwa-panel-body">
                     {queueError && (
-                        <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+                        <p class="mwa-note mwa-note--error" role="alert">
                             {queueError}
                         </p>
                     )}
 
                     {queuePosition !== null ? (
                         <>
-                            <p class="mwa-wiki-intro">
+                            <p class="mwa-intro">
                                 {t('queuePositionLabel')}: <strong>#{queuePosition}</strong>
                             </p>
-                            <div class="mwa-wiki-actions">
+                            <div class="mwa-actions">
                                 <button type="button" onClick={handleLeaveQueue}>
                                     {t('queueLeave')}
                                 </button>
                             </div>
                         </>
                     ) : groupName ? (
-                        <div class="mwa-wiki-actions">
+                        <div class="mwa-actions">
                             <button type="button" class="btn-primary" onClick={handleJoinQueue}>
                                 {t('queueJoinAs', { group: groupName })}
                             </button>
                         </div>
                     ) : (
-                        <p class="mwa-wiki-muted">
+                        <p class="mwa-muted">
                             {t('queueNeedGroup')} <a href="/app/group">{t('queueGoGroup')}</a>
                         </p>
                     )}
                 </div>
             </section>
 
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('dashSupport')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <div class="mwa-wiki-actions">
+                <div class="mwa-panel-body">
+                    <div class="mwa-actions">
                         <button type="button">
                             <PhoneIcon /> {t('dashCall')}
                         </button>
@@ -143,7 +143,7 @@ function HomePage({ transactions, groupName, queuePosition: initialQueuePosition
                             <BookIcon /> {t('dashGuide')}
                         </button>
                     </div>
-                    {guideOpen && <p class="mwa-wiki-muted">{t('dashGuideBody')}</p>}
+                    {guideOpen && <p class="mwa-muted">{t('dashGuideBody')}</p>}
                 </div>
             </section>
         </PageShell>

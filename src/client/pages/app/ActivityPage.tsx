@@ -16,11 +16,11 @@ function ActivityPage({ slug }: ActivityPageProps) {
     const Detail = registeredActivities[slug].Detail;
     return (
         <PageShell section="activities">
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('activityInfoTitle')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
+                <div class="mwa-panel-body">
                     <Detail slug={slug} />
                 </div>
             </section>

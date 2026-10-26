@@ -53,13 +53,13 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
 
     return (
         <PageShell section="host">
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('hostCallTitle')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <div class="mwa-wiki-form">
-                        <div class="mwa-wiki-field">
+                <div class="mwa-panel-body">
+                    <div class="mwa-form">
+                        <div class="mwa-field">
                             <label for="host-station">{t('hostStation')}</label>
                             <select
                                 id="host-station"
@@ -74,7 +74,7 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
                             </select>
                         </div>
 
-                        <div class="mwa-wiki-field">
+                        <div class="mwa-field">
                             <label for="host-count">{t('hostCount')}</label>
                             <input
                                 id="host-count"
@@ -97,15 +97,15 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
                         </div>
                     </div>
 
-                    <p class="mwa-wiki-muted">{t('hostWaiting', { n: String(waiting.length) })}</p>
+                    <p class="mwa-muted">{t('hostWaiting', { n: String(waiting.length) })}</p>
 
                     {error && (
-                        <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+                        <p class="mwa-note mwa-note--error" role="alert">
                             {error}
                         </p>
                     )}
 
-                    <div class="mwa-wiki-actions">
+                    <div class="mwa-actions">
                         <button
                             class="btn-primary"
                             onClick={handleCall}
@@ -117,17 +117,17 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
                 </div>
             </section>
 
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('hostAtStation')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
+                <div class="mwa-panel-body">
                     {onStation.length === 0 ? (
-                        <p class="mwa-wiki-muted">{t('hostStationEmpty')}</p>
+                        <p class="mwa-muted">{t('hostStationEmpty')}</p>
                     ) : (
-                        <ul class="mwa-wiki-rows">
+                        <ul class="mwa-rows">
                             {onStation.map((entry) => (
-                                <li key={entry.id} class="mwa-wiki-row">
+                                <li key={entry.id} class="mwa-row">
                                     <strong>{entry.groupName}</strong>
                                     <button onClick={() => handleDone(entry.id)}>
                                         {t('hostDone')}
@@ -139,13 +139,13 @@ function HostPage({ activities, waiting: initialWaiting, atStation }: HostPagePr
                 </div>
             </section>
 
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('hostNextUp')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
+                <div class="mwa-panel-body">
                     {waiting.length === 0 ? (
-                        <p class="mwa-wiki-muted">{t('hostQueueEmpty')}</p>
+                        <p class="mwa-muted">{t('hostQueueEmpty')}</p>
                     ) : (
                         <ol>
                             {waiting.map((entry) => (

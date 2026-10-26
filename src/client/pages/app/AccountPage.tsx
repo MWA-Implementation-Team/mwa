@@ -15,28 +15,28 @@ function AccountPage({}: AccountPageProps) {
 
     return (
         <PageShell section="account">
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('accountProfile')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <ul class="mwa-wiki-rows">
-                        <li class="mwa-wiki-row">
+                <div class="mwa-panel-body">
+                    <ul class="mwa-rows">
+                        <li class="mwa-row">
                             <span>{t('accountUsername')}</span>
                             <span>
                                 <strong>{user!.username}</strong>{' '}
                                 <button type="button">{t('accountEdit')}</button>
                             </span>
                         </li>
-                        <li class="mwa-wiki-row">
+                        <li class="mwa-row">
                             <span>{t('accountEmail')}</span>
                             <strong>{user!.email}</strong>
                         </li>
-                        <li class="mwa-wiki-row">
+                        <li class="mwa-row">
                             <span>{t('accountRole')}</span>
                             <strong>{user!.role}</strong>
                         </li>
-                        <li class="mwa-wiki-row">
+                        <li class="mwa-row">
                             <span>{t('accountJoined')}</span>
                             <strong>{user!.createdAt.toLocaleDateString(lang)}</strong>
                         </li>
@@ -44,19 +44,19 @@ function AccountPage({}: AccountPageProps) {
                 </div>
             </section>
 
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('dashFinances')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <ul class="mwa-wiki-rows">
-                        <li class="mwa-wiki-row">
+                <div class="mwa-panel-body">
+                    <ul class="mwa-rows">
+                        <li class="mwa-row">
                             <span>{t('dashBalance')}</span>
                             <strong>
                                 {user!.currentBalance.toFixed(2)} {t('currencyName')}
                             </strong>
                         </li>
-                        <li class="mwa-wiki-row">
+                        <li class="mwa-row">
                             <span>{t('accountLifetimeEarned')}</span>
                             <strong>
                                 {user!.lifetimeEarned.toFixed(2)} {t('currencyName')}

@@ -107,9 +107,9 @@ export type Language = {
     dashGuide: string;
     dashGuideBody: string;
 
-    wikiSkip: string;
-    wikiLogoAlt: string;
-    wikiNavLabel: string;
+    shellSkip: string;
+    shellLogoAlt: string;
+    shellNavLabel: string;
     navTitle: string;
 
     activitiesDirectory: string;
@@ -306,9 +306,9 @@ export const languages: Record<LanguageCode, Language> = {
         dashGuide: 'Guide & explanations',
         dashGuideBody: 'This section can contain explanations of the dashboard features.',
 
-        wikiSkip: 'Skip to content',
-        wikiLogoAlt: 'first years Event home',
-        wikiNavLabel: 'Main navigation',
+        shellSkip: 'Skip to content',
+        shellLogoAlt: 'first years Event home',
+        shellNavLabel: 'Main navigation',
         navTitle: 'Menu',
 
         activitiesDirectory: 'activity directory',
@@ -506,9 +506,9 @@ export const languages: Record<LanguageCode, Language> = {
         dashGuide: 'Vadovas ir paaiškinimai',
         dashGuideBody: 'Šiame skyriuje gali būti pateikiami prietaisų skydelio paaiškinimai.',
 
-        wikiSkip: 'Pereiti prie turinio',
-        wikiLogoAlt: 'pirmakursiu renginio pradžia',
-        wikiNavLabel: 'Pagrindinė navigacija',
+        shellSkip: 'Pereiti prie turinio',
+        shellLogoAlt: 'pirmakursiu renginio pradžia',
+        shellNavLabel: 'Pagrindinė navigacija',
         navTitle: 'Meniu',
 
         activitiesDirectory: 'veiklų katalogas',

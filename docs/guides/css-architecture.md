@@ -6,13 +6,13 @@ The app uses Oat as its base framework. App-specific styles live in
 ## Where styles go
 
 `static/style/main.css` is the entry point — it `@import`s `tokens.css`, `base.css`,
-every file in `components/`, and `wiki.css` last.
+every file in `components/`, and `shell.css` last.
 
 - `tokens.css` — shared colors, spacing, and other variables.
 - `base.css` — page-wide defaults and layout rules.
 - `components/` — styles for reusable components.
-- `wiki.css` — the `mwa-wiki-*` design system used by `PageShell`. Loaded last so
-  it wins over the base theme; it is scoped to elements inside `.mwa-wiki`.
+- `shell.css` — the `mwa-*` design system used by `PageShell`. Loaded last so
+  it wins over the base theme; it is scoped to elements inside `.mwa`.
 - `main.css` — imports the other style files.
 
 Use tokens instead of repeating values:
@@ -34,7 +34,7 @@ For a new component:
 Example:
 
 ```tsx
-<button class="mwa-wiki-button">Save</button>
+<button class="mwa-button">Save</button>
 ```
 
 ## Overriding Oat styles

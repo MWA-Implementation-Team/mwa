@@ -28,7 +28,7 @@ type PageShellProps = {
     children: ComponentChildren;
 };
 
-// Wiki-inspired presentation; the visual styles live in wiki.css.
+// App-frame presentation; the visual styles live in shell.css.
 export default function PageShell({
     section,
     nav = true,
@@ -58,15 +58,15 @@ export default function PageShell({
         <>
             <section class="landing-section landing-pane-brand">
                 <div class="landing-welcome">
-                    <a href="/" class="mwa-wiki-logo" aria-label={t('wikiLogoAlt')}>
-                        <img src="/3Logotipas.png" alt={t('wikiLogoAlt')} />
+                    <a href="/" class="mwa-logo" aria-label={t('shellLogoAlt')}>
+                        <img src="/3Logotipas.png" alt={t('shellLogoAlt')} />
                     </a>
                 </div>
             </section>
             {nav && (
                 <section class="landing-section landing-pane-nav">
                     <h2>{t('navTitle')}</h2>
-                    <nav aria-label={t('wikiNavLabel')}>
+                    <nav aria-label={t('shellNavLabel')}>
                         <ul class="landing-menu">
                             {navigation.map((item) => (
                                 <li key={item.section}>
@@ -81,7 +81,7 @@ export default function PageShell({
                             {user && (
                                 <li>
                                     <form method="POST" action="/app" class="landing-menu-logout">
-                                        <button type="submit" class="mwa-wiki-danger">
+                                        <button type="submit" class="mwa-danger">
                                             {t('logOut')}
                                         </button>
                                     </form>
@@ -102,14 +102,14 @@ export default function PageShell({
     );
 
     return (
-        <div class="mwa-wiki">
-            <a class="mwa-wiki-skip" href="#mwa-wiki-main">
-                {t('wikiSkip')}
+        <div class="mwa">
+            <a class="mwa-skip" href="#mwa-main">
+                {t('shellSkip')}
             </a>
-            <div class={`mwa-wiki-frame mwa-wiki-frame--${section}`}>
+            <div class={`mwa-frame mwa-frame--${section}`}>
                 <div class="landing-grid">
                     <div class="landing-col landing-col--side">{sidebar}</div>
-                    <main id="mwa-wiki-main" class="landing-col landing-col--main">
+                    <main id="mwa-main" class="landing-col landing-col--main">
                         {notification && !hideNotification && (
                             <NotificationBanner notification={notification} />
                         )}
@@ -128,16 +128,16 @@ function NotificationBanner({ notification }: { notification: Notification }) {
     const sessionHref = `/app/gambling/sessions/${encodeURIComponent(notification.sessionId)}`;
 
     return (
-        <section class="mwa-wiki-panel">
-            <div class="mwa-wiki-panel-body">
+        <section class="mwa-panel">
+            <div class="mwa-panel-body">
                 {notification.type === 'gambling_invite' ? (
                     <>
-                        <p class="mwa-wiki-intro">
+                        <p class="mwa-intro">
                             {t('gamblingNotificationInvite', {
                                 player: notification.inviterName,
                             })}
                         </p>
-                        <div class="mwa-wiki-actions">
+                        <div class="mwa-actions">
                             <a class="btn-primary" href={sessionHref}>
                                 {t('gamblingOpen')}
                             </a>
@@ -148,8 +148,8 @@ function NotificationBanner({ notification }: { notification: Notification }) {
                     </>
                 ) : (
                     <>
-                        <p class="mwa-wiki-intro">{t('gamblingInProgress')}</p>
-                        <div class="mwa-wiki-actions">
+                        <p class="mwa-intro">{t('gamblingInProgress')}</p>
+                        <div class="mwa-actions">
                             <a class="btn-primary" href={sessionHref}>
                                 {t('gamblingReturn')}
                             </a>

@@ -29,9 +29,9 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
     if (self) {
         return (
             <PageShell section="interact">
-                <section class="mwa-wiki-panel">
-                    <div class="mwa-wiki-panel-body">
-                        <p class="mwa-wiki-muted">{t('interactSelfJoke')}</p>
+                <section class="mwa-panel">
+                    <div class="mwa-panel-body">
+                        <p class="mwa-muted">{t('interactSelfJoke')}</p>
                     </div>
                 </section>
             </PageShell>
@@ -41,12 +41,12 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
     return (
         <PageShell section="interact">
             {/* Stub — real transfers land with the pending/confirm flow. */}
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('interactHeading', { name: target.username })}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <div class="mwa-wiki-actions">
+                <div class="mwa-panel-body">
+                    <div class="mwa-actions">
                         <button disabled>{t('interactSendMoneyTitle')}</button>
                         <a
                             class="btn-primary"
@@ -55,26 +55,26 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
                             {t('gamblingAction')} 💲🤑🎰🤑💲
                         </a>
                     </div>
-                    <p class="mwa-wiki-muted">{t('interactComingSoon')}</p>
+                    <p class="mwa-muted">{t('interactComingSoon')}</p>
                 </div>
             </section>
 
             {detail && (
-                <section class="mwa-wiki-panel">
-                    <div class="mwa-wiki-panel-head">
+                <section class="mwa-panel">
+                    <div class="mwa-panel-head">
                         <h2>{t('interactProfileDetailTitle')}</h2>
                     </div>
-                    <div class="mwa-wiki-panel-body">
-                        <ul class="mwa-wiki-rows">
-                            <li class="mwa-wiki-row">
+                    <div class="mwa-panel-body">
+                        <ul class="mwa-rows">
+                            <li class="mwa-row">
                                 <span>{t('interactDetailEmail')}</span>
                                 <strong>{detail.email}</strong>
                             </li>
-                            <li class="mwa-wiki-row">
+                            <li class="mwa-row">
                                 <span>{t('interactDetailBalance')}</span>
                                 <strong>{detail.currentBalance}</strong>
                             </li>
-                            <li class="mwa-wiki-row">
+                            <li class="mwa-row">
                                 <span>{t('interactDetailJoined')}</span>
                                 <strong>{detail.joinedAt.slice(0, 10)}</strong>
                             </li>

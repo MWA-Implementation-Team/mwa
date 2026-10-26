@@ -26,19 +26,19 @@ function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="login" nav={false}>
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-body">
+            <section class="mwa-panel">
+                <div class="mwa-panel-body">
                     {sentTo ? (
                         <>
-                            <p class="mwa-wiki-muted">
+                            <p class="mwa-muted">
                                 {sentKind === 'signup'
                                     ? t('loginSentSignup', { email: sentTo })
                                     : t('loginSentLogin', { email: sentTo })}
                             </p>
-                            <form method="POST" action="/auth/verify" class="mwa-wiki-form">
+                            <form method="POST" action="/auth/verify" class="mwa-form">
                                 <input type="hidden" name="email" value={sentTo} />
                                 {goto && <input type="hidden" name="goto" value={goto} />}
-                                <div class="mwa-wiki-field">
+                                <div class="mwa-field">
                                     <label for="code">{t('loginCode')}</label>
                                     <input
                                         type="text"
@@ -55,8 +55,8 @@ function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
                             </form>
                         </>
                     ) : (
-                        <form method="POST" class="mwa-wiki-form">
-                            <div class="mwa-wiki-field">
+                        <form method="POST" class="mwa-form">
+                            <div class="mwa-field">
                                 <label for="email">{t('loginEmail')}</label>
                                 <input
                                     type="email"
@@ -73,7 +73,7 @@ function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
                     )}
 
                     {errorKey && (
-                        <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+                        <p class="mwa-note mwa-note--error" role="alert">
                             {t(errorKey)}
                         </p>
                     )}

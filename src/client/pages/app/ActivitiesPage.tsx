@@ -17,15 +17,15 @@ function ActivitiesPage({}: ActivitiesPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="activities">
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('activitiesDirectory')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
+                <div class="mwa-panel-body">
                     {activities.length === 0 ? (
-                        <p class="mwa-wiki-muted">{t('activitiesEmpty')}</p>
+                        <p class="mwa-muted">{t('activitiesEmpty')}</p>
                     ) : (
-                        <ul class="mwa-wiki-directory">
+                        <ul class="mwa-directory">
                             {activities.map(([slug, { Card }]) => (
                                 <li key={slug}>
                                     <a href={`/app/activities/${slug}`}>

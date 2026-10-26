@@ -52,27 +52,27 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
     return (
         <PageShell section="group">
             {error && (
-                <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+                <p class="mwa-note mwa-note--error" role="alert">
                     {error}
                 </p>
             )}
             {successMsg && (
-                <p class="mwa-wiki-note mwa-wiki-note--success" role="status">
+                <p class="mwa-note mwa-note--success" role="status">
                     {successMsg}
                 </p>
             )}
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('groupYourGroups')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
+                <div class="mwa-panel-body">
                     {groups === null || groups.length === 0 ? (
-                        <p class="mwa-wiki-muted">{t('groupEmpty')}</p>
+                        <p class="mwa-muted">{t('groupEmpty')}</p>
                     ) : (
-                        <ul class="mwa-wiki-rows">
+                        <ul class="mwa-rows">
                             {groups.map((group) => (
                                 <li key={group.id}>
-                                    <div class="mwa-wiki-row">
+                                    <div class="mwa-row">
                                         <div>
                                             <strong>{group.name}</strong>
                                             <small>{group.phone_number}</small>
@@ -80,7 +80,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                                         {group.ownerId === user?.id && (
                                             <button
                                                 type="button"
-                                                class="mwa-wiki-danger"
+                                                class="mwa-danger"
                                                 onClick={() => handleDeleteGroup(group.id)}
                                             >
                                                 {t('groupDelete')}
@@ -93,13 +93,13 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                     )}
                 </div>
             </section>
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('groupCreate')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <form class="mwa-wiki-form" onSubmit={handleCreateGroup}>
-                        <div class="mwa-wiki-field">
+                <div class="mwa-panel-body">
+                    <form class="mwa-form" onSubmit={handleCreateGroup}>
+                        <div class="mwa-field">
                             <label for="mwa-group-name">{t('groupName')}</label>
                             <input
                                 id="mwa-group-name"
@@ -109,7 +109,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                                 required
                             />
                         </div>
-                        <div class="mwa-wiki-field">
+                        <div class="mwa-field">
                             <label for="mwa-group-phone">{t('groupPhone')}</label>
                             <input
                                 id="mwa-group-phone"
@@ -121,7 +121,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                                 required
                             />
                         </div>
-                        <div class="mwa-wiki-actions">
+                        <div class="mwa-actions">
                             <button type="submit" class="btn-primary">
                                 {t('groupCreate')}
                             </button>

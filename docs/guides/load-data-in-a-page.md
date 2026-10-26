@@ -64,14 +64,14 @@ export const badgesPage: Page<BadgesPageProps> = {
 function BadgesPage({ badges }: BadgesPageProps) {
     return (
         <PageShell section="badges">
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>Badges</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <ul class="mwa-wiki-rows">
+                <div class="mwa-panel-body">
+                    <ul class="mwa-rows">
                         {badges.map((b) => (
-                            <li key={b.id} class="mwa-wiki-row">
+                            <li key={b.id} class="mwa-row">
                                 {b.title} — {b.description}
                             </li>
                         ))}

@@ -1,35 +1,28 @@
-/*
- * MWA event UI: mobile-first, inspired by the user's kat/wiki page.
- * Intentionally scoped to .mwa-wiki so it doesn't overwrite Oat, Header,
- * existing light/dark tokens, or other parts of the project.
- * This file is imported after the existing styles in main.css.
- */
-.mwa-wiki {
-    /* TRIAL: hue-rotate whole palette — remove when scheme is picked */
+.mwa {
     filter: hue-rotate(-60deg) brightness(1.18) saturate(0.9);
-    --wiki-white: #f7f1ff;
-    --wiki-soft: #cfc0e8;
-    --wiki-pink: #ffb8fa;
-    /* renders as ice blue after the root hue-rotate(-60deg) */
-    --wiki-accent: #c4aeff;
-    --wiki-border: #5c2893;
-    --wiki-panel: rgba(18, 11, 41, 0.92);
-    --wiki-panel-light: rgba(56, 27, 98, 0.66);
+    --shell-white: #f7f1ff;
+    --shell-soft: #cfc0e8;
+    --shell-pink: #ffb8fa;
+
+    --shell-accent: #c4aeff;
+    --shell-border: #5c2893;
+    --shell-panel: rgba(18, 11, 41, 0.92);
+    --shell-panel-light: rgba(56, 27, 98, 0.66);
     isolation: isolate;
     position: relative;
     min-height: 100vh;
     width: 100%;
     overflow: clip;
     color-scheme: dark;
-    color: var(--wiki-white);
-    /* the base theme's hard black text-shadow must not leak into the wiki skin */
+    color: var(--shell-white);
+
     text-shadow: none;
     font:
         400 15px/1.55 'montserrat',
         sans-serif;
     background: #1d063e;
 }
-.mwa-wiki::before {
+.mwa::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -37,10 +30,10 @@
     pointer-events: none;
     opacity: 0.9;
     background:
-        radial-gradient(circle, var(--wiki-pink) 1px, transparent 1.5px),
-        radial-gradient(circle, var(--wiki-accent) 1px, transparent 1.5px),
-        radial-gradient(circle, var(--wiki-soft) 1px, transparent 1.2px),
-        radial-gradient(circle, var(--wiki-accent) 1.5px, transparent 2px), #1c043d;
+        radial-gradient(circle, var(--shell-pink) 1px, transparent 1.5px),
+        radial-gradient(circle, var(--shell-accent) 1px, transparent 1.5px),
+        radial-gradient(circle, var(--shell-soft) 1px, transparent 1.2px),
+        radial-gradient(circle, var(--shell-accent) 1.5px, transparent 2px), #1c043d;
     background-size:
         119px 157px,
         191px 147px,
@@ -52,30 +45,30 @@
         7px 33px,
         140px 60px;
 }
-.mwa-wiki *,
-.mwa-wiki *::before,
-.mwa-wiki *::after {
+.mwa *,
+.mwa *::before,
+.mwa *::after {
     box-sizing: border-box;
 }
-.mwa-wiki :where(h1, h2, h3, h4, p, ul, ol) {
+.mwa :where(h1, h2, h3, h4, p, ul, ol) {
     margin: 0;
 }
-.mwa-wiki :where(img, svg, video, canvas) {
+.mwa :where(img, svg, video, canvas) {
     max-width: 100%;
 }
-.mwa-wiki a {
-    color: var(--wiki-accent);
+.mwa a {
+    color: var(--shell-accent);
     text-decoration: underline;
     text-underline-offset: 3px;
 }
-.mwa-wiki a:hover {
+.mwa a:hover {
     color: #fff;
 }
-.mwa-wiki :is(a, button, input, select, textarea, summary):focus-visible {
-    outline: 3px solid var(--wiki-accent);
+.mwa :is(a, button, input, select, textarea, summary):focus-visible {
+    outline: 3px solid var(--shell-accent);
     outline-offset: 3px;
 }
-.mwa-wiki-skip {
+.mwa-skip {
     position: absolute;
     top: -100px;
     left: 10px;
@@ -83,10 +76,10 @@
     padding: 8px;
     background: #160a2e;
 }
-.mwa-wiki-skip:focus {
+.mwa-skip:focus {
     top: 10px;
 }
-.mwa-wiki-frame {
+.mwa-frame {
     position: relative;
     width: auto;
     max-width: 970px;
@@ -94,10 +87,10 @@
     padding: 10px 12px 18px;
     scrollbar-width: none;
 }
-.mwa-wiki-frame::-webkit-scrollbar {
+.mwa-frame::-webkit-scrollbar {
     display: none;
 }
-.mwa-wiki-logo {
+.mwa-logo {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -105,7 +98,7 @@
     max-width: min(100%, 350px);
     text-decoration: none !important;
 }
-.mwa-wiki-logo img {
+.mwa-logo img {
     display: block;
     width: auto;
     max-width: min(100%, 320px);
@@ -113,111 +106,111 @@
     height: auto;
     object-fit: contain;
 }
-/* the logo takes the same palette filter as everything else — no exception */
-.mwa-wiki h1,
-.mwa-wiki h2,
-.mwa-wiki h3 {
+
+.mwa h1,
+.mwa h2,
+.mwa h3 {
     text-transform: none;
 }
-.mwa-wiki-panel,
+.mwa-panel,
 .landing-section {
     min-width: 0;
-    border: 1px solid var(--wiki-border);
-    background: var(--wiki-panel);
+    border: 1px solid var(--shell-border);
+    background: var(--shell-panel);
     box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
 }
-.mwa-wiki-panel-head {
+.mwa-panel-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
     padding: 5px 12px;
-    border-bottom: 1px solid var(--wiki-border);
+    border-bottom: 1px solid var(--shell-border);
     background: linear-gradient(90deg, #6d33a8, #2d1350);
 }
-.mwa-wiki-panel-head h2,
-.mwa-wiki-panel-head h3 {
+.mwa-panel-head h2,
+.mwa-panel-head h3 {
     display: flex;
     align-items: center;
     gap: 7px;
     margin: 0;
-    color: var(--wiki-white);
+    color: var(--shell-white);
     font-size: 12px;
     letter-spacing: 0.06em;
     overflow-wrap: anywhere;
 }
-.mwa-wiki-panel-body {
+.mwa-panel-body {
     padding: 12px;
     min-width: 0;
 }
-.mwa-wiki-panel-body > :first-child {
+.mwa-panel-body > :first-child {
     margin-top: 0;
 }
-.mwa-wiki-panel-body > :last-child {
+.mwa-panel-body > :last-child {
     margin-bottom: 0;
 }
-.mwa-wiki-muted {
-    color: var(--wiki-soft);
+.mwa-muted {
+    color: var(--shell-soft);
     font-size: 13px;
 }
-.mwa-wiki-intro {
+.mwa-intro {
     font-size: 14px;
     line-height: 1.75;
-    color: var(--wiki-white);
+    color: var(--shell-white);
 }
-.mwa-wiki-note {
+.mwa-note {
     padding: 10px 12px;
-    background: var(--wiki-panel-light);
-    border: 1px solid var(--wiki-border);
-    color: var(--wiki-white);
+    background: var(--shell-panel-light);
+    border: 1px solid var(--shell-border);
+    color: var(--shell-white);
     font-size: 13px;
 }
-.mwa-wiki-note--error {
+.mwa-note--error {
     color: #ffe2e4;
     background: rgba(148, 20, 46, 0.25);
     border-color: #ff8693;
 }
-.mwa-wiki-note--success {
+.mwa-note--success {
     color: #ddffd9;
     background: rgba(31, 98, 38, 0.25);
     border-color: #8cdb95;
 }
-.mwa-wiki-grid {
+.mwa-grid {
     display: grid;
     gap: 12px;
     grid-template-columns: minmax(0, 1fr);
 }
-.mwa-wiki-mini {
+.mwa-mini {
     display: block;
     padding: 13px 12px;
     min-width: 0;
-    border: 1px solid var(--wiki-border);
-    background: var(--wiki-panel-light);
+    border: 1px solid var(--shell-border);
+    background: var(--shell-panel-light);
     text-decoration: none !important;
 }
-.mwa-wiki-mini:hover {
+.mwa-mini:hover {
     background: rgba(98, 45, 143, 0.38);
 }
-.mwa-wiki-mini-title {
+.mwa-mini-title {
     display: block;
     font-size: 15px;
-    color: var(--wiki-accent);
+    color: var(--shell-accent);
     font-weight: 700;
 }
-.mwa-wiki-mini-text {
+.mwa-mini-text {
     display: block;
     margin-top: 5px;
     font-size: 12px;
-    color: var(--wiki-soft);
+    color: var(--shell-soft);
 }
-.mwa-wiki-actions {
+.mwa-actions {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 12px;
 }
-.mwa-wiki :is(button, .btn-primary, .btn-outline, .mwa-wiki-button) {
+.mwa :is(button, .btn-primary, .btn-outline, .mwa-button) {
     min-height: 44px;
     max-width: 100%;
     border-radius: 2px;
@@ -232,57 +225,57 @@
         border-color 0.15s,
         transform 0.15s;
 }
-.mwa-wiki button:active,
-.mwa-wiki .mwa-wiki-button:active {
+.mwa button:active,
+.mwa .mwa-button:active {
     transform: translateY(1px);
 }
-.mwa-wiki :is(.btn-primary, .mwa-wiki-button--primary) {
+.mwa :is(.btn-primary, .mwa-button--primary) {
     background: linear-gradient(90deg, #6d33a8, #2d1350);
-    border: 2px solid var(--wiki-pink);
+    border: 2px solid var(--shell-pink);
     color: white;
     box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
 }
-.mwa-wiki :is(.btn-primary, .mwa-wiki-button--primary):hover {
+.mwa :is(.btn-primary, .mwa-button--primary):hover {
     border-color: white;
     filter: brightness(1.2);
 }
-.mwa-wiki :is(button:not(.btn-primary), .btn-outline, .mwa-wiki-button--outline) {
-    background: var(--wiki-panel-light);
-    border: 1px solid var(--wiki-border);
+.mwa :is(button:not(.btn-primary), .btn-outline, .mwa-button--outline) {
+    background: var(--shell-panel-light);
+    border: 1px solid var(--shell-border);
     color: #fff;
 }
-.mwa-wiki :is(button:not(.btn-primary), .btn-outline, .mwa-wiki-button--outline):hover {
-    background: var(--wiki-border);
+.mwa :is(button:not(.btn-primary), .btn-outline, .mwa-button--outline):hover {
+    background: var(--shell-border);
 }
-.mwa-wiki button.mwa-wiki-danger {
+.mwa button.mwa-danger {
     border-color: #f29aaf;
     color: #ffd2de;
     background: #4c1736;
 }
-.mwa-wiki .mwa-wiki-button {
+.mwa .mwa-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
 }
-.mwa-wiki-form {
+.mwa-form {
     display: grid;
     gap: 12px;
 }
-.mwa-wiki-field {
+.mwa-field {
     display: grid;
     gap: 5px;
 }
-.mwa-wiki-field label {
-    color: var(--wiki-accent);
+.mwa-field label {
+    color: var(--shell-accent);
     font-size: 13px;
 }
-.mwa-wiki :is(input:not([type='hidden']), textarea, select) {
+.mwa :is(input:not([type='hidden']), textarea, select) {
     display: block;
     width: 100%;
     min-width: 0;
     max-width: 100%;
-    border: 2px solid var(--wiki-border);
+    border: 2px solid var(--shell-border);
     border-radius: 2px;
     background: #09091b;
     color: white;
@@ -293,7 +286,7 @@
         16px/1.5 'montserrat',
         sans-serif;
 }
-.mwa-wiki input::placeholder {
+.mwa input::placeholder {
     color: #afa4cb;
 }
 .landing-grid {
@@ -314,7 +307,7 @@
     order: 2;
 }
 .landing-pane-socials,
-.mwa-wiki-panel {
+.mwa-panel {
     order: 3;
 }
 .landing-pane-activities {
@@ -331,13 +324,12 @@
 .landing-pane-extra {
     order: 3;
 }
-/* on mobile the qr pane only belongs on /app — everywhere else it just pads
-   the single-column scroll. desktop keeps it on every page */
+
 @media (max-width: 699.98px) {
     .landing-pane-qr {
         display: none;
     }
-    .mwa-wiki-frame--home .landing-pane-qr {
+    .mwa-frame--home .landing-pane-qr {
         display: block;
     }
 }
@@ -347,7 +339,7 @@
     justify-items: center;
     text-align: center;
     font-size: 11px;
-    color: var(--wiki-soft);
+    color: var(--shell-soft);
     overflow-wrap: anywhere;
 }
 .landing-qr .qr-code {
@@ -366,13 +358,13 @@
     display: block;
     width: 100%;
     padding: 7px 10px;
-    color: var(--wiki-accent);
+    color: var(--shell-accent);
     text-decoration: none;
-    background: var(--wiki-panel-light);
-    border: 1px solid var(--wiki-border);
+    background: var(--shell-panel-light);
+    border: 1px solid var(--shell-border);
 }
 
-.mwa-wiki .landing-menu :is(a, button) {
+.mwa .landing-menu :is(a, button) {
     min-height: 0;
     padding: 7px 10px;
     border-radius: 0;
@@ -380,12 +372,12 @@
     text-align: left;
 }
 .landing-menu a:hover {
-    color: var(--wiki-white);
-    border-color: var(--wiki-pink);
+    color: var(--shell-white);
+    border-color: var(--shell-pink);
 }
 .landing-menu a[aria-current='page'] {
-    color: var(--wiki-accent);
-    border-color: var(--wiki-pink);
+    color: var(--shell-accent);
+    border-color: var(--shell-pink);
     text-decoration: underline;
     text-decoration-style: wavy;
     text-underline-offset: 5px;
@@ -400,7 +392,7 @@
     justify-items: center;
     text-align: center;
     font-size: 11px;
-    color: var(--wiki-soft);
+    color: var(--shell-soft);
 }
 .lang-links {
     display: inline-flex;
@@ -408,22 +400,22 @@
     gap: 6px;
 }
 .lang-links-sep {
-    color: var(--wiki-soft);
+    color: var(--shell-soft);
 }
-.mwa-wiki button.lang-link {
+.mwa button.lang-link {
     background: none;
     border: none;
     padding: 0 2px;
     min-height: 0;
     font: inherit;
-    color: var(--wiki-accent);
+    color: var(--shell-accent);
     text-decoration: underline;
     text-underline-offset: 3px;
     cursor: pointer;
     box-shadow: none;
 }
-.mwa-wiki button.lang-link[aria-pressed='true'] {
-    color: var(--wiki-accent);
+.mwa button.lang-link[aria-pressed='true'] {
+    color: var(--shell-accent);
     text-decoration-style: wavy;
     font-weight: 700;
     pointer-events: none;
@@ -433,12 +425,12 @@
     gap: 12px;
     justify-items: center;
 }
-.mwa-wiki :is(a, button).landing-login {
+.mwa :is(a, button).landing-login {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 0; /* undo the generic button's taller minimum */
+    min-height: 0;
     padding: 6px 14px;
     border-radius: 0;
     font-family: inherit;
@@ -446,16 +438,15 @@
     font-weight: 400;
     line-height: normal;
     text-decoration: none;
-    color: var(--wiki-soft);
-    background: var(--wiki-panel-light);
-    border: 1px solid var(--wiki-border);
+    color: var(--shell-soft);
+    background: var(--shell-panel-light);
+    border: 1px solid var(--shell-border);
 }
 .landing-login:hover {
-    color: var(--wiki-white);
-    border-color: var(--wiki-pink);
+    color: var(--shell-white);
+    border-color: var(--shell-pink);
 }
-/* lets a POST form sit in a stacked pane without a box of its own —
-   its button joins the parent's grid directly */
+
 .landing-login-form {
     display: contents;
 }
@@ -494,13 +485,11 @@
         flex: none;
         width: min(30%, 240px);
         gap: 0;
-        border: 1px solid var(--wiki-border);
-        background: var(--wiki-panel);
+        border: 1px solid var(--shell-border);
+        background: var(--shell-panel);
         box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
     }
-    /* the side column renders as one window on desktop — its sections lose
-       their own chrome and their h2s become fading group headers instead
-       of full titlebars */
+
     .landing-col--side .landing-section {
         border: none;
         background: none;
@@ -521,8 +510,7 @@
     .landing-col--main {
         flex: 1;
         min-width: 0;
-        /* oat.css pads every <main> — the column is a <main> for semantics,
-           not a page column, so the padding must go */
+
         padding-block-start: 0;
     }
 }
@@ -535,19 +523,19 @@
     gap: 7px;
     margin: 0;
     padding: 5px 12px;
-    color: var(--wiki-white);
+    color: var(--shell-white);
     font-size: 12px;
     letter-spacing: 0.06em;
     background: linear-gradient(90deg, #6d33a8, #2d1350);
-    border-bottom: 1px solid var(--wiki-border);
+    border-bottom: 1px solid var(--shell-border);
 }
 .landing-section > h2::before,
-.mwa-wiki-panel-head :is(h2, h3)::before {
+.mwa-panel-head :is(h2, h3)::before {
     content: '';
     flex: none;
     width: 8px;
     height: 8px;
-    background: var(--wiki-pink);
+    background: var(--shell-pink);
     border: 1px solid rgba(255, 255, 255, 0.55);
 }
 .landing-section > *:not(h2) {
@@ -563,19 +551,19 @@
     display: grid;
     gap: 2px;
     padding: 8px 4px;
-    border: 1px solid var(--wiki-border);
-    background: var(--wiki-panel-light);
+    border: 1px solid var(--shell-border);
+    background: var(--shell-panel-light);
 }
 .landing-countdown-value {
     font-size: 22px;
     font-weight: 700;
-    color: var(--wiki-pink);
+    color: var(--shell-pink);
 }
 .landing-countdown-label {
     font-size: 10px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--wiki-soft);
+    color: var(--shell-soft);
 }
 .landing-socials {
     list-style: none;
@@ -586,7 +574,7 @@
 }
 .landing-socials li::before {
     content: '•';
-    color: var(--wiki-pink);
+    color: var(--shell-pink);
     font-size: 22px;
     line-height: 0;
     margin-right: 8px;
@@ -606,80 +594,80 @@
     vertical-align: -4px;
     margin-right: 6px;
 }
-.mwa-wiki-rows {
+.mwa-rows {
     list-style: none;
     padding: 0;
     margin: 0;
 }
-.mwa-wiki-rows > li {
+.mwa-rows > li {
     padding: 12px 0;
-    border-top: 1px dashed var(--wiki-border);
+    border-top: 1px dashed var(--shell-border);
 }
-.mwa-wiki-rows > li:first-child {
+.mwa-rows > li:first-child {
     border-top: 0;
     padding-top: 0;
 }
-.mwa-wiki-row {
+.mwa-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 12px;
 }
-.mwa-wiki-row strong {
-    color: var(--wiki-accent);
+.mwa-row strong {
+    color: var(--shell-accent);
     overflow-wrap: anywhere;
 }
-.mwa-wiki-row small {
+.mwa-row small {
     display: block;
-    color: var(--wiki-soft);
+    color: var(--shell-soft);
     overflow-wrap: anywhere;
 }
-.mwa-wiki-directory {
+.mwa-directory {
     list-style: none;
     padding: 0;
     margin: 0;
     display: grid;
     gap: 12px;
 }
-.mwa-wiki-directory a {
+.mwa-directory a {
     text-decoration: none;
     display: block;
 }
-.mwa-wiki-directory a:hover {
+.mwa-directory a:hover {
     filter: brightness(1.12);
 }
-.mwa-wiki-directory a > * {
+.mwa-directory a > * {
     max-width: 100%;
 }
-.mwa-wiki-tabbar {
+.mwa-tabbar {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
 }
-.mwa-wiki-tabbar a {
+.mwa-tabbar a {
     display: inline-flex;
     min-height: 42px;
     align-items: center;
     padding: 8px 13px;
-    color: var(--wiki-accent);
-    border: 1px solid var(--wiki-border);
+    color: var(--shell-accent);
+    border: 1px solid var(--shell-border);
     text-decoration: none;
-    background: var(--wiki-panel-light);
+    background: var(--shell-panel-light);
 }
-.mwa-wiki-tabbar a[aria-current='page'] {
+.mwa-tabbar a[aria-current='page'] {
     color: #180b2f;
-    border-color: var(--wiki-accent);
-    background: var(--wiki-accent);
+    border-color: var(--shell-accent);
+    background: var(--shell-accent);
     font-weight: 700;
 }
 @media (min-width: 580px) {
-    .mwa-wiki {
+    .mwa {
         display: flex;
         align-items: center;
         justify-content: center;
     }
-    .mwa-wiki-frame {
+    .mwa-frame {
         margin: 24px;
         width: 100%;
         padding: 12px 24px 24px;
@@ -688,8 +676,7 @@
         flex-direction: column;
         overflow: hidden;
     }
-    /* every page is a pane-desktop: the grid fills the window and each
-       column scrolls itself instead of the frame */
+
     .landing-grid {
         flex: 1;
         min-height: 0;
@@ -699,19 +686,19 @@
     .landing-grid::-webkit-scrollbar {
         display: none;
     }
-    .mwa-wiki-grid {
+    .mwa-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 @media (min-width: 850px) {
-    .mwa-wiki-frame {
+    .mwa-frame {
         padding-inline: 36px;
     }
 }
 @media (prefers-reduced-motion: reduce) {
-    .mwa-wiki *,
-    .mwa-wiki *::before,
-    .mwa-wiki *::after {
+    .mwa *,
+    .mwa *::before,
+    .mwa *::after {
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;
         scroll-behavior: auto !important;

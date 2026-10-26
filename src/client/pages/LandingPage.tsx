@@ -69,7 +69,7 @@ function LandingPage({}: LandingPageProps) {
                 <>
                     <section class="landing-section landing-pane-welcome">
                         <div class="landing-welcome">
-                            <img src="/3Logotipas.png" alt={t('wikiLogoAlt')} />
+                            <img src="/3Logotipas.png" alt={t('shellLogoAlt')} />
                         </div>
                     </section>
 
@@ -112,8 +112,8 @@ function LandingPage({}: LandingPageProps) {
                         <h2>{t('sponsorsTitle')}</h2>
                         <ul class="landing-sponsors">
                             {[1, 2, 3, 4].map((n) => (
-                                <li key={n} class="mwa-wiki-mini">
-                                    <span class="mwa-wiki-mini-title">LOGO</span>
+                                <li key={n} class="mwa-mini">
+                                    <span class="mwa-mini-title">LOGO</span>
                                 </li>
                             ))}
                         </ul>
@@ -135,7 +135,7 @@ function LandingPage({}: LandingPageProps) {
 
             <section class="landing-section landing-pane-activities">
                 <h2>{t('landingFeedTitle')}</h2>
-                <ul class="mwa-wiki-directory">
+                <ul class="mwa-directory">
                     {activities.map(([slug, { Card }]) => (
                         <li key={slug}>
                             <a href={`/app/activities/${slug}`}>

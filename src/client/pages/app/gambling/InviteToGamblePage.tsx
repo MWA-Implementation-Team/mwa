@@ -25,16 +25,16 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
 
     return (
         <PageShell section="gambling">
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('gamblingWith', { name: targetUsername })}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-intro">
+                <div class="mwa-panel-body">
+                    <p class="mwa-intro">
                         <strong>{t('gamblingCoinFlip')}</strong>
                     </p>
-                    <p class="mwa-wiki-muted">{t('gamblingCoinFlipDescription')}</p>
-                    <div class="mwa-wiki-actions">
+                    <p class="mwa-muted">{t('gamblingCoinFlipDescription')}</p>
+                    <div class="mwa-actions">
                         <button class="btn-primary" onClick={() => setOpenDialog('coin_flip')}>
                             {t('gamblingChallenge')}
                         </button>
@@ -43,10 +43,10 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
             </section>
 
             <Dialog isOpen={openDialog === 'coin_flip'} onClose={() => setOpenDialog(null)}>
-                <form method="POST" class="mwa-wiki-form">
+                <form method="POST" class="mwa-form">
                     <h2>{t('gamblingCoinFlip')}</h2>
                     <input type="hidden" name="game_type" value="coin_flip" />
-                    <div class="mwa-wiki-field">
+                    <div class="mwa-field">
                         <label for="mwa-cf-bet-amount">{t('gamblingBetAmount')}</label>
                         <input
                             id="mwa-cf-bet-amount"
@@ -56,20 +56,20 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             required
                         />
                     </div>
-                    <div class="mwa-wiki-field">
+                    <div class="mwa-field">
                         <label for="mwa-cf-bet">{t('gamblingCoinFlip')}</label>
                         <select id="mwa-cf-bet" name="cf_bet">
                             <option value="heads">{t('gamblingHeads')}</option>
                             <option value="tails">{t('gamblingTails')}</option>
                         </select>
                     </div>
-                    <div class="mwa-wiki-actions">
+                    <div class="mwa-actions">
                         <button type="submit" class="btn-primary">
                             {t('gamblingSendInvite')}
                         </button>
                     </div>
                     {error?.message && (
-                        <p class="mwa-wiki-note mwa-wiki-note--error" role="alert">
+                        <p class="mwa-note mwa-note--error" role="alert">
                             {t(error.message)}
                         </p>
                     )}

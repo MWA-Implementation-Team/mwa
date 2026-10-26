@@ -17,21 +17,21 @@ function AdminPage({ message }: AdminPageProps) {
     return (
         <PageShell section="admin">
             {message && (
-                <p class="mwa-wiki-note" role="status">
+                <p class="mwa-note" role="status">
                     {message}
                 </p>
             )}
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>Mint coins</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <form method="POST" action="/admin/mint-coins" class="mwa-wiki-form">
-                        <div class="mwa-wiki-field">
+                <div class="mwa-panel-body">
+                    <form method="POST" action="/admin/mint-coins" class="mwa-form">
+                        <div class="mwa-field">
                             <label for="mwa-mint-username">Username</label>
                             <input id="mwa-mint-username" name="username" required />
                         </div>
-                        <div class="mwa-wiki-field">
+                        <div class="mwa-field">
                             <label for="mwa-mint-amount">Amount</label>
                             <input
                                 id="mwa-mint-amount"
@@ -42,7 +42,7 @@ function AdminPage({ message }: AdminPageProps) {
                                 required
                             />
                         </div>
-                        <div class="mwa-wiki-actions">
+                        <div class="mwa-actions">
                             <button type="submit" class="btn-primary">
                                 Mint coins
                             </button>
@@ -50,12 +50,12 @@ function AdminPage({ message }: AdminPageProps) {
                     </form>
                 </div>
             </section>
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('adminPanelHead')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-muted">{t('adminPanelTodo')}</p>
+                <div class="mwa-panel-body">
+                    <p class="mwa-muted">{t('adminPanelTodo')}</p>
                 </div>
             </section>
         </PageShell>

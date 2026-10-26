@@ -18,17 +18,17 @@ function GamblingPage({ sessions, invitations }: GamblingPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="gambling">
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('gamblingInvitations')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
+                <div class="mwa-panel-body">
                     {invitations.length === 0 ? (
-                        <p class="mwa-wiki-muted">{t('gamblingNoInvitations')}</p>
+                        <p class="mwa-muted">{t('gamblingNoInvitations')}</p>
                     ) : (
-                        <ul class="mwa-wiki-rows">
+                        <ul class="mwa-rows">
                             {invitations.map((invite) => (
-                                <li key={invite.id} class="mwa-wiki-row">
+                                <li key={invite.id} class="mwa-row">
                                     <a href={`/app/gambling/sessions/${invite.id}`}>
                                         {t('gamblingNotificationInvite', {
                                             player: invite.p1Name,
@@ -41,17 +41,17 @@ function GamblingPage({ sessions, invitations }: GamblingPageProps) {
                 </div>
             </section>
 
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('gamblingActiveGames')}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
+                <div class="mwa-panel-body">
                     {sessions.length === 0 ? (
-                        <p class="mwa-wiki-muted">{t('gamblingNoActiveGames')}</p>
+                        <p class="mwa-muted">{t('gamblingNoActiveGames')}</p>
                     ) : (
-                        <ul class="mwa-wiki-rows">
+                        <ul class="mwa-rows">
                             {sessions.map((session) => (
-                                <li key={session.id} class="mwa-wiki-row">
+                                <li key={session.id} class="mwa-row">
                                     <a href={`/app/gambling/sessions/${session.id}`}>
                                         <strong>
                                             {t('gamblingVersus', {

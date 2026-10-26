@@ -25,12 +25,12 @@ export const badgesPage: Page<BadgesPageProps> = {
 function BadgesPage({}: BadgesPageProps) {
     return (
         <PageShell section="badges">
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>Badges</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-muted">TODO: list badges here.</p>
+                <div class="mwa-panel-body">
+                    <p class="mwa-muted">TODO: list badges here.</p>
                 </div>
             </section>
         </PageShell>

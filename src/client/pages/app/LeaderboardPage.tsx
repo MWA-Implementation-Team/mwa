@@ -21,7 +21,7 @@ function LeaderboardPage({ type }: LeaderboardPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="leaderboard">
-            <nav class="mwa-wiki-tabbar" aria-label={t('leaderboardTypeLabel')}>
+            <nav class="mwa-tabbar" aria-label={t('leaderboardTypeLabel')}>
                 <a
                     href="/app/leaderboard?type=team"
                     aria-current={type === 'team' ? 'page' : undefined}
@@ -35,12 +35,12 @@ function LeaderboardPage({ type }: LeaderboardPageProps) {
                     {t('leaderboardGroup')}
                 </a>
             </nav>
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('leaderboardRankings', { type: t(typeLabelKey[type]) })}</h2>
                 </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-muted">
+                <div class="mwa-panel-body">
+                    <p class="mwa-muted">
                         {t('leaderboardTodo', { type: t(typeLabelKey[type]) })}
                     </p>
                 </div>

@@ -1,19 +1,9 @@
-/*
-    Design tokens and variables
-    Raw palette, semantic colors, type scale, spacing, radii
-*/
 @import './tokens.css';
 
-/*
-    Base styles and layout
-    Font, body defaults, page texture overlay, app shell, footer
-*/
 @import './base.css';
 
-/* Components */
 @import './components/card.css';
 @import './components/form.css';
 @import './components/qr-code.css';
 
-/* Scoped MWA wiki-styled pages; loaded last so it wins over the base theme */
-@import './wiki.css';
+@import './shell.css';
