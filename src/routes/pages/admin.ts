@@ -1,12 +1,19 @@
-import { requireRole } from '#src/auth.js';
+import { requireRole, requireUser } from '#src/auth.js';
 import { giveCoins } from '#src/db/transactions.js';
 import { findUserByUsername } from '#src/db/users.js';
 import { writePage } from '#src/pages.js';
-import { MwaHono } from '#src/state.js';
+import { MwaContext, MwaHono } from '#src/state.js';
+import { User } from '#src/db/users.js';
+
+// In dev mode the admin page mints coins for testing, so any signed-in user
+// gets in. In production it's admin-only.
+function requireAdmin(ctx: MwaContext): User | Response {
+    return ctx.var.isDevMode ? requireUser(ctx) : requireRole(ctx, 'admin');
+}
 
 export function registerAdminRoutes(app: MwaHono) {
     app.get('/admin', async (ctx) => {
-        const user = requireRole(ctx, ctx.var.isDevMode ? 'user' : 'admin');
+        const user = requireAdmin(ctx);
         if (user instanceof Response) return user;
 
         return writePage(ctx, 'admin', {
@@ -15,7 +22,7 @@ export function registerAdminRoutes(app: MwaHono) {
     });
 
     app.post('/admin/mint-coins', async (ctx) => {
-        const user = requireRole(ctx, ctx.var.isDevMode ? 'user' : 'admin');
+        const user = requireAdmin(ctx);
         if (user instanceof Response) return user;
 
         const form = await ctx.req.formData().catch(() => null);

@@ -79,14 +79,14 @@ sqlite3 db.sqlite "UPDATE users SET role = 'host' WHERE username = 'alice';"
 | `/`, `/login`, `/auth/verify`                                    | public                                                  |
 | `GET /app`, `GET /app/*`                                         | `requireUser`                                           |
 | `POST /app` (logout)                                             | session cookie                                          |
-| `GET /admin`, `POST /admin/mint-coins`                           | admin in production; user in dev                        |
+| `GET /admin`, `POST /admin/mint-coins`                           | admin in production; any logged-in user in dev          |
 | `GET /api/users`                                                 | `requireApiUser`                                        |
 | `GET /api/notifications`, `GET /app/gambling/sessions/:id/watch` | `requireApiUser`                                        |
 | Gambling challenge/accept/reject POSTs                           | `requireUser`; accept/reject require the invited player |
 
 `POST /admin/mint-coins` takes `username` and a positive safe-integer `amount`,
-crediting a `system` transaction through `giveCoins`. In dev, visit `/admin`
-directly as a regular user; the navigation link remains admin-only.
+crediting a `system` transaction through `giveCoins`. In dev, any logged-in
+user can visit `/admin` directly; the navigation link remains admin-only.
 
 ## How to verify (dev)
 
