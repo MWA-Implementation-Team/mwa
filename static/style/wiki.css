@@ -25,9 +25,8 @@
     /* the base theme's hard black text-shadow must not leak into the wiki skin */
     text-shadow: none;
     font:
-        400 15px/1.55 'Lucida Console',
-        'Courier New',
-        monospace;
+        400 15px/1.55 'montserrat',
+        sans-serif;
     background: #1d063e;
 }
 .mwa-wiki::before {
@@ -224,9 +223,8 @@
     border-radius: 2px;
     padding: 10px 15px;
     font:
-        700 14px/1.25 'Lucida Console',
-        'Courier New',
-        monospace;
+        700 14px/1.25 'montserrat',
+        sans-serif;
     text-align: center;
     cursor: pointer;
     transition:
@@ -292,9 +290,8 @@
     min-height: 46px;
     text-shadow: none;
     font:
-        16px/1.5 'Lucida Console',
-        'Courier New',
-        monospace;
+        16px/1.5 'montserrat',
+        sans-serif;
 }
 .mwa-wiki input::placeholder {
     color: #afa4cb;

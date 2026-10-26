@@ -1,7 +1,7 @@
-/* Outfit variable font (100–900), self-hosted subsets */
+/* Montserrat variable font (100–900), self-hosted subsets */
 @font-face {
-    font-family: 'outfit';
-    src: url('/fonts/outfit-latin.woff2') format('woff2');
+    font-family: 'montserrat';
+    src: url('/fonts/montserrat-latin.woff2') format('woff2');
     font-weight: 100 900;
     font-display: swap;
     unicode-range:
@@ -10,8 +10,8 @@
 }
 
 @font-face {
-    font-family: 'outfit';
-    src: url('/fonts/outfit-latin-ext.woff2') format('woff2');
+    font-family: 'montserrat';
+    src: url('/fonts/montserrat-latin-ext.woff2') format('woff2');
     font-weight: 100 900;
     font-display: swap;
     unicode-range:
@@ -32,7 +32,7 @@ body {
     position: relative;
     isolation: isolate;
 
-    font-family: 'outfit', sans-serif;
+    font-family: 'montserrat', sans-serif;
     background: var(--page-bg);
     color: var(--text);
     text-shadow: var(--text-shadow);
