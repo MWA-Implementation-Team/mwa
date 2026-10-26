@@ -1,5 +1,6 @@
 import { createDefaultMwaState } from '#src/state.js';
 import type { UserRole } from '#src/db/users.js';
+import { runTransaction } from './db/transaction.js';
 
 // Seed the database with sample data. Run via `npm run seed`.
 // Refuses to run if the users table isn't empty — delete db.sqlite
@@ -49,8 +50,7 @@ function member(groupId: number, userId: number) {
     insertMember.run(groupId, userId);
 }
 
-state.db.exec('BEGIN');
-try {
+runTransaction(state.db, () => {
     const adminId = addUser('admin', 'admin@mwa.dev', 'admin');
     addUser('host', 'host@mwa.dev', 'host');
     const aliceId = addUser('alice', 'alice@mwa.dev', 'user');
@@ -79,12 +79,7 @@ try {
     member(groupId, carolId);
 
     insertQueueEntry.run(groupId);
-
-    state.db.exec('COMMIT');
-} catch (error) {
-    state.db.exec('ROLLBACK');
-    throw error;
-}
+});
 
 const balances = state.db
     .prepare(

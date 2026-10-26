@@ -1,10 +1,11 @@
 import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
-import { Transaction } from '#src/client/api/transactions.js';
+import { Transaction, TransactionKind } from '#src/client/api/transactions.js';
 import { joinQueue, leaveQueue } from '#src/client/api/queue.js';
 import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
 import PageShell from './PageShell.js';
+import { Language } from '#src/client/language.js';
 
 type HomePageProps = {
     transactions: Transaction[];
@@ -21,7 +22,9 @@ const transactionKindKey = {
     transfer: 'txTransfer',
     purchase: 'txPurchase',
     system: 'txSystem',
-} as const;
+    gambling_deduction: 'txGamblingDeduction',
+    gambling_winnings: 'txGamblingWinnings',
+} as const satisfies Record<TransactionKind, keyof Language>;
 
 function HomePage({ transactions, groupName, queuePosition: initialQueuePosition }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);

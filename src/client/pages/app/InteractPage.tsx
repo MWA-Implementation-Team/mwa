@@ -12,6 +12,7 @@ export type InteractProfileDetail = {
 };
 
 type InteractPageProps = {
+    token: string;
     self: boolean;
     target: { username: string };
     detail: InteractProfileDetail | null;
@@ -22,7 +23,7 @@ export const interactPage: Page<InteractPageProps> = {
     title: (t) => t('titleInteract'),
 };
 
-function InteractPage({ self, target, detail }: InteractPageProps) {
+function InteractPage({ token, self, target, detail }: InteractPageProps) {
     const { t } = useContext(ClientContext);
 
     if (self) {
@@ -47,6 +48,12 @@ function InteractPage({ self, target, detail }: InteractPageProps) {
                 <div class="mwa-wiki-panel-body">
                     <div class="mwa-wiki-actions">
                         <button disabled>{t('interactSendMoneyTitle')}</button>
+                        <a
+                            class="btn-primary"
+                            href={`/app/interact/${encodeURIComponent(token)}/gamble`}
+                        >
+                            {t('gamblingAction')} 💲🤑🎰🤑💲
+                        </a>
                     </div>
                     <p class="mwa-wiki-muted">{t('interactComingSoon')}</p>
                 </div>

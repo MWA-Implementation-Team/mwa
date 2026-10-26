@@ -1,7 +1,21 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
+import { queryActiveGamblingSession, queryGamblingInvitations } from './gambling.js';
 
 export type UserRole = 'admin' | 'host' | 'user';
+
+// Sent to the client over /api/notifications and embedded in page context.
+export type Notification =
+    | {
+          type: 'gambling_invite';
+          inviterName: string;
+          sessionId: number;
+      }
+    | {
+          type: 'return_to_gambling';
+          opponentName: string;
+          sessionId: number;
+      };
 
 export type User = {
     id: number;
@@ -108,4 +122,28 @@ function mapUser(row: Record<string, SQLOutputValue>): User {
         currentBalance: row.current_balance as number,
         lifetimeEarned: row.lifetime_earned as number,
     };
+}
+
+export function queryUserNotification(state: MwaState, userId?: number): Notification | null {
+    if (userId === undefined) return null;
+
+    const active = queryActiveGamblingSession(state, userId);
+    if (active !== null) {
+        return {
+            type: 'return_to_gambling',
+            opponentName: active.opponentName,
+            sessionId: active.id,
+        };
+    }
+
+    const invitations = queryGamblingInvitations(state, userId);
+    if (invitations.length > 0) {
+        return {
+            type: 'gambling_invite',
+            inviterName: invitations[0].p1Name,
+            sessionId: invitations[0].id,
+        };
+    }
+
+    return null;
 }

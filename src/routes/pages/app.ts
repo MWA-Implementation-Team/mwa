@@ -83,13 +83,6 @@ export function registerAppRoutes(app: MwaHono) {
         });
     });
 
-    app.get('/app/casino', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        return writePage(ctx, 'casino', {});
-    });
-
     // One host page serves every station — the host picks which activity
     // they're staffing from a dropdown, so there's no host↔station binding.
     app.get('/app/host', async (ctx) => {
@@ -116,7 +109,8 @@ export function registerAppRoutes(app: MwaHono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        const target = findUserByInteractToken(ctx.var, ctx.req.param('token'));
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
         if (!target) return writeErrorPage(ctx, 404);
 
         const self = target.id === user.id;
@@ -132,6 +126,7 @@ export function registerAppRoutes(app: MwaHono) {
                 : null;
 
         return writePage(ctx, 'interact', {
+            token,
             self,
             target: { username: target.username },
             detail,

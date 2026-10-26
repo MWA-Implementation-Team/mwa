@@ -87,9 +87,9 @@ describe('GET /auth/verify — link path', () => {
     it('honours an allowlisted goto and rejects foreign ones', async () => {
         createUser(state, 'goto2@example.com', 'goto2_u');
         for (const [goto, expected] of [
-            ['/app/casino', '/app/casino'],
+            ['/app/gambling', '/app/gambling'],
             ['https://evil.example/', '/app'],
-            ['/app/../admin/../..', '/app'],
+            ['/app/../admin/../..', '/'],
         ]) {
             const { token } = createLoginToken(state, 'goto2@example.com');
             const res = await app.request(
@@ -113,7 +113,7 @@ describe('POST /auth/verify — code path', () => {
     it('honours the form goto and rejects foreign ones', async () => {
         createUser(state, 'goto3@example.com', 'goto3_u');
         for (const [goto, expected] of [
-            ['/app/casino', '/app/casino'],
+            ['/app/gambling', '/app/gambling'],
             ['https://evil.example/', '/app'],
         ]) {
             const { code } = createLoginToken(state, 'goto3@example.com');

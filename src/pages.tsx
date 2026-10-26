@@ -13,6 +13,7 @@ import { getRequestLanguage } from './utils.js';
 import { MwaContext, MwaHono } from './state.js';
 import { getOrCreateInteractToken } from '#src/db/interactions.js';
 import { renderSVG } from 'uqr';
+import { queryUserNotification } from './db/users.js';
 
 export function writePage<P extends RegisteredPageId>(
     ctx: MwaContext,
@@ -35,6 +36,7 @@ export function writePage<P extends RegisteredPageId>(
         lang: getRequestLanguage(ctx),
         user: user && serialize(user),
         qr,
+        notification: queryUserNotification(ctx.var, user?.id),
     };
 
     const root = Root({

@@ -39,6 +39,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
     ├── state.ts               MwaState factories, statement cache, typed Hono state middleware
     ├── auth.ts                currentUser() + require*/redirectIfAuthed guards — all auth decisions
     ├── utils.ts               server helpers, including getRequestLanguage(ctx)
+    ├── pubsub.ts              in-process subscriptions for notification and game SSE
     ├── emails/                mail templates as Preact components — html + text
     │                          fallback sharing the same props
     │   └── mailer.tsx         Mailer interface + SMTP, console, and no-op implementations
@@ -48,12 +49,12 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
     │   └── migrate.ts         the migrator — reads migrations/*.sql, applies what's new
     ├── routes/                one file per route group, each exporting register*Routes(app)
     │   ├── pages/             HTML routes — handlers end in writePage()
-    │   └── api/               JSON routes — handlers end in ctx.json()
+    │   └── api/               JSON routes and notification SSE
     └── client/                code that also runs in the browser
         ├── bootstrap.tsx      browser entry: reads #ssr-data, hydrates #app
         ├── pages.ts           registeredPages: page id → { Component, title }
         ├── activities.ts      registeredActivities: activity slug → { name, Card, Detail }
-        ├── context.tsx        ClientContext: lang, updateLang, t(), user
+        ├── context.tsx        ClientContext: lang, updateLang, t(), user, live notification
         ├── language.ts        translations (en, lt) + translate() / t()
         ├── constants.ts       cookie names (mwa-session, mwa-language, mwa-theme-override)
         ├── serialize.ts       Serialized<T> wire types + serialize()/revive() for Date fields
@@ -61,7 +62,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
         ├── activities/        one slug-named folder per station (Card + Detail + activity.ts)
         ├── pages/             one component per page, each a Page<P> object;
         │                      app/PageShell.tsx wraps them in the wiki layout
-        └── ui/                shared components (header, toggles, icons)
+        └── ui/                shared components (toggles, icons, Trans, controlled Dialog)
 
 Generated, gitignored:  dist/   tsc output — served to the browser at /client/*
                         db.sqlite   local database, created on first run

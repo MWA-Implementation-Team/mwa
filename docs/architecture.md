@@ -24,8 +24,8 @@ Follow `GET /` through the code:
 3. **The route loads data.** It calls typed functions from `src/db/*.ts` (e.g.
    `listUsers(ctx.var)`), which wrap prepared statements. The results become _page props_.
 4. **`writePage` renders the page.** `writePage(ctx, 'landing', { users })` in
-   `src/pages.tsx` builds `ctxInit = { lang, user }` (lang from the `mwa-language`
-   cookie, user from `currentUser`) and renders the `Root` component with
+   `src/pages.tsx` builds `ctxInit = { lang, user, notification }` (lang from the
+   `mwa-language` cookie, user from `currentUser`, notification from the database) and renders the `Root` component with
    `preact-render-to-string`.
 5. **`Root` emits the document shell** (`src/pages.tsx`). The `<head>` contains:
     - the importmap (explained below),
@@ -104,3 +104,42 @@ stations: `ActivitySlug` is derived from its keys, the `/app/activities/:slug` r
 validates the param against it (unknown slug → 404), and `syncActivities(state)`
 (`src/db/activities.ts`) inserts every slug into the `activities` table on server
 start so queue/badge rows can foreign-key them.
+
+## Interactions and gambling
+
+The `PageShell` sidebar renders a personal QR using `uqr` on every page, linking
+to `/app/interact/:token`.
+Migration `05_interact_tokens.sql` stores one permanent random token per user;
+it identifies the target but grants no permissions. Any signed-in scanner can
+challenge another user; hosts/admins also see their email, balance, and join date.
+Self-scans show no actions, and money transfers remain a placeholder.
+
+`/app/gambling` replaces `/app/casino`, listing running games and the viewer's
+invitations. `/app/interact/:token/gamble` creates a challenge; re-challenging the
+same player while an invite is still open redirects to that session instead of
+stacking invites. Session pages live at `/app/gambling/sessions/:id`, with POST
+`/accept` and `/reject` actions restricted to the invited player. Any signed-in
+user can view a session.
+
+`src/db/gambling.ts` owns the lifecycle, persisted by `06_gambling.sql`:
+
+- Creating a `pending` session deducts the challenger's positive integer stake.
+- Acceptance checks funds, deducts the opponent's equal stake, and marks it `running`.
+- Rejection or expiry marks it `rejected`/`expired` and deletes the challenger's
+  deposit transaction (cascading to its child) to refund the stake.
+- Coin flip chooses and stores a cryptographically random result at creation,
+  hides it until settlement, then credits twice the stake to the winner and marks
+  the session `ended`. Deductions and winnings have separate transaction kinds.
+
+These balance/status changes are transactional. Invitations expire after five
+minutes (`gamblingPendingExpiryMinutes`); accepted flips settle after five seconds.
+`scheduleGamblingTimers` in `src/routes/pages/gambling.ts` restores timers on startup
+from session/deposit timestamps. Coin flip is the only implemented game; chess,
+Connect 4, and draw settlement are future work.
+
+`src/pubsub.ts` provides in-process channels for SSE: `/api/notifications` sends
+the user's current notification, and `/app/gambling/sessions/:id/watch` sends session
+snapshots. Both send initial state on connection and updates after changes. The
+client uses `EventSource`; the notification banner in `PageShell` prioritizes a
+running game over the oldest invitation. Multiple games per player are allowed, but only one notification is
+shown. Timers and pubsub assume a single server process.

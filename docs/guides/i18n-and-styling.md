@@ -21,6 +21,10 @@ Keys and values live in `src/client/language.ts`. To add a string:
    makes a missing translation a compile error, so `npm run lint` catches it.
 3. Placeholders are `{name}`-style and filled by `t(key, params)`.
 
+For JSX placeholders, use `Trans` from `src/client/ui/Trans.tsx`, e.g.
+`<Trans id="gamblingCoinFlipBetOutcome" values={{ amount: <strong>10</strong> }} />`.
+It inserts Preact children without parsing HTML; missing placeholders stay literal.
+
 Missing keys in a non-default language fall back to English
 (`languages[lang]?.[key] || languages[defaultLanguage][key]`) — but since the type
 forces all keys to exist, this mainly guards against future partial languages.
@@ -29,6 +33,9 @@ forces all keys to exist, this mainly guards against future partial languages.
 inside the component. It runs server-side for the `<title>` tag in `writePage`, and
 `ClientContextWrapper` re-runs it in an effect whenever the language changes, so
 `document.title` stays in sync.
+
+Pages with live titles can set `customTitle: true` to skip the wrapper's title
+effect and manage it themselves, as `GamblingSessionPage` does for session updates.
 
 **Switching language**: `LanguageToggle` writes the `mwa-language` cookie and calls
 `updateLang`. `updateLang` re-renders all `t()` output instantly; the cookie makes the

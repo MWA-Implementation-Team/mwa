@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
-import { ClientContext } from '#src/client/context.js';
+import { ClientContext, Notification } from '#src/client/context.js';
 import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 import QrPane from '#src/client/ui/QrPane.js';
 
@@ -12,7 +12,7 @@ export type Section =
     | 'account'
     | 'host'
     | 'admin'
-    | 'casino'
+    | 'gambling'
     | 'interact'
     | 'landing'
     | 'login';
@@ -20,14 +20,23 @@ export type Section =
 type PageShellProps = {
     section: Section;
     nav?: boolean;
+    // hides the live notification banner — gambling session pages suppress it
+    // so an invite doesn't render inside its own session view
+    hideNotification?: boolean;
     // replaces the default sidebar (logo + nav + qr + language panes)
     side?: ComponentChildren;
     children: ComponentChildren;
 };
 
 // Wiki-inspired presentation; the visual styles live in wiki.css.
-export default function PageShell({ section, nav = true, side, children }: PageShellProps) {
-    const { t, user, qr } = useContext(ClientContext);
+export default function PageShell({
+    section,
+    nav = true,
+    hideNotification = false,
+    side,
+    children,
+}: PageShellProps) {
+    const { t, user, qr, notification } = useContext(ClientContext);
 
     const navigation = [
         { section: 'home', label: t('headerHome'), href: '/app' },
@@ -38,6 +47,7 @@ export default function PageShell({ section, nav = true, side, children }: PageS
             label: t('headerLeaderboard'),
             href: '/app/leaderboard?type=team',
         },
+        { section: 'gambling', label: t('headerGambling'), href: '/app/gambling' },
         { section: 'account', label: t('headerAccount'), href: '/app/account' },
         ...(user && (user.role === 'host' || user.role === 'admin')
             ? [{ section: 'host', label: t('headerHost'), href: '/app/host' }]
@@ -91,10 +101,53 @@ export default function PageShell({ section, nav = true, side, children }: PageS
                 <div class="landing-grid">
                     <div class="landing-col landing-col--side">{sidebar}</div>
                     <main id="mwa-wiki-main" class="landing-col landing-col--main">
+                        {notification && !hideNotification && (
+                            <NotificationBanner notification={notification} />
+                        )}
                         {children}
                     </main>
                 </div>
             </div>
         </div>
+    );
+}
+
+// Live notification (gambling invite / running game) pinned to the top of the
+// main column — fed by /api/notifications through ClientContext.
+function NotificationBanner({ notification }: { notification: Notification }) {
+    const { t } = useContext(ClientContext);
+    const sessionHref = `/app/gambling/sessions/${encodeURIComponent(notification.sessionId)}`;
+
+    return (
+        <section class="mwa-wiki-panel">
+            <div class="mwa-wiki-panel-body">
+                {notification.type === 'gambling_invite' ? (
+                    <>
+                        <p class="mwa-wiki-intro">
+                            {t('gamblingNotificationInvite', {
+                                player: notification.inviterName,
+                            })}
+                        </p>
+                        <div class="mwa-wiki-actions">
+                            <a class="btn-primary" href={sessionHref}>
+                                {t('gamblingOpen')}
+                            </a>
+                            <form method="POST" action={`${sessionHref}/reject`}>
+                                <button type="submit">{t('gamblingReject')}</button>
+                            </form>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <p class="mwa-wiki-intro">{t('gamblingInProgress')}</p>
+                        <div class="mwa-wiki-actions">
+                            <a class="btn-primary" href={sessionHref}>
+                                {t('gamblingReturn')}
+                            </a>
+                        </div>
+                    </>
+                )}
+            </div>
+        </section>
     );
 }

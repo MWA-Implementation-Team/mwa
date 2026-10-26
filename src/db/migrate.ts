@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { readdirSync, readFileSync } from 'fs';
 import path from 'path';
+import { runTransaction } from './transaction.js';
 
 export function migrateDatabase(database: DatabaseSync) {
     database.exec(`
@@ -21,14 +22,17 @@ export function migrateDatabase(database: DatabaseSync) {
         .map((file) => [Number(file.split('_')[0]), file] satisfies [number, string])
         .sort(([a], [b]) => a - b);
 
+    // allow breaking foreign keys temporarily during migrations
+    // required when recreating tables and such
+    database.exec('PRAGMA foreign_keys = OFF');
+
     for (const [ver, file] of migrations) {
         if (currentVersion >= ver) {
             continue;
         }
 
         const sql = readFileSync(path.join(dir, file), 'utf8');
-        database.exec('BEGIN');
-        try {
+        runTransaction(database, () => {
             database.exec(sql);
             database
                 .prepare(
@@ -40,11 +44,9 @@ export function migrateDatabase(database: DatabaseSync) {
                 `,
                 )
                 .run(ver);
-            database.exec('COMMIT');
-        } catch (err) {
-            database.exec('ROLLBACK');
-            throw err;
-        }
+        });
         console.log(`[migrate] applied ${file}`);
     }
+
+    database.exec('PRAGMA foreign_keys = ON');
 }

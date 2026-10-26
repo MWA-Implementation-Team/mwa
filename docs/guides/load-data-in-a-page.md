@@ -1,13 +1,15 @@
 # Guide: load data in a page
 
-There are two ways to get server data onto a page:
+Server data reaches a page through:
 
 - **SSR props** — the route queries the db and passes data to `writePage`, which puts it
   in the HTML _and_ the `#ssr-data` JSON.
 - **Client fetch** — the page calls an `/api/*` endpoint from the browser (see
   [add-an-api-endpoint](add-an-api-endpoint.md)).
+- **SSE** — `EventSource` receives snapshots after the initial render; gambling
+  sessions and the `PageShell` notification banner use this (see [architecture](../architecture.md#interactions-and-gambling)).
 
-Both end up as the same Preact props. The difference is _when_ the data arrives and
+These populate Preact props or state. The difference is _when_ the data arrives and
 _who pays_ the loading state.
 
 ## Decision rule
@@ -46,7 +48,7 @@ app.get('/app/badges', async (ctx) => {
 In `src/client/pages/app/BadgesPage.tsx`:
 
 ```tsx
-import Header from '#src/client/ui/Header.js';
+import PageShell from '#src/client/pages/app/PageShell.js';
 import { Page } from '#src/client/pages.js';
 import { Badge } from '#src/client/api/badges.js';
 
@@ -61,18 +63,22 @@ export const badgesPage: Page<BadgesPageProps> = {
 
 function BadgesPage({ badges }: BadgesPageProps) {
     return (
-        <>
-            <Header />
-
-            <h1>Badges</h1>
-            <ul>
-                {badges.map((b) => (
-                    <li key={b.id}>
-                        {b.title} — {b.description}
-                    </li>
-                ))}
-            </ul>
-        </>
+        <PageShell section="badges">
+            <section class="mwa-wiki-panel">
+                <div class="mwa-wiki-panel-head">
+                    <h2>Badges</h2>
+                </div>
+                <div class="mwa-wiki-panel-body">
+                    <ul class="mwa-wiki-rows">
+                        {badges.map((b) => (
+                            <li key={b.id} class="mwa-wiki-row">
+                                {b.title} — {b.description}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </section>
+        </PageShell>
     );
 }
 ```
