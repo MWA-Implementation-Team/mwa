@@ -4,7 +4,7 @@ import { ClientContext } from '#src/client/context.js';
 import { ActivitySlug, Activity, registeredActivities } from '#src/client/activities.js';
 import { FacebookIcon, InstagramIcon, LinkedinIcon, TwitterIcon } from '#src/client/ui/icons.js';
 import PageShell from './app/PageShell.js';
-import LanguageToggle from '#src/client/ui/LanguageToggle.js';
+import ActionsPane from '#src/client/ui/ActionsPane.js';
 
 type LandingPageProps = {};
 
@@ -60,7 +60,7 @@ const socials = [
 ];
 
 function LandingPage({}: LandingPageProps) {
-    const { t } = useContext(ClientContext);
+    const { t, user } = useContext(ClientContext);
 
     return (
         <PageShell
@@ -76,9 +76,15 @@ function LandingPage({}: LandingPageProps) {
                     <section class="landing-section landing-pane-login">
                         <h2>{t('landingLoginTitle')}</h2>
                         <div>
-                            <a href="/app" class="landing-login">
-                                {t('landingGoApp')}
-                            </a>
+                            {user ? (
+                                <a href="/app" class="landing-login">
+                                    {t('landingGoApp')}
+                                </a>
+                            ) : (
+                                <a href="/login" class="landing-login">
+                                    {t('landingLogin')}
+                                </a>
+                            )}
                         </div>
                     </section>
 
@@ -106,12 +112,7 @@ function LandingPage({}: LandingPageProps) {
                         </ul>
                     </section>
 
-                    <section class="landing-section landing-pane-lang">
-                        <h2>{t('landingLangTitle')}</h2>
-                        <div class="landing-footer">
-                            <LanguageToggle />
-                        </div>
-                    </section>
+                    <ActionsPane />
                 </>
             }
         >

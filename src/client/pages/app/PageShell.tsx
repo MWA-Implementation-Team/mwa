@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { ClientContext, Notification } from '#src/client/context.js';
-import LanguageToggle from '#src/client/ui/LanguageToggle.js';
+import ActionsPane from '#src/client/ui/ActionsPane.js';
 import QrPane from '#src/client/ui/QrPane.js';
 
 export type Section =
@@ -83,12 +83,7 @@ export default function PageShell({
                 </section>
             )}
             {qr && <QrPane />}
-            <section class="landing-section landing-pane-lang">
-                <h2>{t('landingLangTitle')}</h2>
-                <div class="landing-footer">
-                    <LanguageToggle />
-                </div>
-            </section>
+            <ActionsPane />
         </>
     );
 

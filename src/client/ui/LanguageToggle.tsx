@@ -1,11 +1,10 @@
-import { Fragment } from 'preact';
 import { useContext } from 'preact/hooks';
 import { LanguageCode, languages } from '#src/client/language.js';
 import { ClientContext } from '#src/client/context.js';
 import { cookieLanguage } from '#src/client/constants.js';
 
 export default function LanguageToggle() {
-    const { lang, updateLang } = useContext(ClientContext);
+    const { lang, updateLang, t } = useContext(ClientContext);
 
     function handleChange(newLang: string) {
         document.cookie = `${cookieLanguage}=${newLang}`;
@@ -13,20 +12,17 @@ export default function LanguageToggle() {
     }
 
     return (
-        <span class="lang-links">
-            {Object.keys(languages).map((code, i) => (
-                <Fragment key={code}>
-                    {i > 0 && <span class="lang-links-sep">·</span>}
-                    <button
-                        type="button"
-                        class="lang-link"
-                        aria-pressed={code === lang}
-                        onClick={() => handleChange(code)}
-                    >
-                        {code.toUpperCase()}
-                    </button>
-                </Fragment>
+        <select
+            class="lang-select"
+            aria-label={t('landingLangTitle')}
+            value={lang}
+            onChange={(e) => handleChange((e.target as HTMLSelectElement).value)}
+        >
+            {Object.entries(languages).map(([code, { displayName }]) => (
+                <option key={code} value={code}>
+                    {displayName}
+                </option>
             ))}
-        </span>
+        </select>
     );
 }
