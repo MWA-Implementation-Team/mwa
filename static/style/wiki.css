@@ -362,9 +362,14 @@
     gap: 6px;
     font-size: 14px;
 }
-.landing-menu a {
+.landing-menu :is(a, button) {
     display: block;
+    width: 100%;
+    min-height: 0;
     padding: 7px 10px;
+    border-radius: 0;
+    font: inherit;
+    text-align: left;
     color: var(--wiki-accent);
     text-decoration: none;
     background: var(--wiki-panel-light);
@@ -381,8 +386,7 @@
     text-decoration-style: wavy;
     text-underline-offset: 5px;
 }
-.landing-menu-logout,
-.landing-menu-logout button {
+.landing-menu-logout {
     display: block;
     width: 100%;
 }
