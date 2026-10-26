@@ -40,9 +40,7 @@ function LeaderboardPage({ type }: LeaderboardPageProps) {
                     <h2>{t('leaderboardRankings', { type: t(typeLabelKey[type]) })}</h2>
                 </div>
                 <div class="mwa-panel-body">
-                    <p class="mwa-muted">
-                        {t('leaderboardTodo', { type: t(typeLabelKey[type]) })}
-                    </p>
+                    <p class="mwa-muted">{t('leaderboardTodo', { type: t(typeLabelKey[type]) })}</p>
                 </div>
             </section>
         </PageShell>
