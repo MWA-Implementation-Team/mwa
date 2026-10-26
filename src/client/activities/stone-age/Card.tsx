@@ -12,9 +12,9 @@ export function StoneAgeCard({}: ActivityProps) {
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#4b3025',
-                background: 'linear-gradient(150deg, #dfae88, #c48669)',
-                border: '2px solid #9d664c',
+                color: '#f0dbc8',
+                background: 'linear-gradient(150deg, #7a4a30, #452616)',
+                border: '2px solid #6b4530',
             }}
         >
             <span

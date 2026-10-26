@@ -5,16 +5,16 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function EgyptCard({}: ActivityProps) {
     return (
         <article
-            class="card1"
+            class="card"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#513b2a',
-                background: 'linear-gradient(135deg, #f2dfb8, #d7ad75)',
-                border: '2px solid #b78b52',
+                color: '#f0e2c4',
+                background: 'linear-gradient(135deg, #6b4f2e, #3f2c17)',
+                border: '2px solid #7a5c38',
             }}
         >
             <div

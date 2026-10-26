@@ -12,8 +12,8 @@ export function SeventiesEightiesCard({}: ActivityProps) {
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#4b2d49',
-                background: 'linear-gradient(160deg, #ffd095, #e5a7a5)',
+                color: '#ffe3c9',
+                background: 'linear-gradient(160deg, #8a4a3c, #4a2540)',
                 border: '2px solid #b97883',
             }}
         >

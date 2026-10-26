@@ -12,9 +12,9 @@ export function MiciausParadiseCard({}: ActivityProps) {
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#355c55',
-                background: 'linear-gradient(160deg, #e9e7c8, #afd9c8)',
-                border: '2px solid #85b09d',
+                color: '#e2f2e8',
+                background: 'linear-gradient(160deg, #4a7a5c, #24503d)',
+                border: '2px solid #3a6b52',
             }}
         >
             <span

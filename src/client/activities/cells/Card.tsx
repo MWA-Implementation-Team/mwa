@@ -12,9 +12,9 @@ export function CellsCard({}: ActivityProps) {
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#265951',
-                background: 'linear-gradient(135deg, #d2e9d5, #8ac7b4)',
-                border: '2px solid #6aa998',
+                color: '#dff3ea',
+                background: 'linear-gradient(135deg, #2e5f52, #173d33)',
+                border: '2px solid #57a68f',
             }}
         >
             <div

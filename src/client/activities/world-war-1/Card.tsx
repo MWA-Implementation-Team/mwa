@@ -12,8 +12,8 @@ export function WorldWar1Card({}: ActivityProps) {
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#3d3b30',
-                background: '#d2ccb5',
+                color: '#e6dfc4',
+                background: '#454130',
                 border: '2px solid #908971',
             }}
         >
