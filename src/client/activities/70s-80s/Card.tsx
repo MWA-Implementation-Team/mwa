@@ -13,7 +13,7 @@ export function SeventiesEightiesCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#ffe3c9',
-                background: 'linear-gradient(160deg, #8a4a3c, #4a2540)',
+                background: 'linear-gradient(160deg, #b7ff00, #77155d)',
                 border: '2px solid #b97883',
             }}
         >

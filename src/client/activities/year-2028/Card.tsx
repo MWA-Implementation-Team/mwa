@@ -13,8 +13,8 @@ export function Year2028Card({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#f3f0ff',
-                background: 'linear-gradient(145deg, #30304c, #51416a)',
-                border: '2px solid #777092',
+                background: 'linear-gradient(145deg, #8b0000, #6200ff)',
+                border: '2px solid #2200a8',
             }}
         >
             <div

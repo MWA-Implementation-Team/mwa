@@ -13,7 +13,7 @@ export function CellsCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#dff3ea',
-                background: 'linear-gradient(135deg, #2e5f52, #173d33)',
+                background: 'linear-gradient(135deg, #305f2e, #0e3613)',
                 border: '2px solid #57a68f',
             }}
         >

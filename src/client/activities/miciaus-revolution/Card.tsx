@@ -12,9 +12,9 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#fff1df',
-                background: 'linear-gradient(125deg, #a34848, #7d353e)',
-                border: '2px solid #662e35',
+                color: '#a4ff2d',
+                background: 'linear-gradient(125deg, #ff0000, #860000)',
+                border: '2px solid #63000c',
             }}
         >
             <div
@@ -25,7 +25,7 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                     top: 32,
                     width: 190,
                     height: 15,
-                    background: '#e5b6a0',
+                    background: '#8b2c00',
                     opacity: 0.25,
                     transform: 'rotate(-24deg)',
                 }}
@@ -38,7 +38,7 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                     right: 22,
                     top: 5,
                     fontSize: 88,
-                    color: '#f3bf8a',
+                    color: '#ff1616',
                     opacity: 0.8,
                 }}
             >

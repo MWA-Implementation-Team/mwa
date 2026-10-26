@@ -13,7 +13,7 @@ export function MiddleAgesCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#f5e9cd',
-                background: '#70464c',
+                background: '#555555',
                 border: '2px solid #b4916f',
             }}
         >
@@ -22,7 +22,7 @@ export function MiddleAgesCard({}: ActivityProps) {
                 style={{
                     position: 'absolute',
                     inset: 9,
-                    border: '1px solid #c5a77b',
+                    border: '1px solid #3e3e3e',
                     opacity: 0.65,
                     pointerEvents: 'none',
                 }}

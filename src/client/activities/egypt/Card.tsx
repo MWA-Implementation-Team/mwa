@@ -12,8 +12,8 @@ export function EgyptCard({}: ActivityProps) {
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#f0e2c4',
-                background: 'linear-gradient(135deg, #6b4f2e, #3f2c17)',
+                color: '#000000',
+                background: 'linear-gradient(135deg, #e4ff77, #373f17)',
                 border: '2px solid #7a5c38',
             }}
         >

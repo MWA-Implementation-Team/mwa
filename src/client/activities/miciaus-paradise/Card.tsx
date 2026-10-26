@@ -12,8 +12,8 @@ export function MiciausParadiseCard({}: ActivityProps) {
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#e2f2e8',
-                background: 'linear-gradient(160deg, #4a7a5c, #24503d)',
+                color: '#000000',
+                background: 'linear-gradient(160deg, #ffd500, #e3ff55)',
                 border: '2px solid #3a6b52',
             }}
         >
@@ -50,6 +50,7 @@ export function MiciausParadiseCard({}: ActivityProps) {
                     margin: '92px 0 0',
                     fontFamily: 'Georgia, serif',
                     fontSize: 34,
+                    color: '#000000',
                 }}
             >
                 Miciaus rojus
