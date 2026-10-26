@@ -365,15 +365,19 @@
 .landing-menu :is(a, button) {
     display: block;
     width: 100%;
+    padding: 7px 10px;
+    color: var(--wiki-accent);
+    text-decoration: none;
+    background: var(--wiki-panel-light);
+    border: 1px solid var(--wiki-border);
+}
+
+.mwa-wiki .landing-menu :is(a, button) {
     min-height: 0;
     padding: 7px 10px;
     border-radius: 0;
     font: inherit;
     text-align: left;
-    color: var(--wiki-accent);
-    text-decoration: none;
-    background: var(--wiki-panel-light);
-    border: 1px solid var(--wiki-border);
 }
 .landing-menu a:hover {
     color: var(--wiki-white);
