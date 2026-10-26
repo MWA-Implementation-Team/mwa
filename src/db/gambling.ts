@@ -1,6 +1,7 @@
 import { MwaState } from '#src/state.js';
 import { randomInt } from 'node:crypto';
 import { runTransaction } from './transaction.js';
+import { insertTransaction } from './transactions.js';
 import { findUserById } from './users.js';
 
 export type GameType = 'coin_flip';
@@ -62,13 +63,11 @@ export function queryGamblingInvitations(state: MwaState, userId: number): Invit
     WHERE p2 = ? AND status = 'pending'
     ORDER BY gambling_sessions.created_at ASC
     `);
-    return query.all(userId).map((row) => {
-        return {
-            id: row.id as number,
-            type: row.game_type as GameType,
-            p1Name: row.p1_name as string,
-        };
-    });
+    return query.all(userId).map((row) => ({
+        id: row.id as number,
+        type: row.game_type as GameType,
+        p1Name: row.p1_name as string,
+    }));
 }
 
 export function queryActiveGamblingSession(state: MwaState, userId: number): ActiveSession | null {
@@ -94,14 +93,12 @@ export function queryGamblingSessions(state: MwaState): SessionSummary[] {
     LEFT JOIN users AS p2u ON gambling_sessions.p2 = p2u.id
     WHERE status = 'running'
     `);
-    return query.all().map((row) => {
-        return {
-            id: row.id as number,
-            type: row.game_type as GameType,
-            p1Name: row.p1_name as string,
-            p2Name: row.p2_name as string,
-        };
-    });
+    return query.all().map((row) => ({
+        id: row.id as number,
+        type: row.game_type as GameType,
+        p1Name: row.p1_name as string,
+        p2Name: row.p2_name as string,
+    }));
 }
 
 export function findGamblingSessionById(state: MwaState, sessionId: number): RunningGame | null {
@@ -131,28 +128,21 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
     const p1Guess = row.cf_p1_bet as CoinSide;
 
     let status: RunningGame['status'];
-    switch (row.status as string) {
-        case 'pending':
-            status = { type: 'pending' };
-            break;
-        case 'expired':
-            status = { type: 'expired' };
-            break;
-        case 'rejected':
-            status = { type: 'rejected' };
-            break;
-        case 'running':
-            status = { type: 'running' };
-            break;
-        case 'ended':
-            status = {
-                type: 'ended',
-                winner: row.winner as Gambler, // draw not possible in coin flip
-                flipResult: row.cf_actual_result as CoinSide,
-            };
-            break;
-        default:
-            throw new Error(`Unknown session status ${row.status}`);
+    if (row.status === 'ended') {
+        status = {
+            type: 'ended',
+            winner: row.winner as Gambler, // draw not possible in coin flip
+            flipResult: row.cf_actual_result as CoinSide,
+        };
+    } else if (
+        row.status === 'pending' ||
+        row.status === 'expired' ||
+        row.status === 'rejected' ||
+        row.status === 'running'
+    ) {
+        status = { type: row.status };
+    } else {
+        throw new Error(`Unknown session status ${row.status}`);
     }
 
     return {
@@ -265,18 +255,12 @@ export function winGamblingSession(state: MwaState, sessionId: number, winner: G
         }
         const betAmount = row.bet_amount as number;
         const userId = winner === 'p1' ? row.p1 : row.p2;
-
-        const insertParentTx = state.prepare(`
-        INSERT INTO parent_transactions (kind) VALUES ('gambling_winnings')
-        RETURNING id
-        `);
-        const { id: parentId } = insertParentTx.get()!;
-
-        const insertChildTx = state.prepare(`
-        INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)
-        RETURNING id
-        `);
-        insertChildTx.run(parentId, userId, betAmount * 2);
+        const parentId = insertTransaction(
+            state,
+            'gambling_winnings',
+            userId as number,
+            betAmount * 2,
+        );
 
         const update = state.prepare(`
         UPDATE gambling_sessions SET status = 'ended', winner = ?, winner_tx = ? WHERE id = ?
@@ -295,12 +279,10 @@ export function queryExpiringGamblingSessions(state: MwaState): ExpiringGambling
     SELECT id, created_at FROM gambling_sessions
     WHERE status = 'pending'
     `);
-    return select.all().map((row) => {
-        return {
-            id: row.id as number,
-            creationTime: new Date(row.created_at as string),
-        };
-    });
+    return select.all().map((row) => ({
+        id: row.id as number,
+        creationTime: new Date(row.created_at as string),
+    }));
 }
 
 function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOpts): number | null {
@@ -342,22 +324,8 @@ function deductCoinsForGambling(
         return { type: 'too_broke' };
     }
 
-    const insertParentTx = state.prepare(`
-    INSERT INTO parent_transactions (kind) VALUES ('gambling_deduction')
-    RETURNING id
-    `);
-    const { id: parentId } = insertParentTx.get()!;
-
-    const insertChildTx = state.prepare(`
-    INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)
-    RETURNING id
-    `);
-    insertChildTx.run(parentId, userId, -betAmount);
-
-    return {
-        type: 'success',
-        parentId: parentId as number,
-    };
+    const parentId = insertTransaction(state, 'gambling_deduction', userId, -betAmount);
+    return { type: 'success', parentId };
 }
 
 // --- COIN FLIP GAME ---
@@ -411,10 +379,8 @@ export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
     LEFT JOIN parent_transactions AS tx ON tx.id = sessions.p2_deposit_tx
     WHERE status = 'running'
     `);
-    return select.all().map((row) => {
-        return {
-            sessionId: row.session_id as number,
-            acceptedTime: new Date(row.accepted_at as string),
-        };
-    });
+    return select.all().map((row) => ({
+        sessionId: row.session_id as number,
+        acceptedTime: new Date(row.accepted_at as string),
+    }));
 }
