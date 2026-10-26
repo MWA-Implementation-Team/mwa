@@ -334,6 +334,16 @@
 .landing-pane-extra {
     order: 3;
 }
+/* on mobile the qr pane only belongs on /app — everywhere else it just pads
+   the single-column scroll. desktop keeps it on every page */
+@media (max-width: 699.98px) {
+    .landing-pane-qr {
+        display: none;
+    }
+    .mwa-wiki-frame--home .landing-pane-qr {
+        display: block;
+    }
+}
 .landing-qr {
     display: grid;
     gap: 8px;

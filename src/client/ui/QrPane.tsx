@@ -18,7 +18,7 @@ export default function QrPane() {
     };
 
     return (
-        <section class="landing-section landing-pane-extra">
+        <section class="landing-section landing-pane-extra landing-pane-qr">
             <h2>{t('dashQrTitle')}</h2>
             <div class="landing-qr">
                 <div class="qr-code" dangerouslySetInnerHTML={{ __html: qr.svg }} />
