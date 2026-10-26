@@ -428,13 +428,15 @@
     gap: 12px;
     justify-items: center;
 }
-.mwa-wiki a.landing-login {
+.mwa-wiki :is(a, button).landing-login {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
+    min-height: 0; /* undo the generic button's taller minimum */
     padding: 6px 14px;
     font-size: 13px;
+    font-weight: 400;
     text-decoration: none;
     color: var(--wiki-soft);
     background: var(--wiki-panel-light);
@@ -443,6 +445,11 @@
 .landing-login:hover {
     color: var(--wiki-white);
     border-color: var(--wiki-pink);
+}
+/* lets a POST form sit in a stacked pane without a box of its own —
+   its button joins the parent's grid directly */
+.landing-login-form {
+    display: contents;
 }
 .landing-welcome img {
     display: block;
