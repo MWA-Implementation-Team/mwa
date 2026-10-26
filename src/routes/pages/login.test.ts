@@ -94,8 +94,8 @@ describe('POST /login — validation and caps', () => {
     it('forwards ?goto into the verify link', async () => {
         createUser(state, 'goto@example.com', 'goto_user');
         sent = [];
-        await postLogin({ email: 'goto@example.com' }, '?goto=%2Fapp%2Fcasino');
-        assert.match(sent[0].props.url, /goto=%2Fapp%2Fcasino/);
+        await postLogin({ email: 'goto@example.com' }, '?goto=%2Fapp%2Fgambling');
+        assert.match(sent[0].props.url, /goto=%2Fapp%2Fgambling/);
     });
 
     it('a failed send errors, keeps the old link alive, and does not arm the cap', async () => {

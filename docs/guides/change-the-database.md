@@ -1,9 +1,10 @@
 # Guide: change the database
 
 The schema lives in numbered SQL files under `migrations/`. On every server start,
-`createDefaultMwaState` in `src/state.ts` opens the database, enables foreign keys,
-and calls `migrateDatabase(db)` (`src/db/migrate.ts`). It applies new files in numeric
-order, each inside a transaction, and records progress in `migration_status`.
+`createDefaultMwaState` in `src/state.ts` opens the database and calls
+`migrateDatabase(db)` (`src/db/migrate.ts`). It disables foreign keys while applying
+new files in numeric order, each inside a transaction, then enables them after
+successful migration. This permits table rebuilds; progress is recorded in `migration_status`.
 `npm run dev`, `npm start`, and `npm run seed` all create state explicitly and trigger
 migration. Imports do not. Tests use `createTestMwaState({})`, which migrates a fresh
 in-memory database.
@@ -14,6 +15,10 @@ in the commands below if you use a custom database path.
 
 There are no down-migrations — schema changes only move forward. In dev, deleting the
 database file is your undo button.
+
+`runTransaction(db, task)` in `src/db/transaction.ts` wraps synchronous work in
+BEGIN/COMMIT and rolls back on exceptions. It is shared by migrations, seeding,
+group creation, and coin operations; callbacks must not be async or nest transactions.
 
 ## 1. Write the migration
 
