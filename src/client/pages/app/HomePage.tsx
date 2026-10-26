@@ -146,22 +146,6 @@ function HomePage({ transactions, groupName, queuePosition: initialQueuePosition
                     {guideOpen && <p class="mwa-wiki-muted">{t('dashGuideBody')}</p>}
                 </div>
             </section>
-
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
-                    <h2>{t('sponsorsTitle')}</h2>
-                </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-muted">{t('sponsorsSubtitle')}</p>
-                    <div class="mwa-wiki-grid">
-                        {[1, 2, 3, 4, 5, 6].map((n) => (
-                            <div key={n} class="mwa-wiki-mini">
-                                <span class="mwa-wiki-mini-title">LOGO</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
         </PageShell>
     );
 }
