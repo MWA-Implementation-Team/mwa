@@ -23,7 +23,10 @@ function AccountPage({}: AccountPageProps) {
                     <ul class="mwa-wiki-rows">
                         <li class="mwa-wiki-row">
                             <span>{t('accountUsername')}</span>
-                            <strong>{user!.username}</strong>
+                            <span>
+                                <strong>{user!.username}</strong>{' '}
+                                <button type="button">{t('accountEdit')}</button>
+                            </span>
                         </li>
                         <li class="mwa-wiki-row">
                             <span>{t('accountEmail')}</span>
@@ -60,25 +63,6 @@ function AccountPage({}: AccountPageProps) {
                             </strong>
                         </li>
                     </ul>
-                    <p class="mwa-wiki-muted">
-                        {t('dashTransactions')} — <a href="/app">{t('headerHome')}</a>
-                    </p>
-                </div>
-            </section>
-
-            <section class="mwa-wiki-panel">
-                <div class="mwa-wiki-panel-head">
-                    <h2>{t('accountSettings')}</h2>
-                </div>
-                <div class="mwa-wiki-panel-body">
-                    <p class="mwa-wiki-muted">{t('accountSettingsTodo')}</p>
-                    <form method="POST" action="/app">
-                        <div class="mwa-wiki-actions">
-                            <button type="submit" class="mwa-wiki-danger">
-                                {t('logOut')}
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </section>
         </PageShell>
