@@ -25,6 +25,12 @@ import { safeGoto } from './login.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { Language } from '#src/client/language.js';
 
+// error_type values pages render as an inline message
+const gambleErrorMessages = {
+    broke: 'gamblingInsufficientCoins',
+    invalid: 'gamblingInvalidBet',
+} as const satisfies Record<string, keyof Language>;
+
 export function registerGamblingRoutes(app: MwaHono) {
     app.get('/app/gambling', async (ctx) => {
         const user = requireUser(ctx);
@@ -47,29 +53,13 @@ export function registerGamblingRoutes(app: MwaHono) {
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
 
-        let errorDialog = ctx.req.query('error_game');
-        if (errorDialog !== 'coin_flip') {
-            errorDialog = '';
-        }
-
-        const errorType = ctx.req.query('error_type');
-        let errorMessage: keyof Language | undefined;
-        switch (errorType) {
-            case 'broke':
-                errorMessage = 'gamblingInsufficientCoins';
-                break;
-            case 'invalid':
-                errorMessage = 'gamblingInvalidBet';
-                break;
-        }
-
-        let error: InviteToGamblePageProps['error'] | undefined;
-        if (errorMessage && errorDialog) {
-            error = {
-                dialog: errorDialog as GameType,
-                message: errorMessage,
-            };
-        }
+        const errorGame = ctx.req.query('error_game');
+        const message =
+            gambleErrorMessages[ctx.req.query('error_type') as keyof typeof gambleErrorMessages];
+        const error: InviteToGamblePageProps['error'] | undefined =
+            errorGame === 'coin_flip' && message !== undefined
+                ? { dialog: errorGame, message }
+                : undefined;
 
         return writePage(ctx, 'inviteToGamble', {
             targetUsername: target.username,
@@ -149,13 +139,8 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 404);
         }
 
-        const error = ctx.req.query('error');
-        let message: keyof Language | undefined;
-        switch (error) {
-            case 'broke':
-                message = 'gamblingInsufficientCoins';
-                break;
-        }
+        const message =
+            gambleErrorMessages[ctx.req.query('error') as keyof typeof gambleErrorMessages];
 
         return writePage(ctx, 'gamblingSession', {
             sessionId: gameId,
@@ -239,15 +224,14 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 400);
         }
 
-        let goto: string | undefined;
-        const ref = ctx.req.header('Referer');
-        if (ref) {
-            goto = new URL(ref).pathname;
-        }
-
-        const gotoQuery = ctx.req.query('goto');
-        if (gotoQuery) {
-            goto = gotoQuery;
+        // ?goto wins; else send them back to the page the form was used on
+        let goto = ctx.req.query('goto');
+        if (!goto) {
+            try {
+                goto = new URL(ctx.req.header('Referer') ?? '').pathname;
+            } catch {
+                // missing or malformed referer — fall back to /app below
+            }
         }
 
         const sessionId = Number(ctx.req.param('id'));
@@ -265,24 +249,23 @@ export function scheduleGamblingTimers(state: MwaState) {
     coinFlips.forEach((flip) => scheduleCoinFlipWinner(state, flip));
 }
 
-function scheduleExpiry(state: MwaState, expiring: ExpiringGamblingSession) {
-    const expireTimeMs = expiring.creationTime.getTime() + gamblingPendingExpiryMinutes * 60000;
-    const remainingMs = Math.max(0, expireTimeMs - Date.now());
+// Fires task at the given timestamp, or immediately if it already passed.
+function scheduleAfter(atMs: number, task: () => void) {
+    setTimeout(task, Math.max(0, atMs - Date.now()));
+}
 
-    setTimeout(() => {
+function scheduleExpiry(state: MwaState, expiring: ExpiringGamblingSession) {
+    scheduleAfter(expiring.creationTime.getTime() + gamblingPendingExpiryMinutes * 60000, () => {
         cancelGamblingSession(state, expiring.id, 'expired');
         broadcastSessionUpdate(state, expiring.id);
-    }, remainingMs);
+    });
 }
 
 function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
-    const flipTimeMs = pending.acceptedTime.getTime() + 5000;
-    const remainingMs = Math.max(0, flipTimeMs - Date.now());
-
-    setTimeout(() => {
+    scheduleAfter(pending.acceptedTime.getTime() + 5000, () => {
         winCoinFlip(state, pending.sessionId);
         broadcastSessionUpdate(state, pending.sessionId);
-    }, remainingMs);
+    });
 }
 
 function broadcastSessionUpdate(state: MwaState, sessionId: number) {
