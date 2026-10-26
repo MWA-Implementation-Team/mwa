@@ -78,15 +78,17 @@ export default function PageShell({
                                     </a>
                                 </li>
                             ))}
+                            {user && (
+                                <li>
+                                    <form method="POST" action="/app" class="landing-menu-logout">
+                                        <button type="submit" class="mwa-wiki-danger">
+                                            {t('logOut')}
+                                        </button>
+                                    </form>
+                                </li>
+                            )}
                         </ul>
                     </nav>
-                    {user && (
-                        <form method="POST" action="/app" class="landing-menu-logout">
-                            <button type="submit" class="mwa-wiki-danger">
-                                {t('logOut')}
-                            </button>
-                        </form>
-                    )}
                 </section>
             )}
             {qr && <QrPane />}
