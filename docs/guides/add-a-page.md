@@ -85,7 +85,7 @@ In `src/client/ui/Header.tsx`, inside the `<ul>`:
 In `src/client/language.ts`, add the keys to the `Language` type:
 
 ```ts
-titleCasino: string;
+titleGambling: string;
 titleBadges: string;
 titleError: string;
 ```

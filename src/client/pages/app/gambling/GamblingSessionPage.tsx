@@ -13,7 +13,7 @@ type GamblingSessionPageProps = {
     message?: keyof Language;
 };
 
-export const gamblingSessionPagie: Page<GamblingSessionPageProps> = {
+export const gamblingSessionPage: Page<GamblingSessionPageProps> = {
     Component: GamblingSessionPage,
     title: (t, props) => title(t, props.game),
     customTitle: true,
@@ -57,11 +57,11 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
 
     useEffect(() => {
         document.title = title(t, currentGame);
-    }, [currentGame]);
+    }, [currentGame, t]);
 
     switch (currentGame.status.type) {
         case 'pending': {
-            if (currentGame.p2 === user!.id) {
+            if (currentGame.p2 === user?.id) {
                 return (
                     <>
                         <Header hideNotifications={true} />
@@ -71,15 +71,15 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                             <Trans
                                 id="gamblingCoinFlipBetDetails"
                                 values={{
-                                    amount: <strong>{game.betAmount}</strong>,
-                                    side: <strong>{t(coinSideTrans(game.p1Guess))}</strong>,
+                                    amount: <strong>{currentGame.betAmount}</strong>,
+                                    side: <strong>{t(coinSideTrans(currentGame.p1Guess))}</strong>,
                                 }}
                             />
                         </p>
                         <p>
                             <Trans
                                 id="gamblingCoinFlipBetOutcome"
-                                values={{ amount: <strong>{game.betAmount}</strong> }}
+                                values={{ amount: <strong>{currentGame.betAmount}</strong> }}
                             />
                         </p>
                         <p>{t('gamblingAcceptQuestion')}</p>
@@ -110,7 +110,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                 <a href="">{t('gamblingRefreshQuestion')}</a>
                             </span>
                         ) : null}
-                        <h1>{t('gamblingWaiting', { player: game.p2Name })}</h1>
+                        <h1>{t('gamblingWaiting', { player: currentGame.p2Name })}</h1>
                         <span>{t('gamblingWaitingHelp')}</span>
                     </>
                 );

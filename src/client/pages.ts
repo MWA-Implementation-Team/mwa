@@ -11,7 +11,7 @@ import { groupPage } from '#src/client/pages/app/GroupPage.js';
 import { gamblingPage } from '#src/client/pages/app/gambling/GamblingHomePage.js';
 import { interactPage } from '#src/client/pages/app/InteractPage.js';
 import { adminPage } from '#src/client/pages/AdminPage.js';
-import { gamblingSessionPagie } from '#src/client/pages/app/gambling/GamblingSessionPage.js';
+import { gamblingSessionPage } from '#src/client/pages/app/gambling/GamblingSessionPage.js';
 import { inviteToGamblePage } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
 import { LanguageCode, TranslateFn } from './language.js';
 
@@ -26,7 +26,7 @@ export const registeredPages = {
     leaderboard: leaderboardPage,
     group: groupPage,
     gambling: gamblingPage,
-    gamblingSession: gamblingSessionPagie,
+    gamblingSession: gamblingSessionPage,
     interact: interactPage,
     inviteToGamble: inviteToGamblePage,
     admin: adminPage,
