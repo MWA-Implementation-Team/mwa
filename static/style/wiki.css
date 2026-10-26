@@ -384,6 +384,13 @@
     text-decoration-style: wavy;
     text-underline-offset: 5px;
 }
+.landing-menu-logout {
+    margin-top: 8px;
+}
+.landing-menu-logout button {
+    display: block;
+    width: 100%;
+}
 .landing-footer {
     display: grid;
     gap: 8px;

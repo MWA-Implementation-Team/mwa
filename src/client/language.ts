@@ -53,7 +53,6 @@ export type Language = {
     interactDetailJoined: string;
 
     landingLangTitle: string;
-    actionsTitle: string;
     landingLoginTitle: string;
     landingCountdownTitle: string;
     landingSocialTitle: string;
@@ -253,7 +252,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailJoined: 'Joined',
 
         landingLangTitle: 'Language',
-        actionsTitle: 'Actions',
         landingLoginTitle: 'System',
         landingCountdownTitle: 'Until the event',
         landingSocialTitle: 'Follow us here!',
@@ -454,7 +452,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailJoined: 'Prisijungė',
 
         landingLangTitle: 'Kalba',
-        actionsTitle: 'Veiksmai',
         landingLoginTitle: 'Sistema',
         landingCountdownTitle: 'Iki renginio',
         landingSocialTitle: 'Sekite mus čia!',

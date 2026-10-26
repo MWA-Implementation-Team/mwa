@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { ClientContext, Notification } from '#src/client/context.js';
-import ActionsPane from '#src/client/ui/ActionsPane.js';
+import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 import QrPane from '#src/client/ui/QrPane.js';
 
 export type Section =
@@ -80,10 +80,22 @@ export default function PageShell({
                             ))}
                         </ul>
                     </nav>
+                    {user && (
+                        <form method="POST" action="/app" class="landing-menu-logout">
+                            <button type="submit" class="mwa-wiki-danger">
+                                {t('logOut')}
+                            </button>
+                        </form>
+                    )}
                 </section>
             )}
             {qr && <QrPane />}
-            <ActionsPane />
+            <section class="landing-section landing-pane-lang">
+                <h2>{t('landingLangTitle')}</h2>
+                <div class="landing-footer">
+                    <LanguageToggle />
+                </div>
+            </section>
         </>
     );
 

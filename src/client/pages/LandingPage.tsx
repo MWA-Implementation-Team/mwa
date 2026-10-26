@@ -4,7 +4,7 @@ import { ClientContext } from '#src/client/context.js';
 import { ActivitySlug, Activity, registeredActivities } from '#src/client/activities.js';
 import { FacebookIcon, InstagramIcon, LinkedinIcon, TwitterIcon } from '#src/client/ui/icons.js';
 import PageShell from './app/PageShell.js';
-import ActionsPane from '#src/client/ui/ActionsPane.js';
+import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 
 type LandingPageProps = {};
 
@@ -77,9 +77,16 @@ function LandingPage({}: LandingPageProps) {
                         <h2>{t('landingLoginTitle')}</h2>
                         <div>
                             {user ? (
-                                <a href="/app" class="landing-login">
-                                    {t('landingGoApp')}
-                                </a>
+                                <>
+                                    <a href="/app" class="landing-login">
+                                        {t('landingGoApp')}
+                                    </a>
+                                    <form method="POST" action="/app">
+                                        <button type="submit" class="mwa-wiki-danger">
+                                            {t('logOut')}
+                                        </button>
+                                    </form>
+                                </>
                             ) : (
                                 <a href="/login" class="landing-login">
                                     {t('landingLogin')}
@@ -112,7 +119,12 @@ function LandingPage({}: LandingPageProps) {
                         </ul>
                     </section>
 
-                    <ActionsPane />
+                    <section class="landing-section landing-pane-lang">
+                        <h2>{t('landingLangTitle')}</h2>
+                        <div class="landing-footer">
+                            <LanguageToggle />
+                        </div>
+                    </section>
                 </>
             }
         >
