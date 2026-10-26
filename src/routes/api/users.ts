@@ -25,21 +25,15 @@ export function registerUsersRoutes(app: MwaHono) {
             try {
                 stream.onAbort(() => sub.close());
 
-                let lastJson = '';
+                // send the current notification, then resend on each poke
+                let lastJson: string | undefined;
                 while (!stream.aborted) {
-                    if (lastJson !== '') {
-                        const signal = await sub.recv();
-                        if (signal === null) break;
+                    const json = JSON.stringify(queryUserNotification(ctx.var, user.id));
+                    if (json !== lastJson) {
+                        lastJson = json;
+                        await stream.writeSSE({ data: json });
                     }
-
-                    const notification = queryUserNotification(ctx.var, user.id);
-                    const json = JSON.stringify(notification);
-                    if (lastJson === json) continue;
-                    lastJson = json;
-
-                    await stream.writeSSE({
-                        data: json,
-                    });
+                    if ((await sub.recv()) === null) break;
                 }
             } finally {
                 sub.close();

@@ -19,21 +19,16 @@ export const gamblingSessionPage: Page<GamblingSessionPageProps> = {
     customTitle: true,
 };
 
+const titleKeys: Record<RunningGame['status']['type'], keyof Language> = {
+    pending: 'titleGamblingRequest',
+    expired: 'titleGamblingExpired',
+    rejected: 'titleGamblingRejected',
+    running: 'titleGamblingCoinFlip', // coin flip is the only game for now
+    ended: 'titleGamblingCoinFlip',
+};
+
 function title(t: TranslateFn, game: RunningGame): string {
-    switch (game.status.type) {
-        case 'pending':
-            return t('titleGamblingRequest');
-        case 'expired':
-            return t('titleGamblingExpired');
-        case 'rejected':
-            return t('titleGamblingRejected');
-        case 'running':
-        case 'ended':
-            switch (game.gameType) {
-                case 'coin_flip':
-                    return t('titleGamblingCoinFlip');
-            }
-    }
+    return t(titleKeys[game.status.type]);
 }
 
 function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPageProps) {
@@ -42,8 +37,8 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
     const [isDisconnected, setIsDisconnected] = useState(false);
 
     let side: Gambler | null = null;
-    if (user?.id === game.p1) side = 'p1';
-    if (user?.id === game.p2) side = 'p2';
+    if (user?.id === currentGame.p1) side = 'p1';
+    if (user?.id === currentGame.p2) side = 'p2';
 
     useEffect(() => {
         const updates = new EventSource(`/app/gambling/sessions/${sessionId}/watch`);
