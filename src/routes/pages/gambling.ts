@@ -4,6 +4,7 @@ import {
     acceptGamblingSession,
     CoinSide,
     findGamblingSessionById,
+    findPendingGamblingSession,
     GameType,
     initCoinFlip,
     PendingCoinFlip,
@@ -57,6 +58,9 @@ export function registerGamblingRoutes(app: MwaHono) {
             case 'broke':
                 errorMessage = 'gamblingInsufficientCoins';
                 break;
+            case 'invalid':
+                errorMessage = 'gamblingInvalidBet';
+                break;
         }
 
         let error: InviteToGamblePageProps['error'] | undefined;
@@ -84,11 +88,21 @@ export function registerGamblingRoutes(app: MwaHono) {
         const form = await ctx.req.formData().catch(() => null);
         if (!form) return writeErrorPage(ctx, 400);
 
-        const betAmount = Number(form.get('bet_amount'));
-        if (isNaN(betAmount) || betAmount <= 0 || !Number.isSafeInteger(betAmount))
-            return writeErrorPage(ctx, 400);
-
         const gameType = form.get('game_type') as GameType;
+        const betAmount = Number(form.get('bet_amount'));
+        if (!Number.isSafeInteger(betAmount) || betAmount <= 0) {
+            if (gameType === 'coin_flip') {
+                return ctx.redirect(
+                    `/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=invalid`,
+                );
+            }
+            return writeErrorPage(ctx, 400);
+        }
+
+        const pendingId = findPendingGamblingSession(ctx.var, user.id, target.id);
+        if (pendingId !== null) {
+            return ctx.redirect(`/app/gambling/sessions/${pendingId}`);
+        }
 
         let sessionId: number | null = null;
         switch (gameType) {

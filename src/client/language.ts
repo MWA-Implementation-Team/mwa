@@ -14,7 +14,6 @@ export type Language = {
     titleLeaderboard: string;
     titleGroup: string;
     titleGambling: string;
-    titleGame: string;
     titleInteract: string;
     titleAdmin: string;
     titleError: string;
@@ -130,6 +129,7 @@ export type Language = {
     gamblingBetAmount: string;
     gamblingSendInvite: string;
     gamblingInsufficientCoins: string;
+    gamblingInvalidBet: string;
     gamblingRequest: string;
     gamblingAcceptQuestion: string;
     gamblingAccept: string;
@@ -173,7 +173,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleLeaderboard: 'MWA | Leaderboard',
         titleGroup: 'MWA | Group',
         titleGambling: 'MWA | Gambling',
-        titleGame: 'MWA | Game',
         titleInteract: 'MWA | Interact',
         titleAdmin: 'MWA | Admin',
         titleError: 'MWA | {status}',
@@ -290,6 +289,7 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingBetAmount: 'Bet amount',
         gamblingSendInvite: 'Send invite',
         gamblingInsufficientCoins: 'You do not have enough coins for this bet.',
+        gamblingInvalidBet: 'Enter a valid whole-number bet amount.',
         gamblingRequest: 'Gambling request',
         gamblingAcceptQuestion: 'Do you wish to accept this bet?',
         gamblingAccept: 'Accept',
@@ -333,7 +333,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleLeaderboard: 'MWA | Lyderių lentelė',
         titleGroup: 'MWA | Grupė',
         titleGambling: 'MWA | Lošimai',
-        titleGame: 'MWA | Žaidimas',
         titleInteract: 'MWA | Sąveika',
         titleAdmin: 'MWA | Administravimas',
         titleError: 'MWA | {status}',
@@ -452,6 +451,7 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingBetAmount: 'Statymo suma',
         gamblingSendInvite: 'Pakviesti',
         gamblingInsufficientCoins: 'Šiam statymui nepakanka monetų.',
+        gamblingInvalidBet: 'Neteisinga statymo suma.',
         gamblingRequest: 'Kvietimas lošti',
         gamblingAcceptQuestion: 'Ar nori priimti šį statymą?',
         gamblingAccept: 'Priimti',

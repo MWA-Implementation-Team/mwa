@@ -114,9 +114,11 @@ challenge another user; hosts/admins also see their email, balance, and join dat
 Self-scans show no actions, and money transfers remain a placeholder.
 
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
-invitations. `/app/interact/:token/gamble` creates a challenge; session pages live at
-`/app/gambling/sessions/:id`, with POST `/accept` and `/reject` actions restricted
-to the invited player. Any signed-in user can view a session.
+invitations. `/app/interact/:token/gamble` creates a challenge; re-challenging the
+same player while an invite is still open redirects to that session instead of
+stacking invites. Session pages live at `/app/gambling/sessions/:id`, with POST
+`/accept` and `/reject` actions restricted to the invited player. Any signed-in
+user can view a session.
 
 `src/db/gambling.ts` owns the lifecycle, persisted by `06_gambling.sql`:
 
