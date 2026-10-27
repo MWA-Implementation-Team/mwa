@@ -7,49 +7,46 @@ export const MAX_GROUP_MEMBERS = 6;
 export const MAX_GROUP_NAME_LENGTH = 64;
 export const MAX_PHONE_NUMBER_LENGTH = 32;
 
-// Local group type
 export type Group = {
     id: number;
     name: string;
     ownerId: number;
-    phone_number: string;
-    created_at: Date;
+    phoneNumber: string;
+    createdAt: Date;
 };
 
-// Local group member type
 export type GroupMember = {
-    group_id: number;
-    user_id: number;
-    joined_at: Date;
+    groupId: number;
+    userId: number;
+    joinedAt: Date;
 };
 
-// Mappers
 function mapGroup(row: Record<string, SQLOutputValue>): Group {
     return {
         id: row.id as number,
         name: row.name as string,
         ownerId: row.owner_id as number,
-        phone_number: row.phone_number as string,
-        created_at: new Date(row.created_at as string),
+        phoneNumber: row.phone_number as string,
+        createdAt: new Date(row.created_at as string),
     };
 }
 
 function mapGroupMember(row: Record<string, SQLOutputValue>): GroupMember {
     return {
-        group_id: row.group_id as number,
-        user_id: row.user_id as number,
-        joined_at: new Date(row.joined_at as string),
+        groupId: row.group_id as number,
+        userId: row.user_id as number,
+        joinedAt: new Date(row.joined_at as string),
     };
 }
 
-// Actions
+// The owner joins as a member in the same transaction — that's what keeps
+// "owner is always a member" true for every other query in this module.
 export function createGroup(
     state: MwaState,
     name: string,
     ownerId: number,
-    phone_number: string,
+    phoneNumber: string,
 ): Group {
-    // Create group and return its info
     const createGroupQuery = state.prepare(`
         INSERT INTO groups (name, owner_id, phone_number)
         VALUES (?, ?, ?)
@@ -61,65 +58,65 @@ export function createGroup(
     `);
 
     return runTransaction(state.db, () => {
-        const row = createGroupQuery.get(name, ownerId, phone_number);
+        const row = createGroupQuery.get(name, ownerId, phoneNumber);
         addMemberQuery.run(row!.id, ownerId);
         return mapGroup(row!);
     });
 }
 
-export function findGroupById(state: MwaState, group_id: number): Group | null {
+export function findGroupById(state: MwaState, groupId: number): Group | null {
     const getGroupByIdQuery = state.prepare(`
         SELECT id, name, owner_id, phone_number, created_at
         FROM groups
         WHERE id = ?
     `);
 
-    const row = getGroupByIdQuery.get(group_id);
+    const row = getGroupByIdQuery.get(groupId);
     if (!row?.id) return null;
     return mapGroup(row);
 }
 
-export function deleteGroup(state: MwaState, group_id: number, owner_id: number): boolean {
+export function deleteGroup(state: MwaState, groupId: number, ownerId: number): boolean {
     const deleteGroupQuery = state.prepare(`
         DELETE FROM groups
         WHERE id = ? AND owner_id = ?
     `);
 
-    const result = deleteGroupQuery.run(group_id, owner_id);
+    const result = deleteGroupQuery.run(groupId, ownerId);
     return result.changes > 0;
 }
 
-// Get group of user by user id
-export function findUserGroup(state: MwaState, user_id: number): Group | null {
+// A user belongs to at most one group — group_members.user_id is UNIQUE.
+export function findUserGroup(state: MwaState, userId: number): Group | null {
     const getUserGroupQuery = state.prepare(`
         SELECT groups.id, groups.name, groups.owner_id, groups.phone_number, groups.created_at
         FROM groups
         JOIN group_members ON groups.id = group_members.group_id
-        WHERE group_members.user_id = ?    
+        WHERE group_members.user_id = ?
     `);
 
-    const row = getUserGroupQuery.get(user_id);
+    const row = getUserGroupQuery.get(userId);
     if (!row?.id) return null;
     return mapGroup(row);
 }
 
-export function listUserGroups(state: MwaState, user_id: number): Group[] {
+export function listUserGroups(state: MwaState, userId: number): Group[] {
     const getUserGroupsQuery = state.prepare(`
-        SELECT DISTINCT groups.id, groups.name, groups.owner_id, groups.phone_number, groups.created_at
+        SELECT groups.id, groups.name, groups.owner_id, groups.phone_number, groups.created_at
         FROM groups
-        LEFT JOIN group_members ON groups.id = group_members.group_id
-        WHERE groups.owner_id = ? OR group_members.user_id = ?
+        JOIN group_members ON groups.id = group_members.group_id
+        WHERE group_members.user_id = ?
         ORDER BY groups.created_at DESC
     `);
 
-    const rows = getUserGroupsQuery.all(user_id, user_id);
+    const rows = getUserGroupsQuery.all(userId);
     return rows.map((row) => mapGroup(row));
 }
 
 export function addGroupMember(
     state: MwaState,
-    group_id: number,
-    user_id: number,
+    groupId: number,
+    userId: number,
 ): { success: boolean; error?: string } {
     const getGroupMemberCountQuery = state.prepare(`
         SELECT COUNT(*) as count
@@ -131,34 +128,38 @@ export function addGroupMember(
         VALUES (?, ?)
     `);
 
-    const row = getGroupMemberCountQuery.get(group_id) as { count: number };
+    const count = getGroupMemberCountQuery.get(groupId)!.count as number;
 
-    if (row.count >= MAX_GROUP_MEMBERS) {
+    if (count >= MAX_GROUP_MEMBERS) {
         return {
             success: false,
             error: `Group has reached the max limit of ${MAX_GROUP_MEMBERS} members`,
         };
     }
 
-    if (findUserGroup(state, user_id)) {
+    if (findUserGroup(state, userId)) {
         return { success: false, error: 'Member is already in a group' };
     }
 
     try {
-        addMemberQuery.run(group_id, user_id);
+        addMemberQuery.run(groupId, userId);
         return { success: true };
-    } catch {
-        return { success: false, error: 'Failed to add member' };
+    } catch (error) {
+        // user_id is UNIQUE — the only expected failure is a duplicate member
+        if (error instanceof Error && error.message.includes('UNIQUE')) {
+            return { success: false, error: 'Member is already in a group' };
+        }
+        throw error;
     }
 }
 
 export function removeGroupMember(
     state: MwaState,
-    group_id: number,
-    user_id: number,
+    groupId: number,
+    userId: number,
 ): { success: boolean; error?: string } {
     const getGroupByIdQuery = state.prepare(`
-        SELECT id, name, owner_id, phone_number, created_at
+        SELECT id, owner_id
         FROM groups
         WHERE id = ?
     `);
@@ -169,38 +170,40 @@ export function removeGroupMember(
     `);
     const removeMemberQuery = state.prepare(`
        DELETE FROM group_members
-       WHERE group_id = ? AND user_id = ? 
+       WHERE group_id = ? AND user_id = ?
     `);
 
-    const group = getGroupByIdQuery.get(group_id);
+    const group = getGroupByIdQuery.get(groupId);
     if (!group) {
         return { success: false, error: 'Group not found' };
     }
 
-    if (group.owner_id === user_id) {
+    // The owner is a member like any other but can never be removed —
+    // deleting the group is the only way out for them.
+    if (group.owner_id === userId) {
         return { success: false, error: 'Cannot remove the group owner' };
     }
 
-    const row = getGroupMemberCountQuery.get(group_id) as { count: number };
+    const count = getGroupMemberCountQuery.get(groupId)!.count as number;
 
-    if (row.count <= MIN_GROUP_MEMBERS) {
+    if (count <= MIN_GROUP_MEMBERS) {
         return {
             success: false,
             error: `Cannot remove member. Groups must maintain a minimum of ${MIN_GROUP_MEMBERS} members`,
         };
     }
 
-    removeMemberQuery.run(group_id, user_id);
+    removeMemberQuery.run(groupId, userId);
     return { success: true };
 }
 
-export function listGroupMembers(state: MwaState, group_id: number): GroupMember[] {
+export function listGroupMembers(state: MwaState, groupId: number): GroupMember[] {
     const getGroupMembersQuery = state.prepare(`
        SELECT group_id, user_id, joined_at
        FROM group_members
        WHERE group_id = ?
     `);
 
-    const rows = getGroupMembersQuery.all(group_id);
+    const rows = getGroupMembersQuery.all(groupId);
     return rows.map((row) => mapGroupMember(row));
 }

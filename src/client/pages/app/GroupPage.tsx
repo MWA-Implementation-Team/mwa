@@ -39,7 +39,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
         setError(null);
         setSuccessMsg(null);
         try {
-            const group = await createGroup(groupName, 0, phoneNumber);
+            const group = await createGroup(groupName, phoneNumber);
             setGroups((currentGroups) => [...(currentGroups ?? []), group]);
             setSuccessMsg(t('groupCreated'));
             setGroupName('');
@@ -75,7 +75,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                                     <div class="mwa-row">
                                         <div>
                                             <strong>{group.name}</strong>
-                                            <small>{group.phone_number}</small>
+                                            <small>{group.phoneNumber}</small>
                                         </div>
                                         {group.ownerId === user?.id && (
                                             <button

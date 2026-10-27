@@ -30,7 +30,6 @@ export function registerGroupsRoutes(app: MwaHono) {
         return ctx.json(listUserGroups(ctx.var, user.id));
     });
 
-    // Create new group
     app.post('/api/groups', async (ctx) => {
         const user = requireApiUser(ctx);
         if (user instanceof Response) return user;
@@ -40,16 +39,16 @@ export function registerGroupsRoutes(app: MwaHono) {
             return ctx.json({ error: 'invalid json body' }, 400);
         }
 
-        const { name, phone_number } = body;
+        const { name, phoneNumber } = body;
         if (
             typeof name !== 'string' ||
             name.trim() === '' ||
             name.length > MAX_GROUP_NAME_LENGTH ||
-            typeof phone_number !== 'string' ||
-            phone_number.trim() === '' ||
-            phone_number.length > MAX_PHONE_NUMBER_LENGTH
+            typeof phoneNumber !== 'string' ||
+            phoneNumber.trim() === '' ||
+            phoneNumber.length > MAX_PHONE_NUMBER_LENGTH
         ) {
-            return ctx.json({ error: 'invalid name or phone_number' }, 400);
+            return ctx.json({ error: 'invalid name or phoneNumber' }, 400);
         }
 
         if (listUserGroups(ctx.var, user.id).length > 0) {
@@ -57,15 +56,18 @@ export function registerGroupsRoutes(app: MwaHono) {
         }
 
         try {
-            // Automatically use the logged in users id as the owner
-            const group = createGroup(ctx.var, name.trim(), user.id, phone_number.trim());
+            // The logged-in user is always the owner
+            const group = createGroup(ctx.var, name.trim(), user.id, phoneNumber.trim());
             return ctx.json(group, 201);
-        } catch {
-            return ctx.json({ error: 'Failed to create group' }, 400);
+        } catch (error) {
+            // groups.name is UNIQUE — the only expected failure is a taken name
+            if (error instanceof Error && error.message.includes('UNIQUE')) {
+                return ctx.json({ error: 'a group with that name already exists' }, 409);
+            }
+            throw error;
         }
     });
 
-    // Get group details by id
     app.get('/api/groups/:id', (ctx) => {
         const user = requireApiUser(ctx);
         if (user instanceof Response) return user;
@@ -132,7 +134,7 @@ export function registerGroupsRoutes(app: MwaHono) {
         }
 
         const result = addGroupMember(ctx.var, groupId, userId);
-        return ctx.json(result);
+        return ctx.json(result, result.success ? 200 : 400);
     });
 
     // Remove a member from a group — owner only
@@ -155,10 +157,9 @@ export function registerGroupsRoutes(app: MwaHono) {
         }
 
         const result = removeGroupMember(ctx.var, groupId, userId);
-        return ctx.json(result);
+        return ctx.json(result, result.success ? 200 : 400);
     });
 
-    // List all members of a group
     app.get('/api/groups/:id/members', (ctx) => {
         const user = requireApiUser(ctx);
         if (user instanceof Response) return user;

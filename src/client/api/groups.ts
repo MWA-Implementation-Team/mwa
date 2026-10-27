@@ -5,22 +5,18 @@ export type GroupJson = Serialized<Group>;
 export type GroupMemberJson = Serialized<GroupMember>;
 
 export function reviveGroup(group: GroupJson): Group {
-    return revive(group, 'created_at');
+    return revive(group, 'createdAt');
 }
 
 export function reviveGroupMember(member: GroupMemberJson): GroupMember {
-    return revive(member, 'joined_at');
+    return revive(member, 'joinedAt');
 }
 
-export async function createGroup(
-    name: string,
-    ownerId: number,
-    phone_number: string,
-): Promise<Group> {
+export async function createGroup(name: string, phoneNumber: string): Promise<Group> {
     const res = await fetch('/api/groups', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, ownerId, phone_number }),
+        body: JSON.stringify({ name, phoneNumber }),
     });
     if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
