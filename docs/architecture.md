@@ -151,4 +151,5 @@ props, so there is no leaderboard API. The **team** tab ranks the members of the
 own group by net balance (`listGroupLeaderboard` in `src/db/leaderboard.ts`, ties broken
 by username). Each row shows only the username and points; the viewer's row gets the
 `mwa-row--self` class. A viewer with no group sees a join-a-group message. The **group**
-tab is still a placeholder until group scoring is defined.
+tab lists every group by name with its member count (`listLeaderboardGroups`), with no
+scores until group scoring is defined.

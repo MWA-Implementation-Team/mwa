@@ -121,7 +121,8 @@ export type Language = {
     leaderboardTeam: string;
     leaderboardGroup: string;
     leaderboardRankings: string;
-    leaderboardTodo: string;
+    leaderboardNoGroups: string;
+    leaderboardMemberCount: string;
     leaderboardNoGroup: string;
     leaderboardYou: string;
 
@@ -322,7 +323,8 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardTeam: 'team',
         leaderboardGroup: 'group',
         leaderboardRankings: '{type} rankings',
-        leaderboardTodo: 'TODO: {type} leaderboard.',
+        leaderboardNoGroups: 'No groups yet.',
+        leaderboardMemberCount: '{n} member(s)',
         leaderboardNoGroup: 'Join a group to see your team rankings.',
         leaderboardYou: 'You',
 
@@ -524,7 +526,8 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardTeam: 'komanda',
         leaderboardGroup: 'grupė',
         leaderboardRankings: '{type} įvertinimai',
-        leaderboardTodo: 'TODO: {type} lyderių lentelė.',
+        leaderboardNoGroups: 'Grupių kol kas nėra.',
+        leaderboardMemberCount: 'Nariai: {n}',
         leaderboardNoGroup: 'Prisijunkite prie grupės, kad matytumėte savo komandos įvertinimus.',
         leaderboardYou: 'Jūs',
 
