@@ -61,7 +61,7 @@ function LeaderboardPage({ type, rows, groups }: LeaderboardPageProps) {
                                         >
                                             <div class="mwa-row">
                                                 <span>
-                                                    <strong>{index + 1}</strong>.{" "}{row.username}
+                                                    <strong>{index + 1}</strong>. {row.username}
                                                     {isSelf && (
                                                         <span class="mwa-row-tag">
                                                             {t('leaderboardYou')}
