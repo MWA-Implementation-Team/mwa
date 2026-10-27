@@ -143,3 +143,12 @@ snapshots. Both send initial state on connection and updates after changes. The
 client uses `EventSource`; the notification banner in `PageShell` prioritizes a
 running game over the oldest invitation. Multiple games per player are allowed, but only one notification is
 shown. Timers and pubsub assume a single server process.
+
+## Leaderboard
+
+`/app/leaderboard` is server-rendered: `src/routes/pages/app.ts` loads the rows as page
+props, so there is no leaderboard API. The **team** tab ranks the members of the viewer's
+own group by net balance (`listGroupLeaderboard` in `src/db/leaderboard.ts`, ties broken
+by username). Each row shows only the username and points; the viewer's row gets the
+`mwa-row--self` class. A viewer with no group sees a join-a-group message. The **group**
+tab is still a placeholder until group scoring is defined.
