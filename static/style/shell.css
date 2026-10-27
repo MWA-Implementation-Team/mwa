@@ -2,13 +2,13 @@
 .mwa {
     filter: brightness(1.08) saturate(0.9);
     --shell-white: #edf5ff;
-    --shell-soft: #a8bfdfa2;
+    --shell-soft: #b9d6ff;
     --shell-pink: #c2dfff;
 
     --shell-accent: #ffffff;
     --shell-border: #0000004e;
-    --shell-panel: rgba(7, 17, 42, 0.94);
-    --shell-panel-light: rgba(24, 48, 87, 0.72);
+    --shell-panel: rgba(7, 17, 42, 0.322);
+    --shell-panel-light: rgba(24, 48, 87, 0.324);
     isolation: isolate;
     position: relative;
     min-height: 100vh;
@@ -83,7 +83,7 @@
     left: 10px;
     z-index: 10;
     padding: 8px;
-    background: #08162e;
+    background: #08162eb7;
 }
 
 .mwa-skip:focus {
@@ -142,7 +142,7 @@
     gap: 8px;
     padding: 5px 12px;
     border-bottom: 1px solid var(--shell-border);
-    background: linear-gradient(90deg, #174b91, #0b2047);
+    background: linear-gradient(90deg, #174c91c0, #0b2047bf);
 }
 
 .mwa-panel-head h2,
@@ -262,7 +262,7 @@
 }
 
 .mwa :is(.btn-primary, .mwa-button--primary) {
-    background: linear-gradient(90deg, #003d8d, #102e63);
+    background: linear-gradient(90deg, #003d8dc5, #102e63ab);
     border: 3px solid var(--shell-pink);
     color: white;
     box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
