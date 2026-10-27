@@ -107,13 +107,17 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         const type = ctx.req.query('type') === 'group' ? 'group' : 'team';
-        // team = themembers of the viewers group
-        // null means no group
-        const group = type === 'team' ? findUserGroup(ctx.var, user.id) : null;
+        // team tab = the members of the viewer's own group
+        if (type === 'team') {
+            const group = findUserGroup(ctx.var, user.id);
+            return writePage(ctx, 'leaderboard', {
+                type,
+                rows: group ? listGroupLeaderboard(ctx.var, group.id) : null,
+            });
+        }
         return writePage(ctx, 'leaderboard', {
             type,
-            rows: group ? listGroupLeaderboard(ctx.var, group.id) : null,
-            groups: type === 'group' ? listLeaderboardGroups(ctx.var) : null,
+            groups: listLeaderboardGroups(ctx.var),
         });
     });
 

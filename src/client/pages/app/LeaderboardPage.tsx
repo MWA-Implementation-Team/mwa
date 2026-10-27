@@ -4,15 +4,9 @@ import { ClientContext } from '#src/client/context.js';
 import type { LeaderboardGroup, LeaderboardRow } from '#src/db/leaderboard.js';
 import PageShell from './PageShell.js';
 
-export type LeaderboardType = 'team' | 'group';
-
-// rows yra null kai team tab'as neturi grupes rankinimui
-// groups is null on the team tab
-type LeaderboardPageProps = {
-    type: LeaderboardType;
-    rows: LeaderboardRow[] | null;
-    groups: LeaderboardGroup[] | null;
-};
+type LeaderboardPageProps =
+    // rows is null when the viewer has no group
+    { type: 'team'; rows: LeaderboardRow[] | null } | { type: 'group'; groups: LeaderboardGroup[] };
 
 export const leaderboardPage: Page<LeaderboardPageProps> = {
     Component: LeaderboardPage,
@@ -24,8 +18,9 @@ const typeLabelKey = {
     group: 'leaderboardGroup',
 } as const;
 
-function LeaderboardPage({ type, rows, groups }: LeaderboardPageProps) {
+function LeaderboardPage(props: LeaderboardPageProps) {
     const { t, user } = useContext(ClientContext);
+    const { type } = props;
     return (
         <PageShell section="leaderboard">
             <nav class="mwa-tabbar" aria-label={t('leaderboardTypeLabel')}>
@@ -47,12 +42,12 @@ function LeaderboardPage({ type, rows, groups }: LeaderboardPageProps) {
                     <h2>{t('leaderboardRankings', { type: t(typeLabelKey[type]) })}</h2>
                 </div>
                 <div class="mwa-panel-body">
-                    {type === 'team' ? (
-                        rows === null ? (
+                    {props.type === 'team' ? (
+                        props.rows === null ? (
                             <p class="mwa-muted">{t('leaderboardNoGroup')}</p>
                         ) : (
                             <ol class="mwa-rows mwa-rows--inset">
-                                {rows.map((row, index) => {
+                                {props.rows.map((row, index) => {
                                     const isSelf = row.userId === user?.id;
                                     return (
                                         <li
@@ -77,11 +72,11 @@ function LeaderboardPage({ type, rows, groups }: LeaderboardPageProps) {
                                 })}
                             </ol>
                         )
-                    ) : groups === null || groups.length === 0 ? (
+                    ) : props.groups.length === 0 ? (
                         <p class="mwa-muted">{t('leaderboardNoGroups')}</p>
                     ) : (
                         <ul class="mwa-rows mwa-rows--inset">
-                            {groups.map((group) => (
+                            {props.groups.map((group) => (
                                 <li key={group.id}>
                                     <div class="mwa-row">
                                         <strong>{group.name}</strong>
