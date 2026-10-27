@@ -76,6 +76,7 @@ export type Language = {
     txSystem: string;
     txGamblingDeduction: string;
     txGamblingWinnings: string;
+    txHostGrant: string;
     dashQrTitle: string;
     qrCopyLink: string;
     qrCopied: string;
@@ -278,6 +279,7 @@ export const languages: Record<LanguageCode, Language> = {
         txSystem: 'System credit',
         txGamblingDeduction: 'Gambling deduction',
         txGamblingWinnings: 'Gambling winnings',
+        txHostGrant: 'Host grant',
         dashQrTitle: 'Account QR code',
         qrCopyLink: 'Copy link',
         qrCopied: 'Copied!',
@@ -481,6 +483,7 @@ export const languages: Record<LanguageCode, Language> = {
         txSystem: 'Sisteminis įskaitymas',
         txGamblingDeduction: 'Lošimo atsiskaitymas',
         txGamblingWinnings: 'Lošimo laimėjimas',
+        txHostGrant: 'Vedėjo įskaitymas',
         dashQrTitle: 'Paskyros QR kodas',
         qrCopyLink: 'Kopijuoti nuorodą',
         qrCopied: 'Nukopijuota!',
