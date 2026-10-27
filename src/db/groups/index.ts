@@ -113,11 +113,13 @@ export function listUserGroups(state: MwaState, userId: number): Group[] {
     return rows.map((row) => mapGroup(row));
 }
 
+export type AddGroupMemberResult = 'added' | 'group_full' | 'already_in_group';
+
 export function addGroupMember(
     state: MwaState,
     groupId: number,
     userId: number,
-): { success: boolean; error?: string } {
+): AddGroupMemberResult {
     const getGroupMemberCountQuery = state.prepare(`
         SELECT COUNT(*) as count
         FROM group_members
@@ -131,33 +133,32 @@ export function addGroupMember(
     const count = getGroupMemberCountQuery.get(groupId)!.count as number;
 
     if (count >= MAX_GROUP_MEMBERS) {
-        return {
-            success: false,
-            error: `Group has reached the max limit of ${MAX_GROUP_MEMBERS} members`,
-        };
+        return 'group_full';
     }
 
     if (findUserGroup(state, userId)) {
-        return { success: false, error: 'Member is already in a group' };
+        return 'already_in_group';
     }
 
     try {
         addMemberQuery.run(groupId, userId);
-        return { success: true };
+        return 'added';
     } catch (error) {
         // user_id is UNIQUE — the only expected failure is a duplicate member
         if (error instanceof Error && error.message.includes('UNIQUE')) {
-            return { success: false, error: 'Member is already in a group' };
+            return 'already_in_group';
         }
         throw error;
     }
 }
 
+export type RemoveGroupMemberResult = 'removed' | 'group_not_found' | 'is_owner' | 'below_minimum';
+
 export function removeGroupMember(
     state: MwaState,
     groupId: number,
     userId: number,
-): { success: boolean; error?: string } {
+): RemoveGroupMemberResult {
     const getGroupByIdQuery = state.prepare(`
         SELECT id, owner_id
         FROM groups
@@ -175,26 +176,23 @@ export function removeGroupMember(
 
     const group = getGroupByIdQuery.get(groupId);
     if (!group) {
-        return { success: false, error: 'Group not found' };
+        return 'group_not_found';
     }
 
     // The owner is a member like any other but can never be removed —
     // deleting the group is the only way out for them.
     if (group.owner_id === userId) {
-        return { success: false, error: 'Cannot remove the group owner' };
+        return 'is_owner';
     }
 
     const count = getGroupMemberCountQuery.get(groupId)!.count as number;
 
     if (count <= MIN_GROUP_MEMBERS) {
-        return {
-            success: false,
-            error: `Cannot remove member. Groups must maintain a minimum of ${MIN_GROUP_MEMBERS} members`,
-        };
+        return 'below_minimum';
     }
 
     removeMemberQuery.run(groupId, userId);
-    return { success: true };
+    return 'removed';
 }
 
 export function listGroupMembers(state: MwaState, groupId: number): GroupMember[] {

@@ -52,7 +52,7 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         const group = findUserGroup(ctx.var, user.id);
-        if (!group || !joinQueue(ctx.var, group.id).success) {
+        if (!group || joinQueue(ctx.var, group.id).type !== 'joined') {
             return ctx.redirect('/app?queueError=queueJoinFailed', 303);
         }
 

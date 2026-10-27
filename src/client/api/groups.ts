@@ -41,7 +41,7 @@ export async function deleteGroup(groupId: number): Promise<void> {
 export async function addGroupMember(
     groupId: number,
     userId: number,
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: true } | { error: string }> {
     const res = await fetch(`/api/groups/${groupId}/members`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,7 +53,7 @@ export async function addGroupMember(
 export async function removeGroupMember(
     groupId: number,
     userId: number,
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: true } | { error: string }> {
     const res = await fetch(`/api/groups/${groupId}/members/${userId}`, {
         method: 'DELETE',
     });

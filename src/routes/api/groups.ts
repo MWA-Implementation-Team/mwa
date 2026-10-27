@@ -10,6 +10,7 @@ import {
     listGroupMembers,
     MAX_GROUP_NAME_LENGTH,
     MAX_PHONE_NUMBER_LENGTH,
+    MIN_GROUP_MEMBERS,
 } from '#src/db/groups/index.js';
 import { MwaContext, MwaHono } from '#src/state.js';
 
@@ -133,8 +134,14 @@ export function registerGroupsRoutes(app: MwaHono) {
             return ctx.json({ error: 'only group members can add members' }, 403);
         }
 
-        const result = addGroupMember(ctx.var, groupId, userId);
-        return ctx.json(result, result.success ? 200 : 400);
+        switch (addGroupMember(ctx.var, groupId, userId)) {
+            case 'added':
+                return ctx.json({ success: true });
+            case 'group_full':
+                return ctx.json({ error: 'group is full' }, 409);
+            case 'already_in_group':
+                return ctx.json({ error: 'member is already in a group' }, 409);
+        }
     });
 
     // Remove a member from a group — owner only
@@ -156,8 +163,19 @@ export function registerGroupsRoutes(app: MwaHono) {
             return ctx.json({ error: 'Only the group owner can remove members' }, 403);
         }
 
-        const result = removeGroupMember(ctx.var, groupId, userId);
-        return ctx.json(result, result.success ? 200 : 400);
+        switch (removeGroupMember(ctx.var, groupId, userId)) {
+            case 'removed':
+                return ctx.json({ success: true });
+            case 'group_not_found':
+                return ctx.json({ error: 'group not found' }, 404);
+            case 'is_owner':
+                return ctx.json({ error: 'cannot remove the group owner' }, 400);
+            case 'below_minimum':
+                return ctx.json(
+                    { error: `groups must keep at least ${MIN_GROUP_MEMBERS} members` },
+                    409,
+                );
+        }
     });
 
     app.get('/api/groups/:id/members', (ctx) => {

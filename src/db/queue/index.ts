@@ -30,14 +30,13 @@ function mapQueueEntry(row: Record<string, SQLOutputValue>): QueueEntry {
     };
 }
 
+export type JoinQueueResult = { type: 'joined'; entry: QueueEntry } | { type: 'already_queued' };
+
 // A group holds one spot at a time; rejoining after leaving inserts a
 // new row so the old 'left' entry stays in the history.
-export function joinQueue(
-    state: MwaState,
-    groupId: number,
-): { success: boolean; entry?: QueueEntry; error?: string } {
+export function joinQueue(state: MwaState, groupId: number): JoinQueueResult {
     if (getWaitingEntry(state, groupId)) {
-        return { success: false, error: 'group is already in the queue' };
+        return { type: 'already_queued' };
     }
 
     const joinQuery = state.prepare(`
@@ -45,7 +44,7 @@ export function joinQueue(
         VALUES (?)
         RETURNING id, group_id, joined_at, status, closed_at, done_at, activity_slug
     `);
-    return { success: true, entry: mapQueueEntry(joinQuery.get(groupId)!) };
+    return { type: 'joined', entry: mapQueueEntry(joinQuery.get(groupId)!) };
 }
 
 export function leaveQueue(state: MwaState, groupId: number): boolean {
