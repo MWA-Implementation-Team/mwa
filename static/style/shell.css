@@ -623,6 +623,10 @@
     color: var(--shell-soft);
     overflow-wrap: anywhere;
 }
+.mwa-rows > li.mwa-row--self {
+    background: var(--shell-panel-light);
+    padding-inline: 8px;
+}
 .mwa-directory {
     list-style: none;
     padding: 0;

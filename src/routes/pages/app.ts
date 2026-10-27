@@ -1,5 +1,6 @@
 import { requireRole, requireUser } from '#src/auth.js';
 import { listUserTransactions } from '#src/db/transactions.js';
+import { listGroupLeaderboard } from '#src/db/leaderboard.js';
 import { findUserGroup, listUserGroups } from '#src/db/groups.js';
 import {
     callNextGroups,
@@ -106,7 +107,13 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         const type = ctx.req.query('type') === 'group' ? 'group' : 'team';
-        return writePage(ctx, 'leaderboard', { type });
+        // team = themembers of the viewers group
+        // null means no group
+        const group = type === 'team' ? findUserGroup(ctx.var, user.id) : null;
+        return writePage(ctx, 'leaderboard', {
+            type,
+            rows: group ? listGroupLeaderboard(ctx.var, group.id) : null,
+        });
     });
 
     app.get('/app/group', async (ctx) => {
