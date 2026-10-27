@@ -32,8 +32,8 @@
     background-color: #061329;
     background-image:
         linear-gradient(
-            rgba(6, 19, 41, 0.68),
-            rgba(6, 19, 41, 0.82)
+            rgba(6, 19, 41, 0.888),
+            rgba(6, 19, 41, 0.922)
         ),
         url('https://i.pinimg.com/originals/1d/15/d8/1d15d8da8b3b6f3a895828ba2663f409.gif');
     background-size: cover, cover;
