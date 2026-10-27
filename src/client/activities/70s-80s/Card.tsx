@@ -17,7 +17,7 @@ export function SeventiesEightiesCard({}: ActivityProps) {
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
-                border: '2px solid #ffffff6d',
+                border: '3px solid #0000006d',
             }}
         >
             <div
@@ -29,7 +29,7 @@ export function SeventiesEightiesCard({}: ActivityProps) {
                     right: 0,
                     height: 14,
                     background:
-                        'linear-gradient(90deg, #5d313e 0 25%, #5e4225 25% 50%, #5a5178 50% 75%, #934b53 75%)',
+                        'linear-gradient(80deg, #5d313e 0 25%, #5e4225 25% 50%, #5a5178 50% 75%, #934b53 75%)',
                 }}
             />
 

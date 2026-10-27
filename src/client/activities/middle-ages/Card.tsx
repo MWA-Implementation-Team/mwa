@@ -17,7 +17,7 @@ export function MiddleAgesCard({}: ActivityProps) {
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
-                border: '2px solid #ffffff6d',
+                border: '3px solid #ffffff6d',
             }}
         >
             <div
@@ -25,7 +25,7 @@ export function MiddleAgesCard({}: ActivityProps) {
                 style={{
                     position: 'absolute',
                     inset: 9,
-                    border: '1px solid #3e3e3e',
+                    border: '2px solid #3e3e3e',
                     opacity: 0.65,
                     pointerEvents: 'none',
                 }}

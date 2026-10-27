@@ -2,11 +2,11 @@
 .mwa {
     filter: brightness(1.08) saturate(0.9);
     --shell-white: #edf5ff;
-    --shell-soft: #a8bfdf;
-    --shell-pink: #8bd8ff;
+    --shell-soft: #a8bfdfa2;
+    --shell-pink: #c2dfff;
 
-    --shell-accent: #82b8ff;
-    --shell-border: #294c82;
+    --shell-accent: #ffffff;
+    --shell-border: #0000004e;
     --shell-panel: rgba(7, 17, 42, 0.94);
     --shell-panel-light: rgba(24, 48, 87, 0.72);
     isolation: isolate;
@@ -155,7 +155,7 @@
 .mwa-panel,
 .landing-section {
     min-width: 0;
-    border: 1px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
     background: var(--shell-panel);
     box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
 }
@@ -209,7 +209,7 @@
 .mwa-note {
     padding: 10px 12px;
     background: var(--shell-panel-light);
-    border: 1px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
     color: var(--shell-white);
     font-size: 13px;
 }
@@ -236,7 +236,7 @@
     display: block;
     padding: 13px 12px;
     min-width: 0;
-    border: 1px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
     background: var(--shell-panel-light);
     text-decoration: none !important;
 }
@@ -287,8 +287,8 @@
 }
 
 .mwa :is(.btn-primary, .mwa-button--primary) {
-    background: linear-gradient(90deg, #2366bd, #102e63);
-    border: 2px solid var(--shell-pink);
+    background: linear-gradient(90deg, #003d8d, #102e63);
+    border: 3px solid var(--shell-pink);
     color: white;
     box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
 }
@@ -300,7 +300,7 @@
 
 .mwa :is(button:not(.btn-primary), .btn-outline, .mwa-button--outline) {
     background: var(--shell-panel-light);
-    border: 1px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
     color: #fff;
 }
 
@@ -341,7 +341,7 @@
     width: 100%;
     min-width: 0;
     max-width: 100%;
-    border: 2px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
     border-radius: 2px;
     background: #050d1d;
     color: white;
@@ -440,7 +440,7 @@
     color: var(--shell-accent);
     text-decoration: none;
     background: var(--shell-panel-light);
-    border: 1px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
 }
 
 .mwa .landing-menu :is(a, button) {
@@ -529,7 +529,7 @@
     text-decoration: none;
     color: var(--shell-soft);
     background: var(--shell-panel-light);
-    border: 1px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
 }
 
 .landing-login:hover {
@@ -581,7 +581,7 @@
         flex: none;
         width: min(30%, 240px);
         gap: 0;
-        border: 1px solid var(--shell-border);
+        border: 3px solid var(--shell-border);
         background: var(--shell-panel);
         box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
     }
@@ -595,7 +595,7 @@
     .landing-col--side .landing-section > h2 {
         background: linear-gradient(
             90deg,
-            rgba(35, 102, 189, 0.9),
+            rgba(14, 71, 146, 0.9),
             rgba(16, 46, 99, 0.5) 60%,
             transparent 95%
         );
@@ -626,7 +626,7 @@
     color: var(--shell-white);
     font-size: 12px;
     letter-spacing: 0.06em;
-    background: linear-gradient(90deg, #174b91, #0b2047);
+    background: linear-gradient(90deg, #0d3972, #0b2047);
     border-bottom: 1px solid var(--shell-border);
 }
 
@@ -637,7 +637,7 @@
     width: 8px;
     height: 8px;
     background: var(--shell-pink);
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    border: 3px solid rgba(255, 255, 255, 0.55);
 }
 
 .landing-section > *:not(h2) {
@@ -655,7 +655,7 @@
     display: grid;
     gap: 2px;
     padding: 8px 4px;
-    border: 1px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
     background: var(--shell-panel-light);
 }
 
@@ -774,7 +774,7 @@
     align-items: center;
     padding: 8px 13px;
     color: var(--shell-accent);
-    border: 1px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
     text-decoration: none;
     background: var(--shell-panel-light);
 }

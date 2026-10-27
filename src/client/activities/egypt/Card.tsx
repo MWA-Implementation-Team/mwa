@@ -17,7 +17,7 @@ export function EgyptCard({}: ActivityProps) {
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
-                border: '2px dotted #0000006d',
+                border: '3px dotted #0000006d',
             }}
         >
             <div

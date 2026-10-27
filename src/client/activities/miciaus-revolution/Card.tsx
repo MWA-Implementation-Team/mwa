@@ -12,12 +12,12 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#dff3ea',
+                color: '#f3ff47',
                 backgroundImage: 'url("https://i.redd.it/mew5vf5yssd61.gif")',
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
-                border: '2px solid #ffffff6d',
+                border: '3px solid #ffffff6d',
             }}
         >
             <div
@@ -55,6 +55,7 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                     maxWidth: 280,
                     fontSize: 29,
                     lineHeight: 1.1,
+                    color: '#f3ff47',
                 }}
             >
                 Didžioji Miciaus revoliucija

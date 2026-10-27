@@ -14,7 +14,7 @@ export function StoneAgeCard({}: ActivityProps) {
                 borderRadius: 14,
                 color: '#f0dbc8',
                 background: 'linear-gradient(150deg, #222222, #2c2c2c)',
-                border: '2px solid #6b4530',
+                border: '3px solid #6b4530',
             }}
         >
             <span

@@ -17,7 +17,7 @@ export function Year2028Card({}: ActivityProps) {
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
-                border: '2px solid #0000006d',
+                border: '3px solid #0000006d',
             }}
         >
             <div
@@ -26,7 +26,7 @@ export function Year2028Card({}: ActivityProps) {
                     position: 'absolute',
                     width: 122,
                     height: 122,
-                    border: '2px solid #a79bcf',
+                    border: '3px solid #a79bcf',
                     borderRadius: '50%',
                     top: -23,
                     right: -17,
@@ -40,7 +40,7 @@ export function Year2028Card({}: ActivityProps) {
                     position: 'absolute',
                     width: 85,
                     height: 85,
-                    border: '1px solid #a79bcf',
+                    border: '2px solid #a79bcf',
                     borderRadius: '50%',
                     top: -5,
                     right: 2,

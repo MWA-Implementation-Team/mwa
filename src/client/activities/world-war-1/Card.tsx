@@ -17,7 +17,7 @@ export function WorldWar1Card({}: ActivityProps) {
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
-                border: '2px solid #ffffff6d',
+                border: '3px solid #ffffff6d',
             }}
         >
             <div
@@ -25,7 +25,7 @@ export function WorldWar1Card({}: ActivityProps) {
                 style={{
                     position: 'absolute',
                     inset: 8,
-                    border: '1px solid #8c8974',
+                    border: '2px solid #8c8974',
                     opacity: 0.6,
                     pointerEvents: 'none',
                 }}
