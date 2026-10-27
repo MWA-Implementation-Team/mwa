@@ -28,42 +28,17 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    opacity: 0.9;
-    background:
-        radial-gradient(circle, #8bd8ff 1px, transparent 1.5px),
-        radial-gradient(circle, #82b8ff 1px, transparent 1.5px),
-        radial-gradient(circle, #d1e5ff 1px, transparent 1.2px),
-        radial-gradient(circle, #568cff 1.5px, transparent 2px),
-        #061329;
-    background-size:
-        119px 157px,
-        191px 147px,
-        83px 107px,
-        233px 191px;
-    background-position:
-        8px 19px,
-        52px 87px,
-        7px 33px,
-        140px 60px;
-    animation: star-drift 100s linear infinite;
-}
 
-@keyframes star-drift {
-    0% {
-        background-position:
-            8px 19px,
-            52px 87px,
-            7px 33px,
-            140px 60px;
-    }
-
-    100% {
-        background-position:
-            127px 176px,
-            -139px 234px,
-            90px -74px,
-            373px 251px;
-    }
+    background-color: #061329;
+    background-image:
+        linear-gradient(
+            rgba(6, 19, 41, 0.68),
+            rgba(6, 19, 41, 0.82)
+        ),
+        url('https://i.pinimg.com/originals/1d/15/d8/1d15d8da8b3b6f3a895828ba2663f409.gif');
+    background-size: cover, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -13,7 +13,7 @@ export function CellsCard({ }: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#dff3ea',
-                backgroundImage: 'url("https://i.pinimg.com/originals/c6/7d/22/c67d22ab2e6cbb2304d598de30b86b73.gif")',
+                backgroundImage: 'url("https://art.pixilart.com/56c33eff8fef045.gif")',
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
