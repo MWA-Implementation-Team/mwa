@@ -31,18 +31,19 @@ describe('db/leaderboard listGroupLeaderboard', () => {
         );
     });
 
-    it('breaks ties alphabetically by username', () => {
-        const z = user('lb_tie_z');
-        const y = user('lb_tie_y');
-        const group = createGroup(state, 'lb tie group', z.id, '555');
-        addGroupMember(state, group.id, y.id);
-        giveCoins(state, z.id, 5);
-        giveCoins(state, y.id, 5);
+    it('breaks ties alphabetically by username, ignoring case', () => {
+        // relies on the username column's COLLATE NOCASE — binary order would flip these
+        const b = user('lb_tie_B');
+        const a = user('lb_tie_a');
+        const group = createGroup(state, 'lb tie group', b.id, '555');
+        addGroupMember(state, group.id, a.id);
+        giveCoins(state, b.id, 5);
+        giveCoins(state, a.id, 5);
 
         const rows = listGroupLeaderboard(state, group.id);
         assert.deepEqual(
             rows.map((r) => r.username),
-            ['lb_tie_y', 'lb_tie_z'],
+            ['lb_tie_a', 'lb_tie_B'],
         );
     });
 
