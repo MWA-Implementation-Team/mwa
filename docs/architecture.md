@@ -146,10 +146,30 @@ shown. Timers and pubsub assume a single server process.
 
 ## Leaderboard
 
-`/app/leaderboard` is server-rendered: `src/routes/pages/app.ts` loads the rows as page
-props, so there is no leaderboard API. The **team** tab ranks the members of the viewer's
-own group by net balance (`listGroupLeaderboard` in `src/db/leaderboard.ts`, ties broken
-by username). Each row shows only the username and points; the viewer's row gets the
-`mwa-row--self` class. A viewer with no group sees a join-a-group message. The **group**
-tab lists every group by name with its member count (`listLeaderboardGroups`), with no
-scores until group scoring is defined.
+`/app/leaderboard` is server-rendered: `src/routes/pages/app.ts` loads rows as page
+props, so there is no leaderboard API. Two query params pick the view —
+`?board=activity|gambling|combined` (default `activity`) and
+`?scope=players|groups` (default `players`).
+
+Every `child_transactions` row is stamped with the user's `group_id` at insert time
+(`insertTransaction` looks it up via `findUserGroup`). Group scores therefore
+attribute coins to the group the user belonged to when the delta was recorded:
+switching groups never moves past earnings, and coins earned while groupless count
+for no group.
+
+Board definitions (`src/db/leaderboard.ts`):
+
+- **activity** — coins minted into the economy: positive deltas whose parent kind
+  is `system` or `host_grant` (an allowlist — transfers, purchases and gambling only
+  move coins between players and never count, so transfer-gifting and gambling
+  ping-pong can't inflate the board).
+- **gambling** — net of `gambling_deduction` + `gambling_winnings`, plus a
+  games-played count. Only users who actually gambled are listed.
+- **combined** — net of every delta: the player's actual balance for users, the
+  stamped net for groups.
+
+Player boards only rank `role = 'user'` accounts — admins and hosts never appear.
+Group boards rank every group by stamped score with member count. On player rows,
+the viewer gets `mwa-row--self` (+ "You" tag) and their groupmates `mwa-row--group`.
+Zero-sum kinds (transfers, gambling) can't move net-based boards at all — collusion
+shows up as coin concentration, not score inflation.

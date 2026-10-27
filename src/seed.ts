@@ -21,7 +21,7 @@ if (existing > 0) {
 const insertUser = state.prepare(`INSERT INTO users (username, email, role) VALUES (?, ?, ?)`);
 const insertParent = state.prepare(`INSERT INTO parent_transactions (kind) VALUES (?)`);
 const insertLeg = state.prepare(
-    `INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)`,
+    `INSERT INTO child_transactions (parent_id, user_id, balance_delta, group_id) VALUES (?, ?, ?, ?)`,
 );
 const awardBadge = state.prepare(`INSERT INTO user_badges (badge_id, user_id) VALUES (?, ?)`);
 const insertGroup = state.prepare(
@@ -34,12 +34,19 @@ function addUser(username: string, email: string, role: UserRole): number {
     return Number(insertUser.run(username, email, role).lastInsertRowid);
 }
 
-function addParent(kind: 'transfer' | 'purchase' | 'system'): number {
+function addParent(kind: 'transfer' | 'purchase' | 'system' | 'host_grant'): number {
     return Number(insertParent.run(kind).lastInsertRowid);
 }
 
-function leg(parentId: number, userId: number, balanceDelta: number) {
-    insertLeg.run(parentId, userId, balanceDelta);
+// groupId stamps the leg the way insertTransaction does at runtime — pass the
+// group the user belonged to when the delta was earned
+function leg(
+    parentId: number,
+    userId: number,
+    balanceDelta: number,
+    groupId: number | null = null,
+) {
+    insertLeg.run(parentId, userId, balanceDelta, groupId);
 }
 
 function addGroup(name: string, ownerId: number, phoneNumber: string): number {
@@ -57,26 +64,30 @@ runTransaction(state.db, () => {
     const bobId = addUser('bob', 'bob@mwa.dev', 'user');
     const carolId = addUser('carol', 'carol@mwa.dev', 'user');
 
-    const grantId = addParent('transfer');
-    leg(grantId, aliceId, 100);
-    leg(grantId, adminId, -100);
-
-    const p2pId = addParent('transfer');
-    leg(p2pId, aliceId, -30);
-    leg(p2pId, bobId, 30);
-
-    const purchaseId = addParent('purchase');
-    leg(purchaseId, bobId, -20);
-
-    const systemId = addParent('system');
-    leg(systemId, carolId, 50);
-
-    awardBadge.run('test_badge', aliceId);
-
     const groupId = addGroup('high rollers', aliceId, '555-0100');
     member(groupId, aliceId);
     member(groupId, bobId);
     member(groupId, carolId);
+
+    const grantId = addParent('transfer');
+    leg(grantId, aliceId, 100, groupId);
+    leg(grantId, adminId, -100);
+
+    const hostGrantId = addParent('host_grant');
+    leg(hostGrantId, aliceId, 40, groupId);
+    leg(hostGrantId, bobId, 25, groupId);
+
+    const p2pId = addParent('transfer');
+    leg(p2pId, aliceId, -30, groupId);
+    leg(p2pId, bobId, 30, groupId);
+
+    const purchaseId = addParent('purchase');
+    leg(purchaseId, bobId, -20, groupId);
+
+    const systemId = addParent('system');
+    leg(systemId, carolId, 50, groupId);
+
+    awardBadge.run('test_badge', aliceId);
 
     insertQueueEntry.run(groupId);
 });
