@@ -51,7 +51,7 @@ function LeaderboardPage({ type, rows, groups }: LeaderboardPageProps) {
                         rows === null ? (
                             <p class="mwa-muted">{t('leaderboardNoGroup')}</p>
                         ) : (
-                            <ol class="mwa-rows">
+                            <ol class="mwa-rows mwa-rows--inset">
                                 {rows.map((row, index) => {
                                     const isSelf = row.userId === user?.id;
                                     return (
@@ -61,8 +61,12 @@ function LeaderboardPage({ type, rows, groups }: LeaderboardPageProps) {
                                         >
                                             <div class="mwa-row">
                                                 <span>
-                                                    <strong>{index + 1}</strong>.{row.username}
-                                                    {isSelf && <small>{t('leaderboardYou')}</small>}
+                                                    <strong>{index + 1}</strong>.{" "}{row.username}
+                                                    {isSelf && (
+                                                        <span class="mwa-row-tag">
+                                                            {t('leaderboardYou')}
+                                                        </span>
+                                                    )}
                                                 </span>
                                                 <strong>
                                                     {row.points} {t('currencyName')}
@@ -76,7 +80,7 @@ function LeaderboardPage({ type, rows, groups }: LeaderboardPageProps) {
                     ) : groups === null || groups.length === 0 ? (
                         <p class="mwa-muted">{t('leaderboardNoGroups')}</p>
                     ) : (
-                        <ul class="mwa-rows">
+                        <ul class="mwa-rows mwa-rows--inset">
                             {groups.map((group) => (
                                 <li key={group.id}>
                                     <div class="mwa-row">
