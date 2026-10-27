@@ -1,5 +1,5 @@
 import { MwaState } from '#src/state.js';
-import { findUserById, User } from '#src/db/users.js';
+import { findUserById, User } from '#src/db/users/index.js';
 import { randomBytes } from 'node:crypto';
 
 // Minted lazily on the owner's first /app view; one per user, never rotated.

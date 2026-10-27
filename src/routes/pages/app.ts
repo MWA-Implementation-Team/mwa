@@ -1,11 +1,11 @@
 import { requireRole, requireUser } from '#src/auth.js';
-import { listUserTransactions } from '#src/db/transactions.js';
+import { listUserTransactions } from '#src/db/transactions/index.js';
 import {
     LeaderboardBoard,
     listGroupLeaderboard,
     listPlayerLeaderboard,
-} from '#src/db/leaderboard.js';
-import { findUserGroup, listUserGroups } from '#src/db/groups.js';
+} from '#src/db/leaderboard/index.js';
+import { findUserGroup, listUserGroups } from '#src/db/groups/index.js';
 import {
     callNextGroups,
     markEntryDone,
@@ -15,12 +15,12 @@ import {
     getUserWaitingEntry,
     listWaitingQueue,
     listStationGroups,
-} from '#src/db/queue.js';
+} from '#src/db/queue/index.js';
 import { serialize } from '#src/client/serialize.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
-import { findUserByInteractToken } from '#src/db/interactions.js';
-import { deleteSession } from '#src/db/sessions.js';
+import { findUserByInteractToken } from '#src/db/interactions/index.js';
+import { deleteSession } from '#src/db/sessions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';

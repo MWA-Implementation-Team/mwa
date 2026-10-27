@@ -15,8 +15,8 @@ import {
     winCoinFlip,
     ExpiringGamblingSession,
     queryExpiringGamblingSessions,
-} from '#src/db/gambling.js';
-import { findUserByInteractToken } from '#src/db/interactions.js';
+} from '#src/db/gambling/index.js';
+import { findUserByInteractToken } from '#src/db/interactions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { notificationsChannel, publish, sessionChannel, subscribe } from '#src/pubsub.js';
 import { MwaHono, MwaState } from '#src/state.js';

@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { Hono } from 'hono';
-import { createUser } from '#src/db/users.js';
-import { createSession } from '#src/db/sessions.js';
-import { getOrCreateInteractToken } from '#src/db/interactions.js';
+import { createUser } from '#src/db/users/index.js';
+import { createSession } from '#src/db/sessions/index.js';
+import { getOrCreateInteractToken } from '#src/db/interactions/index.js';
 import { registerAppRoutes } from './app.js';
 import { createTestMwaState, MwaHono, setupHonoState } from '#src/state.js';
 

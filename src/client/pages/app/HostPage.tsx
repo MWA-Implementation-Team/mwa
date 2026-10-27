@@ -1,7 +1,7 @@
 import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
-import type { WaitingQueueRow } from '#src/db/queue.js';
+import type { WaitingQueueRow } from '#src/db/queue/index.js';
 import PageShell from './PageShell.js';
 import { Language } from '#src/client/language.js';
 

@@ -1,6 +1,6 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
-import { queryActiveGamblingSession, queryGamblingInvitations } from './gambling.js';
+import { queryActiveGamblingSession, queryGamblingInvitations } from '../gambling/index.js';
 
 export type UserRole = 'admin' | 'host' | 'user';
 

@@ -1,6 +1,6 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
-import { runTransaction } from './transaction.js';
+import { runTransaction } from '../transaction.js';
 
 export type QueueStatus = 'waiting' | 'left' | 'called';
 

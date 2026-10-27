@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { Hono } from 'hono';
-import { addGroupMember, createGroup } from '#src/db/groups.js';
-import { createUser } from '#src/db/users.js';
-import { createSession } from '#src/db/sessions.js';
-import { giveCoins, insertTransaction } from '#src/db/transactions.js';
+import { addGroupMember, createGroup } from '#src/db/groups/index.js';
+import { createUser } from '#src/db/users/index.js';
+import { createSession } from '#src/db/sessions/index.js';
+import { giveCoins, insertTransaction } from '#src/db/transactions/index.js';
 import { registerAppRoutes } from './app.js';
 import { createTestMwaState, MwaHono, setupHonoState } from '#src/state.js';
 

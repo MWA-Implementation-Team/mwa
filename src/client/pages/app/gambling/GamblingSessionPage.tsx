@@ -2,7 +2,7 @@ import { Trans } from '#src/client/ui/Trans.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
-import { CoinSide, Gambler, RunningGame } from '#src/db/gambling.js';
+import { CoinSide, Gambler, RunningGame } from '#src/db/gambling/index.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import { Language, TranslateFn } from '#src/client/language.js';
 import PageShell from '../PageShell.js';

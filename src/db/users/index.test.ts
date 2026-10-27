@@ -7,7 +7,7 @@ import {
     findUserById,
     findUserByUsername,
     markEmailVerified,
-} from './users.js';
+} from './index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});

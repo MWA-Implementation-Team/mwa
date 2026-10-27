@@ -4,14 +4,14 @@ Worked example: `GET /api/badges`, returning the badges list as JSON. This guide
 the four pieces: the db function, the route, its registration, and a client-side
 fetcher.
 
-The pattern (from `src/routes/api/users.ts`): the SQL lives in `db/<domain>.ts` as a
+The pattern (from `src/routes/api/users.ts`): the SQL lives in `db/<domain>/index.ts` as a
 prepared statement + typed function; the route handler only checks auth and serializes.
 
 ## 1. The db function
 
-Write `listBadges(state: MwaState)` in `src/db/badges.ts` following the house pattern:
+Write `listBadges(state: MwaState)` in `src/db/badges/index.ts` following the house pattern:
 a row type and a typed function that calls `state.prepare(sql)` and executes the
-returned statement. Preparation is cached per state; do not prepare at module scope. See `src/db/users.ts` for the
+returned statement. Preparation is cached per state; do not prepare at module scope. See `src/db/users/index.ts` for the
 shape, and [change-the-database](change-the-database.md) if you need a new table first.
 
 ## 2. Add the route
@@ -20,7 +20,7 @@ Create `src/routes/api/badges.ts`:
 
 ```ts
 import { requireApiUser } from '#src/auth.js';
-import { listBadges } from '#src/db/badges.js';
+import { listBadges } from '#src/db/badges/index.js';
 import type { MwaHono } from '#src/state.js';
 
 export function registerBadgesRoutes(app: MwaHono) {
@@ -48,9 +48,9 @@ after `setupHonoState(app, state)`. The middleware exposes dependencies as `ctx.
 Create `src/client/api/badges.ts`:
 
 ```ts
-import type { Badge } from '#src/db/badges.js';
+import type { Badge } from '#src/db/badges/index.js';
 // ^ type-only import: erased at compile time, so the browser never
-// loads the server-only src/db/badges.ts module.
+// loads the server-only src/db/badges/index.ts module.
 
 export type { Badge };
 
@@ -63,7 +63,7 @@ export async function fetchBadges(): Promise<Badge[]> {
 
 Two things going on here:
 
-- **`import type`, not `import`.** `db/*.ts` modules are server-only and their URLs
+- **`import type`, not `import`.** `db/<domain>/index.ts` modules are server-only and their URLs
   are not served in production. Explicit initialization does not make them client code. Type-only imports are erased
   by `tsc`, so the emitted JS never references the module. Re-exporting the type keeps
   one source of truth for the API response shape.

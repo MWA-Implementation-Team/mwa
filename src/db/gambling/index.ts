@@ -1,8 +1,8 @@
 import { MwaState } from '#src/state.js';
 import { randomInt } from 'node:crypto';
-import { runTransaction } from './transaction.js';
-import { insertTransaction } from './transactions.js';
-import { findUserById } from './users.js';
+import { runTransaction } from '../transaction.js';
+import { insertTransaction } from '../transactions/index.js';
+import { findUserById } from '../users/index.js';
 
 export type GameType = 'coin_flip';
 

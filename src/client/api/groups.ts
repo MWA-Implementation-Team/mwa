@@ -1,4 +1,4 @@
-import type { Group, GroupMember } from '#src/db/groups.js';
+import type { Group, GroupMember } from '#src/db/groups/index.js';
 import { revive, type Serialized } from '#src/client/serialize.js';
 export type { Group, GroupMember };
 export type GroupJson = Serialized<Group>;

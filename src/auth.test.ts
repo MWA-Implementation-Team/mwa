@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { Hono } from 'hono';
-import { createUser, User, UserRole } from '#src/db/users.js';
-import { createSession } from '#src/db/sessions.js';
+import { createUser, User, UserRole } from '#src/db/users/index.js';
+import { createSession } from '#src/db/sessions/index.js';
 import { requireApiRole, requireApiUser, requireRole, requireUser } from './auth.js';
 import { createTestMwaState, MwaHono, setupHonoState } from './state.js';
 

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
-import { createUser } from './users.js';
-import { addGroupMember, createGroup } from './groups.js';
+import { createUser } from '../users/index.js';
+import { addGroupMember, createGroup } from '../groups/index.js';
 import {
     callNextGroups,
     getQueuePosition,
@@ -12,7 +12,7 @@ import {
     listStationGroups,
     listWaitingQueue,
     markEntryDone,
-} from './queue.js';
+} from './index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});

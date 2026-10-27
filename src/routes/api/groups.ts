@@ -10,7 +10,7 @@ import {
     listGroupMembers,
     MAX_GROUP_NAME_LENGTH,
     MAX_PHONE_NUMBER_LENGTH,
-} from '#src/db/groups.js';
+} from '#src/db/groups/index.js';
 import { MwaContext, MwaHono } from '#src/state.js';
 
 async function readJsonBody(ctx: MwaContext) {

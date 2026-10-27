@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { createUser } from './users.js';
-import { findUserByInteractToken, getOrCreateInteractToken } from './interactions.js';
+import { createUser } from '../users/index.js';
+import { findUserByInteractToken, getOrCreateInteractToken } from './index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});

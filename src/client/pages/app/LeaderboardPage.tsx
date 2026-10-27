@@ -1,7 +1,7 @@
 import { useContext } from 'preact/hooks';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
-import type { GroupRow, LeaderboardBoard, PlayerRow } from '#src/db/leaderboard.js';
+import type { GroupRow, LeaderboardBoard, PlayerRow } from '#src/db/leaderboard/index.js';
 import PageShell from './PageShell.js';
 
 type LeaderboardPageProps = { board: LeaderboardBoard } & (

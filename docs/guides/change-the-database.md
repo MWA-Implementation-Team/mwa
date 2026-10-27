@@ -60,7 +60,7 @@ rebuild restarts it).
 
 ## 3. Update the code
 
-- `src/db/users.ts` — add `tagline: string;` to the `User` type. `SELECT *` queries pick
+- `src/db/users/index.ts` — add `tagline: string;` to the `User` type. `SELECT *` queries pick
   the column up automatically; queries listing columns need the new field added.
 - `src/seed.ts` — seed the new field if sample data should have it.
 

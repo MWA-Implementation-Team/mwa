@@ -35,7 +35,7 @@ Continuing the [badges example](add-a-page.md). In `src/routes/pages/app.ts`, th
 already registered by `main.ts`. Pass `ctx.var` to DB functions:
 
 ```ts
-import { listBadges } from '#src/db/badges.js';
+import { listBadges } from '#src/db/badges/index.js';
 // ...
 app.get('/app/badges', async (ctx) => {
     const user = requireUser(ctx);
@@ -83,7 +83,7 @@ function BadgesPage({ badges }: BadgesPageProps) {
 }
 ```
 
-Note the `Badge` type comes from `src/client/api/badges.ts`, not `src/db/badges.ts` —
+Note the `Badge` type comes from `src/client/api/badges.ts`, not `src/db/badges/index.ts` —
 always reach for the type through the `client/api/` re-export so client code never
 runtime-imports a db module.
 
