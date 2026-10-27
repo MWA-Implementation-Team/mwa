@@ -1,6 +1,10 @@
 import { requireRole, requireUser } from '#src/auth.js';
 import { listUserTransactions } from '#src/db/transactions.js';
-import { listGroupLeaderboard, listLeaderboardGroups } from '#src/db/leaderboard.js';
+import {
+    LeaderboardBoard,
+    listGroupLeaderboard,
+    listPlayerLeaderboard,
+} from '#src/db/leaderboard.js';
 import { findUserGroup, listUserGroups } from '#src/db/groups.js';
 import {
     callNextGroups,
@@ -106,18 +110,22 @@ export function registerAppRoutes(app: MwaHono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        const type = ctx.req.query('type') === 'group' ? 'group' : 'team';
-        // team tab = the members of the viewer's own group
-        if (type === 'team') {
-            const group = findUserGroup(ctx.var, user.id);
+        const boardParam = ctx.req.query('board');
+        const board: LeaderboardBoard =
+            boardParam === 'gambling' || boardParam === 'combined' ? boardParam : 'activity';
+        const scope = ctx.req.query('scope') === 'groups' ? 'groups' : 'players';
+        if (scope === 'players') {
             return writePage(ctx, 'leaderboard', {
-                type,
-                rows: group ? listGroupLeaderboard(ctx.var, group.id) : null,
+                board,
+                scope,
+                rows: listPlayerLeaderboard(ctx.var, board),
+                viewerGroupId: findUserGroup(ctx.var, user.id)?.id ?? null,
             });
         }
         return writePage(ctx, 'leaderboard', {
-            type,
-            groups: listLeaderboardGroups(ctx.var),
+            board,
+            scope,
+            groups: listGroupLeaderboard(ctx.var, board),
         });
     });
 

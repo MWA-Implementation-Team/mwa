@@ -119,12 +119,17 @@ export type Language = {
     activityBack: string;
 
     leaderboardTypeLabel: string;
-    leaderboardTeam: string;
-    leaderboardGroup: string;
+    leaderboardScopeLabel: string;
+    leaderboardActivity: string;
+    leaderboardGambling: string;
+    leaderboardCombined: string;
+    leaderboardPlayers: string;
+    leaderboardGroups: string;
     leaderboardRankings: string;
     leaderboardNoGroups: string;
+    leaderboardNoPlayers: string;
     leaderboardMemberCount: string;
-    leaderboardNoGroup: string;
+    leaderboardGames: string;
     leaderboardYou: string;
 
     accountProfile: string;
@@ -321,13 +326,18 @@ export const languages: Record<LanguageCode, Language> = {
         activityInfoTitle: 'activity information',
         activityBack: '← back to activities',
 
-        leaderboardTypeLabel: 'Leaderboard type',
-        leaderboardTeam: 'team',
-        leaderboardGroup: 'group',
+        leaderboardTypeLabel: 'Leaderboard board',
+        leaderboardScopeLabel: 'Leaderboard scope',
+        leaderboardActivity: 'activity',
+        leaderboardGambling: 'gambling',
+        leaderboardCombined: 'all',
+        leaderboardPlayers: 'players',
+        leaderboardGroups: 'groups',
         leaderboardRankings: '{type} rankings',
         leaderboardNoGroups: 'No groups yet.',
+        leaderboardNoPlayers: 'No players yet.',
         leaderboardMemberCount: '{n} member(s)',
-        leaderboardNoGroup: 'Join a group to see your team rankings.',
+        leaderboardGames: '{n} game(s)',
         leaderboardYou: 'You',
 
         accountProfile: 'Profile',
@@ -526,12 +536,17 @@ export const languages: Record<LanguageCode, Language> = {
         activityBack: '← atgal į veiklas',
 
         leaderboardTypeLabel: 'Lentelės tipas',
-        leaderboardTeam: 'komanda',
-        leaderboardGroup: 'grupė',
+        leaderboardScopeLabel: 'Lentelės apimtis',
+        leaderboardActivity: 'aktyvumas',
+        leaderboardGambling: 'lošimai',
+        leaderboardCombined: 'viskas',
+        leaderboardPlayers: 'žaidėjai',
+        leaderboardGroups: 'grupės',
         leaderboardRankings: '{type} įvertinimai',
         leaderboardNoGroups: 'Grupių kol kas nėra.',
+        leaderboardNoPlayers: 'Žaidėjų kol kas nėra.',
         leaderboardMemberCount: 'Nariai: {n}',
-        leaderboardNoGroup: 'Prisijunkite prie grupės, kad matytumėte savo komandos įvertinimus.',
+        leaderboardGames: 'Žaidimai: {n}',
         leaderboardYou: 'Jūs',
 
         accountProfile: 'Profilis',

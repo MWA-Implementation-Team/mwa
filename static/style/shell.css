@@ -630,6 +630,9 @@
 .mwa-rows > li.mwa-row--self {
     background: var(--shell-panel-light);
 }
+.mwa-rows > li.mwa-row--group {
+    box-shadow: inset 3px 0 0 var(--shell-accent);
+}
 .mwa-rows--inset .mwa-row {
     align-items: center;
 }
