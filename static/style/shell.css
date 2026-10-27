@@ -627,6 +627,9 @@
     background: var(--shell-panel-light);
     padding-inline: 8px;
 }
+.mwa-rows > li.mwa-row--self .mwa-row {
+    align-items: center;
+}
 .mwa-directory {
     list-style: none;
     padding: 0;

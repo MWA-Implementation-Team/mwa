@@ -1,13 +1,18 @@
 import { useContext } from 'preact/hooks';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
-import type { LeaderboardRow } from '#src/db/leaderboard.js';
+import type { LeaderboardGroup, LeaderboardRow } from '#src/db/leaderboard.js';
 import PageShell from './PageShell.js';
 
 export type LeaderboardType = 'team' | 'group';
 
 // rows yra null kai team tab'as neturi grupes rankinimui
-type LeaderboardPageProps = { type: LeaderboardType; rows: LeaderboardRow[] | null };
+// groups is null on the team tab
+type LeaderboardPageProps = {
+    type: LeaderboardType;
+    rows: LeaderboardRow[] | null;
+    groups: LeaderboardGroup[] | null;
+};
 
 export const leaderboardPage: Page<LeaderboardPageProps> = {
     Component: LeaderboardPage,
@@ -19,7 +24,7 @@ const typeLabelKey = {
     group: 'leaderboardGroup',
 } as const;
 
-function LeaderboardPage({ type, rows }: LeaderboardPageProps) {
+function LeaderboardPage({ type, rows, groups }: LeaderboardPageProps) {
     const { t, user } = useContext(ClientContext);
     return (
         <PageShell section="leaderboard">
@@ -68,10 +73,23 @@ function LeaderboardPage({ type, rows }: LeaderboardPageProps) {
                                 })}
                             </ol>
                         )
+                    ) : groups === null || groups.length === 0 ? (
+                        <p class="mwa-muted">{t('leaderboardNoGroups')}</p>
                     ) : (
-                        <p class="mwa-muted">
-                            {t('leaderboardTodo', { type: t(typeLabelKey[type]) })}
-                        </p>
+                        <ul class="mwa-rows">
+                            {groups.map((group) => (
+                                <li key={group.id}>
+                                    <div class="mwa-row">
+                                        <strong>{group.name}</strong>
+                                        <small>
+                                            {t('leaderboardMemberCount', {
+                                                n: String(group.memberCount),
+                                            })}
+                                        </small>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
                     )}
                 </div>
             </section>

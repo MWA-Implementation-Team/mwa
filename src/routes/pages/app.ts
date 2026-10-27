@@ -1,6 +1,6 @@
 import { requireRole, requireUser } from '#src/auth.js';
 import { listUserTransactions } from '#src/db/transactions.js';
-import { listGroupLeaderboard } from '#src/db/leaderboard.js';
+import { listGroupLeaderboard, listLeaderboardGroups } from '#src/db/leaderboard.js';
 import { findUserGroup, listUserGroups } from '#src/db/groups.js';
 import {
     callNextGroups,
@@ -113,6 +113,7 @@ export function registerAppRoutes(app: MwaHono) {
         return writePage(ctx, 'leaderboard', {
             type,
             rows: group ? listGroupLeaderboard(ctx.var, group.id) : null,
+            groups: type === 'group' ? listLeaderboardGroups(ctx.var) : null,
         });
     });
 

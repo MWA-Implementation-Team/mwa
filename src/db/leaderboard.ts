@@ -6,6 +6,32 @@ export type LeaderboardRow = {
     points: number;
 };
 
+export type LeaderboardGroup = {
+    id: number;
+    name: string;
+    memberCount: number;
+};
+
+// every group in the event, by name. No points: group scoring is not defined yet.
+export function listLeaderboardGroups(state: MwaState): LeaderboardGroup[] {
+    const query = state.prepare(`
+    SELECT
+        groups.id,
+        groups.name,
+        COUNT(group_members.user_id) AS member_count
+    FROM groups
+    LEFT JOIN group_members ON group_members.group_id = groups.id
+    GROUP BY groups.id, groups.name
+    ORDER BY groups.name COLLATE NOCASE ASC
+    `);
+
+    return query.all().map((row) => ({
+        id: row.id as number,
+        name: row.name as string,
+        memberCount: row.member_count as number,
+    }));
+}
+
 // fetches group members ranked by total points (desc)
 // defaults users with no transactions to 0 points
 export function listGroupLeaderboard(state: MwaState, groupId: number): LeaderboardRow[] {

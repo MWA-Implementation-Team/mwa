@@ -18,6 +18,23 @@ function authCookie(userId: number) {
     return { cookie: `mwa-session=${createSession(state, userId)}` };
 }
 
+describe('GET /app/leaderboard (group tab)', () => {
+    it('lists every group without scores', async () => {
+        const viewer = createUser(state, 'lbg_view@example.com', 'lbg_view');
+        createGroup(state, 'lbg route group', viewer.id, '555-9999');
+
+        const res = await app.request('/app/leaderboard?type=group', {
+            headers: authCookie(viewer.id),
+        });
+        assert.equal(res.status, 200);
+        const html = await res.text();
+        assert.match(html, /lbg route group/);
+        assert.match(html, /1 member\(s\)/);
+        assert.doesNotMatch(html, /555-9999/);
+        assert.doesNotMatch(html, /mwa-row--self/);
+    });
+});
+
 describe('GET /app/leaderboard (team tab)', () => {
     it('redirects logged-out visitors to login', async () => {
         const res = await app.request('/app/leaderboard?type=team');

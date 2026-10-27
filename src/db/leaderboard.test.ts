@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { listGroupLeaderboard } from './leaderboard.js';
+import { listGroupLeaderboard, listLeaderboardGroups } from './leaderboard.js';
 import { addGroupMember, createGroup } from './groups.js';
 import { createUser } from './users.js';
 import { giveCoins, insertTransaction } from './transactions.js';
@@ -106,5 +106,36 @@ describe('db/leaderboard listGroupLeaderboard', () => {
 
     it('returns an empty list for a group id that does not exist', () => {
         assert.deepEqual(listGroupLeaderboard(state, 987654), []);
+    });
+});
+
+describe('db/leaderboard listLeaderboardGroups', () => {
+    it('lists every group with its member count, sorted by name', () => {
+        const owner = createUser(state, 'lbg_owner@example.com', 'lbg_owner');
+        const other = createUser(state, 'lbg_other@example.com', 'lbg_other');
+        const bravo = createGroup(state, 'lbg Bravo', owner.id, '555');
+        addGroupMember(state, bravo.id, other.id);
+        const solo = createUser(state, 'lbg_solo@example.com', 'lbg_solo');
+        createGroup(state, 'lbg alpha', solo.id, '555');
+
+        const groups = listLeaderboardGroups(state).filter((g) => g.name.startsWith('lbg '));
+        assert.deepEqual(
+            groups.map((g) => [g.name, g.memberCount]),
+            [
+                ['lbg alpha', 1],
+                ['lbg Bravo', 2],
+            ],
+        );
+    });
+
+    it('returns only id, name and member count', () => {
+        const group = createGroup(
+            state,
+            'lbg shape',
+            createUser(state, 'lbg_shape@example.com', 'lbg_shape').id,
+            '555',
+        );
+        const row = listLeaderboardGroups(state).find((g) => g.id === group.id)!;
+        assert.deepEqual(Object.keys(row).sort(), ['id', 'memberCount', 'name']);
     });
 });
