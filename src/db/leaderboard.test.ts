@@ -5,7 +5,7 @@ import {
     listPlayerLeaderboard,
     type LeaderboardBoard,
 } from './leaderboard.js';
-import { addGroupMember, createGroup, removeGroupMember } from './groups.js';
+import { addGroupMember, createGroup, deleteGroup, removeGroupMember } from './groups.js';
 import { createUser } from './users.js';
 import { giveCoins, insertTransaction } from './transactions.js';
 import { createTestMwaState } from '#src/state.js';
@@ -163,6 +163,17 @@ describe('db/leaderboard listGroupLeaderboard', () => {
         const row = listGroupLeaderboard(state, 'activity').find((g) => g.id === group.id)!;
         assert.equal(row.score, 40);
         assert.equal(row.memberCount, 2);
+    });
+
+    it('clears stamps when the group is deleted', () => {
+        const { user: u, group } = grouped('lb_gs_del', 'lb gs deleted');
+        giveCoins(state, u.id, 10);
+
+        assert.ok(deleteGroup(state, group.id, u.id));
+        const stamp = state
+            .prepare(`SELECT group_id FROM child_transactions WHERE user_id = ?`)
+            .get(u.id);
+        assert.equal(stamp?.group_id, null);
     });
 
     it('ranks groups by score desc, name asc', () => {

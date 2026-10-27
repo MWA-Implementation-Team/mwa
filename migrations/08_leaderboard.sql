@@ -1,7 +1,9 @@
 -- coins are attributed to the group the user belonged to when the delta was
--- recorded, so switching groups can never move past earnings
+-- recorded, so switching groups can never move past earnings. ON DELETE SET
+-- NULL keeps group deletion working — a dead group's coins go unattributed
 ALTER TABLE child_transactions
-ADD COLUMN group_id INTEGER REFERENCES groups(id);
+ADD COLUMN group_id INTEGER REFERENCES groups(id) ON DELETE
+SET NULL;
 CREATE INDEX child_transactions_index_group_id ON child_transactions (group_id)
 WHERE group_id IS NOT NULL;
 -- adding 'host_grant' kind for host -> user / host -> group coin grants
