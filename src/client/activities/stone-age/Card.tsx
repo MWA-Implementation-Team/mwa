@@ -5,7 +5,7 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function StoneAgeCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card stone-age"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
@@ -48,7 +48,6 @@ export function StoneAgeCard({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '83px 0 0',
-                    fontFamily: 'Georgia, serif',
                     fontSize: 33,
                     fontWeight: 800,
                 }}

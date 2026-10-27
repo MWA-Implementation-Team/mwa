@@ -2,10 +2,10 @@
 
 import type { ActivityProps } from '#src/client/activities.js';
 
-export function CellsCard({}: ActivityProps) {
+export function CellsCard({ }: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card cells"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
@@ -13,8 +13,11 @@ export function CellsCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#dff3ea',
-                background: 'linear-gradient(135deg, #305f2e, #0e3613)',
-                border: '2px solid #57a68f',
+                backgroundImage: 'url("https://i.pinimg.com/originals/c6/7d/22/c67d22ab2e6cbb2304d598de30b86b73.gif")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '2px dotted #0000006d',
             }}
         >
             <div
@@ -52,7 +55,6 @@ export function CellsCard({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '90px 0 0',
-                    fontFamily: 'Georgia, serif',
                     fontSize: 35,
                 }}
             >

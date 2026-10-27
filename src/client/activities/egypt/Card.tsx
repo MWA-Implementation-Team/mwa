@@ -5,16 +5,19 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function EgyptCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card egypt"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#000000',
-                background: 'linear-gradient(135deg, #e4ff77, #373f17)',
-                border: '2px solid #7a5c38',
+                color: '#dff3ea',
+                backgroundImage: 'url("https://i.redd.it/h9q1rf0xtma81.gif")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '2px dotted #0000006d',
             }}
         >
             <div
@@ -61,7 +64,6 @@ export function EgyptCard({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '82px 0 0',
-                    fontFamily: 'Georgia, serif',
                     fontSize: 34,
                     letterSpacing: 1,
                 }}

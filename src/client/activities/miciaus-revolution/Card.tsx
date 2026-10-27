@@ -5,16 +5,19 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function MiciausRevolutionCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card miciaus-revolution"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#a4ff2d',
-                background: 'linear-gradient(125deg, #ff0000, #860000)',
-                border: '2px solid #63000c',
+                color: '#dff3ea',
+                backgroundImage: 'url("https://i.redd.it/mew5vf5yssd61.gif")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '2px solid #ffffff6d',
             }}
         >
             <div
@@ -50,7 +53,6 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                     position: 'relative',
                     margin: '79px 0 0',
                     maxWidth: 280,
-                    fontFamily: 'Georgia, serif',
                     fontSize: 29,
                     lineHeight: 1.1,
                 }}

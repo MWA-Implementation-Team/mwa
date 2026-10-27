@@ -5,16 +5,19 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function Year2028Card({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card year-2028"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#f3f0ff',
-                background: 'linear-gradient(145deg, #8b0000, #6200ff)',
-                border: '2px solid #2200a8',
+                color: '#dff3ea',
+                backgroundImage: 'url("https://i.pinimg.com/originals/97/44/74/974474076756514513cb9c521bdce76e.gif")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '2px solid #0000006d',
             }}
         >
             <div
@@ -63,7 +66,6 @@ export function Year2028Card({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '80px 0 0',
-                    fontFamily: 'monospace',
                     fontSize: 46,
                     letterSpacing: 3,
                 }}

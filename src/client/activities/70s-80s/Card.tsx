@@ -5,28 +5,31 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function SeventiesEightiesCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card seventies-eighties"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#ffe3c9',
-                background: 'linear-gradient(160deg, #b7ff00, #77155d)',
-                border: '2px solid #b97883',
+                color: '#dff3ea',
+                backgroundImage: 'url("https://i.pinimg.com/originals/e5/1e/b7/e51eb7f31309c7b370d75ef23aa98c12.gif")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '2px solid #ffffff6d',
             }}
         >
             <div
                 aria-hidden="true"
                 style={{
                     position: 'absolute',
-                    bottom: 0,
+                    bottom: -4,
                     left: 0,
                     right: 0,
-                    height: 13,
+                    height: 14,
                     background:
-                        'linear-gradient(90deg, #cc6985 0 25%, #e6a45e 25% 50%, #8a7db6 50% 75%, #ca6a76 75%)',
+                        'linear-gradient(90deg, #5d313e 0 25%, #5e4225 25% 50%, #5a5178 50% 75%, #934b53 75%)',
                 }}
             />
 
@@ -46,7 +49,6 @@ export function SeventiesEightiesCard({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '81px 0 0',
-                    fontFamily: 'Georgia, serif',
                     fontSize: 48,
                     fontWeight: 900,
                     letterSpacing: 2,
