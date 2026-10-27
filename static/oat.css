@@ -1128,7 +1128,7 @@
         border-radius: var(--radius-medium);
         box-shadow: var(--shadow-small);
         padding: var(--space-6);
-        text-shadow: rgba(0, 0, 0, 0.518) 0px 0px 4px, black 0px 0px 8px, rgba(0, 0, 0, 0.495) 0px 0px 2px, rgba(255, 255, 255, 0.532) 0px 0px 16px;
+        text-shadow: rgba(0, 0, 0, 0.518) 0px 0px 4px, black 0px 0px 8px, rgba(0, 0, 0, 0.495) 0px 0px 2px, rgba(255, 255, 255, 0.532) 0px 0px 16px !important;
     }
 }
 @layer components {
