@@ -22,6 +22,7 @@ export type Language = {
     titleGamblingExpired: string;
     titleGamblingRejected: string;
     titleGamblingCoinFlip: string;
+    titleGamblingConnect4: string;
     titleGamblingInvite: string;
 
     headerHome: string;
@@ -198,6 +199,9 @@ export type Language = {
     gamblingCoinFlipBetDetails: string;
     gamblingCoinFlipBetOutcome: string;
     gamblingCoinFlipping: string;
+
+    gamblingConnect4: string;
+    gamblingConnect4Description: string;
 };
 
 export const languages: Record<LanguageCode, Language> = {
@@ -221,6 +225,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingExpired: 'first years | Expired',
         titleGamblingRejected: 'first years | Rejected',
         titleGamblingCoinFlip: 'first years | Coin flip',
+        titleGamblingConnect4: 'first years | Connect 4',
         titleGamblingInvite: 'first years | Gamble with {name}',
 
         headerHome: 'App',
@@ -399,6 +404,9 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingCoinFlipBetOutcome:
             'If they are right, you lose {amount} coins. If they are wrong, you win {amount} coins.',
         gamblingCoinFlipping: 'Flipping the coin...',
+
+        gamblingConnect4: 'Connect 4',
+        gamblingConnect4Description: 'Connect 4 description',
     },
     lt: {
         displayName: 'Lietuvių',
@@ -420,6 +428,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingExpired: 'pirmakursiu | Kvietimas nebegalioja',
         titleGamblingRejected: 'pirmakursiu | Kvietimas atmestas',
         titleGamblingCoinFlip: 'pirmakursiu | Monetos metimas',
+        titleGamblingConnect4: '',
         titleGamblingInvite: 'pirmakursiu | Lošk su {name}',
 
         headerHome: 'Programa',
@@ -602,6 +611,9 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingCoinFlipBetOutcome:
             'Jei spėjimas teisingas, prarasi {amount} monetų. Jei klaidingas, laimėsi {amount} monetų.',
         gamblingCoinFlipping: 'Metama moneta...',
+
+        gamblingConnect4: '',
+        gamblingConnect4Description: '',
     },
 };
 

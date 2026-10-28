@@ -15,6 +15,9 @@ import {
     winCoinFlip,
     ExpiringGamblingSession,
     queryExpiringGamblingSessions,
+    initConnect4,
+    connect4TakeTurn,
+    Gambler,
 } from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
@@ -24,6 +27,7 @@ import { streamSSE } from 'hono/streaming';
 import { safeGoto } from './login.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { Language } from '#src/client/language.js';
+import { C4Cell, C4Player, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
 
 // error_type values pages render as an inline message
 const gambleErrorMessages = {
@@ -53,13 +57,13 @@ export function registerGamblingRoutes(app: MwaHono) {
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
 
-        const errorGame = ctx.req.query('error_game');
+        const errorGame = ctx.req.query('error_game') as GameType;
         const message =
             gambleErrorMessages[ctx.req.query('error_type') as keyof typeof gambleErrorMessages];
-        const error: InviteToGamblePageProps['error'] | undefined =
-            errorGame === 'coin_flip' && message !== undefined
-                ? { dialog: errorGame, message }
-                : undefined;
+        let error: InviteToGamblePageProps['error'] | undefined = undefined;
+        if (errorGame === 'coin_flip' || errorGame === 'connect_4') {
+            error = { dialog: errorGame, message };
+        }
 
         return writePage(ctx, 'inviteToGamble', {
             targetUsername: target.username,
@@ -79,14 +83,15 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (!form) return writeErrorPage(ctx, 400);
 
         const gameType = form.get('game_type') as GameType;
+        if (gameType !== 'coin_flip' && gameType !== 'connect_4') {
+            return writeErrorPage(ctx, 400);
+        }
+
         const betAmount = Number(form.get('bet_amount'));
         if (!Number.isSafeInteger(betAmount) || betAmount <= 0) {
-            if (gameType === 'coin_flip') {
-                return ctx.redirect(
-                    `/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=invalid`,
-                );
-            }
-            return writeErrorPage(ctx, 400);
+            return ctx.redirect(
+                `/app/interact/${encodeURIComponent(token)}/gamble?error_game=${gameType}&error_type=invalid`,
+            );
         }
 
         const pendingId = findPendingGamblingSession(ctx.var, user.id, target.id);
@@ -108,13 +113,19 @@ export function registerGamblingRoutes(app: MwaHono) {
                 });
                 break;
             }
-            default:
-                return writeErrorPage(ctx, 400);
+            case 'connect_4': {
+                sessionId = initConnect4(ctx.var, {
+                    p1: user.id,
+                    p2: target.id,
+                    betAmount,
+                });
+                break;
+            }
         }
 
         if (sessionId === null) {
             return ctx.redirect(
-                `/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=broke`,
+                `/app/interact/${encodeURIComponent(token)}/gamble?error_game=${gameType}&error_type=broke`,
             );
         }
 
@@ -224,13 +235,12 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 400);
         }
 
-        // ?goto wins; else send them back to the page the form was used on
         let goto = ctx.req.query('goto');
         if (!goto) {
             try {
                 goto = new URL(ctx.req.header('Referer') ?? '').pathname;
             } catch {
-                // missing or malformed referer — fall back to /app below
+                // fallback below
             }
         }
 
@@ -238,6 +248,45 @@ export function registerGamblingRoutes(app: MwaHono) {
         cancelGamblingSession(ctx.var, sessionId, 'rejected', user.id);
         broadcastSessionUpdate(ctx.var, sessionId);
         return ctx.redirect(safeGoto(ctx, goto) ?? '/app');
+    });
+
+    app.post('/app/gambling/sessions/:id/c4-place', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const sessionId = Number(ctx.req.param('id'));
+        const game = findGamblingSessionById(ctx.var, sessionId);
+        if (!game) {
+            return writeErrorPage(ctx, 404);
+        }
+
+        if (game.gameType !== 'connect_4' || (user.id !== game.p1 && user.id !== game.p2)) {
+            return writeErrorPage(ctx, 400);
+        }
+
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) {
+            return writeErrorPage(ctx, 400);
+        }
+
+        const x = Number(form.get('x'));
+        if (x < 0 || x >= c4Width) {
+            return writeErrorPage(ctx, 400);
+        }
+
+        const gambler: Gambler = game.p1 === user.id ? 'p1' : 'p2';
+        const c4Player: C4Player = gambler === 'p1' ? 'x' : 'o';
+        const board = Connect4Board.fromString(game.boardStr);
+
+        if (!board.place(x, c4Player)) {
+            return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
+        }
+
+        if (connect4TakeTurn(ctx.var, sessionId, gambler, board)) {
+            broadcastSessionUpdate(ctx.var, sessionId);
+        }
+
+        return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
     });
 }
 

@@ -10,7 +10,18 @@ export class Connect4Board {
     #cells: C4Cell[];
 
     constructor(cells: C4Cell[] = Array(c4Width * c4Height).fill('.')) {
+        if (cells.length !== c4Width * c4Height) {
+            throw new Error(`Expected ${c4Width * c4Height} cells`);
+        }
+        for (const cell of cells) {
+            if (cell !== 'x' && cell !== 'o' && cell !== '.') {
+                throw new Error(`Cells must consist of x, o and . chars`);
+            }
+        }
         this.#cells = cells;
+        if (!this.#isValid()) {
+            throw new Error('Floating cells detected');
+        }
     }
 
     static fromString(str: string) {
@@ -25,12 +36,8 @@ export class Connect4Board {
             if (trimmedLine.length !== c4Width) {
                 throw new Error(`Line must be ${c4Width} chars: '${trimmedLine}'`);
             }
-
             for (const c of trimmedLine) {
-                if (c !== 'x' && c !== 'o' && c !== '.') {
-                    throw new Error(`String must consist of x, o and . chars`);
-                }
-                cells.push(c);
+                cells.push(c as C4Cell);
             }
         }
         return new Connect4Board(cells);
@@ -44,6 +51,16 @@ export class Connect4Board {
         this.#cells[this.#idx(x, y)] = cell;
     }
 
+    place(x: number, player: C4Player): boolean {
+        for (let y = 0; y < c4Height; y++) {
+            if (this.get(x, y) === '.') {
+                this.set(x, y, player);
+                return true;
+            }
+        }
+        return false;
+    }
+
     isValidPos(x: number, y: number): boolean {
         return x >= 0 && x < c4Width && y >= 0 && y < c4Height;
     }
@@ -55,14 +72,34 @@ export class Connect4Board {
         return x + c4Width * y;
     }
 
-    print(): void {
-        for (let y = 0; y < c4Height; y++) {
-            let c = '';
-            for (let x = 0; x < c4Width; x++) {
-                c += this.get(x, y);
+    asString(): string {
+        let out = '';
+        for (let y = c4Height - 1; y >= 0; y--) {
+            if (y !== c4Height - 1) {
+                out += '\n';
             }
-            console.log(c);
+            let line = '';
+            for (let x = 0; x < c4Width; x++) {
+                line += this.get(x, y);
+            }
+            out += line;
         }
+        return out;
+    }
+
+    #isValid(): boolean {
+        for (let x = 0; x < c4Width; x++) {
+            let foundEmpty = false;
+            for (let y = 0; y < c4Height; y++) {
+                const cell = this.get(x, y);
+                if (cell === '.') {
+                    foundEmpty = true;
+                } else if (foundEmpty) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     winner(): C4Player | null {
@@ -123,19 +160,19 @@ export class Connect4Board {
         }
 
         for (let yStart = c4Height - 1; yStart >= 0; yStart--) {
-            if (checkDiagonal(0, yStart, 1, 1)){
+            if (checkDiagonal(0, yStart, 1, 1)) {
                 return player;
             }
-            if (checkDiagonal(c4Width - 1, yStart, -1, 1)){
+            if (checkDiagonal(c4Width - 1, yStart, -1, 1)) {
                 return player;
             }
         }
 
         for (let xStart = 0; xStart < c4Width; xStart++) {
-            if (checkDiagonal(xStart, 0, 1, 1)){
+            if (checkDiagonal(xStart, 0, 1, 1)) {
                 return player;
             }
-            if (checkDiagonal(xStart, 0, -1, 1)){
+            if (checkDiagonal(xStart, 0, -1, 1)) {
                 return player;
             }
         }

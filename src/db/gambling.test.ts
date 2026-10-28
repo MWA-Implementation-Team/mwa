@@ -43,6 +43,7 @@ describe('db/gambling', () => {
         assert.equal(balance(p2.id), 0);
 
         const game = findGamblingSessionById(state, sessionId);
+        assert.equal(game?.gameType, 'coin_flip');
         assert.equal(game?.status.type, 'pending');
         assert.equal(game?.betAmount, 30);
         assert.equal(game?.p1Guess, 'heads');
@@ -231,6 +232,7 @@ describe('db/gambling', () => {
 
         const row = coinFlipRow(sessionId);
         const game = findGamblingSessionById(state, sessionId);
+        assert.equal(game?.gameType, 'coin_flip');
         assert.equal(game?.status.type, 'ended');
         if (game?.status.type !== 'ended') return;
 

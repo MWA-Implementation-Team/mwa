@@ -3,10 +3,22 @@ import assert from 'node:assert/strict';
 import { Connect4Board } from "./connect4.js";
 
 describe('connect 4', () => {
-    it('wins', () => {
-        const initialBoard = new Connect4Board();
-        initialBoard.print();
+    it('encodes to string correctly', () => {
+        const board = Connect4Board.fromString(`
+        .......
+        .o.oxoo
+        ..x....
+        x..xxx.
+        x.x....
+        .x.xxx.
+        `);
+        const str = board.asString();
+        const parsedBoard = Connect4Board.fromString(str);
+        const parsedStr = parsedBoard.asString();
+        assert.equal(str, parsedStr);
+    });
 
+    it('wins', () => {
         const none = Connect4Board.fromString(`
         .......
         .o.oxoo

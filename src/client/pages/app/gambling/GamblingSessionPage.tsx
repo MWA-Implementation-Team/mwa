@@ -2,10 +2,12 @@ import { Trans } from '#src/client/ui/Trans.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
-import { CoinSide, Gambler, RunningGame } from '#src/db/gambling.js';
+import { CoinFlipGame, CoinSide, Connect4Game, Gambler, RunningGame } from '#src/db/gambling.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import { Language, TranslateFn } from '#src/client/language.js';
 import PageShell from '../PageShell.js';
+import { C4Cell, c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
+import { ComponentChildren } from 'preact';
 
 type GamblingSessionPageProps = {
     sessionId: number;
@@ -19,16 +21,23 @@ export const gamblingSessionPage: Page<GamblingSessionPageProps> = {
     customTitle: true,
 };
 
-const titleKeys: Record<RunningGame['status']['type'], keyof Language> = {
-    pending: 'titleGamblingRequest',
-    expired: 'titleGamblingExpired',
-    rejected: 'titleGamblingRejected',
-    running: 'titleGamblingCoinFlip', // coin flip is the only game for now
-    ended: 'titleGamblingCoinFlip',
-};
-
 function title(t: TranslateFn, game: RunningGame): string {
-    return t(titleKeys[game.status.type]);
+    switch (game.status.type) {
+        case 'pending':
+            return t('titleGamblingRequest');
+        case 'expired':
+            return t('titleGamblingExpired');
+        case 'rejected':
+            return t('titleGamblingRejected');
+        case 'running':
+        case 'ended':
+            switch (game.gameType) {
+                case 'coin_flip':
+                    return t('titleGamblingCoinFlip');
+                case 'connect_4':
+                    return t('titleGamblingCoinFlip');
+            }
+    }
 }
 
 function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPageProps) {
@@ -62,7 +71,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
 
     switch (currentGame.status.type) {
         case 'pending': {
-            if (currentGame.p2 === user?.id) {
+            if (currentGame.p2 == user?.id) {
                 return (
                     <PageShell section="gambling" hideNotification={true}>
                         <section class="mwa-panel">
@@ -70,32 +79,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                 <h2>{t('gamblingRequest')}</h2>
                             </div>
                             <div class="mwa-panel-body">
-                                <p class="mwa-intro">
-                                    {t('gamblingCoinFlipChallenged', {
-                                        player: currentGame.p1Name,
-                                    })}
-                                </p>
-                                <p>
-                                    <Trans
-                                        id="gamblingCoinFlipBetDetails"
-                                        values={{
-                                            amount: <strong>{currentGame.betAmount}</strong>,
-                                            side: (
-                                                <strong>
-                                                    {t(coinSideTrans(currentGame.p1Guess))}
-                                                </strong>
-                                            ),
-                                        }}
-                                    />
-                                </p>
-                                <p>
-                                    <Trans
-                                        id="gamblingCoinFlipBetOutcome"
-                                        values={{
-                                            amount: <strong>{currentGame.betAmount}</strong>,
-                                        }}
-                                    />
-                                </p>
+                                <PendingProposal t={t} currentGame={currentGame} />
                                 <p>{t('gamblingAcceptQuestion')}</p>
                                 <form method="POST" class="mwa-actions">
                                     <button
@@ -181,34 +165,8 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                 >
                     {disconnected}
                     <section class="mwa-panel">
-                        <div class="mwa-panel-head">
-                            <h2>{t('gamblingCoinFlip')}</h2>
-                        </div>
-                        <div class="mwa-panel-body">
-                            <p class="mwa-intro">
-                                {t('gamblingVersus', {
-                                    p1: currentGame.p1Name,
-                                    p2: currentGame.p2Name,
-                                })}
-                            </p>
-                            {currentGame.status.type === 'ended' ? (
-                                <>
-                                    <h3>{t(coinSideTrans(currentGame.status.flipResult))}</h3>
-                                    <p>
-                                        {side && side === currentGame.status.winner
-                                            ? t('gamblingYouWin')
-                                            : t('gamblingWinner', {
-                                                  player:
-                                                      currentGame.status.winner === 'p1'
-                                                          ? currentGame.p1Name
-                                                          : currentGame.p2Name,
-                                              })}
-                                    </p>
-                                </>
-                            ) : (
-                                <p class="mwa-muted">{t('gamblingCoinFlipping')}</p>
-                            )}
-                        </div>
+                        {currentGame.gameType === 'coin_flip' && <CoinFlipping t={t} currentGame={currentGame} side={side} />}
+                        {currentGame.gameType === 'connect_4' && <Connect4View sessionId={sessionId} t={t} currentGame={currentGame} side={side} />}
                     </section>
                 </PageShell>
             );
@@ -216,6 +174,136 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
     }
 }
 
+function PendingProposal({ t, currentGame }: { t: TranslateFn, currentGame: RunningGame }) {
+    switch (currentGame.gameType) {
+        case 'coin_flip':
+            return (
+                <>
+                    <p class="mwa-intro">
+                        {t('gamblingCoinFlipChallenged', {
+                            player: currentGame.p1Name,
+                        })}
+                    </p>
+                    <p>
+                        <Trans
+                            id="gamblingCoinFlipBetDetails"
+                            values={{
+                                amount: <strong>{currentGame.betAmount}</strong>,
+                                side: (
+                                    <strong>
+                                        {t(coinSideTrans(currentGame.p1Guess))}
+                                    </strong>
+                                ),
+                            }}
+                        />
+                    </p>
+                    <p>
+                        <Trans
+                            id="gamblingCoinFlipBetOutcome"
+                            values={{
+                                amount: <strong>{currentGame.betAmount}</strong>,
+                            }}
+                        />
+                    </p>
+                </>
+            );
+        case 'connect_4':
+            return (
+                <>
+                    <p class="mwa-intro">
+                        {currentGame.p1Name} invites you to a Connect 4 duel.
+                    </p>
+                </>
+            );
+    }
+}
+
+function CoinFlipping({ t, currentGame, side }: { t: TranslateFn, currentGame: CoinFlipGame, side: Gambler | null }) {
+    return (
+        <>
+            <div class="mwa-panel-head">
+                <h2>{t('gamblingCoinFlip')}</h2>
+            </div>
+            <div class="mwa-panel-body">
+                <p class="mwa-intro">
+                    {t('gamblingVersus', {
+                        p1: currentGame.p1Name,
+                        p2: currentGame.p2Name,
+                    })}
+                </p>
+                {currentGame.status.type === 'ended' ? (
+                    <>
+                        {/*<h3>{t(coinSideTrans(currentGame.status.flipResult))}</h3>*/}
+                        <p>
+                            {side && side === currentGame.status.winner
+                                ? t('gamblingYouWin')
+                                : t('gamblingWinner', {
+                                    player:
+                                        sideName(currentGame, currentGame.status.winner),
+                                })}
+                        </p>
+                    </>
+                ) : (
+                    <p class="mwa-muted">{t('gamblingCoinFlipping')}</p>
+                )}
+            </div>
+        </>
+    )
+}
+
+function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, t: TranslateFn, currentGame: Connect4Game, side: Gambler | null }) {
+    const board = Connect4Board.fromString(currentGame.boardStr);
+
+    function Cell(c: C4Cell): ComponentChildren {
+        switch (c) {
+            case 'x':
+                return '🔴';
+            case 'o':
+                return '🟢';
+            case '.':
+                return '⚪';
+        }
+    }
+
+    const isYourTurn = currentGame.nextTurn === side;
+
+    return (
+        <>
+            <form method="POST" action={`/app/gambling/sessions/${sessionId}/c4-place`}>
+                <table>
+                    <tbody>
+                        {Array.from({ length: c4Height }, (_, y) => (
+                            <div key={y}>
+                                {Array.from({ length: c4Width }, (_, x) => (
+
+                                    <td
+                                        key={x}
+                                    >
+                                        <button
+                                            type="submit"
+                                            name="x"
+                                            value={x}
+                                            disabled={!isYourTurn}
+                                        >
+                                            {Cell(board.get(x, c4Height - 1 - y))}
+                                        </button>
+                                    </td>
+                                ))}
+                            </div>
+                        ))}
+                    </tbody>
+                </table>
+
+                <h2>{currentGame.nextTurn === side ? 'YOUR TURN' : `${sideName(currentGame, currentGame.nextTurn)}'s turn`}</h2>
+            </form>
+        </>
+    );
+}
+
 function coinSideTrans(side: CoinSide) {
     return side === 'heads' ? 'gamblingHeads' : 'gamblingTails';
+}
+
+function sideName(game: RunningGame, gambler: Gambler) {
+    return gambler === 'p1' ? game.p1Name : game.p2Name;
 }

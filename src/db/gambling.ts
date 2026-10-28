@@ -3,8 +3,9 @@ import { randomInt } from 'node:crypto';
 import { runTransaction } from './transaction.js';
 import { insertTransaction } from './transactions.js';
 import { findUserById } from './users.js';
+import { Connect4Board } from '#src/client/gambling/connect4.js';
 
-export type GameType = 'coin_flip';
+export type GameType = 'coin_flip' | 'connect_4';
 
 export type SessionSummary = {
     id: number;
@@ -21,29 +22,49 @@ export type CommonGameOpts = {
 
 export type Gambler = 'p1' | 'p2';
 
-// The shape assumes coin_flip — the only game for now. A second game type
-// should turn this into a discriminated union on gameType.
-export type RunningGame = {
-    gameType: 'coin_flip';
+type CoinFlipStatus =
+    | { type: 'pending' }
+    | { type: 'expired' }
+    | { type: 'rejected' }
+    | { type: 'running' }
+    | {
+        type: 'ended';
+        winner: Gambler;
+        flipResult: CoinSide;
+    };
 
-    status:
-        | { type: 'pending' }
-        | { type: 'expired' }
-        | { type: 'rejected' }
-        | { type: 'running' }
-        | {
-              type: 'ended';
-              winner: Gambler;
-              flipResult: CoinSide;
-          };
+type Connect4Status =
+    | { type: 'pending' }
+    | { type: 'expired' }
+    | { type: 'rejected' }
+    | { type: 'running' }
+    | {
+        type: 'ended';
+        winner: Gambler | 'draw';
+    };
 
+type RunningGameCommon = {
     p1: number;
     p2: number;
     p1Name: string;
     p2Name: string;
     betAmount: number;
+};
+
+export type CoinFlipGame = RunningGameCommon & {
+    gameType: 'coin_flip';
+    status: CoinFlipStatus;
     p1Guess: CoinSide;
 };
+
+export type Connect4Game = RunningGameCommon & {
+    gameType: 'connect_4';
+    status: Connect4Status
+    boardStr: string;
+    nextTurn: Gambler;
+};
+
+export type RunningGame = CoinFlipGame | Connect4Game;
 
 export type Invitation = {
     id: number;
@@ -125,36 +146,83 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
     const row = query.get(sessionId);
     if (!row) return null;
 
-    const p1Guess = row.cf_p1_bet as CoinSide;
+    const gameType = row.game_type as GameType;
 
-    let status: RunningGame['status'];
-    if (row.status === 'ended') {
-        status = {
-            type: 'ended',
-            winner: row.winner as Gambler, // draw not possible in coin flip
-            flipResult: row.cf_actual_result as CoinSide,
-        };
-    } else if (
-        row.status === 'pending' ||
-        row.status === 'expired' ||
-        row.status === 'rejected' ||
-        row.status === 'running'
-    ) {
-        status = { type: row.status };
-    } else {
-        throw new Error(`Unknown session status ${row.status}`);
-    }
+    const statusRow = row.status as string;
 
-    return {
-        gameType: row.game_type as GameType,
-        p1Guess,
-        status,
+    const common = {
         p1: row.p1 as number,
         p2: row.p2 as number,
         p1Name: row.p1_name as string,
         p2Name: row.p2_name as string,
         betAmount: row.bet_amount as number,
     };
+
+    switch (gameType) {
+        case 'coin_flip': {
+            const p1Guess = row.cf_p1_bet as CoinSide;
+
+            let status: CoinFlipStatus;
+            switch (statusRow) {
+                case 'pending':
+                case 'expired':
+                case 'rejected':
+                case 'running':
+                    status = { type: statusRow };
+                    break;
+                case 'ended':
+                    status = {
+                        type: 'ended',
+                        winner: row.winner as Gambler, // draw not possible in coin flip
+                        flipResult: row.winner === 'p1' ? p1Guess : p1Guess === 'heads' ? 'tails' : 'heads',
+                    };
+                    break;
+                default:
+                    throw new Error(`Unknown session status ${row.status}`);
+            }
+
+            return {
+                gameType: 'coin_flip',
+                p1Guess,
+                status,
+                ...common
+            };
+        }
+        case 'connect_4': {
+            let status: Connect4Status;
+            switch (statusRow) {
+                case 'pending':
+                case 'expired':
+                case 'rejected':
+                case 'running':
+                    status = { type: statusRow };
+                    break;
+                case 'ended':
+                    status = {
+                        type: 'ended',
+                        winner: row.winner as Gambler | 'draw',
+                    };
+                    break;
+                default:
+                    throw new Error(`Unknown session status ${row.status}`);
+            }
+
+            // unsure how to do it in 1 query
+            const turn = state.prepare(`
+            SELECT player, new_board from connect_4_turns
+            WHERE session = ?
+            ORDER BY created_at DESC LIMIT 1
+            `).get(sessionId)!;
+
+            return {
+                gameType: 'connect_4',
+                boardStr: turn.new_board as string,
+                nextTurn: turn.player === 'p1' ? 'p2' : 'p1',
+                status,
+                ...common
+            };
+        }
+    }
 }
 
 // An open invitation from p1 to p2, if one exists — used to avoid stacking
@@ -302,12 +370,12 @@ function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOp
 
 export type DeductCoinsResult =
     | {
-          type: 'success';
-          parentId: number;
-      }
+        type: 'success';
+        parentId: number;
+    }
     | {
-          type: 'too_broke';
-      };
+        type: 'too_broke';
+    };
 
 // this is expected to run in a transaction
 function deductCoinsForGambling(
@@ -383,4 +451,43 @@ export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
         sessionId: row.session_id as number,
         acceptedTime: new Date(row.accepted_at as string),
     }));
+}
+
+// --- CONNECT 4 GAME ---
+
+export function initConnect4(
+    state: MwaState,
+    opts: CommonGameOpts,
+): number | null {
+    return runTransaction(state.db, () => {
+        const sessionId = initGamblingSession(state, 'connect_4', opts);
+        if (sessionId === null) return null;
+
+        const secondTurn: Gambler = randomInt(2) === 0 ? 'p1' : 'p2';
+        const initialBoard = new Connect4Board().asString();
+
+        state.prepare(`
+        INSERT INTO connect_4_turns (session, player, new_board) VALUES (?, ?, ?)
+        `).run(sessionId, secondTurn, initialBoard);
+
+        return sessionId;
+    });
+}
+
+export function connect4TakeTurn(state: MwaState, sessionId: number, player: Gambler, newBoard: Connect4Board): boolean {
+    return runTransaction(state.db, () => {
+        const row = state.prepare(`
+        SELECT player from connect_4_turns
+        WHERE session = ?
+        ORDER BY created_at DESC LIMIT 1
+        `).get(sessionId);
+        if (!row) return false;
+        const nextPlayer: Gambler = row.player === 'p1' ? 'p2' : 'p1';
+        if (player !== nextPlayer) return false;
+
+        state.prepare(`
+        INSERT INTO connect_4_turns (session, player, new_board) VALUES (?, ?, ?)
+        `).run(sessionId, player, newBoard.asString());
+        return true;
+    });
 }
