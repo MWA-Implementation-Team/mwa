@@ -184,6 +184,7 @@ export type Language = {
     gamblingRejected: string;
     gamblingRejectedDetails: string;
     gamblingYouWin: string;
+    gamblingDraw: string;
     gamblingWinner: string;
     gamblingNotificationInvite: string;
     gamblingOpen: string;
@@ -388,6 +389,7 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingRejected: 'Rejected',
         gamblingRejectedDetails: '{player} has rejected this challenge.',
         gamblingYouWin: 'You win!',
+        gamblingDraw: 'It\'s a draw!',
         gamblingWinner: '{player} won',
         gamblingNotificationInvite: '{player} has invited you to gamble!',
         gamblingOpen: 'Open',
@@ -595,6 +597,7 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingRejected: 'Kvietimas atmestas',
         gamblingRejectedDetails: '{player} atmetė šį kvietimą.',
         gamblingYouWin: 'Tu laimėjai!',
+        gamblingDraw: 'Lygiosios',
         gamblingWinner: 'Laimėjo {player}',
         gamblingNotificationInvite: '{player} kviečia tave lošti!',
         gamblingOpen: 'Atidaryti',

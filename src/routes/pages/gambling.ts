@@ -18,6 +18,7 @@ import {
     initConnect4,
     connect4TakeTurn,
     Gambler,
+    winGamblingSession,
 } from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
@@ -283,6 +284,11 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         if (connect4TakeTurn(ctx.var, sessionId, gambler, board)) {
+            const winner = board.winner();
+            if (winner) {
+                winGamblingSession(ctx.var, sessionId, winner === 'x' ? 'p1' : 'p2');
+            }
+
             broadcastSessionUpdate(ctx.var, sessionId);
         }
 

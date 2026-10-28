@@ -316,9 +316,6 @@ export function winGamblingSession(state: MwaState, sessionId: number, winner: G
         `);
         const row = sessionQuery.get(sessionId);
         if (!row) {
-            // Called from a timer — the session may already be settled. A throw
-            // here would escape the setTimeout callback and crash the process.
-            console.warn(`[gambling] settle skipped for session ${sessionId}: not running`);
             return;
         }
         const betAmount = row.bet_amount as number;

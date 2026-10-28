@@ -6,7 +6,7 @@ import { CoinFlipGame, CoinSide, Connect4Game, Gambler, RunningGame } from '#src
 import { useContext, useEffect, useState } from 'preact/hooks';
 import { Language, TranslateFn } from '#src/client/language.js';
 import PageShell from '../PageShell.js';
-import { C4Cell, c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
+import { C4Cell, c4Height, C4Player, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
 import { ComponentChildren } from 'preact';
 
 type GamblingSessionPageProps = {
@@ -233,9 +233,9 @@ function CoinFlipping({ t, currentGame, side }: { t: TranslateFn, currentGame: C
                 </p>
                 {currentGame.status.type === 'ended' ? (
                     <>
-                        {/*<h3>{t(coinSideTrans(currentGame.status.flipResult))}</h3>*/}
+                        {<h3>{t(coinSideTrans(currentGame.status.flipResult))}</h3>}
                         <p>
-                            {side && side === currentGame.status.winner
+                            {side === currentGame.status.winner
                                 ? t('gamblingYouWin')
                                 : t('gamblingWinner', {
                                     player:
@@ -254,18 +254,40 @@ function CoinFlipping({ t, currentGame, side }: { t: TranslateFn, currentGame: C
 function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, t: TranslateFn, currentGame: Connect4Game, side: Gambler | null }) {
     const board = Connect4Board.fromString(currentGame.boardStr);
 
-    function Cell(c: C4Cell): ComponentChildren {
-        switch (c) {
+    function color(side: Gambler | C4Cell) {
+        switch (side) {
+            case 'p1':
             case 'x':
-                return '🔴';
+                return '#ff0000';
+            case 'p2':
             case 'o':
-                return '🟢';
-            case '.':
-                return '⚪';
+                return '#00ff00'
+            default:
+                return '#ffffff';
         }
     }
 
-    const isYourTurn = currentGame.nextTurn === side;
+    const isYourTurn = currentGame.nextTurn === side && currentGame.status.type === 'running';
+
+    let status: ComponentChildren;
+    if (currentGame.status.type === 'ended') {
+        if (side === currentGame.status.winner) {
+            status = <h1>{t('gamblingYouWin')}</h1>;
+        } else if (currentGame.status.winner === 'draw') {
+            status = <h1>{t('gamblingDraw')}</h1>;
+        } else {
+            status = <h1>{t('gamblingWinner', {
+                player:
+                    sideName(currentGame, currentGame.status.winner),
+            })}</h1>
+        }
+    } else {
+        if (currentGame.nextTurn === side) {
+            status = <h1 style={{ color: color(side) }}>YOUR TURN</h1>;
+        } else {
+            status = <h1 style={{ color: color(currentGame.nextTurn) }}>{sideName(currentGame, currentGame.nextTurn)}'s turn</h1>;
+        }
+    }
 
     return (
         <>
@@ -284,8 +306,8 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
                                             name="x"
                                             value={x}
                                             disabled={!isYourTurn}
+                                            style={{ backgroundColor: color(board.get(x, c4Height - 1 - y)), aspectRatio: '1 / 1' }}
                                         >
-                                            {Cell(board.get(x, c4Height - 1 - y))}
                                         </button>
                                     </td>
                                 ))}
@@ -294,7 +316,7 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
                     </tbody>
                 </table>
 
-                <h2>{currentGame.nextTurn === side ? 'YOUR TURN' : `${sideName(currentGame, currentGame.nextTurn)}'s turn`}</h2>
+                <h2>{status}</h2>
             </form>
         </>
     );
