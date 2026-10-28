@@ -19,6 +19,8 @@ import {
     connect4TakeTurn,
     Gambler,
     winGamblingSession,
+    queryPendingConnect4Matches,
+    queryActiveGamblingSession,
 } from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
@@ -28,7 +30,7 @@ import { streamSSE } from 'hono/streaming';
 import { safeGoto } from './login.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { Language } from '#src/client/language.js';
-import { C4Cell, C4Player, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
+import { C4Player, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
 
 // error_type values pages render as an inline message
 const gambleErrorMessages = {
@@ -284,16 +286,21 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         if (connect4TakeTurn(ctx.var, sessionId, gambler, board)) {
-            const winner = board.winner();
-            if (winner) {
-                winGamblingSession(ctx.var, sessionId, winner === 'x' ? 'p1' : 'p2');
-            }
-
+            updateConnect4Match(ctx.var, sessionId, board);
             broadcastSessionUpdate(ctx.var, sessionId);
         }
 
         return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
     });
+}
+
+function updateConnect4Match(state: MwaState, sessionId: number, board: Connect4Board) {
+    const winner = board.winner();
+    if (winner) {
+        winGamblingSession(state, sessionId, winner === 'x' ? 'p1' : 'p2');
+    } else if (board.isFull()) {
+        winGamblingSession(state, sessionId, 'draw');
+    }
 }
 
 export function scheduleGamblingTimers(state: MwaState) {
@@ -302,6 +309,14 @@ export function scheduleGamblingTimers(state: MwaState) {
 
     const coinFlips = queryPendingCoinFlips(state);
     coinFlips.forEach((flip) => scheduleCoinFlipWinner(state, flip));
+
+    const pendingConnect4s = queryPendingConnect4Matches(state);
+    for (const pending of pendingConnect4s) {
+        const game = findGamblingSessionById(state, pending.sessionId);
+        if (!game || game.gameType !== 'connect_4') continue;
+        const board = Connect4Board.fromString(game.boardStr);
+        updateConnect4Match(state, pending.sessionId, board);
+    }
 }
 
 // Fires task at the given timestamp, or immediately if it already passed.

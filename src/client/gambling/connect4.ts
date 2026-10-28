@@ -19,8 +19,17 @@ export class Connect4Board {
             }
         }
         this.#cells = cells;
-        if (!this.#isValid()) {
-            throw new Error('Floating cells detected');
+
+        for (let x = 0; x < c4Width; x++) {
+            let foundEmpty = false;
+            for (let y = 0; y < c4Height; y++) {
+                const cell = this.get(x, y);
+                if (cell === '.') {
+                    foundEmpty = true;
+                } else if (foundEmpty) {
+                    throw new Error('Floating cells detected');
+                }
+            }
         }
     }
 
@@ -87,19 +96,8 @@ export class Connect4Board {
         return out;
     }
 
-    #isValid(): boolean {
-        for (let x = 0; x < c4Width; x++) {
-            let foundEmpty = false;
-            for (let y = 0; y < c4Height; y++) {
-                const cell = this.get(x, y);
-                if (cell === '.') {
-                    foundEmpty = true;
-                } else if (foundEmpty) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    isFull(): boolean {
+        return !this.#cells.includes('.');
     }
 
     winner(): C4Player | null {

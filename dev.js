@@ -54,7 +54,7 @@ let crashCount = 0;
 const killedForRestart = new WeakSet();
 
 function startServer() {
-    const child = spawn('node', ['./dist/main.js', '--dev'], {
+    const child = spawn('node', ['--enable-source-maps', './dist/main.js', '--dev'], {
         stdio: ['inherit', 'pipe', 'inherit'],
     });
     server = child;

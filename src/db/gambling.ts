@@ -276,39 +276,27 @@ export function cancelGamblingSession(
     userId?: number,
 ) {
     runTransaction(state.db, () => {
-        const row = state
-            .prepare(
-                `
+        const row = state.prepare(`
         SELECT p1_deposit_tx FROM gambling_sessions
         WHERE id = ? AND (? IS NULL OR p2 = ?) AND status = 'pending'
-        `,
-            )
-            .get(sessionId, userId ?? null, userId ?? null);
+        `).get(sessionId, userId ?? null, userId ?? null);
         if (!row) return;
 
-        state
-            .prepare(
-                `
+        state.prepare(`
         UPDATE gambling_sessions SET status = ?, p1_deposit_tx = NULL
         WHERE id = ?
-        `,
-            )
-            .run(reason, sessionId);
+        `).run(reason, sessionId);
 
         // Delete p1 deposit transaction to return money to p1.
         // The balance delta is supposed to be negative so this should be fine.
         // At the same time, p1_deposit_tx is cascaded to null and that marks the session as rejected.
-        state
-            .prepare(
-                `
+        state.prepare(`
         DELETE FROM parent_transactions WHERE id = ?
-        `,
-            )
-            .run(row.p1_deposit_tx);
+        `).run(row.p1_deposit_tx);
     });
 }
 
-export function winGamblingSession(state: MwaState, sessionId: number, winner: Gambler) {
+export function winGamblingSession(state: MwaState, sessionId: number, winner: Gambler | 'draw') {
     runTransaction(state.db, () => {
         const sessionQuery = state.prepare(`
         SELECT p1, p2, bet_amount FROM gambling_sessions
@@ -319,18 +307,41 @@ export function winGamblingSession(state: MwaState, sessionId: number, winner: G
             return;
         }
         const betAmount = row.bet_amount as number;
-        const userId = winner === 'p1' ? row.p1 : row.p2;
-        const parentId = insertTransaction(
-            state,
-            'gambling_winnings',
-            userId as number,
-            betAmount * 2,
-        );
 
-        const update = state.prepare(`
-        UPDATE gambling_sessions SET status = 'ended', winner = ?, winner_tx = ? WHERE id = ?
-        `);
-        update.run(winner, parentId, sessionId);
+        switch (winner) {
+            case 'p1':
+            case 'p2': {
+                const userId = winner === 'p1' ? row.p1 : row.p2;
+                const parentId = insertTransaction(
+                    state,
+                    'gambling_winnings',
+                    userId as number,
+                    betAmount * 2,
+                );
+
+                state.prepare(`
+                UPDATE gambling_sessions SET status = 'ended', winner = ?, winner_tx = ? WHERE id = ?
+                `).run(winner, parentId, sessionId);
+                break;
+            }
+            case 'draw': {
+                const row = state.prepare(`
+                SELECT p1_deposit_tx, p2_deposit_tx FROM gambling_sessions
+                WHERE id = ? AND status = 'running'
+                `).get(sessionId);
+                if (!row) return;
+
+                state.prepare(`
+                UPDATE gambling_sessions SET status = ?, winner = 'draw', p1_deposit_tx = NULL, p2_deposit_tx = NULL
+                WHERE id = ?
+                `).run('ended', sessionId);
+
+                state.prepare(`
+                DELETE FROM parent_transactions WHERE id = ? OR id = ?;
+                `).run(row.p1_deposit_tx, row.p2_deposit_tx);
+                break;
+            }
+        }
     });
 }
 
@@ -487,4 +498,18 @@ export function connect4TakeTurn(state: MwaState, sessionId: number, player: Gam
         `).run(sessionId, player, newBoard.asString());
         return true;
     });
+}
+
+export type PendingConnect4Match = {
+    sessionId: number;
+};
+
+export function queryPendingConnect4Matches(state: MwaState): PendingConnect4Match[] {
+    const select = state.prepare(`
+    SELECT id FROM gambling_sessions
+    WHERE game_type = 'connect_4' AND status = 'running'
+    `);
+    return select.all().map((row) => ({
+        sessionId: row.id as number,
+    }));
 }
