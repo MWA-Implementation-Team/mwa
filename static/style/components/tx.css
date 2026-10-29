@@ -1,5 +1,5 @@
 /* Transaction table — oat .table markup, compacted. Left-edge sign bars
-   tint positive/negative rows. */
+   tint positive rows green and negative rows red. */
 .mwa-tx {
     min-width: 0;
     /* .table's overflow-x:auto also computes overflow-y:auto, which can show

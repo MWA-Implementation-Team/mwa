@@ -20,6 +20,6 @@
     --text-danger: #ffd2de;
     --divider: rgb(from var(--muted-foreground) r g b / 0.32);
     --highlight-self: rgb(from var(--muted-foreground) r g b / 0.12);
-    --tx-positive: hsl(200 85% 55%);
-    --tx-negative: hsl(48 100% 32%);
+    --tx-positive: #27df7d;
+    --tx-negative: #ff7373;
 }
