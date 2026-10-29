@@ -55,7 +55,7 @@ for f in $(git ls-tree --name-only "$base" -- migrations/); do
     [ "$skip" -eq 1 ] && continue
     n=$(basename "$f" | cut -d_ -f1)
     if [[ "$n" =~ ^[0-9]+$ ]] && [ "$n" -gt "$max" ]; then
-        max="$n"
+        max=$((10#$n))
     fi
 done
 
