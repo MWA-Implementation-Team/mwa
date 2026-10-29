@@ -60,7 +60,7 @@ export default function PageShell({
             <section class="landing-section landing-pane-brand">
                 <div class="landing-welcome">
                     <a href="/" class="mwa-logo" aria-label={t('shellLogoAlt')}>
-                        <img src="/3Logotipas.png" alt={t('shellLogoAlt')} />
+                        <img src="/logo.png" alt={t('shellLogoAlt')} />
                     </a>
                 </div>
             </section>
