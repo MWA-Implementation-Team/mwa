@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Orbitron:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Righteous&family=Rye&family=Shrikhand&family=Special+Elite&family=UnifrakturCook:wght@700&display=swap');
+
+/* Card titles stay white regardless of each card's inline text colour. */
+.card :is(h1, h2, h3, h4) {
+    color: var(--card-foreground);
+}
+
+.egypt {
+    font-family: 'Alfa Slab One', serif;
+}
+
+.cells {
+    font-family: 'Outfit', sans-serif;
+}
+
+.micius-revolution {
+    font-family: 'Oswald', sans-serif;
+}
+
+.micius-paradise {
+    font-family: 'Shrikhand', cursive;
+}
+
+.middle-ages {
+    font-family: 'UnifrakturCook', cursive;
+}
+
+.stone-age {
+    font-family: 'Rye', serif;
+}
+
+.year-2028 {
+    font-family: 'Orbitron', sans-serif;
+}
+
+.world-war-1 {
+    font-family: 'Special Elite', monospace;
+}
+
+.seventies-eighties {
+    font-family: 'Righteous', cursive;
+}

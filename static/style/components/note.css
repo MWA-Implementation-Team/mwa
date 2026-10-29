@@ -1,0 +1,19 @@
+.mwa-note {
+    padding: var(--space-3);
+    background: var(--muted);
+    border: 3px solid var(--border);
+    color: var(--foreground);
+    font-size: var(--text-7);
+}
+
+.mwa-note--error {
+    color: var(--note-error-fg);
+    background: var(--note-error-bg);
+    border-color: var(--note-error-border);
+}
+
+.mwa-note--success {
+    color: var(--note-success-fg);
+    background: var(--note-success-bg);
+    border-color: var(--note-success-border);
+}

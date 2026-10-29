@@ -1,0 +1,38 @@
+/* Shared navbar/menu button — app menu items and the landing page's
+   login/logout buttons. Soft label on a panel-light block; white text
+   on hover and on the current page. Applied directly to the <a>/<button>
+   so the look doesn't depend on the surrounding menu structure. */
+.mwa-navbar-menu {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 0;
+    padding: var(--space-2) var(--space-4);
+    text-align: left;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: var(--text-7);
+    font-weight: 400;
+    line-height: normal;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    border: 3px solid var(--border);
+    border-radius: 0;
+    box-shadow: none;
+    transition:
+        color 0.15s,
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.mwa-navbar-menu:hover {
+    color: var(--foreground);
+    background: var(--muted);
+    border-color: var(--border);
+    filter: none;
+}
+
+.mwa-navbar-menu[aria-current='page'] {
+    color: var(--foreground);
+}

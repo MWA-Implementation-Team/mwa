@@ -1,0 +1,102 @@
+.mwa-panel,
+.landing-section {
+    min-width: 0;
+    border: 3px solid var(--border);
+    background: var(--card);
+    box-shadow: var(--shadow-panel);
+}
+
+.mwa-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border-bottom: 1px solid var(--border);
+    background: var(--panel-head-bg);
+}
+
+.mwa-panel-head h2,
+.mwa-panel-head h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--foreground);
+    font-size: var(--text-8);
+    letter-spacing: 0.06em;
+    overflow-wrap: anywhere;
+}
+
+.mwa-panel-body {
+    padding: var(--space-3);
+    min-width: 0;
+}
+
+.mwa-panel-body > :first-child {
+    margin-top: 0;
+}
+
+.mwa-panel-body > :last-child {
+    margin-bottom: 0;
+}
+
+.mwa-muted {
+    color: var(--muted-foreground);
+    font-size: var(--text-7);
+}
+
+.mwa-intro {
+    font-size: var(--text-7);
+    line-height: 1.75;
+    color: var(--foreground);
+}
+
+.mwa-mini {
+    display: block;
+    padding: var(--space-3);
+    min-width: 0;
+    border: 3px solid var(--border);
+    background: var(--muted);
+    text-decoration: none;
+}
+
+.mwa-mini:hover {
+    background: var(--muted-hover);
+}
+
+.mwa-mini-title {
+    display: block;
+    font-size: var(--text-regular);
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.mwa-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+}
+
+.mwa-directory {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+}
+
+.mwa-directory a {
+    text-decoration: none;
+    display: block;
+}
+
+.mwa-directory a:hover {
+    filter: brightness(1.12);
+}
+
+.mwa-directory a > * {
+    max-width: 100%;
+}

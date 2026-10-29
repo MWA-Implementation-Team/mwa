@@ -1,0 +1,51 @@
+/* Home queue panel — group art square with a link-style action on the left,
+   per-board "your standings" list on the right. */
+.mwa-queue-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: var(--space-4);
+    align-items: center;
+}
+.mwa-queue-art {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    width: 100%;
+    max-width: 150px;
+    margin: 0 auto;
+    font-size: 72px;
+    line-height: 1;
+    border: 1px solid var(--border);
+    background: var(--muted);
+}
+.mwa-queue-cta {
+    margin-top: var(--space-2);
+    text-align: center;
+    font-size: var(--text-6);
+}
+/* Leave form sits inline so "#N in the queue · Leave" renders as one line —
+   same height as the join button, so joining doesn't shift the layout. */
+.mwa-queue-cta form {
+    display: inline;
+}
+.mwa-queue-members {
+    margin-top: var(--space-1);
+    text-align: center;
+    font-size: var(--text-8);
+    color: var(--muted-foreground);
+}
+/* The dimmed hint next to a board name explains what it measures — opacity
+   because .mwa's brightness(1.08) filter washes muted colors out. */
+.mwa-standing-hint {
+    color: var(--muted-foreground);
+    font-size: var(--text-8);
+    opacity: 0.55;
+}
+.mwa-standing-sub td:first-child {
+    padding-left: var(--space-6);
+}
+@media (max-width: 559.98px) {
+    .mwa-queue-grid {
+        grid-template-columns: 1fr;
+    }
+}

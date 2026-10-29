@@ -1,9 +1,14 @@
-.form-stack {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
+.mwa-form {
+    display: grid;
+    gap: var(--space-3);
 }
 
-.form-stack label {
-    margin-bottom: calc(-1 * var(--space-sm));
+.mwa-field {
+    display: grid;
+    gap: var(--space-1);
+}
+
+.mwa-field label {
+    color: var(--primary);
+    font-size: var(--text-7);
 }

@@ -1,0 +1,50 @@
+/* Leaderboard — one-line toolbar over the dense table: compact board tabs on
+   the left, scope as a text toggle on the right. */
+.mwa-lb-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-2);
+}
+.mwa-tabbar--compact a {
+    min-height: 0;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-8);
+}
+.mwa-scope {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-7);
+    white-space: nowrap;
+}
+.mwa-scope a {
+    text-decoration: none;
+}
+.mwa-scope strong {
+    color: var(--foreground);
+}
+/* The pinned "you" row duplicates the viewer's standing at the head of the
+   table — a light tint over the table's panel-light surface marks "you" the
+   same way wherever it appears. */
+.mwa-lb-rank {
+    width: 1%;
+    text-align: end;
+}
+.mwa-lb td.mwa-lb-rank {
+    color: var(--muted-foreground);
+}
+.mwa-lb-you td {
+    background: var(--highlight-self);
+    font-weight: 700;
+}
+.mwa-lb tr.mwa-lb--self td {
+    background: var(--highlight-self);
+}
+/* groupmate tag after a player name — shares the dimmed standing-hint look,
+   margin scoped here so the home-page hints keep their own spacing. */
+.mwa-lb .mwa-standing-hint {
+    margin-left: var(--space-2);
+}
