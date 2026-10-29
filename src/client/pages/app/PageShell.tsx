@@ -16,7 +16,8 @@ export type Section =
     | 'gambling'
     | 'interact'
     | 'landing'
-    | 'login';
+    | 'login'
+    | 'error';
 
 type PageShellProps = {
     section: Section;
@@ -29,7 +30,7 @@ type PageShellProps = {
     children: ComponentChildren;
 };
 
-// App-frame presentation; the visual styles live in shell.css.
+// App-frame presentation; the visual styles live in static/style/.
 export default function PageShell({
     section,
     nav = true,
