@@ -6,11 +6,11 @@ describe('connect 4', () => {
     it('encodes to string correctly', () => {
         const board = Connect4Board.fromString(`
         .......
-        .......
-        .......
-        .......
-        .ox....
-        xox....
+        ...oxo.
+        ...ooo.
+        x.oxxx.
+        x.xoxo.
+        oxoxxx.
         `);
         const str = board.asString();
         const parsedBoard = Connect4Board.fromString(str);
@@ -21,72 +21,84 @@ describe('connect 4', () => {
     it('wins', () => {
         const none = Connect4Board.fromString(`
         .......
-        .......
-        .......
-        .......
-        .ox....
-        xox....
+        ...oxo.
+        ...ooo.
+        x.oxxx.
+        x.xoxo.
+        oxoxxx.
         `);
         assert.equal(none.winner(), null);
 
-        const horizontal = Connect4Board.fromString(`
+        const horizontal = Connect4Board.fromString(
+            `
         .......
-        .......
-        .......
-        ....x..
-        ....xxx
-        ...oooo
-        `);
+        ...OOOO
+        ...xoxo
+        ...xxxo
+        ..xooox
+        .xoxxxo
+        `.toLowerCase(),
+        );
         checkWinner(horizontal);
 
-        const vertical = Connect4Board.fromString(`
+        const vertical = Connect4Board.fromString(
+            `
         .......
         .......
-        ....x..
-        ....xo.
-        ....xo.
-        ....xo.
-        `);
+        ....X..
+        ...oXo.
+        ...oXo.
+        ...oXoo
+        `.toLowerCase(),
+        );
         checkWinner(vertical);
 
-        const diag1 = Connect4Board.fromString(`
-        ....o..
-        ....x..
-        ...xxx.
-        ..xoxoo
-        .xxooxo
-        oxoxoxo
-        `);
+        const diag1 = Connect4Board.fromString(
+            `
+        .......
+        ....X..
+        ...Xx..
+        ..Xxo..
+        .Xooo..
+        .ooxo..
+        `.toLowerCase(),
+        );
         checkWinner(diag1);
 
-        const diag2 = Connect4Board.fromString(`
-        x...o.x
-        o.o.oxo
-        o.ooxxx
-        x.xxoox
-        o.oxxxo
-        oxooxxx
-        `);
+        const diag2 = Connect4Board.fromString(
+            `
+        ......X
+        .....Xo
+        ....Xxx
+        ...Xoxo
+        ..ooxoo
+        ..xxxoo
+        `.toLowerCase(),
+        );
         checkWinner(diag2);
 
-        const diag3 = Connect4Board.fromString(`
-        ......x
-        ...x..x
-        o.ox..o
-        x.oo.ox
-        xoxooxx
-        xoxxooo
-        `);
+        const diag3 = Connect4Board.fromString(
+            `
+        .......
+        .......
+        ..O....
+        ..oO...
+        ..xoO..
+        ..xxxO.
+        `.toLowerCase(),
+        );
         checkWinner(diag3);
 
-        const diag4 = Connect4Board.fromString(`
-        x.xoo.o
-        o.oxo.x
-        xxxooox
-        xooxxxo
-        oxxooox
-        xoxxxoo
-        `);
+        const diag4 = Connect4Board.fromString(
+            `
+        ...O...
+        ...xO..
+        ...oxO.
+        ...xxoO
+        ...oxxo
+        ...ooox
+        `.toLowerCase(),
+        );
         checkWinner(diag4);
     });
 });
