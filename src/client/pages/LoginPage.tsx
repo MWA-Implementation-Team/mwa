@@ -49,9 +49,7 @@ function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
                                         required
                                     />
                                 </div>
-                                <button type="submit" class="btn-primary">
-                                    {t('loginVerify')}
-                                </button>
+                                <button type="submit">{t('loginVerify')}</button>
                             </form>
                         </>
                     ) : (
@@ -66,9 +64,7 @@ function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
                                     required
                                 />
                             </div>
-                            <button type="submit" class="btn-primary">
-                                {t('loginSendLink')}
-                            </button>
+                            <button type="submit">{t('loginSendLink')}</button>
                         </form>
                     )}
 

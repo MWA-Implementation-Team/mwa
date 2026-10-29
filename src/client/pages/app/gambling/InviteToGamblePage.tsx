@@ -37,7 +37,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                     </p>
                     <p class="mwa-muted">{t('gamblingCoinFlipDescription')}</p>
                     <div class="mwa-actions">
-                        <button class="btn-primary" onClick={() => setOpenDialog('coin_flip')}>
+                        <button onClick={() => setOpenDialog('coin_flip')}>
                             {t('gamblingChallenge')}
                         </button>
                     </div>
@@ -66,9 +66,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                         </select>
                     </div>
                     <div class="mwa-actions">
-                        <button type="submit" class="btn-primary">
-                            {t('gamblingSendInvite')}
-                        </button>
+                        <button type="submit">{t('gamblingSendInvite')}</button>
                     </div>
                     {error?.message && (
                         <p class="mwa-note mwa-note--error" role="alert">

@@ -50,7 +50,7 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
                     <div class="mwa-actions">
                         <button disabled>{t('interactSendMoneyTitle')}</button>
                         <a
-                            class="btn-primary"
+                            class="button"
                             href={`/app/interact/${encodeURIComponent(token)}/gamble`}
                         >
                             {t('gamblingAction')} 💲🤑🎰🤑💲

@@ -139,7 +139,7 @@ function NotificationBanner({ notification }: { notification: Notification }) {
                             })}
                         </p>
                         <div class="mwa-actions">
-                            <a class="btn-primary" href={sessionHref}>
+                            <a class="button" href={sessionHref}>
                                 {t('gamblingOpen')}
                             </a>
                             <form method="POST" action={`${sessionHref}/reject`}>
@@ -151,7 +151,7 @@ function NotificationBanner({ notification }: { notification: Notification }) {
                     <>
                         <p class="mwa-intro">{t('gamblingInProgress')}</p>
                         <div class="mwa-actions">
-                            <a class="btn-primary" href={sessionHref}>
+                            <a class="button" href={sessionHref}>
                                 {t('gamblingReturn')}
                             </a>
                         </div>

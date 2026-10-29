@@ -43,9 +43,7 @@ function AdminPage({ message }: AdminPageProps) {
                             />
                         </div>
                         <div class="mwa-actions">
-                            <button type="submit" class="btn-primary">
-                                Mint coins
-                            </button>
+                            <button type="submit">Mint coins</button>
                         </div>
                     </form>
                 </div>

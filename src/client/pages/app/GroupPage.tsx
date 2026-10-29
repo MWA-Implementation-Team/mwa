@@ -80,7 +80,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                                         {group.ownerId === user?.id && (
                                             <button
                                                 type="button"
-                                                class="mwa-danger"
+                                                data-variant="danger"
                                                 onClick={() => handleDeleteGroup(group.id)}
                                             >
                                                 {t('groupDelete')}
@@ -122,9 +122,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                             />
                         </div>
                         <div class="mwa-actions">
-                            <button type="submit" class="btn-primary">
-                                {t('groupCreate')}
-                            </button>
+                            <button type="submit">{t('groupCreate')}</button>
                         </div>
                     </form>
                 </div>
