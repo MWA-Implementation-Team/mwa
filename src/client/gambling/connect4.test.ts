@@ -6,11 +6,11 @@ describe('connect 4', () => {
     it('encodes to string correctly', () => {
         const board = Connect4Board.fromString(`
         .......
-        .o.oxoo
-        ..x....
-        x..xxx.
-        x.x....
-        .x.xxx.
+        .......
+        .......
+        .......
+        .ox....
+        xox....
         `);
         const str = board.asString();
         const parsedBoard = Connect4Board.fromString(str);
@@ -21,71 +21,71 @@ describe('connect 4', () => {
     it('wins', () => {
         const none = Connect4Board.fromString(`
         .......
-        .o.oxoo
-        ..x....
-        x..xxx.
-        x.x....
-        .x.xxx.
+        .......
+        .......
+        .......
+        .ox....
+        xox....
         `);
         assert.equal(none.winner(), null);
 
         const horizontal = Connect4Board.fromString(`
         .......
-        ...oooo
         .......
-        ...xxx.
-        ..x....
-        .x.xxx.
+        .......
+        ....x..
+        ....xxx
+        ...oooo
         `);
         assert.equal(horizontal.winner(), 'o');
 
         const vertical = Connect4Board.fromString(`
         .......
-        ....xo.
+        .......
         ....x..
         ....xo.
         ....xo.
-        .....o.
+        ....xo.
         `);
         assert.equal(vertical.winner(), 'x');
 
         const diag1 = Connect4Board.fromString(`
-        .....o.
+        ....o..
         ....x..
-        ...x...
-        ..x....
-        .xo....
-        .......
+        ...xxx.
+        ..xoxoo
+        .xxooxo
+        oxoxoxo
         `);
         assert.equal(diag1.winner(), 'x');
 
         const diag2 = Connect4Board.fromString(`
-        ......x
-        .....x.
-        ....x..
-        ...x...
-        ..o....
-        .......
+        x...o.x
+        o.o.oxo
+        o.ooxxx
+        x.xxoox
+        o.oxxxo
+        oxooxxx
         `);
         assert.equal(diag2.winner(), 'x');
 
         const diag3 = Connect4Board.fromString(`
-        .......
-        .......
-        ..o....
-        ...o...
-        ....o..
-        .....o.
+        ......x
+        ...x..x
+        o.ox..o
+        x.oo.ox
+        xoxooxx
+        xoxxooo
         `);
         assert.equal(diag3.winner(), 'o');
 
         const diag4 = Connect4Board.fromString(`
-        ...o...
-        ....o..
-        .....o.
-        ......o
-        .......
-        .......
+        x.xoo.o
+        o.oxo.x
+        xxxooox
+        xooxxxo
+        oxxooox
+        xoxxxoo
         `);
         assert.equal(diag4.winner(), 'o');
     });
