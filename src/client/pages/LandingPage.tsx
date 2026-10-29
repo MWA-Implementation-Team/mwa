@@ -78,17 +78,17 @@ function LandingPage({}: LandingPageProps) {
                         <div class="landing-footer">
                             {user ? (
                                 <>
-                                    <a href="/app" class="landing-login">
+                                    <a href="/app" class="mwa-navbar-menu">
                                         {t('landingGoApp')}
                                     </a>
                                     <form method="POST" action="/app" class="landing-login-form">
-                                        <button type="submit" class="landing-login">
+                                        <button type="submit" class="mwa-navbar-menu">
                                             {t('logOut')}
                                         </button>
                                     </form>
                                 </>
                             ) : (
-                                <a href="/login" class="landing-login">
+                                <a href="/login" class="mwa-navbar-menu">
                                     {t('landingLogin')}
                                 </a>
                             )}

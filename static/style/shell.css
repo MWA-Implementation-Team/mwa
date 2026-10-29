@@ -408,40 +408,40 @@
     font-size: 13px;
 }
 
-/* Menu buttons share the .landing-login button look used on the landing
-   page — left-aligned soft-colored label on a panel-light block. Scoped
-   under .mwa so the logout <button> matches the links and doesn't fall
-   back to the generic .mwa button padding/color/hover. */
-.mwa .landing-menu :is(a, button) {
-    display: block;
+/* Shared navbar/menu button — app menu items and the landing page's
+   login/logout buttons. Soft label on a panel-light block; white text
+   on hover and on the current page. Applied directly to the <a>/<button>
+   so the look doesn't depend on the surrounding menu structure. */
+.mwa .mwa-navbar-menu {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     width: 100%;
     min-height: 0;
     padding: 6px 14px;
     text-align: left;
     text-decoration: none;
-    font: inherit;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 400;
     line-height: normal;
     color: var(--shell-soft);
     background: var(--shell-panel-light);
     border: 3px solid var(--shell-border);
     border-radius: 0;
-    /* same 0.15s fade the generic .mwa buttons get — anchors would otherwise
-       snap into the hover state while <button> eases in */
     transition:
         color 0.15s,
         background 0.15s,
         border-color 0.15s;
 }
 
-.mwa .landing-menu :is(a, button):hover {
+.mwa .mwa-navbar-menu:hover {
     color: var(--shell-white);
     background: var(--shell-panel-light);
-    border-color: var(--shell-pink);
 }
 
-.mwa .landing-menu a[aria-current='page'] {
+.mwa .mwa-navbar-menu[aria-current='page'] {
     color: var(--shell-white);
-    border-color: rgb(from var(--shell-pink) r g b / 0.4);
 }
 
 .landing-menu-logout {
@@ -495,34 +495,6 @@
     display: grid;
     gap: 12px;
     justify-items: center;
-}
-
-.mwa :is(a, button).landing-login {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: left;
-    width: 100%;
-    min-height: 0;
-    padding: 6px 14px;
-    border-radius: 0;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 400;
-    line-height: normal;
-    text-decoration: none;
-    color: var(--shell-soft);
-    background: var(--shell-panel-light);
-    border: 3px solid var(--shell-border);
-    transition:
-        color 0.15s,
-        background 0.15s,
-        border-color 0.15s;
-}
-
-.landing-login:hover {
-    color: var(--shell-white);
-    border-color: var(--shell-pink);
 }
 
 .landing-login-form {
