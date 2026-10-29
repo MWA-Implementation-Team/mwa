@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from 'node:assert/strict';
-import { Connect4Board } from "./connect4.js";
+import { Connect4Board, WinCondition } from "./connect4.js";
 
 describe('connect 4', () => {
     it('encodes to string correctly', () => {
@@ -37,7 +37,7 @@ describe('connect 4', () => {
         ....xxx
         ...oooo
         `);
-        assert.equal(horizontal.winner(), 'o');
+        checkWinner(horizontal);
 
         const vertical = Connect4Board.fromString(`
         .......
@@ -47,7 +47,7 @@ describe('connect 4', () => {
         ....xo.
         ....xo.
         `);
-        assert.equal(vertical.winner(), 'x');
+        checkWinner(vertical);
 
         const diag1 = Connect4Board.fromString(`
         ....o..
@@ -57,7 +57,7 @@ describe('connect 4', () => {
         .xxooxo
         oxoxoxo
         `);
-        assert.equal(diag1.winner(), 'x');
+        checkWinner(diag1);
 
         const diag2 = Connect4Board.fromString(`
         x...o.x
@@ -67,7 +67,7 @@ describe('connect 4', () => {
         o.oxxxo
         oxooxxx
         `);
-        assert.equal(diag2.winner(), 'x');
+        checkWinner(diag2);
 
         const diag3 = Connect4Board.fromString(`
         ......x
@@ -77,7 +77,7 @@ describe('connect 4', () => {
         xoxooxx
         xoxxooo
         `);
-        assert.equal(diag3.winner(), 'o');
+        checkWinner(diag3);
 
         const diag4 = Connect4Board.fromString(`
         x.xoo.o
@@ -87,6 +87,16 @@ describe('connect 4', () => {
         oxxooox
         xoxxxoo
         `);
-        assert.equal(diag4.winner(), 'o');
+        checkWinner(diag4);
     });
 });
+
+function checkWinner(board: Connect4Board) {
+    const win = board.winner();
+    assert.ok(win);
+
+    assert.equal(win.cells.length, 4);
+    for (const point of win.cells) {
+        assert.equal(board.get(point.x, point.y), win.player);
+    }
+}

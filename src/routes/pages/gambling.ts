@@ -295,9 +295,9 @@ export function registerGamblingRoutes(app: MwaHono) {
 }
 
 function updateConnect4Match(state: MwaState, sessionId: number, board: Connect4Board) {
-    const winner = board.winner();
-    if (winner) {
-        winGamblingSession(state, sessionId, winner === 'x' ? 'p1' : 'p2');
+    const win = board.winner();
+    if (win) {
+        winGamblingSession(state, sessionId, win.player === 'x' ? 'p1' : 'p2');
     } else if (board.isFull()) {
         winGamblingSession(state, sessionId, 'draw');
     }

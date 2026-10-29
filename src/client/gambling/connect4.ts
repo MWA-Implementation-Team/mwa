@@ -5,6 +5,16 @@ export type C4Cell = C4Player | '.';
 export const c4Width = 7;
 export const c4Height = 6;
 
+type Point = {
+    x: number;
+    y: number;
+};
+
+export type WinCondition = {
+    player: C4Player;
+    cells: Point[]
+};
+
 export class Connect4Board {
     // 0,0: bottom left of board
     #cells: C4Cell[];
@@ -100,16 +110,20 @@ export class Connect4Board {
         return !this.#cells.includes('.');
     }
 
-    winner(): C4Player | null {
+    winner(): WinCondition | null {
+        const board = this;
+
         let player: C4Player | null = null;
-        let streak = 0;
+        let winCells: Point[] = [];
 
         function reset() {
             player = null;
-            streak = 0;
+            winCells = [];
         }
 
-        function consume(cell: C4Cell): boolean {
+        function consume(point: Point): boolean {
+            const cell = board.get(point.x, point.y);
+
             if (cell === '.') {
                 reset();
                 return false;
@@ -120,13 +134,14 @@ export class Connect4Board {
                 player = cell;
             }
 
-            return ++streak >= 4;
+            winCells.push(point);
+            return winCells.length >= 4;
         }
 
         for (let x = 0; x < c4Width; x++) {
             for (let y = 0; y < c4Height; y++) {
-                if (consume(this.get(x, y))) {
-                    return player;
+                if (consume({ x, y })) {
+                    return { player: player!, cells: winCells };
                 }
             }
             reset();
@@ -134,20 +149,18 @@ export class Connect4Board {
 
         for (let y = 0; y < c4Height; y++) {
             for (let x = 0; x < c4Width; x++) {
-                if (consume(this.get(x, y))) {
-                    return player;
+                if (consume({ x, y })) {
+                    return { player: player!, cells: winCells };
                 }
             }
             reset();
         }
 
-        const board = this;
-
         function checkDiagonal(startX: number, startY: number, dx: number, dy: number): boolean {
             let x = startX;
             let y = startY;
             while (board.isValidPos(x, y)) {
-                if (consume(board.get(x, y))) {
+                if (consume({ x, y })) {
                     return true;
                 }
                 x += dx;
@@ -159,21 +172,22 @@ export class Connect4Board {
 
         for (let yStart = c4Height - 1; yStart >= 0; yStart--) {
             if (checkDiagonal(0, yStart, 1, 1)) {
-                return player;
+                return { player: player!, cells: winCells };
             }
             if (checkDiagonal(c4Width - 1, yStart, -1, 1)) {
-                return player;
+                return { player: player!, cells: winCells };
             }
         }
 
         for (let xStart = 0; xStart < c4Width; xStart++) {
             if (checkDiagonal(xStart, 0, 1, 1)) {
-                return player;
+                return { player: player!, cells: winCells };
             }
             if (checkDiagonal(xStart, 0, -1, 1)) {
-                return player;
+                return { player: player!, cells: winCells };
             }
         }
+
         return null;
     }
 }
