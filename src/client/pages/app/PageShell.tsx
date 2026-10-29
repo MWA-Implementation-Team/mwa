@@ -16,7 +16,8 @@ export type Section =
     | 'gambling'
     | 'interact'
     | 'landing'
-    | 'login';
+    | 'login'
+    | 'error';
 
 type PageShellProps = {
     section: Section;
@@ -29,7 +30,7 @@ type PageShellProps = {
     children: ComponentChildren;
 };
 
-// App-frame presentation; the visual styles live in shell.css.
+// App-frame presentation; the visual styles live in static/style/.
 export default function PageShell({
     section,
     nav = true,
@@ -59,7 +60,7 @@ export default function PageShell({
             <section class="landing-section landing-pane-brand">
                 <div class="landing-welcome">
                     <a href="/" class="mwa-logo" aria-label={t('shellLogoAlt')}>
-                        <img src="/3Logotipas.png" alt={t('shellLogoAlt')} />
+                        <img src="/logo.png" alt={t('shellLogoAlt')} />
                     </a>
                 </div>
             </section>
@@ -139,7 +140,7 @@ function NotificationBanner({ notification }: { notification: Notification }) {
                             })}
                         </p>
                         <div class="mwa-actions">
-                            <a class="btn-primary" href={sessionHref}>
+                            <a class="button" href={sessionHref}>
                                 {t('gamblingOpen')}
                             </a>
                             <form method="POST" action={`${sessionHref}/reject`}>
@@ -151,7 +152,7 @@ function NotificationBanner({ notification }: { notification: Notification }) {
                     <>
                         <p class="mwa-intro">{t('gamblingInProgress')}</p>
                         <div class="mwa-actions">
-                            <a class="btn-primary" href={sessionHref}>
+                            <a class="button" href={sessionHref}>
                                 {t('gamblingReturn')}
                             </a>
                         </div>

@@ -13,7 +13,7 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#f3ff47',
-                backgroundImage: 'url("https://i.redd.it/mew5vf5yssd61.gif")',
+                backgroundImage: 'url("/img/activities/miciaus-revolution.webp")',
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',

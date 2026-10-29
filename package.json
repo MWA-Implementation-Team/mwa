@@ -13,7 +13,7 @@
         "test": "rm -rf dist && npm run build && node --test 'dist/**/*.test.js'",
         "tsc-watch": "tsc --watch --preserveWatchOutput",
         "format": "prettier --write .",
-        "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && prettier --check .",
+        "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && prettier --check . && node scripts/check-css-usage.mjs",
         "check:migrations": "bash scripts/check-migrations.sh"
     },
     "devDependencies": {

@@ -100,7 +100,6 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                 <p>{t('gamblingAcceptQuestion')}</p>
                                 <form method="POST" class="mwa-actions">
                                     <button
-                                        class="btn-primary"
                                         formaction={`/app/gambling/sessions/${sessionId}/accept`}
                                         type="submit"
                                     >

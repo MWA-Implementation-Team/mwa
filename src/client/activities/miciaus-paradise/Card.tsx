@@ -13,7 +13,7 @@ export function MiciausParadiseCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#ffffff',
-                backgroundImage: 'url("https://i.redd.it/obvv1zx851t91.gif")',
+                backgroundImage: 'url("/img/activities/miciaus-paradise.webp")',
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',

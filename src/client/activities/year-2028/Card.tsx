@@ -13,8 +13,7 @@ export function Year2028Card({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#dff3ea',
-                backgroundImage:
-                    'url("https://mir-s3-cdn-cf.behance.net/project_modules/hd/3bad3d60305305.5a4661bf1eef9.gif")',
+                backgroundImage: 'url("/img/activities/year-2028.webp")',
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',

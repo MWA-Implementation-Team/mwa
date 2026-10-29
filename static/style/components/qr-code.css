@@ -1,6 +1,6 @@
 .qr-code {
     width: min(15rem, 80%);
-    margin: var(--space-md) auto;
+    margin: var(--space-3) auto;
 }
 
 .qr-code svg {

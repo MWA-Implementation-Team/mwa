@@ -78,12 +78,7 @@ function HostPage({
                     )}
 
                     <div class="mwa-actions">
-                        <button
-                            class="btn-primary"
-                            type="submit"
-                            form="host-call"
-                            disabled={waiting.length === 0}
-                        >
+                        <button type="submit" form="host-call" disabled={waiting.length === 0}>
                             {t('hostRequest')}
                         </button>
                     </div>

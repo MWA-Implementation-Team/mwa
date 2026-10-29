@@ -13,8 +13,7 @@ export function SeventiesEightiesCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#dff3ea',
-                backgroundImage:
-                    'url("https://i.pinimg.com/originals/e5/1e/b7/e51eb7f31309c7b370d75ef23aa98c12.gif")',
+                backgroundImage: 'url("/img/activities/70s-80s.webp")',
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',

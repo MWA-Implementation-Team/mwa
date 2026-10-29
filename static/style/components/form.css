@@ -1,56 +1,14 @@
-input,
-select,
-textarea {
-    width: 100%;
-    padding: 0.625rem;
-
-    font-family: 'montserrat', sans-serif;
-    font-size: var(--text-base);
-    font-weight: 600;
-
-    background: var(--surface-soft);
-    border: 0.125rem solid var(--edge-soft);
-    border-radius: var(--radius-md);
-
-    color: var(--text);
-    text-shadow: var(--text-shadow);
-    outline: none;
+.mwa-form {
+    display: grid;
+    gap: var(--space-3);
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-    border-color: var(--accent-border);
+.mwa-field {
+    display: grid;
+    gap: var(--space-1);
 }
 
-input::placeholder,
-textarea::placeholder {
-    color: var(--text-muted);
-}
-
-select {
-    width: auto;
-    cursor: pointer;
-}
-
-select option {
-    color: #000000;
-    text-shadow: none;
-}
-
-label {
-    display: block;
-    margin-bottom: var(--space-xs);
-    font-weight: 700;
-    font-size: var(--text-sm);
-}
-
-.form-stack {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-.form-stack label {
-    margin-bottom: calc(-1 * var(--space-sm));
+.mwa-field label {
+    color: var(--primary);
+    font-size: var(--text-7);
 }

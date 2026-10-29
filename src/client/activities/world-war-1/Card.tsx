@@ -13,7 +13,7 @@ export function WorldWar1Card({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#dff3ea',
-                backgroundImage: 'url("https://i.redd.it/aug4lonkbfld1.gif")',
+                backgroundImage: 'url("/img/activities/world-war-1.webp")',
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',

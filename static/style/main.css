@@ -1,9 +1,15 @@
 @import './tokens.css';
-
 @import './base.css';
-
-@import './components/card.css';
+@import './components/panel.css';
+@import './components/note.css';
 @import './components/form.css';
+@import './components/landing.css';
+@import './components/navbar-menu.css';
+@import './components/lang-links.css';
+@import './components/rows.css';
+@import './components/tx.css';
+@import './components/queue.css';
+@import './components/tabbar.css';
+@import './components/leaderboard.css';
+@import './components/activity-card.css';
 @import './components/qr-code.css';
-
-@import './shell.css';

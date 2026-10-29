@@ -1,4 +1,5 @@
 import { Page } from '#src/client/pages.js';
+import PageShell from './app/PageShell.js';
 
 type ErrorPageProps = {
     status: number;
@@ -10,9 +11,13 @@ export const errorPage: Page<ErrorPageProps> = {
 };
 
 function ErrorPage({ status }: ErrorPageProps) {
-    if (status === 404) {
-        return <h1>404 Not Found</h1>;
-    }
-
-    return <h1>Error: {status}</h1>;
+    return (
+        <PageShell section="error">
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
+                    <h2>{status === 404 ? '404 Not Found' : `Error: ${status}`}</h2>
+                </div>
+            </section>
+        </PageShell>
+    );
 }

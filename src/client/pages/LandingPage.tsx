@@ -69,7 +69,7 @@ function LandingPage({}: LandingPageProps) {
                 <>
                     <section class="landing-section landing-pane-welcome">
                         <div class="landing-welcome">
-                            <img src="/3Logotipas.png" alt={t('shellLogoAlt')} />
+                            <img src="/logo.png" alt={t('shellLogoAlt')} />
                         </div>
                     </section>
 

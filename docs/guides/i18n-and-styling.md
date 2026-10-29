@@ -63,30 +63,26 @@ stable identifiers/logs. Translate the user-facing message where it is displayed
 
 Two stylesheets load on every page (see `Root` in `src/pages.tsx`):
 
-- `/oat.css` — the [Oat.](https://oat.ink) CSS framework: a classless-ish base theme with
-  CSS variables. It's third-party — edit only if absolutely necessary.
-- `/style/main.css` — **your** stylesheet entry point
-  (`static/style/main.css`). It imports tokens, base styles, and component styles.
+- `/oat.css` — our fork of the [Oat.](https://oat.ink) CSS framework. It holds the
+  theme variables and the look of plain elements (buttons, inputs, links, tables).
+- `/style/main.css` — the app's stylesheet entry point (`static/style/main.css`). It
+  imports `tokens.css`, `base.css` and one file per component from
+  `static/style/components/`.
 
-The CSS layers are:
-
-- `static/style/tokens.css` — shared design tokens and app-facing aliases for Oat
-  variables;
-- `static/style/base.css` — document-wide defaults, media rules, and the `#app`
-  layout;
-- `static/style/components/` — one stylesheet per reusable component or component
-  family, imported by `main.css`.
-
-See [css-architecture](css-architecture.md) for the full layering convention,
-component examples, and how to override Oat styles without editing `oat.css`.
+See [css-architecture](css-architecture.md) for where a style belongs, how to edit
+`oat.css`, the token scales, and the rules `npm run lint` enforces.
 
 Since `static/` changes trigger a browser reload without a server restart, CSS edits
 show up immediately in dev.
 
-**Theming**: oat.css colors everything through `light-dark()`. The `ThemeToggle` sets
-the `mwa-theme-override` cookie and flips `document.body.style.colorScheme`; on the
-next SSR render `Root` reads that cookie and inlines the same `color-scheme` on
-`<body>` — so the choice survives reloads and matches on both server and client.
+**Theming**: oat.css colors everything through `light-dark()`. For now the site is
+dark-only: Oat's `:root` sets `color-scheme: dark`, and only the dark values are
+themed. The light/dark plumbing is kept for a future light theme: `ThemeToggle` (not
+rendered anywhere yet) sets the `mwa-theme-override` cookie and flips
+`document.body.style.colorScheme`; on the next SSR render `Root` reads that cookie and
+inlines the same `color-scheme` on `<body>`, so the choice survives reloads and matches
+on both server and client. A leftover `mwa-theme-override=light` cookie therefore
+switches the site to Oat's unthemed light values; delete it if colours look wrong.
 
 ## How to verify
 
@@ -94,6 +90,7 @@ next SSR render `Root` reads that cookie and inlines the same `color-scheme` on
    → passes.
 2. Toggle the language selector — visible text and the tab title switch instantly, and
    a reload keeps the language (cookie).
-3. Add a rule to `static/style/main.css`, save — the page reloads with it applied.
-4. Click the theme toggle → colors flip; check the `mwa-theme-override` cookie in
-   DevTools; reload → the theme sticks.
+3. Change a rule in a file under `static/style/components/`, save — the page reloads
+   with it applied, and `npm run lint` still passes.
+4. Set the `mwa-theme-override` cookie to `light` in DevTools and reload → `<body>`
+   gets `color-scheme: light`; delete the cookie and reload → back to dark.

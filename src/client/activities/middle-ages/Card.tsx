@@ -13,8 +13,7 @@ export function MiddleAgesCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#dff3ea',
-                backgroundImage:
-                    'url("https://mir-s3-cdn-cf.behance.net/project_modules/source/44bdd636389967.571e688a4be1d.gif")',
+                backgroundImage: 'url("/img/activities/middle-ages.webp")',
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',

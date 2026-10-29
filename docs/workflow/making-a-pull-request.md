@@ -35,8 +35,8 @@ set it as the default formatter, and turn on `editor.formatOnSave`.
 npm run lint
 ```
 
-This is exactly what CI runs on PRs to `main` (typecheck + prettier check). If it's
-clean locally, CI is green.
+This is exactly what CI runs on PRs to `main` (typecheck + prettier check + CSS lint).
+If it's clean locally, CI is green.
 
 ## Open the PR — via the GitHub UI
 
