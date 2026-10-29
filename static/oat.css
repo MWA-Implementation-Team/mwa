@@ -1,3 +1,4 @@
+/* Forked from Oat (https://oat.ink). Local edits are marked "mwa:". */
 @layer theme, base, components, animations, utilities;
 
 @layer base {
@@ -108,8 +109,9 @@
 
     a {
         color: var(--primary);
-        text-decoration: none;
-        text-underline-offset: 2px;
+        /* mwa: links are underlined */
+        text-decoration: underline;
+        text-underline-offset: 3px;
         transition: color var(--transition-fast);
 
         &:hover {
@@ -200,9 +202,10 @@
         display: none;
     }
 
+    /* mwa: chunkier focus ring */
     :focus-visible {
-        outline: 2px solid var(--ring);
-        outline-offset: 2px;
+        outline: 3px solid var(--ring);
+        outline-offset: 3px;
     }
 
     :disabled,
@@ -213,30 +216,36 @@
 }
 @layer theme {
     :root {
-        color-scheme: light dark;
+        color-scheme: dark; /* mwa: dark-only for now; light slots stay upstream until a light theme lands */
 
-        --background: light-dark(#fff, #09090b);
-        --foreground: light-dark(#09090b, #fafafa);
-        --card: light-dark(#fff, #18181b);
-        --card-foreground: light-dark(#09090b, #fafafa);
-        --primary: light-dark(#574747, #fafafa);
-        --primary-foreground: light-dark(#fafafa, #18181b);
-        --secondary: light-dark(#f4f4f5, #27272a);
-        --secondary-foreground: light-dark(#574747, #fafafa);
-        --muted: light-dark(#3535ff, #27272a);
-        --muted-foreground: light-dark(#71717a, #a1a1aa);
+        /* mwa: shell palette (dark slot) */
+        --background: light-dark(#fff, #061329);
+        --foreground: light-dark(#09090b, #edf5ff);
+        --card: light-dark(#fff, rgb(7 17 42 / 0.322));
+        --card-foreground: light-dark(#09090b, #edf5ff);
+        --primary: light-dark(#574747, #ffffff);
+        --primary-foreground: light-dark(#fafafa, #ffffff);
+        --secondary: light-dark(#f4f4f5, rgb(24 48 87 / 0.324));
+        --secondary-foreground: light-dark(#574747, #ffffff);
+        --muted: light-dark(#f4f4f5, rgb(24 48 87 / 0.324));
+        --muted-foreground: light-dark(#71717a, #b9d6ff);
         --faint: light-dark(#fafafa, #1e1e21);
         --faint-foreground: light-dark(#a1a1aa, #71717a);
-        --accent: light-dark(#f4f4f5, #27272a);
+        --accent: light-dark(#f4f4f5, rgb(24 48 87 / 0.324));
         --danger: light-dark(#d32f2f, #f4807b);
         --danger-foreground: light-dark(#fafafa, #18181b);
         --success: light-dark(#008032, #6cc070);
         --success-foreground: light-dark(#fafafa, #18181b);
         --warning: light-dark(#a65b00, #f0a030);
         --warning-foreground: #09090b;
-        --border: light-dark(#d4d4d8, #52525b);
-        --input: light-dark(#d4d4d8, #52525b);
-        --ring: light-dark(#574747, #d4d4d8);
+        --border: light-dark(#d4d4d8, rgb(0 0 0 / 0.306));
+        --input: light-dark(#d4d4d8, rgb(0 0 0 / 0.306));
+        --ring: light-dark(#574747, #c2dfff);
+        --primary-gradient: linear-gradient(
+            90deg,
+            #003d8dc5,
+            #102e63ab
+        ); /* mwa: primary button fill */
 
         /* ==================== */
         --space-1: 0.25rem;
@@ -253,13 +262,13 @@
         --space-18: 4.5rem;
 
         --radius-small: 0.125rem;
-        --radius-medium: 0.375rem;
+        --radius-medium: 0.125rem; /* mwa: square UI */
         --radius-large: 0.75rem;
         --radius-full: 9999px;
 
         --bar-height: 0.5rem;
 
-        --font-sans: system-ui, sans-serif;
+        --font-sans: 'montserrat', sans-serif; /* mwa: site font */
         --font-mono: ui-monospace, Consolas, monospace;
 
         --text-1: clamp(1.75rem, 1.5rem + 1.1vw, 2.25rem);
@@ -270,14 +279,14 @@
         --text-6: 1rem;
         --text-7: 0.875rem;
         --text-8: 0.75rem;
-        --text-regular: var(--text-6);
+        --text-regular: 0.9375rem; /* mwa: 15px body */
 
         --leading-normal: 1.5;
 
         --font-normal: 400;
         --font-medium: 500;
         --font-semibold: 600;
-        --font-bold: 600;
+        --font-bold: 700; /* mwa: real bold */
 
         --shadow-small: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-medium: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -409,17 +418,19 @@
         padding: var(--space-2) var(--space-4);
         font-family: inherit;
         font-size: var(--text-7);
-        font-weight: var(--font-medium);
+        font-weight: var(--font-bold); /* mwa: bold buttons */
         line-height: var(--leading-normal);
         white-space: nowrap;
         text-decoration: none;
-        background-color: var(--primary);
+        background: var(--primary-gradient); /* mwa: gradient fill */
         color: var(--primary-foreground);
         border-radius: var(--radius-medium);
-        border: 3px solid;
-        border-color: rgb(255 255 255 / 0.15) rgb(0 0 0 / 0.2) rgb(0 0 0 / 0.2)
-            rgb(255 255 255 / 0.15);
+        border: 3px solid var(--ring); /* mwa: solid ring border */
+        min-height: 2.75rem; /* mwa: 44px touch target */
+        box-shadow: 3px 3px 0 rgb(0 0 0 / 0.6); /* mwa: hard drop shadow */
         transition:
+            filter var(--transition-fast),
+            border-color var(--transition-fast),
             background-color var(--transition-fast),
             opacity var(--transition-fast),
             transform var(--transition-fast);
@@ -428,8 +439,10 @@
             cursor: pointer;
         }
 
+        /* mwa: brighten + white border instead of flat hover color */
         &:hover:not(:disabled) {
-            background-color: var(--_hov);
+            border-color: var(--foreground);
+            filter: brightness(1.2);
         }
 
         &:active:not(:disabled) {
@@ -438,7 +451,7 @@
 
         &[data-variant='secondary'] {
             --_hov: color-mix(in srgb, var(--secondary), black 10%);
-            background-color: var(--secondary);
+            background: var(--secondary); /* mwa: resets primary gradient */
             color: var(--secondary-foreground);
             border-color: rgb(255 255 255 / 0.5) rgb(0 0 0 / 0.1) rgb(0 0 0 / 0.1)
                 rgb(255 255 255 / 0.5);
@@ -446,13 +459,13 @@
 
         &[data-variant='danger'] {
             --_hov: color-mix(in srgb, var(--danger), black 15%);
-            background-color: var(--danger);
+            background: var(--danger); /* mwa: resets primary gradient */
             color: var(--danger-foreground);
         }
 
         &:is(.outline, .ghost) {
             --_hov: var(--accent);
-            background-color: transparent;
+            background: transparent; /* mwa: resets primary gradient */
             color: var(--foreground);
 
             &[data-variant='danger'] {
@@ -509,7 +522,7 @@
     }
 
     ::file-selector-button {
-        background-color: transparent;
+        background: transparent; /* mwa: resets primary gradient */
         color: var(--foreground);
         border: 3px solid var(--border);
     }
@@ -580,7 +593,7 @@
         width: 100%;
         margin-block-start: var(--space-1);
         padding: var(--space-2) var(--space-3);
-        font-size: var(--text-7);
+        font-size: var(--text-6); /* mwa: 16px stops iOS focus zoom */
         line-height: var(--leading-normal);
         background-color: var(--background);
         color: var(--foreground);
@@ -1128,11 +1141,12 @@
         border-radius: var(--radius-medium);
         box-shadow: var(--shadow-small);
         padding: var(--space-6);
+        /* mwa: text-shadow for activity card art */
         text-shadow:
             rgba(0, 0, 0, 0.518) 0px 0px 4px,
             black 0px 0px 8px,
             rgba(0, 0, 0, 0.495) 0px 0px 2px,
-            rgba(255, 255, 255, 0.532) 0px 0px 16px !important;
+            rgba(255, 255, 255, 0.532) 0px 0px 16px;
     }
 }
 @layer components {

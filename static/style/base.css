@@ -91,10 +91,6 @@ main.page-narrow {
     width: min(var(--content-width-narrow), 94%);
 }
 
-a:hover {
-    color: var(--text-muted);
-}
-
 footer {
     position: relative;
     z-index: 2;

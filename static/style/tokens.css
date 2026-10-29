@@ -1,6 +1,4 @@
 :root {
-    color-scheme: light;
-
     --color1: #a9e6bb;
     --color2: #7fd6a4;
     --color3: #ffd98a;
@@ -52,16 +50,6 @@
     --status-busy: rgba(255, 220, 94, 0.25);
     --value-positive: #d8ffd5;
     --value-negative: #ffd6d6;
-    --danger: #ffd6d6;
-
-    --background: var(--page-bg);
-    --foreground: var(--text);
-    --card: var(--surface);
-    --card-foreground: var(--text);
-    --primary: var(--accent-bg);
-    --primary-foreground: var(--text);
-    --muted-foreground: var(--text-muted);
-    --border: var(--edge-soft);
 
     --text-xs: 0.75rem;
     --text-sm: 0.875rem;

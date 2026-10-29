@@ -1,24 +1,11 @@
 .mwa {
     filter: brightness(1.08) saturate(0.9);
-    --shell-white: #edf5ff;
-    --shell-soft: #b9d6ff;
-    --shell-pink: #c2dfff;
-
-    --shell-accent: #ffffff;
-    --shell-border: #0000004e;
-    --shell-panel: rgba(7, 17, 42, 0.322);
-    --shell-panel-light: rgba(24, 48, 87, 0.324);
     isolation: isolate;
     position: relative;
     min-height: 100vh;
     width: 100%;
     overflow: clip;
-    color-scheme: dark;
-    color: var(--shell-white);
     text-shadow: none;
-    font:
-        400 15px/1.55 'montserrat',
-        sans-serif;
     background: #061329;
 }
 
@@ -44,33 +31,12 @@
     }
 }
 
-.mwa *,
-.mwa *::before,
-.mwa *::after {
-    box-sizing: border-box;
-}
-
 .mwa :where(h1, h2, h3, h4, p, ul, ol) {
     margin: 0;
 }
 
 .mwa :where(img, svg, video, canvas) {
     max-width: 100%;
-}
-
-.mwa a {
-    color: var(--shell-accent);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-
-.mwa a:hover {
-    color: #ffffff;
-}
-
-.mwa :is(a, button, input, select, textarea, summary):focus-visible {
-    outline: 3px solid var(--shell-pink);
-    outline-offset: 3px;
 }
 
 .mwa-skip {
@@ -105,7 +71,7 @@
     justify-content: center;
     min-height: 65px;
     max-width: min(100%, 350px);
-    text-decoration: none !important;
+    text-decoration: none;
 }
 
 .mwa-logo img {
@@ -117,17 +83,11 @@
     object-fit: contain;
 }
 
-.mwa h1,
-.mwa h2,
-.mwa h3 {
-    text-transform: none;
-}
-
 .mwa-panel,
 .landing-section {
     min-width: 0;
-    border: 3px solid var(--shell-border);
-    background: var(--shell-panel);
+    border: 3px solid var(--border);
+    background: var(--card);
     box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
 }
 
@@ -137,7 +97,7 @@
     justify-content: space-between;
     gap: 8px;
     padding: 5px 12px;
-    border-bottom: 1px solid var(--shell-border);
+    border-bottom: 1px solid var(--border);
     background: linear-gradient(90deg, #174c91c0, #0b2047bf);
 }
 
@@ -147,7 +107,7 @@
     align-items: center;
     gap: 7px;
     margin: 0;
-    color: var(--shell-white);
+    color: var(--foreground);
     font-size: 12px;
     letter-spacing: 0.06em;
     overflow-wrap: anywhere;
@@ -167,21 +127,21 @@
 }
 
 .mwa-muted {
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
     font-size: 13px;
 }
 
 .mwa-intro {
     font-size: 14px;
     line-height: 1.75;
-    color: var(--shell-white);
+    color: var(--foreground);
 }
 
 .mwa-note {
     padding: 10px 12px;
-    background: var(--shell-panel-light);
-    border: 3px solid var(--shell-border);
-    color: var(--shell-white);
+    background: var(--muted);
+    border: 3px solid var(--border);
+    color: var(--foreground);
     font-size: 13px;
 }
 
@@ -207,9 +167,9 @@
     display: block;
     padding: 13px 12px;
     min-width: 0;
-    border: 3px solid var(--shell-border);
-    background: var(--shell-panel-light);
-    text-decoration: none !important;
+    border: 3px solid var(--border);
+    background: var(--muted);
+    text-decoration: none;
 }
 
 .mwa-mini:hover {
@@ -219,7 +179,7 @@
 .mwa-mini-title {
     display: block;
     font-size: 15px;
-    color: var(--shell-accent);
+    color: var(--primary);
     font-weight: 700;
 }
 
@@ -227,7 +187,7 @@
     display: block;
     margin-top: 5px;
     font-size: 12px;
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
 }
 
 .mwa-actions {
@@ -236,62 +196,6 @@
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 12px;
-}
-
-.mwa :is(button, .btn-primary, .btn-outline, .mwa-button) {
-    min-height: 44px;
-    max-width: 100%;
-    border-radius: 2px;
-    padding: 10px 15px;
-    font:
-        700 14px/1.25 'montserrat',
-        sans-serif;
-    text-align: center;
-    cursor: pointer;
-    transition:
-        background 0.15s,
-        border-color 0.15s,
-        transform 0.15s;
-}
-
-.mwa button:active,
-.mwa .mwa-button:active {
-    transform: translateY(1px);
-}
-
-.mwa :is(.btn-primary, .mwa-button--primary) {
-    background: linear-gradient(90deg, #003d8dc5, #102e63ab);
-    border: 3px solid var(--shell-pink);
-    color: white;
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
-}
-
-.mwa :is(.btn-primary, .mwa-button--primary):hover {
-    border-color: white;
-    filter: brightness(1.2);
-}
-
-.mwa :is(button:not(.btn-primary), .btn-outline, .mwa-button--outline) {
-    background: var(--shell-panel-light);
-    border: 3px solid var(--shell-border);
-    color: #fff;
-}
-
-.mwa :is(button:not(.btn-primary), .btn-outline, .mwa-button--outline):hover {
-    background: #294c82;
-}
-
-.mwa button.mwa-danger {
-    border-color: #f29aaf;
-    color: #ffd2de;
-    background: #401b39;
-}
-
-.mwa .mwa-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
 }
 
 .mwa-form {
@@ -305,29 +209,8 @@
 }
 
 .mwa-field label {
-    color: var(--shell-accent);
+    color: var(--primary);
     font-size: 13px;
-}
-
-.mwa :is(input:not([type='hidden']), textarea, select) {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    border: 3px solid var(--shell-border);
-    border-radius: 2px;
-    background: #050d1d;
-    color: white;
-    padding: 10px 12px;
-    min-height: 46px;
-    text-shadow: none;
-    font:
-        16px/1.5 'montserrat',
-        sans-serif;
-}
-
-.mwa input::placeholder {
-    color: #8ea6ca;
 }
 
 .landing-grid {
@@ -390,7 +273,7 @@
     justify-items: center;
     text-align: center;
     font-size: 11px;
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
     overflow-wrap: anywhere;
 }
 
@@ -425,10 +308,11 @@
     font-size: 13px;
     font-weight: 400;
     line-height: normal;
-    color: var(--shell-soft);
-    background: var(--shell-panel-light);
-    border: 3px solid var(--shell-border);
+    color: var(--muted-foreground);
+    background: var(--muted);
+    border: 3px solid var(--border);
     border-radius: 0;
+    box-shadow: none;
     transition:
         color 0.15s,
         background 0.15s,
@@ -436,12 +320,14 @@
 }
 
 .mwa .mwa-navbar-menu:hover {
-    color: var(--shell-white);
-    background: var(--shell-panel-light);
+    color: var(--foreground);
+    background: var(--muted);
+    border-color: var(--border);
+    filter: none;
 }
 
 .mwa .mwa-navbar-menu[aria-current='page'] {
-    color: var(--shell-white);
+    color: var(--foreground);
 }
 
 .landing-menu-logout {
@@ -455,7 +341,7 @@
     justify-items: center;
     text-align: center;
     font-size: 11px;
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
 }
 
 .lang-links {
@@ -465,7 +351,7 @@
 }
 
 .lang-links-sep {
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
 }
 
 .mwa button.lang-link {
@@ -474,15 +360,19 @@
     padding: 0 2px;
     min-height: 0;
     font: inherit;
-    color: var(--shell-accent);
+    color: var(--primary);
     text-decoration: underline;
     text-underline-offset: 3px;
     cursor: pointer;
     box-shadow: none;
 }
 
+.mwa button.lang-link:hover {
+    filter: none;
+}
+
 .mwa button.lang-link[aria-pressed='true'] {
-    color: var(--shell-accent);
+    color: var(--primary);
     text-decoration-style: wavy;
     font-weight: 700;
     pointer-events: none;
@@ -541,8 +431,8 @@
         flex: none;
         width: min(30%, 240px);
         gap: 0;
-        border: 3px solid var(--shell-border);
-        background: var(--shell-panel);
+        border: 3px solid var(--border);
+        background: var(--card);
         box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
     }
 
@@ -583,11 +473,11 @@
     gap: 7px;
     margin: 0;
     padding: 5px 12px;
-    color: var(--shell-white);
+    color: var(--foreground);
     font-size: 12px;
     letter-spacing: 0.06em;
     background: linear-gradient(90deg, #0d3972, #0b2047);
-    border-bottom: 1px solid var(--shell-border);
+    border-bottom: 1px solid var(--border);
 }
 
 .landing-section > *:not(h2) {
@@ -605,21 +495,21 @@
     display: grid;
     gap: 2px;
     padding: 8px 4px;
-    border: 3px solid var(--shell-border);
-    background: var(--shell-panel-light);
+    border: 3px solid var(--border);
+    background: var(--muted);
 }
 
 .landing-countdown-value {
     font-size: 22px;
     font-weight: 700;
-    color: var(--shell-pink);
+    color: var(--ring);
 }
 
 .landing-countdown-label {
     font-size: 10px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
 }
 
 .landing-socials {
@@ -632,7 +522,7 @@
 
 .landing-socials li::before {
     content: '•';
-    color: var(--shell-pink);
+    color: var(--ring);
     font-size: 22px;
     line-height: 0;
     margin-right: 8px;
@@ -664,9 +554,9 @@
 
 .mwa-rows > li {
     padding: 12px 0;
-    /* --shell-border is a near-invisible black in this theme — row separators
+    /* --border is a near-invisible black in this theme — row separators
        need a faint tint of the soft blue instead. */
-    border-top: 1px dashed rgb(from var(--shell-soft) r g b / 0.32);
+    border-top: 1px dashed rgb(from var(--muted-foreground) r g b / 0.32);
 }
 
 .mwa-rows > li:first-child {
@@ -683,13 +573,13 @@
 }
 
 .mwa-row strong {
-    color: var(--shell-accent);
+    color: var(--primary);
     overflow-wrap: anywhere;
 }
 
 .mwa-row small {
     display: block;
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
     overflow-wrap: anywhere;
 }
 .mwa-rows--inset > li,
@@ -697,17 +587,17 @@
     padding: 12px 8px;
 }
 .mwa-rows > li.mwa-row--self {
-    background: var(--shell-panel-light);
+    background: var(--muted);
 }
 .mwa-rows > li.mwa-row--group {
-    box-shadow: inset 3px 0 0 var(--shell-accent);
+    box-shadow: inset 3px 0 0 var(--primary);
 }
 .mwa-rows--inset .mwa-row {
     align-items: center;
 }
 .mwa-row-tag {
     margin-left: 8px;
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
 }
 /* Transaction table — oat .table markup, compacted. The left-edge sign bars
    are authored +60deg in hue so .mwa's hue-rotate(-60deg) lands them on
@@ -727,21 +617,21 @@
     line-height: 1.3;
 }
 .mwa-tx th {
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
     font-size: 11px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
 }
 .mwa-tx td {
-    color: var(--shell-white);
+    color: var(--foreground);
 }
 .mwa-tx thead,
 .mwa-tx tbody tr {
-    /* see .mwa-rows — --shell-border is too dark to read as a separator */
-    border-color: rgb(from var(--shell-soft) r g b / 0.32);
+    /* see .mwa-rows — --border is too dark to read as a separator */
+    border-color: rgb(from var(--muted-foreground) r g b / 0.32);
 }
 .mwa-tx-date {
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
     white-space: nowrap;
 }
 .mwa-tx-amount {
@@ -771,8 +661,8 @@
     margin: 0 auto;
     font-size: 72px;
     line-height: 1;
-    border: 1px solid var(--shell-border);
-    background: var(--shell-panel-light);
+    border: 1px solid var(--border);
+    background: var(--muted);
 }
 .mwa-queue-cta {
     margin-top: 8px;
@@ -788,12 +678,12 @@
     margin-top: 4px;
     text-align: center;
     font-size: 12px;
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
 }
 /* The dimmed hint next to a board name explains what it measures — opacity
    because .mwa's brightness(1.18) filter washes muted colors out. */
 .mwa-standing-hint {
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
     font-size: 11px;
     opacity: 0.55;
 }
@@ -837,16 +727,16 @@
     min-height: 42px;
     align-items: center;
     padding: 8px 13px;
-    color: var(--shell-accent);
-    border: 3px solid var(--shell-border);
+    color: var(--primary);
+    border: 3px solid var(--border);
     text-decoration: none;
-    background: var(--shell-panel-light);
+    background: var(--muted);
 }
 
 .mwa-tabbar a[aria-current='page'] {
     color: #061329;
-    border-color: var(--shell-accent);
-    background: var(--shell-accent);
+    border-color: var(--primary);
+    background: var(--primary);
     font-weight: 700;
 }
 /* Leaderboard — one-line toolbar over the dense table: compact board tabs on
@@ -875,7 +765,7 @@
     text-decoration: none;
 }
 .mwa-scope strong {
-    color: var(--shell-white);
+    color: var(--foreground);
 }
 /* The pinned "you" row duplicates the viewer's standing at the head of the
    table — a light tint over the table's panel-light surface marks "you" the
@@ -885,14 +775,14 @@
     text-align: end;
 }
 .mwa-lb td.mwa-lb-rank {
-    color: var(--shell-soft);
+    color: var(--muted-foreground);
 }
 .mwa-lb-you td {
-    background: rgb(from var(--shell-soft) r g b / 0.12);
+    background: rgb(from var(--muted-foreground) r g b / 0.12);
     font-weight: 700;
 }
 .mwa-lb tr.mwa-lb--self td {
-    background: rgb(from var(--shell-soft) r g b / 0.12);
+    background: rgb(from var(--muted-foreground) r g b / 0.12);
 }
 /* groupmate tag after a player name — shares the dimmed standing-hint look,
    margin scoped here so the home-page hints keep their own spacing. */
@@ -935,15 +825,5 @@
 @media (min-width: 850px) {
     .mwa-frame {
         padding-inline: 36px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .mwa *,
-    .mwa *::before,
-    .mwa *::after {
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
     }
 }
