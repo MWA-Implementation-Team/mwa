@@ -14,9 +14,14 @@
 }
 
 .mwa-connect4-cell[data-cell='x'] {
-    background-color: var(--connect4-p1);
+    background: var(--connect4-p1);
 }
 
 .mwa-connect4-cell[data-cell='o'] {
-    background-color: var(--connect4-p2);
+    background: var(--connect4-p2);
+}
+
+.mwa-connect4-cell[data-cell='x'],
+.mwa-connect4-cell[data-cell='o'] {
+    opacity: 1;
 }
