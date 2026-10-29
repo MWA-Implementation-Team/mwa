@@ -81,9 +81,7 @@ export default function PageShell({
                             {user && (
                                 <li>
                                     <form method="POST" action="/app" class="landing-menu-logout">
-                                        <button type="submit" class="mwa-danger">
-                                            {t('logOut')}
-                                        </button>
+                                        <button type="submit">{t('logOut')}</button>
                                     </form>
                                 </li>
                             )}
