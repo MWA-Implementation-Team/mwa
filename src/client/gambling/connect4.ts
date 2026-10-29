@@ -12,7 +12,7 @@ type Point = {
 
 export type WinCondition = {
     player: C4Player;
-    cells: Point[]
+    cells: Point[];
 };
 
 export class Connect4Board {
@@ -191,4 +191,3 @@ export class Connect4Board {
         return null;
     }
 }
-

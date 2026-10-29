@@ -1,4 +1,4 @@
-import { Gambler } from "#src/db/gambling.js";
+import { Gambler } from '#src/db/gambling.js';
 
 export type PlayerTurnTime = {
     // base how much time the player has remaining
@@ -20,7 +20,11 @@ export type MatchTurn = {
     timeMs: number;
 };
 
-export function calcPlayerTurnTime(turns: MatchTurn[], player: Gambler, totalTimeMs: number): PlayerTurnTime {
+export function calcPlayerTurnTime(
+    turns: MatchTurn[],
+    player: Gambler,
+    totalTimeMs: number,
+): PlayerTurnTime {
     let baseTimeLeftMs = totalTimeMs;
     let turnStartedTimeMs: number | undefined;
 
@@ -37,4 +41,3 @@ export function calcPlayerTurnTime(turns: MatchTurn[], player: Gambler, totalTim
 
     return { baseTimeLeftMs: Math.max(0, baseTimeLeftMs), turnStartedTimeMs };
 }
-

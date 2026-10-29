@@ -34,29 +34,29 @@ type RunningGameCommon = {
 export type CoinFlipGame = RunningGameCommon & {
     gameType: 'coin_flip';
     status:
-    | { type: 'pending' }
-    | { type: 'expired' }
-    | { type: 'rejected' }
-    | { type: 'running' }
-    | {
-        type: 'ended';
-        winner: Gambler;
-        flipResult: CoinSide;
-    };
+        | { type: 'pending' }
+        | { type: 'expired' }
+        | { type: 'rejected' }
+        | { type: 'running' }
+        | {
+              type: 'ended';
+              winner: Gambler;
+              flipResult: CoinSide;
+          };
     p1Guess: CoinSide;
 };
 
 export type Connect4Game = RunningGameCommon & {
     gameType: 'connect_4';
     status:
-    | { type: 'pending' }
-    | { type: 'expired' }
-    | { type: 'rejected' }
-    | { type: 'running' }
-    | {
-        type: 'ended';
-        winner: Gambler | 'draw';
-    };
+        | { type: 'pending' }
+        | { type: 'expired' }
+        | { type: 'rejected' }
+        | { type: 'running' }
+        | {
+              type: 'ended';
+              winner: Gambler | 'draw';
+          };
     boardStr: string;
     nextTurn: Gambler;
     p1TurnTime: PlayerTurnTime;
@@ -173,7 +173,8 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
                     status = {
                         type: 'ended',
                         winner: row.winner as Gambler, // draw not possible in coin flip
-                        flipResult: row.winner === 'p1' ? p1Guess : p1Guess === 'heads' ? 'tails' : 'heads',
+                        flipResult:
+                            row.winner === 'p1' ? p1Guess : p1Guess === 'heads' ? 'tails' : 'heads',
                     };
                     break;
                 default:
@@ -184,7 +185,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
                 gameType: 'coin_flip',
                 p1Guess,
                 status,
-                ...common
+                ...common,
             };
         }
         case 'connect_4': {
@@ -206,29 +207,33 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
                     throw new Error(`Unknown session status ${row.status}`);
             }
 
-            const turnRows = state.prepare(`
+            const turnRows = state
+                .prepare(
+                    `
             SELECT created_at, player, new_board from connect_4_turns
             WHERE session = ?
             ORDER BY id ASC
-            `).all(sessionId);
+            `,
+                )
+                .all(sessionId);
 
-            const turns: MatchTurn[] = turnRows.map(row => {
+            const turns: MatchTurn[] = turnRows.map((row) => {
                 return {
                     player: row.player as Gambler,
                     timeMs: new Date(row.created_at as string).getTime(),
                 };
-            })
+            });
 
             const lastTurn = turnRows[turnRows.length - 1];
 
             return {
                 gameType: 'connect_4',
-                boardStr: lastTurn?.new_board as string ?? new Connect4Board().asString(),
+                boardStr: (lastTurn?.new_board as string) ?? new Connect4Board().asString(),
                 nextTurn: lastTurn?.player === 'p1' ? 'p2' : 'p1',
                 status,
                 p1TurnTime: calcPlayerTurnTime(turns, 'p1', c4PlayerTurnTime),
                 p2TurnTime: calcPlayerTurnTime(turns, 'p2', c4PlayerTurnTime),
-                ...common
+                ...common,
             };
         }
     }
@@ -280,9 +285,13 @@ export function acceptGamblingSession(
                 const secondTurn: Gambler = randomInt(2) === 0 ? 'p1' : 'p2';
                 const initialBoard = new Connect4Board().asString();
 
-                state.prepare(`
+                state
+                    .prepare(
+                        `
                 INSERT INTO connect_4_turns (session, player, new_board) VALUES (?, ?, ?)
-                `).run(sessionId, secondTurn, initialBoard);
+                `,
+                    )
+                    .run(sessionId, secondTurn, initialBoard);
                 break;
             }
         }
@@ -298,23 +307,35 @@ export function cancelGamblingSession(
     userId?: number,
 ) {
     runTransaction(state.db, () => {
-        const row = state.prepare(`
+        const row = state
+            .prepare(
+                `
         SELECT p1_deposit_tx FROM gambling_sessions
         WHERE id = ? AND (? IS NULL OR p2 = ?) AND status = 'pending'
-        `).get(sessionId, userId ?? null, userId ?? null);
+        `,
+            )
+            .get(sessionId, userId ?? null, userId ?? null);
         if (!row) return;
 
-        state.prepare(`
+        state
+            .prepare(
+                `
         UPDATE gambling_sessions SET status = ?, p1_deposit_tx = NULL
         WHERE id = ?
-        `).run(reason, sessionId);
+        `,
+            )
+            .run(reason, sessionId);
 
         // Delete p1 deposit transaction to return money to p1.
         // The balance delta is supposed to be negative so this should be fine.
         // At the same time, p1_deposit_tx is cascaded to null and that marks the session as rejected.
-        state.prepare(`
+        state
+            .prepare(
+                `
         DELETE FROM parent_transactions WHERE id = ?
-        `).run(row.p1_deposit_tx);
+        `,
+            )
+            .run(row.p1_deposit_tx);
     });
 }
 
@@ -341,26 +362,42 @@ export function winGamblingSession(state: MwaState, sessionId: number, winner: G
                     betAmount * 2,
                 );
 
-                state.prepare(`
+                state
+                    .prepare(
+                        `
                 UPDATE gambling_sessions SET status = 'ended', winner = ?, winner_tx = ? WHERE id = ?
-                `).run(winner, parentId, sessionId);
+                `,
+                    )
+                    .run(winner, parentId, sessionId);
                 break;
             }
             case 'draw': {
-                const row = state.prepare(`
+                const row = state
+                    .prepare(
+                        `
                 SELECT p1_deposit_tx, p2_deposit_tx FROM gambling_sessions
                 WHERE id = ? AND status = 'running'
-                `).get(sessionId);
+                `,
+                    )
+                    .get(sessionId);
                 if (!row) return;
 
-                state.prepare(`
+                state
+                    .prepare(
+                        `
                 UPDATE gambling_sessions SET status = ?, winner = 'draw', p1_deposit_tx = NULL, p2_deposit_tx = NULL
                 WHERE id = ?
-                `).run('ended', sessionId);
+                `,
+                    )
+                    .run('ended', sessionId);
 
-                state.prepare(`
+                state
+                    .prepare(
+                        `
                 DELETE FROM parent_transactions WHERE id = ? OR id = ?;
-                `).run(row.p1_deposit_tx, row.p2_deposit_tx);
+                `,
+                    )
+                    .run(row.p1_deposit_tx, row.p2_deposit_tx);
                 break;
             }
         }
@@ -400,12 +437,12 @@ function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOp
 
 export type DeductCoinsResult =
     | {
-        type: 'success';
-        parentId: number;
-    }
+          type: 'success';
+          parentId: number;
+      }
     | {
-        type: 'too_broke';
-    };
+          type: 'too_broke';
+      };
 
 // this is expected to run in a transaction
 function deductCoinsForGambling(
@@ -488,29 +525,39 @@ export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
 //export const c4PlayerTurnTime = 2 * 60 * 1000;
 export const c4PlayerTurnTime = 30 * 1000; // lower for testing for now
 
-export function initConnect4(
-    state: MwaState,
-    opts: CommonGameOpts,
-): number | null {
+export function initConnect4(state: MwaState, opts: CommonGameOpts): number | null {
     return runTransaction(state.db, () => {
         return initGamblingSession(state, 'connect_4', opts);
     });
 }
 
-export function connect4TakeTurn(state: MwaState, sessionId: number, player: Gambler, newBoard: Connect4Board): boolean {
+export function connect4TakeTurn(
+    state: MwaState,
+    sessionId: number,
+    player: Gambler,
+    newBoard: Connect4Board,
+): boolean {
     return runTransaction(state.db, () => {
-        const row = state.prepare(`
+        const row = state
+            .prepare(
+                `
         SELECT player from connect_4_turns
         WHERE session = ?
         ORDER BY id DESC LIMIT 1
-        `).get(sessionId);
+        `,
+            )
+            .get(sessionId);
         if (!row) return false;
         const nextPlayer: Gambler = row.player === 'p1' ? 'p2' : 'p1';
         if (player !== nextPlayer) return false;
 
-        state.prepare(`
+        state
+            .prepare(
+                `
         INSERT INTO connect_4_turns (session, player, new_board) VALUES (?, ?, ?)
-        `).run(sessionId, player, newBoard.asString());
+        `,
+            )
+            .run(sessionId, player, newBoard.asString());
         return true;
     });
 }

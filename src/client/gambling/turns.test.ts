@@ -1,6 +1,6 @@
-import { describe, it } from "node:test";
+import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calcPlayerTurnTime, MatchTurn } from "./turns.js";
+import { calcPlayerTurnTime, MatchTurn } from './turns.js';
 
 describe('turns', () => {
     it('correctly calculates player turn time', () => {
@@ -19,4 +19,3 @@ describe('turns', () => {
         assert.equal(p2.turnStartedTimeMs, 145);
     });
 });
-

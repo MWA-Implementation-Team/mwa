@@ -228,7 +228,11 @@ export function registerGamblingRoutes(app: MwaHono) {
                 });
                 break;
             case 'connect_4':
-                scheduleConnect4Timeout(ctx.var, sessionId, game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime);
+                scheduleConnect4Timeout(
+                    ctx.var,
+                    sessionId,
+                    game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime,
+                );
                 break;
         }
 
@@ -300,7 +304,11 @@ export function registerGamblingRoutes(app: MwaHono) {
             broadcastSessionUpdate(ctx.var, sessionId);
 
             const newGame = findGamblingSessionById(ctx.var, sessionId) as Connect4Game;
-            scheduleConnect4Timeout(ctx.var, sessionId, newGame.nextTurn === 'p1' ? newGame.p1TurnTime : newGame.p2TurnTime);
+            scheduleConnect4Timeout(
+                ctx.var,
+                sessionId,
+                newGame.nextTurn === 'p1' ? newGame.p1TurnTime : newGame.p2TurnTime,
+            );
         }
 
         return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
@@ -345,7 +353,11 @@ export function scheduleGamblingTimers(state: MwaState) {
         if (!game) continue;
         const board = Connect4Board.fromString(game.boardStr);
         if (updateConnect4Board(state, pending.sessionId, board)) continue;
-        scheduleConnect4Timeout(state, pending.sessionId, game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime);
+        scheduleConnect4Timeout(
+            state,
+            pending.sessionId,
+            game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime,
+        );
     }
 }
 
@@ -355,18 +367,25 @@ function scheduleAfter(key: string, atMs: number, task: () => void) {
     if (scheduledUpdates.has(key)) {
         clearTimeout(scheduledUpdates.get(key));
     }
-    const id = setTimeout(() => {
-        scheduledUpdates.delete(key);
-        task();
-    }, Math.max(0, atMs - Date.now()));
+    const id = setTimeout(
+        () => {
+            scheduledUpdates.delete(key);
+            task();
+        },
+        Math.max(0, atMs - Date.now()),
+    );
     scheduledUpdates.set(key, id);
 }
 
 function scheduleExpiry(state: MwaState, expiring: ExpiringGamblingSession) {
-    scheduleAfter(`expire-${expiring.id}`, expiring.creationTime.getTime() + gamblingPendingExpiryMinutes * 60000, () => {
-        cancelGamblingSession(state, expiring.id, 'expired');
-        broadcastSessionUpdate(state, expiring.id);
-    });
+    scheduleAfter(
+        `expire-${expiring.id}`,
+        expiring.creationTime.getTime() + gamblingPendingExpiryMinutes * 60000,
+        () => {
+            cancelGamblingSession(state, expiring.id, 'expired');
+            broadcastSessionUpdate(state, expiring.id);
+        },
+    );
 }
 
 function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
@@ -386,7 +405,11 @@ function scheduleConnect4Timeout(state: MwaState, sessionId: number, turnTime: P
             // this theoretically (?) shouldn't happen
             // because setTimeout should only call after at least
             // the specified duration. but just to be safe
-            scheduleConnect4Timeout(state, sessionId, newGame.nextTurn === 'p1' ? newGame.p1TurnTime : newGame.p2TurnTime);
+            scheduleConnect4Timeout(
+                state,
+                sessionId,
+                newGame.nextTurn === 'p1' ? newGame.p1TurnTime : newGame.p2TurnTime,
+            );
         }
     });
 }
