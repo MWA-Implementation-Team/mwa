@@ -24,6 +24,7 @@ const transactionKindKey = {
     system: 'txSystem',
     gambling_deduction: 'txGamblingDeduction',
     gambling_winnings: 'txGamblingWinnings',
+    host_grant: 'txHostGrant',
 } as const satisfies Record<TransactionKind, keyof Language>;
 
 function HomePage({ transactions, groupName, queuePosition, queueError }: HomePageProps) {

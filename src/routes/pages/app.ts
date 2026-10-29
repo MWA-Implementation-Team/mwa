@@ -1,5 +1,10 @@
 import { requireRole, requireUser } from '#src/auth.js';
 import { listUserTransactions } from '#src/db/transactions.js';
+import {
+    LeaderboardBoard,
+    listGroupLeaderboard,
+    listPlayerLeaderboard,
+} from '#src/db/leaderboard.js';
 import { findUserGroup, listUserGroups } from '#src/db/groups.js';
 import {
     callNextGroups,
@@ -105,8 +110,23 @@ export function registerAppRoutes(app: MwaHono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        const type = ctx.req.query('type') === 'group' ? 'group' : 'team';
-        return writePage(ctx, 'leaderboard', { type });
+        const boardParam = ctx.req.query('board');
+        const board: LeaderboardBoard =
+            boardParam === 'gambling' || boardParam === 'combined' ? boardParam : 'activity';
+        const scope = ctx.req.query('scope') === 'groups' ? 'groups' : 'players';
+        if (scope === 'players') {
+            return writePage(ctx, 'leaderboard', {
+                board,
+                scope,
+                rows: listPlayerLeaderboard(ctx.var, board),
+                viewerGroupId: findUserGroup(ctx.var, user.id)?.id ?? null,
+            });
+        }
+        return writePage(ctx, 'leaderboard', {
+            board,
+            scope,
+            groups: listGroupLeaderboard(ctx.var, board),
+        });
     });
 
     app.get('/app/group', async (ctx) => {

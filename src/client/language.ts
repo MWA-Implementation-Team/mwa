@@ -76,6 +76,7 @@ export type Language = {
     txSystem: string;
     txGamblingDeduction: string;
     txGamblingWinnings: string;
+    txHostGrant: string;
     dashQrTitle: string;
     qrCopyLink: string;
     qrCopied: string;
@@ -118,10 +119,18 @@ export type Language = {
     activityBack: string;
 
     leaderboardTypeLabel: string;
-    leaderboardTeam: string;
-    leaderboardGroup: string;
+    leaderboardScopeLabel: string;
+    leaderboardActivity: string;
+    leaderboardGambling: string;
+    leaderboardCombined: string;
+    leaderboardPlayers: string;
+    leaderboardGroups: string;
     leaderboardRankings: string;
-    leaderboardTodo: string;
+    leaderboardNoGroups: string;
+    leaderboardNoPlayers: string;
+    leaderboardMemberCount: string;
+    leaderboardGames: string;
+    leaderboardYou: string;
 
     accountProfile: string;
     accountUsername: string;
@@ -275,6 +284,7 @@ export const languages: Record<LanguageCode, Language> = {
         txSystem: 'System credit',
         txGamblingDeduction: 'Gambling deduction',
         txGamblingWinnings: 'Gambling winnings',
+        txHostGrant: 'Host grant',
         dashQrTitle: 'Account QR code',
         qrCopyLink: 'Copy link',
         qrCopied: 'Copied!',
@@ -316,11 +326,19 @@ export const languages: Record<LanguageCode, Language> = {
         activityInfoTitle: 'activity information',
         activityBack: '← back to activities',
 
-        leaderboardTypeLabel: 'Leaderboard type',
-        leaderboardTeam: 'team',
-        leaderboardGroup: 'group',
+        leaderboardTypeLabel: 'Leaderboard board',
+        leaderboardScopeLabel: 'Leaderboard scope',
+        leaderboardActivity: 'activity',
+        leaderboardGambling: 'gambling',
+        leaderboardCombined: 'all',
+        leaderboardPlayers: 'players',
+        leaderboardGroups: 'groups',
         leaderboardRankings: '{type} rankings',
-        leaderboardTodo: 'TODO: {type} leaderboard.',
+        leaderboardNoGroups: 'No groups yet.',
+        leaderboardNoPlayers: 'No players yet.',
+        leaderboardMemberCount: '{n} member(s)',
+        leaderboardGames: '{n} game(s)',
+        leaderboardYou: 'You',
 
         accountProfile: 'Profile',
         accountUsername: 'Username',
@@ -475,6 +493,7 @@ export const languages: Record<LanguageCode, Language> = {
         txSystem: 'Sisteminis įskaitymas',
         txGamblingDeduction: 'Lošimo atsiskaitymas',
         txGamblingWinnings: 'Lošimo laimėjimas',
+        txHostGrant: 'Vedėjo įskaitymas',
         dashQrTitle: 'Paskyros QR kodas',
         qrCopyLink: 'Kopijuoti nuorodą',
         qrCopied: 'Nukopijuota!',
@@ -517,10 +536,18 @@ export const languages: Record<LanguageCode, Language> = {
         activityBack: '← atgal į veiklas',
 
         leaderboardTypeLabel: 'Lentelės tipas',
-        leaderboardTeam: 'komanda',
-        leaderboardGroup: 'grupė',
+        leaderboardScopeLabel: 'Lentelės apimtis',
+        leaderboardActivity: 'aktyvumas',
+        leaderboardGambling: 'lošimai',
+        leaderboardCombined: 'viskas',
+        leaderboardPlayers: 'žaidėjai',
+        leaderboardGroups: 'grupės',
         leaderboardRankings: '{type} įvertinimai',
-        leaderboardTodo: 'TODO: {type} lyderių lentelė.',
+        leaderboardNoGroups: 'Grupių kol kas nėra.',
+        leaderboardNoPlayers: 'Žaidėjų kol kas nėra.',
+        leaderboardMemberCount: 'Nariai: {n}',
+        leaderboardGames: 'Žaidimai: {n}',
+        leaderboardYou: 'Jūs',
 
         accountProfile: 'Profilis',
         accountUsername: 'Vartotojo vardas',
