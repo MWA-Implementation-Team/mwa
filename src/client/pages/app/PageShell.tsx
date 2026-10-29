@@ -3,6 +3,7 @@ import { useContext } from 'preact/hooks';
 import { ClientContext, Notification } from '#src/client/context.js';
 import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 import QrPane from '#src/client/ui/QrPane.js';
+import { displayActor } from '#src/client/display.js';
 
 export type Section =
     | 'home'
@@ -41,7 +42,6 @@ export default function PageShell({
     const navigation = [
         { section: 'home', label: t('headerHome'), href: '/app' },
         { section: 'activities', label: t('headerActivities'), href: '/app/activities' },
-        { section: 'group', label: t('headerGroup'), href: '/app/group' },
         {
             section: 'leaderboard',
             label: t('headerLeaderboard'),
@@ -124,7 +124,7 @@ export default function PageShell({
 // Live notification (gambling invite / running game) pinned to the top of the
 // main column — fed by /api/notifications through ClientContext.
 function NotificationBanner({ notification }: { notification: Notification }) {
-    const { t } = useContext(ClientContext);
+    const { t, user } = useContext(ClientContext);
     const sessionHref = `/app/gambling/sessions/${encodeURIComponent(notification.sessionId)}`;
 
     return (
@@ -134,7 +134,7 @@ function NotificationBanner({ notification }: { notification: Notification }) {
                     <>
                         <p class="mwa-intro">
                             {t('gamblingNotificationInvite', {
-                                player: notification.inviterName,
+                                player: displayActor(notification.inviterName, user, t),
                             })}
                         </p>
                         <div class="mwa-actions">

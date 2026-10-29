@@ -3,6 +3,7 @@ import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
 import { Invitation, SessionSummary } from '#src/db/gambling/index.js';
 import PageShell from '../PageShell.js';
+import { displayActor } from '#src/client/display.js';
 
 type GamblingPageProps = {
     sessions: SessionSummary[];
@@ -15,7 +16,7 @@ export const gamblingPage: Page<GamblingPageProps> = {
 };
 
 function GamblingPage({ sessions, invitations }: GamblingPageProps) {
-    const { t } = useContext(ClientContext);
+    const { t, user } = useContext(ClientContext);
     return (
         <PageShell section="gambling">
             <section class="mwa-panel">
@@ -31,7 +32,7 @@ function GamblingPage({ sessions, invitations }: GamblingPageProps) {
                                 <li key={invite.id} class="mwa-row">
                                     <a href={`/app/gambling/sessions/${invite.id}`}>
                                         {t('gamblingNotificationInvite', {
-                                            player: invite.p1Name,
+                                            player: displayActor(invite.p1Name, user, t),
                                         })}
                                     </a>
                                 </li>
@@ -55,8 +56,8 @@ function GamblingPage({ sessions, invitations }: GamblingPageProps) {
                                     <a href={`/app/gambling/sessions/${session.id}`}>
                                         <strong>
                                             {t('gamblingVersus', {
-                                                p1: session.p1Name,
-                                                p2: session.p2Name,
+                                                p1: displayActor(session.p1Name, user, t),
+                                                p2: displayActor(session.p2Name, user, t),
                                             })}
                                         </strong>
                                     </a>

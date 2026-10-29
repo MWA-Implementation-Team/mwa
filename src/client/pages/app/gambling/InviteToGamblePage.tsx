@@ -5,6 +5,7 @@ import Dialog from '#src/client/ui/Dialog.js';
 import { GameType } from '#src/db/gambling/index.js';
 import { Language } from '#src/client/language.js';
 import PageShell from '../PageShell.js';
+import { displayUsername } from '#src/client/display.js';
 
 export type InviteToGamblePageProps = {
     targetUsername: string;
@@ -16,7 +17,8 @@ export type InviteToGamblePageProps = {
 
 export const inviteToGamblePage: Page<InviteToGamblePageProps> = {
     Component: InviteToGamblePage,
-    title: (t, { targetUsername }) => t('titleGamblingInvite', { name: targetUsername }),
+    title: (t, { targetUsername }) =>
+        t('titleGamblingInvite', { name: displayUsername(targetUsername) }),
 };
 
 function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) {
@@ -27,7 +29,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
         <PageShell section="gambling">
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
-                    <h2>{t('gamblingWith', { name: targetUsername })}</h2>
+                    <h2>{t('gamblingWith', { name: displayUsername(targetUsername) })}</h2>
                 </div>
                 <div class="mwa-panel-body">
                     <p class="mwa-intro">

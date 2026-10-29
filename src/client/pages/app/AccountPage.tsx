@@ -2,6 +2,7 @@ import { useContext } from 'preact/hooks';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
 import PageShell from './PageShell.js';
+import { displayUsername } from '#src/client/display.js';
 
 type AccountPageProps = {};
 
@@ -24,7 +25,7 @@ function AccountPage({}: AccountPageProps) {
                         <li class="mwa-row">
                             <span>{t('accountUsername')}</span>
                             <span>
-                                <strong>{user!.username}</strong>{' '}
+                                <strong>{displayUsername(user!.username)}</strong>{' '}
                                 <button type="button">{t('accountEdit')}</button>
                             </span>
                         </li>

@@ -195,6 +195,25 @@ export function removeGroupMember(
     return 'removed';
 }
 
+export type GroupMemberInfo = { userId: number; username: string };
+
+// Member ids joined to usernames — for display lists where raw
+// GroupMember rows would force a lookup per member.
+export function listGroupMemberInfos(state: MwaState, groupId: number): GroupMemberInfo[] {
+    const getMemberInfosQuery = state.prepare(`
+       SELECT group_members.user_id, users.username
+       FROM group_members
+       JOIN users ON users.id = group_members.user_id
+       WHERE group_members.group_id = ?
+       ORDER BY group_members.joined_at
+    `);
+
+    return getMemberInfosQuery.all(groupId).map((row) => ({
+        userId: row.user_id as number,
+        username: row.username as string,
+    }));
+}
+
 export function listGroupMembers(state: MwaState, groupId: number): GroupMember[] {
     const getGroupMembersQuery = state.prepare(`
        SELECT group_id, user_id, joined_at

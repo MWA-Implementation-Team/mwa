@@ -169,7 +169,10 @@ Board definitions (`src/db/leaderboard/index.ts`):
   stamped net for groups.
 
 Player boards only rank `role = 'user'` accounts — admins and hosts never appear.
-Group boards rank every group by stamped score with member count. On player rows,
-the viewer gets `mwa-row--self` (+ "You" tag) and their groupmates `mwa-row--group`.
+Group boards rank every group by stamped score with member count. The page renders
+a dense table: when a board lists more than 20 rows, the viewer's own standing is
+pinned in a bold `mwa-lb-you` header row, their in-list row gets `mwa-lb--self`,
+and their groupmates `mwa-lb--group` (on the groups board, `mwa-lb--self` marks
+the viewer's group).
 Zero-sum kinds (transfers, gambling) can't move net-based boards at all — collusion
 shows up as coin concentration, not score inflation.
