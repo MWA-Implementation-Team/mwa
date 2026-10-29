@@ -26,6 +26,13 @@ export default {
             '/^(padding|margin|gap|row-gap|column-gap)/': ['px'],
             'border-radius': ['px'],
         },
+        'selector-disallowed-list': [
+            /^\.mwa\s+(?!:where\()/,
+            {
+                message:
+                    'Don\'t scope selectors under ".mwa " — app CSS is unlayered and already beats Oat',
+            },
+        ],
         'selector-max-id': 0,
         'selector-max-specificity': '0,3,1',
         'max-nesting-depth': 1,
