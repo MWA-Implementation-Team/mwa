@@ -425,6 +425,12 @@
     background: var(--shell-panel-light);
     border: 3px solid var(--shell-border);
     border-radius: 0;
+    /* same 0.15s fade the generic .mwa buttons get — anchors would otherwise
+       snap into the hover state while <button> eases in */
+    transition:
+        color 0.15s,
+        background 0.15s,
+        border-color 0.15s;
 }
 
 .mwa .landing-menu :is(a, button):hover {
@@ -508,6 +514,10 @@
     color: var(--shell-soft);
     background: var(--shell-panel-light);
     border: 3px solid var(--shell-border);
+    transition:
+        color 0.15s,
+        background 0.15s,
+        border-color 0.15s;
 }
 
 .landing-login:hover {
