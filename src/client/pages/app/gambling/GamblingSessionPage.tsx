@@ -8,6 +8,7 @@ import { Language, TranslateFn } from '#src/client/language.js';
 import PageShell from '../PageShell.js';
 import { C4Cell, c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
 import { ComponentChildren } from 'preact';
+import { calcTurnTimeLeftMs, PlayerTurnTime } from '#src/client/gambling/turns.js';
 
 type GamblingSessionPageProps = {
     sessionId: number;
@@ -282,11 +283,13 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
             })}</h1>
         }
     } else {
-        if (currentGame.nextTurn === side) {
-            status = <h1 style={{ color: color(side) }}>YOUR TURN</h1>;
-        } else {
-            status = <h1 style={{ color: color(currentGame.nextTurn) }}>{sideName(currentGame, currentGame.nextTurn)}'s turn</h1>;
-        }
+        status = <div>
+            <span style={{ color: color('p1') }}>{currentGame.p1Name}{side === 'p1' ? ' (You)' : ''}</span>
+            <TurnTimeLeftDisplay turn={currentGame.p1TurnTime} />
+
+            <span style={{ color: color('p2') }}>{currentGame.p2Name}{side === 'p2' ? ' (You)' : ''}</span>
+            <TurnTimeLeftDisplay turn={currentGame.p2TurnTime} />
+        </div>
     }
 
     const winCells = board.winner()?.cells ?? [];
@@ -327,6 +330,41 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
             </form>
         </>
     );
+}
+
+function TurnTimeLeftDisplay({ turn }: { turn: PlayerTurnTime }) {
+    const [, setTick] = useState(0);
+
+    function tick() {
+        setTick(t => t + 1);
+    }
+
+    useEffect(() => {
+        if (turn.turnStartedTimeMs === undefined) return;
+
+        let intervalId: ReturnType<typeof setInterval> | undefined;
+        const msToNextSecond = 1000 - (Date.now() % 1000);
+        const timeoutId = setTimeout(() => {
+            tick();
+            intervalId = setInterval(tick, 1000);
+        }, msToNextSecond);
+
+        return () => {
+            clearTimeout(timeoutId);
+            if (intervalId !== undefined) clearInterval(intervalId);
+        };
+    }, [turn.turnStartedTimeMs]);
+
+    const timeLeftMs = calcTurnTimeLeftMs(turn);
+
+    return <p>{formatDuration(Math.floor(timeLeftMs / 1000))}</p>;
+}
+
+function formatDuration(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
 }
 
 function coinSideTrans(side: CoinSide) {
