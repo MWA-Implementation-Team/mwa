@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from 'node:assert/strict';
-import { Connect4Board, WinCondition } from "./connect4.js";
+import { Connect4Board } from "./connect4.js";
 
 describe('connect 4', () => {
     it('encodes to string correctly', () => {

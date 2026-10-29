@@ -6,7 +6,7 @@ import { CoinFlipGame, CoinSide, Connect4Game, Gambler, RunningGame } from '#src
 import { useContext, useEffect, useState } from 'preact/hooks';
 import { Language, TranslateFn } from '#src/client/language.js';
 import PageShell from '../PageShell.js';
-import { C4Cell, c4Height, C4Player, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
+import { C4Cell, c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
 import { ComponentChildren } from 'preact';
 
 type GamblingSessionPageProps = {
@@ -263,7 +263,7 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
             case 'o':
                 return '#00ff00'
             default:
-                return '#ffffff';
+                return null;
         }
     }
 
@@ -289,13 +289,19 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
         }
     }
 
+    const winCells = board.winner()?.cells ?? [];
+
+    function isWinCell(x: number, y: number): boolean {
+        return winCells.some(p => p.x === x && p.y === y);
+    }
+
     return (
         <>
             <form method="POST" action={`/app/gambling/sessions/${sessionId}/c4-place`}>
                 <table>
                     <tbody>
                         {Array.from({ length: c4Height }, (_, y) => (
-                            <div key={y}>
+                            <tr key={y}>
                                 {Array.from({ length: c4Width }, (_, x) => (
 
                                     <td
@@ -306,12 +312,13 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
                                             name="x"
                                             value={x}
                                             disabled={!isYourTurn}
-                                            style={{ backgroundColor: color(board.get(x, c4Height - 1 - y)), aspectRatio: '1 / 1' }}
+                                            style={{ backgroundColor: color(board.get(x, c4Height - 1 - y)), display: 'flex', width: '2.5rem', height: '2.5rem', padding: 0 }}
                                         >
+                                            {isWinCell(x, c4Height - 1 - y) && 'x'}
                                         </button>
                                     </td>
                                 ))}
-                            </div>
+                            </tr>
                         ))}
                     </tbody>
                 </table>

@@ -20,7 +20,6 @@ import {
     Gambler,
     winGamblingSession,
     queryPendingConnect4Matches,
-    queryActiveGamblingSession,
 } from '#src/db/gambling.js';
 import { findUserByInteractToken } from '#src/db/interactions.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
