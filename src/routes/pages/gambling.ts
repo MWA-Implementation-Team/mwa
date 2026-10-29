@@ -283,7 +283,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const x = Number(form.get('x'));
-        if (x < 0 || x >= c4Width) {
+        if (!Number.isSafeInteger(x) || x < 0 || x >= c4Width) {
             return writeErrorPage(ctx, 400);
         }
 
@@ -355,7 +355,10 @@ function scheduleAfter(key: string, atMs: number, task: () => void) {
     if (scheduledUpdates.has(key)) {
         clearTimeout(scheduledUpdates.get(key));
     }
-    const id = setTimeout(task, Math.max(0, atMs - Date.now()));
+    const id = setTimeout(() => {
+        scheduledUpdates.delete(key);
+        task();
+    }, Math.max(0, atMs - Date.now()));
     scheduledUpdates.set(key, id);
 }
 
@@ -379,7 +382,12 @@ function scheduleConnect4Timeout(state: MwaState, sessionId: number, turnTime: P
     scheduleAfter(`c4-${sessionId}`, Date.now() + timeLeftMs, () => {
         const newGame = findGamblingSessionById(state, sessionId) as Connect4Game;
         if (newGame.status.type !== 'running') return;
-        updateConnect4Times(state, sessionId, newGame);
+        if (!updateConnect4Times(state, sessionId, newGame)) {
+            // this theoretically (?) shouldn't happen
+            // because setTimeout should only call after at least
+            // the specified duration. but just to be safe
+            scheduleConnect4Timeout(state, sessionId, newGame.nextTurn === 'p1' ? newGame.p1TurnTime : newGame.p2TurnTime);
+        }
     });
 }
 
