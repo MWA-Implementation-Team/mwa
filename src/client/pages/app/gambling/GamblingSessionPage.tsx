@@ -212,7 +212,7 @@ function PendingProposal({ t, currentGame }: { t: TranslateFn, currentGame: Runn
             return (
                 <>
                     <p class="mwa-intro">
-                        {currentGame.p1Name} invites you to a Connect 4 duel.
+                        {currentGame.p1Name} invites you to a Connect 4 duel for <strong>{currentGame.betAmount}</strong> coins.
                     </p>
                 </>
             );

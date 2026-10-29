@@ -263,6 +263,11 @@ export function registerGamblingRoutes(app: MwaHono) {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) {
+            return writeErrorPage(ctx, 400);
+        }
+
         const sessionId = Number(ctx.req.param('id'));
         const game = findGamblingSessionById(ctx.var, sessionId);
         if (!game) {
@@ -273,13 +278,8 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 400);
         }
 
-        if (game.status.type !== 'running') {
+        if (game.status.type !== 'running' || updateConnect4Times(ctx.var, sessionId, game)) {
             return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
-        }
-
-        const form = await ctx.req.formData().catch(() => null);
-        if (!form) {
-            return writeErrorPage(ctx, 400);
         }
 
         const x = Number(form.get('x'));
@@ -319,6 +319,19 @@ function updateConnect4Board(state: MwaState, sessionId: number, board: Connect4
     return false;
 }
 
+function updateConnect4Times(state: MwaState, sessionId: number, newGame: Connect4Game): boolean {
+    if (calcTurnTimeLeftMs(newGame.p1TurnTime) <= 0) {
+        winGamblingSession(state, sessionId, 'p2');
+        broadcastSessionUpdate(state, sessionId);
+        return true;
+    } else if (calcTurnTimeLeftMs(newGame.p2TurnTime) <= 0) {
+        winGamblingSession(state, sessionId, 'p1');
+        broadcastSessionUpdate(state, sessionId);
+        return true;
+    }
+    return false;
+}
+
 export function scheduleGamblingTimers(state: MwaState) {
     const expiring = queryExpiringGamblingSessions(state);
     expiring.forEach((exp) => scheduleExpiry(state, exp));
@@ -332,7 +345,7 @@ export function scheduleGamblingTimers(state: MwaState) {
         if (!game) continue;
         const board = Connect4Board.fromString(game.boardStr);
         if (updateConnect4Board(state, pending.sessionId, board)) continue;
-        scheduleConnect4Timeout(state, pending.sessionId, game.nextTurn === 'p1' ? game.p2TurnTime : game.p1TurnTime);
+        scheduleConnect4Timeout(state, pending.sessionId, game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime);
     }
 }
 
@@ -366,14 +379,7 @@ function scheduleConnect4Timeout(state: MwaState, sessionId: number, turnTime: P
     scheduleAfter(`c4-${sessionId}`, Date.now() + timeLeftMs, () => {
         const newGame = findGamblingSessionById(state, sessionId) as Connect4Game;
         if (newGame.status.type !== 'running') return;
-
-        if (calcTurnTimeLeftMs(newGame.p1TurnTime) <= 0) {
-            winGamblingSession(state, sessionId, 'p2');
-            broadcastSessionUpdate(state, sessionId);
-        } else if (calcTurnTimeLeftMs(newGame.p2TurnTime) <= 0) {
-            winGamblingSession(state, sessionId, 'p1');
-            broadcastSessionUpdate(state, sessionId);
-        }
+        updateConnect4Times(state, sessionId, newGame);
     });
 }
 

@@ -209,7 +209,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
             const turnRows = state.prepare(`
             SELECT created_at, player, new_board from connect_4_turns
             WHERE session = ?
-            ORDER BY created_at ASC
+            ORDER BY id ASC
             `).all(sessionId);
 
             const turns: MatchTurn[] = turnRows.map(row => {
@@ -502,7 +502,7 @@ export function connect4TakeTurn(state: MwaState, sessionId: number, player: Gam
         const row = state.prepare(`
         SELECT player from connect_4_turns
         WHERE session = ?
-        ORDER BY created_at DESC LIMIT 1
+        ORDER BY id DESC LIMIT 1
         `).get(sessionId);
         if (!row) return false;
         const nextPlayer: Gambler = row.player === 'p1' ? 'p2' : 'p1';
