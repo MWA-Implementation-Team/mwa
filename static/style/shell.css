@@ -623,23 +623,6 @@
     color: var(--shell-soft);
     overflow-wrap: anywhere;
 }
-.mwa-rows--inset > li,
-.mwa-rows--inset > li:first-child {
-    padding: 12px 8px;
-}
-.mwa-rows > li.mwa-row--self {
-    background: var(--shell-panel-light);
-}
-.mwa-rows > li.mwa-row--group {
-    box-shadow: inset 3px 0 0 var(--shell-accent);
-}
-.mwa-rows--inset .mwa-row {
-    align-items: center;
-}
-.mwa-row-tag {
-    margin-left: 8px;
-    color: var(--shell-soft);
-}
 .mwa-directory {
     list-style: none;
     padding: 0;

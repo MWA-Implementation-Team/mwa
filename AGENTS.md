@@ -5,7 +5,6 @@
 - Commit style: short, lowercase, imperative-ish (e.g. "remove rng slop", "switch to hono from node http server").
 - Keep commits small and scoped to a single change — prefer several tiny commits over one mixed commit.
 - Do NOT add any agent signatures, "Generated with" footers, or Co-Authored-By trailers to commits. User preference for this repo.
-- NEVER force-push. If a push is rejected (non-fast-forward), stop and ask — do not rewrite remote history, even with `--force-with-lease`.
 
 ## Branches
 

@@ -1,9 +1,8 @@
 import { MwaState } from '#src/state.js';
 import { runTransaction } from './transaction.js';
-import { findUserGroup } from './groups.js';
 
 export type TransactionKind =
-    'transfer' | 'purchase' | 'system' | 'gambling_deduction' | 'gambling_winnings' | 'host_grant';
+    'transfer' | 'purchase' | 'system' | 'gambling_deduction' | 'gambling_winnings';
 
 export type Transaction = {
     // kept as the ISO string stored in sqlite so SSR and hydration
@@ -47,12 +46,10 @@ export function insertTransaction(
     `);
     const { id: parentId } = insertParentTx.get(kind)!;
 
-    // stamp the user's current group so coins are attributed where they were earned
-    const group = findUserGroup(state, userId);
     const insertChildTx = state.prepare(`
-    INSERT INTO child_transactions (parent_id, user_id, balance_delta, group_id) VALUES (?, ?, ?, ?)
+    INSERT INTO child_transactions (parent_id, user_id, balance_delta) VALUES (?, ?, ?)
     `);
-    insertChildTx.run(parentId, userId, balanceDelta, group?.id ?? null);
+    insertChildTx.run(parentId, userId, balanceDelta);
 
     return parentId as number;
 }
