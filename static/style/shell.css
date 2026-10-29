@@ -692,7 +692,9 @@
 
 .mwa-rows > li {
     padding: 12px 0;
-    border-top: 1px dashed var(--shell-border);
+    /* --shell-border is a near-invisible black in this theme — row separators
+       need a faint tint of the soft blue instead. */
+    border-top: 1px dashed rgb(from var(--shell-soft) r g b / 0.32);
 }
 
 .mwa-rows > li:first-child {
@@ -718,7 +720,7 @@
     color: var(--shell-soft);
     overflow-wrap: anywhere;
 }
-<<<<<<< HEAD .mwa-rows--inset > li,
+.mwa-rows--inset > li,
 .mwa-rows--inset > li:first-child {
     padding: 12px 8px;
 }
@@ -763,7 +765,8 @@
 }
 .mwa-tx thead,
 .mwa-tx tbody tr {
-    border-color: var(--shell-border);
+    /* see .mwa-rows — --shell-border is too dark to read as a separator */
+    border-color: rgb(from var(--shell-soft) r g b / 0.32);
 }
 .mwa-tx-date {
     color: var(--shell-soft);
@@ -874,7 +877,6 @@
     background: var(--shell-accent);
     font-weight: 700;
 }
-<<<<<<< HEAD
 /* Leaderboard — one-line toolbar over the dense table: compact board tabs on
    the left, scope as a text toggle on the right. */
 .mwa-lb-toolbar {
@@ -903,9 +905,16 @@
 .mwa-scope strong {
     color: var(--shell-white);
 }
+/* Table body gets its own faint surface + edge so the dense grid reads as a
+   block instead of text floating on the translucent panel. */
+.mwa-lb {
+    padding: 0 4px;
+    background: var(--shell-panel-light);
+    border: 1px solid rgb(from var(--shell-soft) r g b / 0.32);
+}
 /* The pinned "you" row duplicates the viewer's standing at the head of the
-   table — same panel-light fill as the in-list self highlight, so "you" reads
-   the same wherever it appears. */
+   table — a light tint over the table's panel-light surface marks "you" the
+   same way wherever it appears. */
 .mwa-lb-rank {
     width: 1%;
     text-align: end;
@@ -914,11 +923,11 @@
     color: var(--shell-soft);
 }
 .mwa-lb-you td {
-    background: var(--shell-panel-light);
+    background: rgb(from var(--shell-soft) r g b / 0.12);
     font-weight: 700;
 }
 .mwa-lb tr.mwa-lb--self td {
-    background: var(--shell-panel-light);
+    background: rgb(from var(--shell-soft) r g b / 0.12);
 }
 .mwa-lb tr.mwa-lb--group td:first-child {
     box-shadow: inset 3px 0 0 var(--shell-accent);
