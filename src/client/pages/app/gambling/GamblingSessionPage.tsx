@@ -36,7 +36,7 @@ function title(t: TranslateFn, game: RunningGame): string {
                 case 'coin_flip':
                     return t('titleGamblingCoinFlip');
                 case 'connect_4':
-                    return t('titleGamblingCoinFlip');
+                    return t('titleGamblingConnect4');
             }
     }
 }
@@ -166,8 +166,17 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                 >
                     {disconnected}
                     <section class="mwa-panel">
-                        {currentGame.gameType === 'coin_flip' && <CoinFlipping t={t} currentGame={currentGame} side={side} />}
-                        {currentGame.gameType === 'connect_4' && <Connect4View sessionId={sessionId} t={t} currentGame={currentGame} side={side} />}
+                        {currentGame.gameType === 'coin_flip' && (
+                            <CoinFlipping t={t} currentGame={currentGame} side={side} />
+                        )}
+                        {currentGame.gameType === 'connect_4' && (
+                            <Connect4View
+                                sessionId={sessionId}
+                                t={t}
+                                currentGame={currentGame}
+                                side={side}
+                            />
+                        )}
                     </section>
                 </PageShell>
             );
@@ -175,7 +184,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
     }
 }
 
-function PendingProposal({ t, currentGame }: { t: TranslateFn, currentGame: RunningGame }) {
+function PendingProposal({ t, currentGame }: { t: TranslateFn; currentGame: RunningGame }) {
     switch (currentGame.gameType) {
         case 'coin_flip':
             return (
@@ -190,11 +199,7 @@ function PendingProposal({ t, currentGame }: { t: TranslateFn, currentGame: Runn
                             id="gamblingCoinFlipBetDetails"
                             values={{
                                 amount: <strong>{currentGame.betAmount}</strong>,
-                                side: (
-                                    <strong>
-                                        {t(coinSideTrans(currentGame.p1Guess))}
-                                    </strong>
-                                ),
+                                side: <strong>{t(coinSideTrans(currentGame.p1Guess))}</strong>,
                             }}
                         />
                     </p>
@@ -212,14 +217,28 @@ function PendingProposal({ t, currentGame }: { t: TranslateFn, currentGame: Runn
             return (
                 <>
                     <p class="mwa-intro">
-                        {currentGame.p1Name} invites you to a Connect 4 duel for <strong>{currentGame.betAmount}</strong> coins.
+                        <Trans
+                            id="gamblingConnect4Challenged"
+                            values={{
+                                player: currentGame.p1Name,
+                                amount: <strong>{currentGame.betAmount}</strong>,
+                            }}
+                        />
                     </p>
                 </>
             );
     }
 }
 
-function CoinFlipping({ t, currentGame, side }: { t: TranslateFn, currentGame: CoinFlipGame, side: Gambler | null }) {
+function CoinFlipping({
+    t,
+    currentGame,
+    side,
+}: {
+    t: TranslateFn;
+    currentGame: CoinFlipGame;
+    side: Gambler | null;
+}) {
     return (
         <>
             <div class="mwa-panel-head">
@@ -239,9 +258,8 @@ function CoinFlipping({ t, currentGame, side }: { t: TranslateFn, currentGame: C
                             {side === currentGame.status.winner
                                 ? t('gamblingYouWin')
                                 : t('gamblingWinner', {
-                                    player:
-                                        sideName(currentGame, currentGame.status.winner),
-                                })}
+                                      player: sideName(currentGame, currentGame.status.winner),
+                                  })}
                         </p>
                     </>
                 ) : (
@@ -249,10 +267,20 @@ function CoinFlipping({ t, currentGame, side }: { t: TranslateFn, currentGame: C
                 )}
             </div>
         </>
-    )
+    );
 }
 
-function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, t: TranslateFn, currentGame: Connect4Game, side: Gambler | null }) {
+function Connect4View({
+    sessionId,
+    t,
+    currentGame,
+    side,
+}: {
+    sessionId: number;
+    t: TranslateFn;
+    currentGame: Connect4Game;
+    side: Gambler | null;
+}) {
     const board = Connect4Board.fromString(currentGame.boardStr);
 
     function color(side: Gambler | C4Cell) {
@@ -262,7 +290,7 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
                 return '#ff0000';
             case 'p2':
             case 'o':
-                return '#00ff00'
+                return '#00ff00';
             default:
                 return null;
         }
@@ -277,25 +305,38 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
         } else if (currentGame.status.winner === 'draw') {
             status = <h1>{t('gamblingDraw')}</h1>;
         } else {
-            status = <h1>{t('gamblingWinner', {
-                player:
-                    sideName(currentGame, currentGame.status.winner),
-            })}</h1>
+            status = (
+                <h1>
+                    {t('gamblingWinner', {
+                        player: sideName(currentGame, currentGame.status.winner),
+                    })}
+                </h1>
+            );
         }
     } else {
-        status = <div>
-            <span style={{ color: color('p1') }}>{currentGame.p1Name}{side === 'p1' ? ' (You)' : ''}</span>
-            <TurnTimeLeftDisplay turn={currentGame.p1TurnTime} />
+        status = (
+            <div>
+                <span style={{ color: color('p1') }}>
+                    {side === 'p1'
+                        ? t('gamblingPlayerYou', { player: currentGame.p1Name })
+                        : currentGame.p1Name}
+                </span>
+                <TurnTimeLeftDisplay turn={currentGame.p1TurnTime} />
 
-            <span style={{ color: color('p2') }}>{currentGame.p2Name}{side === 'p2' ? ' (You)' : ''}</span>
-            <TurnTimeLeftDisplay turn={currentGame.p2TurnTime} />
-        </div>
+                <span style={{ color: color('p2') }}>
+                    {side === 'p2'
+                        ? t('gamblingPlayerYou', { player: currentGame.p2Name })
+                        : currentGame.p2Name}
+                </span>
+                <TurnTimeLeftDisplay turn={currentGame.p2TurnTime} />
+            </div>
+        );
     }
 
     const winCells = board.winner()?.cells ?? [];
 
     function isWinCell(x: number, y: number): boolean {
-        return winCells.some(p => p.x === x && p.y === y);
+        return winCells.some((p) => p.x === x && p.y === y);
     }
 
     return (
@@ -306,16 +347,21 @@ function Connect4View({ sessionId, t, currentGame, side }: { sessionId: number, 
                         {Array.from({ length: c4Height }, (_, y) => (
                             <tr key={y}>
                                 {Array.from({ length: c4Width }, (_, x) => (
-
-                                    <td
-                                        key={x}
-                                    >
+                                    <td key={x}>
                                         <button
                                             type="submit"
                                             name="x"
                                             value={x}
                                             disabled={!isYourTurn}
-                                            style={{ backgroundColor: color(board.get(x, c4Height - 1 - y)), display: 'flex', width: '2.5rem', height: '2.5rem', padding: 0 }}
+                                            style={{
+                                                backgroundColor: color(
+                                                    board.get(x, c4Height - 1 - y),
+                                                ),
+                                                display: 'flex',
+                                                width: '2.5rem',
+                                                height: '2.5rem',
+                                                padding: 0,
+                                            }}
                                         >
                                             {isWinCell(x, c4Height - 1 - y) && 'x'}
                                         </button>
@@ -336,7 +382,7 @@ function TurnTimeLeftDisplay({ turn }: { turn: PlayerTurnTime }) {
     const [, setTick] = useState(0);
 
     function tick() {
-        setTick(t => t + 1);
+        setTick((t) => t + 1);
     }
 
     useEffect(() => {
@@ -364,7 +410,7 @@ function formatDuration(seconds: number): string {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
 
-    return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 }
 
 function coinSideTrans(side: CoinSide) {

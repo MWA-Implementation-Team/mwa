@@ -184,6 +184,7 @@ export type Language = {
     gamblingRejected: string;
     gamblingRejectedDetails: string;
     gamblingYouWin: string;
+    gamblingPlayerYou: string;
     gamblingDraw: string;
     gamblingWinner: string;
     gamblingNotificationInvite: string;
@@ -203,6 +204,7 @@ export type Language = {
 
     gamblingConnect4: string;
     gamblingConnect4Description: string;
+    gamblingConnect4Challenged: string;
 };
 
 export const languages: Record<LanguageCode, Language> = {
@@ -389,7 +391,8 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingRejected: 'Rejected',
         gamblingRejectedDetails: '{player} has rejected this challenge.',
         gamblingYouWin: 'You win!',
-        gamblingDraw: 'It\'s a draw!',
+        gamblingPlayerYou: '{player} (You)',
+        gamblingDraw: "It's a draw!",
         gamblingWinner: '{player} won',
         gamblingNotificationInvite: '{player} has invited you to gamble!',
         gamblingOpen: 'Open',
@@ -408,7 +411,9 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingCoinFlipping: 'Flipping the coin...',
 
         gamblingConnect4: 'Connect 4',
-        gamblingConnect4Description: 'Connect 4 description',
+        gamblingConnect4Description:
+            'Be the first to connect four of your pieces horizontally, vertically, or diagonally.',
+        gamblingConnect4Challenged: '{player} invites you to a Connect 4 duel for {amount} coins.',
     },
     lt: {
         displayName: 'Lietuvių',
@@ -430,7 +435,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingExpired: 'pirmakursiu | Kvietimas nebegalioja',
         titleGamblingRejected: 'pirmakursiu | Kvietimas atmestas',
         titleGamblingCoinFlip: 'pirmakursiu | Monetos metimas',
-        titleGamblingConnect4: '',
+        titleGamblingConnect4: 'first years | Keturi iš eilės',
         titleGamblingInvite: 'pirmakursiu | Lošk su {name}',
 
         headerHome: 'Programa',
@@ -597,6 +602,7 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingRejected: 'Kvietimas atmestas',
         gamblingRejectedDetails: '{player} atmetė šį kvietimą.',
         gamblingYouWin: 'Tu laimėjai!',
+        gamblingPlayerYou: '{player} (Tu)',
         gamblingDraw: 'Lygiosios',
         gamblingWinner: 'Laimėjo {player}',
         gamblingNotificationInvite: '{player} kviečia tave lošti!',
@@ -615,8 +621,11 @@ export const languages: Record<LanguageCode, Language> = {
             'Jei spėjimas teisingas, prarasi {amount} monetų. Jei klaidingas, laimėsi {amount} monetų.',
         gamblingCoinFlipping: 'Metama moneta...',
 
-        gamblingConnect4: '',
-        gamblingConnect4Description: '',
+        gamblingConnect4: 'Keturi iš eilės',
+        gamblingConnect4Description:
+            'Pirmas sudėk keturis savo žetonus į eilę horizontaliai, vertikaliai arba įstrižai.',
+        gamblingConnect4Challenged:
+            '{player} kviečia tave žaisti „Keturi iš eilės“ statant {amount} monetų.',
     },
 };
 
