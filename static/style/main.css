@@ -1,7 +1,5 @@
 @import './tokens.css';
-
 @import './base.css';
-
 @import './components/panel.css';
 @import './components/note.css';
 @import './components/form.css';

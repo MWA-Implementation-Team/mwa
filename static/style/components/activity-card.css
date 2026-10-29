@@ -20,7 +20,7 @@
 }
 
 @font-face {
-    font-family: 'Orbitron';
+    font-family: Orbitron;
     src: url('/fonts/orbitron-latin.woff2') format('woff2');
     font-weight: 400 900;
     font-display: swap;
@@ -30,7 +30,7 @@
 }
 
 @font-face {
-    font-family: 'Oswald';
+    font-family: Oswald;
     src: url('/fonts/oswald-latin-ext.woff2') format('woff2');
     font-weight: 200 700;
     font-display: swap;
@@ -41,7 +41,7 @@
 }
 
 @font-face {
-    font-family: 'Oswald';
+    font-family: Oswald;
     src: url('/fonts/oswald-latin.woff2') format('woff2');
     font-weight: 200 700;
     font-display: swap;
@@ -51,7 +51,7 @@
 }
 
 @font-face {
-    font-family: 'Outfit';
+    font-family: Outfit;
     src: url('/fonts/outfit-latin-ext.woff2') format('woff2');
     font-weight: 400 900;
     font-display: swap;
@@ -62,7 +62,7 @@
 }
 
 @font-face {
-    font-family: 'Outfit';
+    font-family: Outfit;
     src: url('/fonts/outfit-latin.woff2') format('woff2');
     font-weight: 400 900;
     font-display: swap;
@@ -72,7 +72,7 @@
 }
 
 @font-face {
-    font-family: 'Righteous';
+    font-family: Righteous;
     src: url('/fonts/righteous-latin-ext.woff2') format('woff2');
     font-weight: 400;
     font-display: swap;
@@ -83,7 +83,7 @@
 }
 
 @font-face {
-    font-family: 'Righteous';
+    font-family: Righteous;
     src: url('/fonts/righteous-latin.woff2') format('woff2');
     font-weight: 400;
     font-display: swap;
@@ -93,7 +93,7 @@
 }
 
 @font-face {
-    font-family: 'Rye';
+    font-family: Rye;
     src: url('/fonts/rye-latin-ext.woff2') format('woff2');
     font-weight: 400;
     font-display: swap;
@@ -104,7 +104,7 @@
 }
 
 @font-face {
-    font-family: 'Rye';
+    font-family: Rye;
     src: url('/fonts/rye-latin.woff2') format('woff2');
     font-weight: 400;
     font-display: swap;
@@ -114,7 +114,7 @@
 }
 
 @font-face {
-    font-family: 'Shrikhand';
+    font-family: Shrikhand;
     src: url('/fonts/shrikhand-latin-ext.woff2') format('woff2');
     font-weight: 400;
     font-display: swap;
@@ -125,7 +125,7 @@
 }
 
 @font-face {
-    font-family: 'Shrikhand';
+    font-family: Shrikhand;
     src: url('/fonts/shrikhand-latin.woff2') format('woff2');
     font-weight: 400;
     font-display: swap;
@@ -156,7 +156,7 @@
 }
 
 @font-face {
-    font-family: 'UnifrakturCook';
+    font-family: UnifrakturCook;
     src: url('/fonts/unifrakturcook-latin.woff2') format('woff2');
     font-weight: 700;
     font-display: swap;
@@ -170,27 +170,27 @@
 }
 
 .cells {
-    font-family: 'Outfit', sans-serif;
+    font-family: Outfit, sans-serif;
 }
 
 .miciaus-revolution {
-    font-family: 'Oswald', sans-serif;
+    font-family: Oswald, sans-serif;
 }
 
 .miciaus-paradise {
-    font-family: 'Shrikhand', cursive;
+    font-family: Shrikhand, cursive;
 }
 
 .middle-ages {
-    font-family: 'UnifrakturCook', cursive;
+    font-family: UnifrakturCook, cursive;
 }
 
 .stone-age {
-    font-family: 'Rye', serif;
+    font-family: Rye, serif;
 }
 
 .year-2028 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: Orbitron, sans-serif;
 }
 
 .world-war-1 {
@@ -198,5 +198,5 @@
 }
 
 .seventies-eighties {
-    font-family: 'Righteous', cursive;
+    font-family: Righteous, cursive;
 }

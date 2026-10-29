@@ -1,5 +1,5 @@
 @font-face {
-    font-family: 'montserrat';
+    font-family: montserrat;
     src: url('/fonts/montserrat-latin.woff2') format('woff2');
     font-weight: 100 900;
     font-display: swap;
@@ -9,7 +9,7 @@
 }
 
 @font-face {
-    font-family: 'montserrat';
+    font-family: montserrat;
     src: url('/fonts/montserrat-latin-ext.woff2') format('woff2');
     font-weight: 100 900;
     font-display: swap;
@@ -35,7 +35,6 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-
     background-color: var(--background);
     background-image: var(--backdrop-scrim), url('/img/backdrop.webp');
     background-size: cover, cover;

@@ -6,6 +6,7 @@
 
 .mwa-rows > li {
     padding: var(--space-3) 0;
+
     /* --border is a near-invisible black in this theme — row separators
        need a faint tint of the soft blue instead. */
     border-top: 1px dashed var(--divider);
