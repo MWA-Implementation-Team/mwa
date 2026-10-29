@@ -1,13 +1,15 @@
+import { Fragment } from 'preact';
 import { useContext } from 'preact/hooks';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
 import type { GroupRow, LeaderboardBoard, PlayerRow } from '#src/db/leaderboard/index.js';
+import { displayActor } from '#src/client/display.js';
 import PageShell from './PageShell.js';
 
-type LeaderboardPageProps = { board: LeaderboardBoard } & (
-    | { scope: 'players'; rows: PlayerRow[]; viewerGroupId: number | null }
-    | { scope: 'groups'; groups: GroupRow[] }
-);
+type LeaderboardPageProps = {
+    board: LeaderboardBoard;
+    viewerGroupId: number | null;
+} & ({ scope: 'players'; rows: PlayerRow[] } | { scope: 'groups'; groups: GroupRow[] });
 
 export const leaderboardPage: Page<LeaderboardPageProps> = {
     Component: LeaderboardPage,
@@ -29,112 +31,176 @@ const scopeLabelKey = {
 } as const;
 
 function LeaderboardPage(props: LeaderboardPageProps) {
-    const { t, user } = useContext(ClientContext);
+    const { t } = useContext(ClientContext);
     const { board, scope } = props;
     return (
         <PageShell section="leaderboard">
-            <nav class="mwa-tabbar" aria-label={t('leaderboardTypeLabel')}>
-                {boards.map((b) => (
-                    <a
-                        key={b}
-                        href={`/app/leaderboard?board=${b}&scope=${scope}`}
-                        aria-current={b === board ? 'page' : undefined}
-                    >
-                        {t(boardLabelKey[b])}
-                    </a>
-                ))}
-            </nav>
-            <nav class="mwa-tabbar" aria-label={t('leaderboardScopeLabel')}>
-                {scopes.map((s) => (
-                    <a
-                        key={s}
-                        href={`/app/leaderboard?board=${board}&scope=${s}`}
-                        aria-current={s === scope ? 'page' : undefined}
-                    >
-                        {t(scopeLabelKey[s])}
-                    </a>
-                ))}
-            </nav>
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
                     <h2>{t('leaderboardRankings', { type: t(boardLabelKey[board]) })}</h2>
                 </div>
                 <div class="mwa-panel-body">
-                    {props.scope === 'players' ? (
-                        props.rows.length === 0 ? (
-                            <p class="mwa-muted">{t('leaderboardNoPlayers')}</p>
-                        ) : (
-                            <ol class="mwa-rows mwa-rows--inset">
-                                {props.rows.map((row, index) => {
-                                    const isSelf = row.userId === user?.id;
-                                    const isGroupmate =
-                                        !isSelf &&
-                                        props.viewerGroupId !== null &&
-                                        row.groupId === props.viewerGroupId;
-                                    return (
-                                        <li
-                                            key={row.userId}
-                                            class={
-                                                isSelf
-                                                    ? 'mwa-row--self'
-                                                    : isGroupmate
-                                                      ? 'mwa-row--group'
-                                                      : undefined
-                                            }
-                                        >
-                                            <div class="mwa-row">
-                                                <span>
-                                                    <strong>{index + 1}</strong>. {row.username}
-                                                    {isSelf && (
-                                                        <span class="mwa-row-tag">
-                                                            {t('leaderboardYou')}
-                                                        </span>
-                                                    )}
-                                                </span>
-                                                <strong>
-                                                    {row.score} {t('currencyName')}
-                                                    {board === 'gambling' && (
-                                                        <small>
-                                                            {' '}
-                                                            ·{' '}
-                                                            {t('leaderboardGames', {
-                                                                n: String(row.gamesPlayed ?? 0),
-                                                            })}
-                                                        </small>
-                                                    )}
-                                                </strong>
-                                            </div>
-                                        </li>
-                                    );
-                                })}
-                            </ol>
-                        )
-                    ) : props.groups.length === 0 ? (
-                        <p class="mwa-muted">{t('leaderboardNoGroups')}</p>
-                    ) : (
-                        <ol class="mwa-rows mwa-rows--inset">
-                            {props.groups.map((group, index) => (
-                                <li key={group.id}>
-                                    <div class="mwa-row">
-                                        <span>
-                                            <strong>{index + 1}</strong>. {group.name}
-                                            <small>
-                                                {' '}
-                                                {t('leaderboardMemberCount', {
-                                                    n: String(group.memberCount),
-                                                })}
-                                            </small>
-                                        </span>
-                                        <strong>
-                                            {group.score} {t('currencyName')}
-                                        </strong>
-                                    </div>
-                                </li>
+                    <div class="mwa-lb-toolbar">
+                        <nav
+                            class="mwa-tabbar mwa-tabbar--compact"
+                            aria-label={t('leaderboardTypeLabel')}
+                        >
+                            {boards.map((b) => (
+                                <a
+                                    key={b}
+                                    href={`/app/leaderboard?board=${b}&scope=${scope}`}
+                                    aria-current={b === board ? 'page' : undefined}
+                                >
+                                    {t(boardLabelKey[b])}
+                                </a>
                             ))}
-                        </ol>
+                        </nav>
+                        <nav class="mwa-scope" aria-label={t('leaderboardScopeLabel')}>
+                            {scopes.map((s, i) => (
+                                <Fragment key={s}>
+                                    {i > 0 && <span class="lang-links-sep">·</span>}
+                                    {s === scope ? (
+                                        <strong aria-current="page">{t(scopeLabelKey[s])}</strong>
+                                    ) : (
+                                        <a href={`/app/leaderboard?board=${board}&scope=${s}`}>
+                                            {t(scopeLabelKey[s])}
+                                        </a>
+                                    )}
+                                </Fragment>
+                            ))}
+                        </nav>
+                    </div>
+                    {props.scope === 'players' ? (
+                        <PlayersTable
+                            board={board}
+                            rows={props.rows}
+                            viewerGroupId={props.viewerGroupId}
+                        />
+                    ) : (
+                        <GroupsTable groups={props.groups} viewerGroupId={props.viewerGroupId} />
                     )}
                 </div>
             </section>
         </PageShell>
+    );
+}
+
+function PlayersTable({
+    board,
+    rows,
+    viewerGroupId,
+}: {
+    board: LeaderboardBoard;
+    rows: PlayerRow[];
+    viewerGroupId: number | null;
+}) {
+    const { t, user } = useContext(ClientContext);
+    if (rows.length === 0) return <p class="mwa-muted">{t('leaderboardNoPlayers')}</p>;
+
+    const viewerIndex = rows.findIndex((row) => row.userId === user?.id);
+    const viewerRow = viewerIndex >= 0 ? rows[viewerIndex] : null;
+    const games = board === 'gambling';
+    const pinned = rows.length > 20;
+
+    return (
+        <div class="table mwa-tx mwa-lb">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="mwa-lb-rank">#</th>
+                        <th>{t('leaderboardPlayers')}</th>
+                        {games && <th class="mwa-tx-amount">{t('leaderboardColGames')}</th>}
+                        <th class="mwa-tx-amount">{t('currencyName')}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {pinned && (
+                        <tr class="mwa-lb-you">
+                            <td class="mwa-lb-rank">{viewerIndex >= 0 ? viewerIndex + 1 : '—'}</td>
+                            <td>{t('leaderboardYou')}</td>
+                            {games && (
+                                <td class="mwa-tx-amount">{viewerRow?.gamesPlayed ?? '—'}</td>
+                            )}
+                            <td class="mwa-tx-amount">
+                                {viewerRow ? viewerRow.score.toFixed(2) : '—'}
+                            </td>
+                        </tr>
+                    )}
+                    {rows.map((row, index) => {
+                        const isSelf = row.userId === user?.id;
+                        const isGroupmate =
+                            !isSelf && viewerGroupId !== null && row.groupId === viewerGroupId;
+                        return (
+                            <tr key={row.userId} class={isSelf ? 'mwa-lb--self' : undefined}>
+                                <td class="mwa-lb-rank">{index + 1}</td>
+                                <td>
+                                    {displayActor(row.username, user, t)}
+                                    {isGroupmate && (
+                                        <small class="mwa-standing-hint">
+                                            {t('leaderboardGroupTag')}
+                                        </small>
+                                    )}
+                                </td>
+                                {games && <td class="mwa-tx-amount">{row.gamesPlayed ?? 0}</td>}
+                                <td class="mwa-tx-amount">{row.score.toFixed(2)}</td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        </div>
+    );
+}
+
+function GroupsTable({
+    groups,
+    viewerGroupId,
+}: {
+    groups: GroupRow[];
+    viewerGroupId: number | null;
+}) {
+    const { t } = useContext(ClientContext);
+    if (groups.length === 0) return <p class="mwa-muted">{t('leaderboardNoGroups')}</p>;
+
+    const viewerIndex = groups.findIndex((g) => g.id === viewerGroupId);
+    const viewerGroup = viewerIndex >= 0 ? groups[viewerIndex] : null;
+    const pinned = groups.length > 20;
+
+    return (
+        <div class="table mwa-tx mwa-lb">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="mwa-lb-rank">#</th>
+                        <th>{t('leaderboardGroups')}</th>
+                        <th class="mwa-tx-amount">{t('leaderboardColMembers')}</th>
+                        <th class="mwa-tx-amount">{t('currencyName')}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {pinned && (
+                        <tr class="mwa-lb-you">
+                            <td class="mwa-lb-rank">{viewerIndex >= 0 ? viewerIndex + 1 : '—'}</td>
+                            <td>{viewerGroup?.name ?? '—'}</td>
+                            <td class="mwa-tx-amount">{viewerGroup?.memberCount ?? '—'}</td>
+                            <td class="mwa-tx-amount">
+                                {viewerGroup ? viewerGroup.score.toFixed(2) : '—'}
+                            </td>
+                        </tr>
+                    )}
+                    {groups.map((group, index) => (
+                        <tr
+                            key={group.id}
+                            class={group.id === viewerGroupId ? 'mwa-lb--self' : undefined}
+                        >
+                            <td class="mwa-lb-rank">{index + 1}</td>
+                            <td>{group.name}</td>
+                            <td class="mwa-tx-amount">{group.memberCount}</td>
+                            <td class="mwa-tx-amount">{group.score.toFixed(2)}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
 }

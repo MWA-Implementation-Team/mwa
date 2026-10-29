@@ -17,6 +17,53 @@
     color: var(--text);
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Orbitron:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Righteous&family=Rye&family=Shrikhand&family=Special+Elite&family=UnifrakturCook:wght@700&display=swap');
+
+.card.egypt,
+.egypt {
+    font-family: 'Alfa Slab One', serif !important;
+}
+
+.card.cells,
+.cells {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+.card.micius-revolution,
+.micius-revolution {
+    font-family: 'Oswald', sans-serif !important;
+}
+
+.card.micius-paradise,
+.micius-paradise {
+    font-family: 'Shrikhand', cursive !important;
+}
+
+.card.middle-ages,
+.middle-ages {
+    font-family: 'UnifrakturCook', cursive !important;
+}
+
+.card.stone-age,
+.stone-age {
+    font-family: 'Rye', serif !important;
+}
+
+.card.year-2028,
+.year-2028 {
+    font-family: 'Orbitron', sans-serif !important;
+}
+
+.card.world-war-1,
+.world-war-1 {
+    font-family: 'Special Elite', monospace !important;
+}
+
+.card.seventies-eighties,
+.seventies-eighties {
+    font-family: 'Righteous', cursive !important;
+}
+
 .section-title {
     margin: 0 0 var(--space-lg);
     font-size: var(--text-2xl);

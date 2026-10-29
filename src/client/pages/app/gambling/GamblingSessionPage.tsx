@@ -6,6 +6,7 @@ import { CoinSide, Gambler, RunningGame } from '#src/db/gambling/index.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import { Language, TranslateFn } from '#src/client/language.js';
 import PageShell from '../PageShell.js';
+import { displayActor } from '#src/client/display.js';
 
 type GamblingSessionPageProps = {
     sessionId: number;
@@ -72,7 +73,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                             <div class="mwa-panel-body">
                                 <p class="mwa-intro">
                                     {t('gamblingCoinFlipChallenged', {
-                                        player: currentGame.p1Name,
+                                        player: displayActor(currentGame.p1Name, user, t),
                                     })}
                                 </p>
                                 <p>
@@ -127,7 +128,11 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                         {disconnected}
                         <section class="mwa-panel">
                             <div class="mwa-panel-head">
-                                <h2>{t('gamblingWaiting', { player: currentGame.p2Name })}</h2>
+                                <h2>
+                                    {t('gamblingWaiting', {
+                                        player: displayActor(currentGame.p2Name, user, t),
+                                    })}
+                                </h2>
                             </div>
                             <div class="mwa-panel-body">
                                 <p class="mwa-muted">{t('gamblingWaitingHelp')}</p>
@@ -147,7 +152,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                         <div class="mwa-panel-body">
                             <p class="mwa-muted">
                                 {t('gamblingExpiryDetails', {
-                                    player: currentGame.p2Name,
+                                    player: displayActor(currentGame.p2Name, user, t),
                                     minutes: String(gamblingPendingExpiryMinutes),
                                 })}
                             </p>
@@ -165,7 +170,9 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                         </div>
                         <div class="mwa-panel-body">
                             <p class="mwa-muted">
-                                {t('gamblingRejectedDetails', { player: currentGame.p2Name })}
+                                {t('gamblingRejectedDetails', {
+                                    player: displayActor(currentGame.p2Name, user, t),
+                                })}
                             </p>
                         </div>
                     </section>
@@ -187,8 +194,8 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                         <div class="mwa-panel-body">
                             <p class="mwa-intro">
                                 {t('gamblingVersus', {
-                                    p1: currentGame.p1Name,
-                                    p2: currentGame.p2Name,
+                                    p1: displayActor(currentGame.p1Name, user, t),
+                                    p2: displayActor(currentGame.p2Name, user, t),
                                 })}
                             </p>
                             {currentGame.status.type === 'ended' ? (
@@ -200,8 +207,16 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                             : t('gamblingWinner', {
                                                   player:
                                                       currentGame.status.winner === 'p1'
-                                                          ? currentGame.p1Name
-                                                          : currentGame.p2Name,
+                                                          ? displayActor(
+                                                                currentGame.p1Name,
+                                                                user,
+                                                                t,
+                                                            )
+                                                          : displayActor(
+                                                                currentGame.p2Name,
+                                                                user,
+                                                                t,
+                                                            ),
                                               })}
                                     </p>
                                 </>

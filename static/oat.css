@@ -223,7 +223,7 @@
         --primary-foreground: light-dark(#fafafa, #18181b);
         --secondary: light-dark(#f4f4f5, #27272a);
         --secondary-foreground: light-dark(#574747, #fafafa);
-        --muted: light-dark(#f4f4f5, #27272a);
+        --muted: light-dark(#3535ff, #27272a);
         --muted-foreground: light-dark(#71717a, #a1a1aa);
         --faint: light-dark(#fafafa, #1e1e21);
         --faint-foreground: light-dark(#a1a1aa, #71717a);
@@ -372,7 +372,7 @@
         & figure[data-variant='avatar'] {
             isolation: isolate;
             margin-inline-end: calc(var(--space-5) * -1);
-            border: 2px solid var(--background);
+            border: 3px solid var(--background);
 
             &:last-child {
                 margin-inline-end: 0;
@@ -416,7 +416,7 @@
         background-color: var(--primary);
         color: var(--primary-foreground);
         border-radius: var(--radius-medium);
-        border: 1px solid;
+        border: 3px solid;
         border-color: rgb(255 255 255 / 0.15) rgb(0 0 0 / 0.2) rgb(0 0 0 / 0.2)
             rgb(255 255 255 / 0.15);
         transition:
@@ -511,7 +511,7 @@
     ::file-selector-button {
         background-color: transparent;
         color: var(--foreground);
-        border: 1px solid var(--border);
+        border: 3px solid var(--border);
     }
     ::file-selector-button:hover {
         /* pseudoelement:hover can't be nested and has to be a separate block. */
@@ -584,7 +584,7 @@
         line-height: var(--leading-normal);
         background-color: var(--background);
         color: var(--foreground);
-        border: 1px solid var(--input);
+        border: 3px solid var(--input);
         border-radius: var(--radius-medium);
         transition:
             border-color var(--transition-fast),
@@ -636,7 +636,7 @@
         margin: 0;
         position: relative;
         background-color: var(--background);
-        border: 1px solid var(--input);
+        border: 3px solid var(--input);
         transition:
             background-color var(--transition-fast),
             border-color var(--transition-fast);
@@ -745,7 +745,7 @@
     }
 
     fieldset {
-        border: 1px solid var(--border);
+        border: 3px solid var(--border);
         border-radius: var(--radius-medium);
         padding: var(--space-4);
         margin-block-end: var(--space-4);
@@ -795,7 +795,7 @@
             font-weight: var(--font-normal);
             color: var(--muted-foreground);
             background-color: var(--muted);
-            border: 1px solid var(--input);
+            border: 3px solid var(--input);
 
             &:not(:last-child) {
                 border-inline-end: 0;
@@ -966,7 +966,7 @@
             display: inline-block;
             width: 1.5rem;
             height: 1.5rem;
-            border: 2px solid var(--muted);
+            border: 3px solid var(--muted);
             border-top-color: var(--primary);
             border-radius: var(--radius-full);
             animation: spin 1s linear infinite;
@@ -1124,10 +1124,15 @@
     .card {
         background-color: var(--card);
         color: var(--card-foreground);
-        border: 1px solid var(--border);
+        border: 3px solid var(--border);
         border-radius: var(--radius-medium);
         box-shadow: var(--shadow-small);
         padding: var(--space-6);
+        text-shadow:
+            rgba(0, 0, 0, 0.518) 0px 0px 4px,
+            black 0px 0px 8px,
+            rgba(0, 0, 0, 0.495) 0px 0px 2px,
+            rgba(255, 255, 255, 0.532) 0px 0px 16px !important;
     }
 }
 @layer components {
@@ -1137,7 +1142,7 @@
         gap: var(--space-3);
         padding: var(--space-4) var(--space-6);
         background-color: var(--background);
-        border: 1px solid var(--border);
+        border: 3px solid var(--border);
         border-radius: var(--radius-medium);
         font-size: var(--text-7);
 
@@ -1181,7 +1186,7 @@
         &.outline {
             background-color: transparent;
             color: var(--foreground);
-            border: 1px solid var(--border);
+            border: 3px solid var(--border);
         }
 
         &[data-variant='secondary'] {
@@ -1228,7 +1233,7 @@
 }
 @layer components {
     details {
-        border: 1px solid var(--border);
+        border: 3px solid var(--border);
         border-radius: var(--radius-medium);
         overflow: hidden;
 
@@ -1352,7 +1357,7 @@
         margin: auto;
         padding: 0;
         background-color: var(--card);
-        border: 1px solid var(--border);
+        border: 3px solid var(--border);
         border-radius: var(--radius-large);
         box-shadow: var(--shadow-large);
 
@@ -1436,7 +1441,7 @@
             /* padding: var(--space-1); */
             min-width: 12rem;
             background-color: var(--background);
-            border: 1px solid var(--border);
+            border: 3px solid var(--border);
             border-radius: var(--radius-medium);
             box-shadow: var(--shadow-small);
             opacity: 0;
@@ -1529,7 +1534,7 @@
         min-width: 20rem;
         pointer-events: auto;
         background-color: var(--card);
-        border: 1px solid var(--border);
+        border: 3px solid var(--border);
         border-inline-start-width: var(--space-1);
         border-inline-start-style: solid;
         border-inline-start-color: var(--_variant-color, var(--border));
@@ -1708,7 +1713,7 @@
     [data-sidebar-toggle] {
         padding: 0 var(--space-1);
         background: none;
-        border: 1px solid var(--border);
+        border: 3px solid var(--border);
         border-radius: var(--radius-small);
     }
 
@@ -1787,7 +1792,7 @@
         gap: var(--space-2);
         padding: var(--space-2) var(--space-3);
         background-color: var(--background);
-        border: 1px solid var(--input);
+        border: 3px solid var(--input);
         border-radius: var(--radius-medium);
         cursor: text;
         transition:

@@ -27,7 +27,6 @@ export type Language = {
     headerHome: string;
     headerActivities: string;
     headerLeaderboard: string;
-    headerGroup: string;
     headerGambling: string;
     headerAccount: string;
     headerHost: string;
@@ -69,7 +68,6 @@ export type Language = {
     dashFinances: string;
     dashBalance: string;
     currencyName: string;
-    dashTransactions: string;
     dashNoTransactions: string;
     txTransfer: string;
     txPurchase: string;
@@ -77,18 +75,23 @@ export type Language = {
     txGamblingDeduction: string;
     txGamblingWinnings: string;
     txHostGrant: string;
+    txColDate: string;
+    txColType: string;
+    txColAmount: string;
     dashQrTitle: string;
     qrCopyLink: string;
     qrCopied: string;
 
-    queueTitle: string;
-    queuePositionLabel: string;
-    queueJoinAs: string;
+    dashGame: string;
+    queuePositionInline: string;
+    queueJoin: string;
     queueLeave: string;
+    queueGroupSize: string;
     queueNeedGroup: string;
     queueGoGroup: string;
     queueJoinFailed: string;
     queueLeaveFailed: string;
+    dashStandings: string;
 
     hostCallTitle: string;
     hostStation: string;
@@ -123,13 +126,19 @@ export type Language = {
     leaderboardActivity: string;
     leaderboardGambling: string;
     leaderboardCombined: string;
+    leaderboardActivityHint: string;
+    leaderboardGamblingHint: string;
+    leaderboardCombinedHint: string;
     leaderboardPlayers: string;
     leaderboardGroups: string;
     leaderboardRankings: string;
+    leaderboardColMembers: string;
+    leaderboardColGames: string;
     leaderboardNoGroups: string;
     leaderboardNoPlayers: string;
     leaderboardMemberCount: string;
     leaderboardGames: string;
+    leaderboardGroupTag: string;
     leaderboardYou: string;
 
     accountProfile: string;
@@ -142,6 +151,16 @@ export type Language = {
     adminPanelHead: string;
     adminPanelTodo: string;
 
+    dashGroup: string;
+    groupNone: string;
+    groupOwner: string;
+    groupKick: string;
+    groupKickHint: string;
+    groupLeave: string;
+    groupLeaveHint: string;
+    groupDeleteHint: string;
+    groupKickFailed: string;
+    groupLeaveFailed: string;
     groupName: string;
     groupPhone: string;
     groupCreate: string;
@@ -235,7 +254,6 @@ export const languages: Record<LanguageCode, Language> = {
         headerHome: 'App',
         headerActivities: 'Activities',
         headerLeaderboard: 'Leaderboard',
-        headerGroup: 'Group',
         headerGambling: 'Gambling',
         headerAccount: 'Account',
         headerHost: 'Host tools',
@@ -277,7 +295,6 @@ export const languages: Record<LanguageCode, Language> = {
         dashFinances: 'Your finances',
         dashBalance: 'Current balance',
         currencyName: 'micius koinai',
-        dashTransactions: 'Transaction history',
         dashNoTransactions: 'No transactions yet',
         txTransfer: 'Transfer',
         txPurchase: 'Purchase',
@@ -285,18 +302,23 @@ export const languages: Record<LanguageCode, Language> = {
         txGamblingDeduction: 'Gambling deduction',
         txGamblingWinnings: 'Gambling winnings',
         txHostGrant: 'Host grant',
+        txColDate: 'Date',
+        txColType: 'Type',
+        txColAmount: 'Amount',
         dashQrTitle: 'Account QR code',
         qrCopyLink: 'Copy link',
         qrCopied: 'Copied!',
 
-        queueTitle: 'Event queue',
-        queuePositionLabel: 'Your position',
-        queueJoinAs: 'Join the queue as {group}',
+        dashGame: 'Game',
+        queuePositionInline: '#{pos} in the queue',
+        queueJoin: 'Join queue',
         queueLeave: 'Leave the queue',
+        queueGroupSize: '{n} people in the group',
         queueNeedGroup: 'You need a group to join the queue.',
         queueGoGroup: 'Go to your group',
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
+        dashStandings: 'Your standings',
 
         hostCallTitle: 'Send groups to a station',
         hostStation: 'Station',
@@ -321,23 +343,29 @@ export const languages: Record<LanguageCode, Language> = {
         shellNavLabel: 'Main navigation',
         navTitle: 'Menu',
 
-        activitiesDirectory: 'activity directory',
+        activitiesDirectory: 'Activity directory',
         activitiesEmpty: 'No activities listed yet.',
         activityInfoTitle: 'activity information',
         activityBack: '← back to activities',
 
         leaderboardTypeLabel: 'Leaderboard board',
         leaderboardScopeLabel: 'Leaderboard scope',
-        leaderboardActivity: 'activity',
-        leaderboardGambling: 'gambling',
-        leaderboardCombined: 'all',
+        leaderboardActivity: 'Activity',
+        leaderboardGambling: 'Gambling',
+        leaderboardCombined: 'All',
+        leaderboardActivityHint: 'earned at activity stations',
+        leaderboardGamblingHint: 'net gambling balance',
+        leaderboardCombinedHint: 'total balance',
         leaderboardPlayers: 'players',
         leaderboardGroups: 'groups',
         leaderboardRankings: '{type} rankings',
+        leaderboardColMembers: 'members',
+        leaderboardColGames: 'games',
         leaderboardNoGroups: 'No groups yet.',
         leaderboardNoPlayers: 'No players yet.',
         leaderboardMemberCount: '{n} member(s)',
         leaderboardGames: '{n} game(s)',
+        leaderboardGroupTag: '*group',
         leaderboardYou: 'You',
 
         accountProfile: 'Profile',
@@ -350,6 +378,16 @@ export const languages: Record<LanguageCode, Language> = {
         adminPanelHead: 'administration',
         adminPanelTodo: 'TODO: admin panel.',
 
+        dashGroup: 'Your group',
+        groupNone: 'You are not in a group.',
+        groupOwner: 'owner',
+        groupKick: 'Kick',
+        groupKickHint: 'Remove {name} from the group',
+        groupLeave: 'Leave',
+        groupLeaveHint: 'Leave this group',
+        groupDeleteHint: 'Delete this group and all its members',
+        groupKickFailed: 'Could not remove the member',
+        groupLeaveFailed: 'Could not leave the group',
         groupName: 'Group Name',
         groupPhone: 'Enter emergency phone Number',
         groupCreate: 'Create Group',
@@ -443,7 +481,6 @@ export const languages: Record<LanguageCode, Language> = {
         headerHome: 'Programa',
         headerActivities: 'Veiklos',
         headerLeaderboard: 'Lyderių lentelė',
-        headerGroup: 'Grupė',
         headerGambling: 'Lošimai',
         headerAccount: 'Paskyra',
         headerHost: 'Vedėjo įrankiai',
@@ -486,7 +523,6 @@ export const languages: Record<LanguageCode, Language> = {
         dashFinances: 'Tavo finansai',
         dashBalance: 'Dabartinis balansas',
         currencyName: 'micius koinai',
-        dashTransactions: 'Operacijų istorija',
         dashNoTransactions: 'Operacijų dar nėra',
         txTransfer: 'Pervedimas',
         txPurchase: 'Pirkimas',
@@ -494,18 +530,23 @@ export const languages: Record<LanguageCode, Language> = {
         txGamblingDeduction: 'Lošimo atsiskaitymas',
         txGamblingWinnings: 'Lošimo laimėjimas',
         txHostGrant: 'Vedėjo įskaitymas',
+        txColDate: 'Data',
+        txColType: 'Tipas',
+        txColAmount: 'Suma',
         dashQrTitle: 'Paskyros QR kodas',
         qrCopyLink: 'Kopijuoti nuorodą',
         qrCopied: 'Nukopijuota!',
 
-        queueTitle: 'Renginio eilė',
-        queuePositionLabel: 'Tavo pozicija',
-        queueJoinAs: 'Stoti į eilę kaip {group}',
+        dashGame: 'Žaidimas',
+        queuePositionInline: '#{pos} eilėje',
+        queueJoin: 'Stoti į eilę',
         queueLeave: 'Palikti eilę',
+        queueGroupSize: '{n} nariai grupėje',
         queueNeedGroup: 'Norint stoti į eilę, reikia grupės.',
         queueGoGroup: 'Eiti į grupę',
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
+        dashStandings: 'Tavo pozicijos',
 
         hostCallTitle: 'Siųsti grupes į stotį',
         hostStation: 'Stotis',
@@ -530,23 +571,29 @@ export const languages: Record<LanguageCode, Language> = {
         shellNavLabel: 'Pagrindinė navigacija',
         navTitle: 'Meniu',
 
-        activitiesDirectory: 'veiklų katalogas',
+        activitiesDirectory: 'Veiklų katalogas',
         activitiesEmpty: 'Veiklų dar nėra.',
         activityInfoTitle: 'veiklos informacija',
         activityBack: '← atgal į veiklas',
 
         leaderboardTypeLabel: 'Lentelės tipas',
         leaderboardScopeLabel: 'Lentelės apimtis',
-        leaderboardActivity: 'aktyvumas',
-        leaderboardGambling: 'lošimai',
-        leaderboardCombined: 'viskas',
+        leaderboardActivity: 'Aktyvumas',
+        leaderboardGambling: 'Lošimai',
+        leaderboardCombined: 'Viskas',
+        leaderboardActivityHint: 'uždirbta per veiklas',
+        leaderboardGamblingHint: 'lošimų balansas',
+        leaderboardCombinedHint: 'bendras balansas',
         leaderboardPlayers: 'žaidėjai',
         leaderboardGroups: 'grupės',
-        leaderboardRankings: '{type} įvertinimai',
+        leaderboardRankings: '{type} lyderiai',
+        leaderboardColMembers: 'nariai',
+        leaderboardColGames: 'žaidimai',
         leaderboardNoGroups: 'Grupių kol kas nėra.',
         leaderboardNoPlayers: 'Žaidėjų kol kas nėra.',
         leaderboardMemberCount: 'Nariai: {n}',
         leaderboardGames: 'Žaidimai: {n}',
+        leaderboardGroupTag: '*grupė',
         leaderboardYou: 'Jūs',
 
         accountProfile: 'Profilis',
@@ -560,6 +607,16 @@ export const languages: Record<LanguageCode, Language> = {
         adminPanelHead: 'administravimas',
         adminPanelTodo: 'TODO: administravimo skydelis.',
 
+        dashGroup: 'Tavo grupė',
+        groupNone: 'Nesate grupėje.',
+        groupOwner: 'savininkas',
+        groupKick: 'Išmesti',
+        groupKickHint: 'Pašalinti {name} iš grupės',
+        groupLeave: 'Išeiti',
+        groupLeaveHint: 'Išeiti iš grupės',
+        groupDeleteHint: 'Ištrinti grupę ir visus narius',
+        groupKickFailed: 'Nepavyko pašalinti nario',
+        groupLeaveFailed: 'Nepavyko išeiti iš grupės',
         groupName: 'Grupės pavadinimas',
         groupPhone: 'Įveskite skubios pagalbos telefono numerį',
         groupCreate: 'Sukurti grupę',

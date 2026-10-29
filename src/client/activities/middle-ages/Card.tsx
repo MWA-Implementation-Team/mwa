@@ -5,16 +5,20 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function MiddleAgesCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card middle-ages"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#f5e9cd',
-                background: '#70464c',
-                border: '2px solid #b4916f',
+                color: '#dff3ea',
+                backgroundImage:
+                    'url("https://mir-s3-cdn-cf.behance.net/project_modules/source/44bdd636389967.571e688a4be1d.gif")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '3px solid #ffffff6d',
             }}
         >
             <div
@@ -22,7 +26,7 @@ export function MiddleAgesCard({}: ActivityProps) {
                 style={{
                     position: 'absolute',
                     inset: 9,
-                    border: '1px solid #c5a77b',
+                    border: '2px solid #3e3e3e',
                     opacity: 0.65,
                     pointerEvents: 'none',
                 }}
@@ -46,7 +50,6 @@ export function MiddleAgesCard({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '88px 0 0',
-                    fontFamily: 'Georgia, serif',
                     fontSize: 34,
                 }}
             >

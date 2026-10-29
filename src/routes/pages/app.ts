@@ -4,8 +4,16 @@ import {
     LeaderboardBoard,
     listGroupLeaderboard,
     listPlayerLeaderboard,
+    listViewerStandings,
 } from '#src/db/leaderboard/index.js';
-import { findUserGroup, listUserGroups } from '#src/db/groups/index.js';
+import {
+    deleteGroup,
+    findUserGroup,
+    listGroupMemberInfos,
+    listGroupMembers,
+    listUserGroups,
+    removeGroupMember,
+} from '#src/db/groups/index.js';
 import {
     callNextGroups,
     markEntryDone,
@@ -26,6 +34,11 @@ import { MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';
 import { Language } from '#src/client/language.js';
 
+// Emoji stand-ins until real per-group art ships. The pick is stable per
+// group — a mascot, not a slot machine — keyed off the group's id.
+const GROUP_ART_PLACEHOLDERS = ['🦊', '🐸', '🐼', '🐨', '🐯', '🦁', '🐙', '🦄'];
+const NO_GROUP_ART = '😔';
+
 export function registerAppRoutes(app: MwaHono) {
     app.get('/app', async (ctx) => {
         const user = requireUser(ctx);
@@ -34,17 +47,91 @@ export function registerAppRoutes(app: MwaHono) {
         const group = findUserGroup(ctx.var, user.id);
         const queueEntry = getUserWaitingEntry(ctx.var, user.id);
 
+        const memberCount = group ? listGroupMembers(ctx.var, group.id).length : 0;
+        const groupEmoji =
+            group && memberCount >= 1 && memberCount <= 6
+                ? GROUP_ART_PLACEHOLDERS[group.id % GROUP_ART_PLACEHOLDERS.length]
+                : NO_GROUP_ART;
+
         let queueError: keyof Language | undefined = ctx.req.query('queueError') as keyof Language;
         if (queueError !== 'queueJoinFailed' && queueError !== 'queueLeaveFailed') {
             queueError = undefined;
         }
 
+        let groupError: keyof Language | undefined = ctx.req.query('groupError') as keyof Language;
+        if (
+            groupError !== 'groupKickFailed' &&
+            groupError !== 'groupLeaveFailed' &&
+            groupError !== 'groupDeleteFailed'
+        ) {
+            groupError = undefined;
+        }
+
+        // owner first, then join order — the member table reads top-down
+        const groupMembers = group ? listGroupMemberInfos(ctx.var, group.id) : [];
+        if (group) {
+            groupMembers.sort(
+                (a, b) => Number(b.userId === group.ownerId) - Number(a.userId === group.ownerId),
+            );
+        }
+
         return writePage(ctx, 'home', {
             transactions: listUserTransactions(ctx.var, user.id),
             groupName: group?.name ?? null,
+            groupEmoji,
+            groupMemberCount: group ? memberCount : null,
+            groupOwnerId: group?.ownerId ?? null,
+            groupMembers,
+            groupError,
             queueError,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
+            standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
         });
+    });
+
+    // Members can only remove themselves; the owner can't leave — deleting
+    // the group (on /app/group) is the only way out for them.
+    app.post('/app/group/leave', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const group = findUserGroup(ctx.var, user.id);
+        if (!group || removeGroupMember(ctx.var, group.id, user.id) !== 'removed') {
+            return ctx.redirect('/app?groupError=groupLeaveFailed', 303);
+        }
+        return ctx.redirect('/app', 303);
+    });
+
+    // Deleting is the owner's only way out — owner check is inside
+    // deleteGroup, members/queue rows cascade away with the group.
+    app.post('/app/group/delete', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const group = findUserGroup(ctx.var, user.id);
+        if (!group || !deleteGroup(ctx.var, group.id, user.id)) {
+            return ctx.redirect('/app?groupError=groupDeleteFailed', 303);
+        }
+        return ctx.redirect('/app', 303);
+    });
+
+    // Kicking is owner-only; removeGroupMember still refuses below-minimum.
+    app.post('/app/group/kick', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const group = findUserGroup(ctx.var, user.id);
+        const form = await ctx.req.formData().catch(() => null);
+        const memberId = Number(form?.get('member_id'));
+        if (
+            !group ||
+            group.ownerId !== user.id ||
+            !Number.isInteger(memberId) ||
+            removeGroupMember(ctx.var, group.id, memberId) !== 'removed'
+        ) {
+            return ctx.redirect('/app?groupError=groupKickFailed', 303);
+        }
+        return ctx.redirect('/app', 303);
     });
 
     app.post('/app/queue/join', (ctx) => {
@@ -114,18 +201,20 @@ export function registerAppRoutes(app: MwaHono) {
         const board: LeaderboardBoard =
             boardParam === 'gambling' || boardParam === 'combined' ? boardParam : 'activity';
         const scope = ctx.req.query('scope') === 'groups' ? 'groups' : 'players';
+        const viewerGroupId = findUserGroup(ctx.var, user.id)?.id ?? null;
         if (scope === 'players') {
             return writePage(ctx, 'leaderboard', {
                 board,
                 scope,
                 rows: listPlayerLeaderboard(ctx.var, board),
-                viewerGroupId: findUserGroup(ctx.var, user.id)?.id ?? null,
+                viewerGroupId,
             });
         }
         return writePage(ctx, 'leaderboard', {
             board,
             scope,
             groups: listGroupLeaderboard(ctx.var, board),
+            viewerGroupId,
         });
     });
 

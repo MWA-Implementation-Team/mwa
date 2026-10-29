@@ -5,16 +5,19 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function MiciausParadiseCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card miciaus-paradise"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#e2f2e8',
-                background: 'linear-gradient(160deg, #4a7a5c, #24503d)',
-                border: '2px solid #3a6b52',
+                color: '#ffffff',
+                backgroundImage: 'url("https://i.redd.it/obvv1zx851t91.gif")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '3px solid #ffffff6d',
             }}
         >
             <span
@@ -24,7 +27,7 @@ export function MiciausParadiseCard({}: ActivityProps) {
                     top: 8,
                     right: 20,
                     fontSize: 72,
-                    color: '#ebc576',
+                    color: '#ffffff',
                     opacity: 0.8,
                 }}
             >
@@ -48,8 +51,8 @@ export function MiciausParadiseCard({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '92px 0 0',
-                    fontFamily: 'Georgia, serif',
                     fontSize: 34,
+                    color: '#ffffff',
                 }}
             >
                 Miciaus rojus

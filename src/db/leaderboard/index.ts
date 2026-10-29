@@ -67,6 +67,39 @@ export function listPlayerLeaderboard(state: MwaState, board: LeaderboardBoard):
     }));
 }
 
+export type Standing = { rank: number; score: number };
+
+// The viewer's own slice of a board — their player row plus their group's row.
+// null side = no row on that board (groupless, or no gambling games yet).
+export type ViewerStanding = {
+    board: LeaderboardBoard;
+    you: Standing | null;
+    group: Standing | null;
+};
+
+// One entry per board — the home page renders all three as "your standings".
+// Position = 1-based index into the same ordering the leaderboard page lists,
+// so the numbers here match what that page shows.
+export function listViewerStandings(
+    state: MwaState,
+    userId: number,
+    groupId: number | null,
+): ViewerStanding[] {
+    const boards: LeaderboardBoard[] = ['activity', 'gambling', 'combined'];
+    return boards.map((board) => {
+        const players = listPlayerLeaderboard(state, board);
+        const groups = listGroupLeaderboard(state, board);
+        const youIndex = players.findIndex((row) => row.userId === userId);
+        const groupIndex = groupId === null ? -1 : groups.findIndex((row) => row.id === groupId);
+        return {
+            board,
+            you: youIndex >= 0 ? { rank: youIndex + 1, score: players[youIndex].score } : null,
+            group:
+                groupIndex >= 0 ? { rank: groupIndex + 1, score: groups[groupIndex].score } : null,
+        };
+    });
+}
+
 // every group, ranked by the deltas stamped to it while members belonged.
 // Scores come from a separate aggregate so member joins don't multiply them.
 export function listGroupLeaderboard(state: MwaState, board: LeaderboardBoard): GroupRow[] {
