@@ -69,7 +69,7 @@ function HomePage({
                     <h2>{t('dashGame')}</h2>
                 </div>
                 <div class="mwa-panel-body mwa-queue-grid">
-                    <div class="mwa-queue">
+                    <div>
                         <div class="mwa-queue-art" aria-hidden="true">
                             {groupEmoji}
                         </div>
@@ -108,7 +108,7 @@ function HomePage({
                         )}
                     </div>
 
-                    <div class="mwa-standing-wrap">
+                    <div>
                         <div class="table mwa-tx">
                             <table>
                                 <thead>
