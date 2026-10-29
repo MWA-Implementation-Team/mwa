@@ -66,7 +66,7 @@ export function EgyptCard({}: ActivityProps) {
                     letterSpacing: 1,
                 }}
             >
-                Egiptas
+                Miauripto piramidės
             </h2>
         </article>
     );

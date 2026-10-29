@@ -66,7 +66,7 @@ export function WorldWar1Card({}: ActivityProps) {
                     lineHeight: 1.15,
                 }}
             >
-                Pirmasis pasaulinis karas
+                Miciaus fronte nieko naujo
             </h2>
         </article>
     );

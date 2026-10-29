@@ -52,7 +52,7 @@ export function SeventiesEightiesCard({}: ActivityProps) {
                     letterSpacing: 2,
                 }}
             >
-                70/80
+                Micius Disco
             </h2>
         </article>
     );

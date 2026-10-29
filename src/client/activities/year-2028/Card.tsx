@@ -68,7 +68,7 @@ export function Year2028Card({}: ActivityProps) {
                     letterSpacing: 3,
                 }}
             >
-                2028
+                Miciaus dabartis
             </h2>
         </article>
     );
