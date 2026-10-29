@@ -154,7 +154,7 @@ describe('db/leaderboard listGroupLeaderboard', () => {
         addGroupMember(state, group.id, a.id);
         addGroupMember(state, group.id, b.id);
         giveCoins(state, a.id, 40);
-        assert.ok(removeGroupMember(state, group.id, a.id).success);
+        assert.equal(removeGroupMember(state, group.id, a.id), 'removed');
 
         const row = listGroupLeaderboard(state, 'activity').find((g) => g.id === group.id)!;
         assert.equal(row.score, 40);
