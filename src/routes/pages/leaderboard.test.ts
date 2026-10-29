@@ -43,11 +43,13 @@ describe('GET /app/leaderboard', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        const richPos = html.indexOf('lbv_rich');
-        const mePos = html.indexOf('lbv_me<');
+        // markup-only patterns — ssr-data embeds raw usernames in <head>, and
+        // the viewer's own row renders "You" via displayActor
+        const richPos = html.indexOf('>Lbv_rich<');
+        const mePos = html.indexOf('>You<');
         assert.ok(richPos > 0 && mePos > 0, 'both players render');
         assert.ok(richPos < mePos, 'higher earned ranks first');
-        assert.equal((html.match(/mwa-row--self/g) ?? []).length, 1);
+        assert.equal((html.match(/mwa-lb--self/g) ?? []).length, 1);
     });
 
     it('highlights the viewer groupmates but nobody else', async () => {
@@ -61,8 +63,8 @@ describe('GET /app/leaderboard', () => {
         const res = await app.request('/app/leaderboard', { headers: authCookie(me.id) });
         const html = await res.text();
 
-        assert.equal((html.match(/mwa-row--group/g) ?? []).length, 1, 'one groupmate row');
-        assert.equal((html.match(/mwa-row--self/g) ?? []).length, 1, 'one self row');
+        assert.equal((html.match(/mwa-lb--group/g) ?? []).length, 1, 'one groupmate row');
+        assert.equal((html.match(/mwa-lb--self/g) ?? []).length, 1, 'one self row');
     });
 
     it('gambling board nets wins and losses and shows game counts', async () => {
@@ -78,8 +80,11 @@ describe('GET /app/leaderboard', () => {
         const html = await res.text();
 
         assert.match(html, /lbg_net_me/);
-        assert.match(html, /15 micius koinai/);
-        assert.match(html, /1 game\(s\)/);
+        // the viewer's row: games count then net score in the amount cells
+        assert.match(
+            html,
+            />You<\/td><td class="mwa-tx-amount">1<\/td><td class="mwa-tx-amount">15\.00<\/td>/,
+        );
         assert.doesNotMatch(html, /lbg_net_clean/, 'never-gamblers are omitted');
     });
 
@@ -94,8 +99,8 @@ describe('GET /app/leaderboard', () => {
             headers: authCookie(me.id),
         });
         const html = await res.text();
-        const drainedPos = html.indexOf('lbc_drained');
-        const mePos = html.indexOf('lbc_me<');
+        const drainedPos = html.indexOf('>Lbc_drained<');
+        const mePos = html.indexOf('>You<');
         assert.ok(drainedPos > 0 && mePos > 0);
         // both at 10 net — tie falls to NOCASE username order: lbc_drained first? 'lbc_drained' < 'lbc_me' alphabetically
         assert.ok(drainedPos < mePos, 'tie breaks by username');
@@ -114,11 +119,12 @@ describe('GET /app/leaderboard', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
 
-        const alphaPos = html.indexOf('lbgs alpha');
-        const zetaPos = html.indexOf('lbgs zeta');
+        const alphaPos = html.indexOf('>lbgs alpha<');
+        const zetaPos = html.indexOf('>lbgs zeta<');
         assert.ok(alphaPos > 0 && zetaPos > 0);
         assert.ok(alphaPos < zetaPos, 'higher score ranks first');
-        assert.match(html, /member\(s\)/);
+        // member count sits in its own column next to the group name
+        assert.match(html, /lbgs alpha<\/td><td class="mwa-tx-amount">1<\/td>/);
         // the viewer's own email legitimately appears in ssr-data; others' must not
         assert.doesNotMatch(html, /lbgs_other@example\.com/, 'no emails leak');
     });
@@ -132,7 +138,7 @@ describe('GET /app/leaderboard', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
         assert.match(html, /lbbad/);
-        assert.match(html, /aria-current="page"[^>]*>\s*activity/);
+        assert.match(html, /aria-current="page"[^>]*>\s*Activity/);
         assert.match(html, /aria-current="page"[^>]*>\s*players/);
     });
 

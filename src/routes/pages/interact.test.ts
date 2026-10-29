@@ -60,7 +60,7 @@ describe('GET /app/interact/:token', () => {
         });
         assert.equal(res.status, 200);
         const html = await res.text();
-        assert.match(html, /Interact with target_user/);
+        assert.match(html, /Interact with Target_user/);
         assert.match(html, /Send money/);
         // detail fields must not leak into props for a regular scanner
         assert.doesNotMatch(html, /target@example\.com/);
