@@ -50,7 +50,7 @@ export function MiddleAgesCard({}: ActivityProps) {
                     fontSize: 34,
                 }}
             >
-                Viduramžiai
+                Micius viduramžiuose
             </h2>
         </article>
     );

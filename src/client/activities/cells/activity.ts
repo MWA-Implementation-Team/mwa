@@ -3,7 +3,7 @@ import { CellsCard } from './Card.js';
 import { CellsDetail } from './Detail.js';
 
 export const cellsActivity: Activity = {
-    name: 'Ląstelės',
+    name: 'Miautohondrija',
     Card: CellsCard,
     Detail: CellsDetail,
 };

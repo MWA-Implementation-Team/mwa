@@ -56,7 +56,7 @@ export function CellsCard({}: ActivityProps) {
                     fontSize: 35,
                 }}
             >
-                Ląstelės
+                Miautohondrija
             </h2>
         </article>
     );

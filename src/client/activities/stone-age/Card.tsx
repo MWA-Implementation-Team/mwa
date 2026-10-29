@@ -53,7 +53,7 @@ export function StoneAgeCard({}: ActivityProps) {
                     fontWeight: 800,
                 }}
             >
-                Akmens amžius
+                Urvinio Miciaus laikai
             </h2>
         </article>
     );
