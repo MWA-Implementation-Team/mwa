@@ -14,6 +14,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── tsconfig.json              strict TS, JSX → preact, "#src/*" → "./src/*" for tsc
 ├── Dockerfile                 two-stage build: compile TS, run dist/main.js
 ├── AGENTS.md                  project conventions — read before contributing
+├── stylelint.config.mjs       CSS lint rules for static/style (see guides/css-architecture.md)
 ├── .github/workflows/         ci.yml — npm ci + npm run lint + npm run test;
 │                              migrations.yml — runs scripts/check-migrations.sh on migration PRs
 │
@@ -21,16 +22,20 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 │                              (run by src/db/migrate.ts, progress tracked in migration_status database table)
 │
 ├── scripts/                   runnable checks shared by CI and local runs
-│   └── check-migrations.sh    new migrations must be digit-prefixed, append-only,
-│                              and take the next sequential version on the base branch
+│   ├── check-migrations.sh    new migrations must be digit-prefixed, append-only,
+│   │                          and take the next sequential version on the base branch
+│   └── check-css-usage.mjs    unused/undefined CSS classes + inline style= (npm run lint:css)
 │
 ├── static/                    files served as-is
-│   ├── oat.css                Oat CSS framework — third-party, editable if needed
+│   ├── oat.css                forked Oat CSS: theme variables + plain-element styles;
+│   │                          our edits are marked /* mwa: … */
 │   ├── oat.js                 Oat CSS framework JS, minified, don't edit
-│   ├── style/main.css         stylesheet entry point; imports tokens, base, components
-│   ├── style/tokens.css       design tokens and Oat variable overrides
-│   ├── style/base.css         document-wide defaults and app shell layout
-│   ├── style/components/      one stylesheet per reusable component or component family
+│   ├── style/main.css         stylesheet entry point; only @imports
+│   ├── style/tokens.css       app-only design tokens (the only app file with raw colours)
+│   ├── style/base.css         site font + .mwa page frame
+│   ├── style/components/      one stylesheet per component family
+│   ├── fonts/                 self-hosted .woff2 files
+│   ├── img/                   self-hosted images (backdrop, activity card art)
 │   └── reload.js              dev-only auto-reload client
 │
 └── src/
