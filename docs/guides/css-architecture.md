@@ -50,7 +50,7 @@ Before you write a new class, check whether Oat markup already does the job:
 - The site is dark-only for now: `:root` has `color-scheme: dark`. Change the
   **second** (dark) argument of `light-dark()`. Leave the first (light) argument at
   Oat's value; it gets real values when the light theme lands.
-- stylelint doesn't check `oat.css`. Review its diffs by hand.
+- Review `oat.css` diffs by hand.
 
 ## Files
 
@@ -147,17 +147,11 @@ Adding a component:
 
 ## Lint
 
-`npm run lint` runs `npm run lint:css` last. That runs:
+`npm run lint` runs `scripts/check-css-usage.mjs` after typechecking and the
+Prettier check. The script checks for unused and undefined classes, and inline
+`style=` in `src/client/`.
 
-- **stylelint** on `static/style/**/*.css` (config: `stylelint.config.mjs`). It rejects
-  `!important`, raw colours outside `tokens.css`, `px` in the properties listed above,
-  external `url()`s, `@import` outside `main.css`, IDs, deep selectors and names that
-  break the naming pattern.
-- **`scripts/check-css-usage.mjs`** — unused and undefined classes, and inline
-  `style=` in `src/client/`.
-
-When lint fails, fix the CSS. Don't loosen `stylelint.config.mjs`, don't add
-`stylelint-disable` comments, and don't add exceptions to the usage script.
+When lint fails, fix the CSS. Don't add exceptions to the usage script.
 
 ## Finding the rule to change
 

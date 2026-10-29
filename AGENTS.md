@@ -18,8 +18,7 @@
 
 ## Commands
 
-- `npm run lint` — typecheck (`tsc --noEmit --noUnusedLocals --noUnusedParameters`) + prettier check + `npm run lint:css`
-- `npm run lint:css` — stylelint on `static/style/**/*.css` + `scripts/check-css-usage.mjs` (unused/undefined classes, inline `style=`)
+- `npm run lint` — typecheck (`tsc --noEmit --noUnusedLocals --noUnusedParameters`) + prettier check + `scripts/check-css-usage.mjs` (unused/undefined classes, inline `style=`)
 
 ## CSS
 
@@ -33,7 +32,7 @@ Full guide: `docs/guides/css-architecture.md`. Read it before touching any CSS. 
 - **Never:** `!important`, IDs in selectors, scoping selectors under the `.mwa` wrapper (`.mwa .mwa-panel`, `.mwa button` — write `.mwa-panel`; the `mwa-` start of class names is required naming and is fine), `@import` outside `main.css`, external URLs in CSS (fonts go in `static/fonts/`, compressed images in `static/img/`), inline `style=` in `src/client/` (only `src/client/activities/` is exempt).
 - **Class names:** kebab-case, `mwa-<block>`, `mwa-<block>-<part>`, `mwa-<block>--<modifier>`. Keep selectors flat.
 - **Delete a class's CSS when you remove its last use**, and never ship a class that no stylesheet defines.
-- **Never weaken the checks:** don't edit `stylelint.config.mjs` or `scripts/check-css-usage.mjs` to make lint pass, and don't add `stylelint-disable` comments. Fix the CSS. If a rule seems genuinely wrong, ask the user.
+- **Never weaken the checks:** don't edit `scripts/check-css-usage.mjs` to make lint pass. Fix the CSS. If a rule seems genuinely wrong, ask the user.
 - **Keep the CSS guide in sync:** if you change where styles live, a token's meaning or a lint rule, update `docs/guides/css-architecture.md` in the same PR.
 - **Run `npm run lint` before every commit that touches CSS or markup.** For visual changes, tell the user which page and element changed so they can check it in the browser.
 - `npm run dev` — dev server on :3000

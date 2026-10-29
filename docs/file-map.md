@@ -14,7 +14,6 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── tsconfig.json              strict TS, JSX → preact, "#src/*" → "./src/*" for tsc
 ├── Dockerfile                 two-stage build: compile TS, run dist/main.js
 ├── AGENTS.md                  project conventions — read before contributing
-├── stylelint.config.mjs       CSS lint rules for static/style (see guides/css-architecture.md)
 ├── .github/workflows/         ci.yml — npm ci + npm run lint + npm run test;
 │                              migrations.yml — runs scripts/check-migrations.sh on migration PRs
 │
@@ -24,7 +23,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── scripts/                   runnable checks shared by CI and local runs
 │   ├── check-migrations.sh    new migrations must be digit-prefixed, append-only,
 │   │                          and take the next sequential version on the base branch
-│   └── check-css-usage.mjs    unused/undefined CSS classes + inline style= (npm run lint:css)
+│   └── check-css-usage.mjs    unused/undefined CSS classes + inline style= (npm run lint)
 │
 ├── static/                    files served as-is
 │   ├── oat.css                forked Oat CSS: theme variables + plain-element styles;

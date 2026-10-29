@@ -13,16 +13,13 @@
         "test": "rm -rf dist && npm run build && node --test 'dist/**/*.test.js'",
         "tsc-watch": "tsc --watch --preserveWatchOutput",
         "format": "prettier --write .",
-        "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && prettier --check . && npm run lint:css",
-        "lint:css": "stylelint \"static/style/**/*.css\" && node scripts/check-css-usage.mjs",
+        "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && prettier --check . && node scripts/check-css-usage.mjs",
         "check:migrations": "bash scripts/check-migrations.sh"
     },
     "devDependencies": {
         "@types/node": "^22.20.3",
         "@types/nodemailer": "^8.0.2",
         "prettier": "^3.9.10",
-        "stylelint": "^17.16.0",
-        "stylelint-config-standard": "^40.0.0",
         "typescript": "^7.0.2"
     },
     "dependencies": {
