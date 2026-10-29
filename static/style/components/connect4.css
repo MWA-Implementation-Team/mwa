@@ -1,0 +1,22 @@
+.mwa-connect4-player--p1 {
+    color: var(--connect4-p1);
+}
+
+.mwa-connect4-player--p2 {
+    color: var(--connect4-p2);
+}
+
+.mwa-connect4-cell {
+    display: flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+}
+
+.mwa-connect4-cell[data-cell='x'] {
+    background-color: var(--connect4-p1);
+}
+
+.mwa-connect4-cell[data-cell='o'] {
+    background-color: var(--connect4-p2);
+}

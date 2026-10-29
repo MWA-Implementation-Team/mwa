@@ -10,7 +10,7 @@ import {
     RunningGame,
 } from '#src/db/gambling/index.js';
 import { Language, TranslateFn } from '#src/client/language.js';
-import { C4Cell, c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
+import { c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
 import { ComponentChildren } from 'preact';
 import { calcTurnTimeLeftMs, PlayerTurnTime } from '#src/client/gambling/turns.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
@@ -305,19 +305,6 @@ function Connect4View({
 
     const board = Connect4Board.fromString(currentGame.boardStr);
 
-    function color(side: Gambler | C4Cell) {
-        switch (side) {
-            case 'p1':
-            case 'x':
-                return '#ff0000';
-            case 'p2':
-            case 'o':
-                return '#00ff00';
-            default:
-                return null;
-        }
-    }
-
     const isYourTurn = currentGame.nextTurn === side && currentGame.status.type === 'running';
 
     let status: ComponentChildren;
@@ -342,12 +329,12 @@ function Connect4View({
     } else {
         status = (
             <div>
-                <span style={{ color: color('p1') }}>
+                <span class="mwa-connect4-player--p1">
                     {displayActor(currentGame.p1Name, user, t)}
                 </span>
                 <TurnTimeLeftDisplay turn={currentGame.p1TurnTime} />
 
-                <span style={{ color: color('p2') }}>
+                <span class="mwa-connect4-player--p2">
                     {displayActor(currentGame.p2Name, user, t)}
                 </span>
                 <TurnTimeLeftDisplay turn={currentGame.p2TurnTime} />
@@ -375,15 +362,8 @@ function Connect4View({
                                             name="x"
                                             value={x}
                                             disabled={!isYourTurn}
-                                            style={{
-                                                backgroundColor: color(
-                                                    board.get(x, c4Height - 1 - y),
-                                                ),
-                                                display: 'flex',
-                                                width: '2.5rem',
-                                                height: '2.5rem',
-                                                padding: 0,
-                                            }}
+                                            class="mwa-connect4-cell"
+                                            data-cell={board.get(x, c4Height - 1 - y)}
                                         >
                                             {isWinCell(x, c4Height - 1 - y) && 'x'}
                                         </button>

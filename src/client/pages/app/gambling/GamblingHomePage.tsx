@@ -1,7 +1,7 @@
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
-import { GameType, Invitation, SessionSummary } from '#src/db/gambling.js';
+import { GameType, Invitation, SessionSummary } from '#src/db/gambling/index.js';
 import PageShell from '../PageShell.js';
 import { Language } from '#src/client/language.js';
 import { displayActor } from '#src/client/display.js';

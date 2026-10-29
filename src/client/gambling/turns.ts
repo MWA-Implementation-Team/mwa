@@ -1,4 +1,4 @@
-import { Gambler } from '#src/db/gambling.js';
+import { Gambler } from '#src/db/gambling/index.js';
 
 export type PlayerTurnTime = {
     // base how much time the player has remaining

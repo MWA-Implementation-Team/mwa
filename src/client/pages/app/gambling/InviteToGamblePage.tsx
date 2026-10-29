@@ -46,7 +46,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
 
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
-                    <h2>{t('gamblingWith', { name: targetUsername })}</h2>
+                    <h2>{t('gamblingWith', { name: displayUsername(targetUsername) })}</h2>
                 </div>
                 <div class="mwa-panel-body">
                     <p class="mwa-intro">
@@ -54,7 +54,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                     </p>
                     <p class="mwa-muted">{t('gamblingConnect4Description')}</p>
                     <div class="mwa-actions">
-                        <button class="btn-primary" onClick={() => setOpenDialog('connect_4')}>
+                        <button onClick={() => setOpenDialog('connect_4')}>
                             {t('gamblingChallenge')}
                         </button>
                     </div>
@@ -108,9 +108,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                         />
                     </div>
                     <div class="mwa-actions">
-                        <button type="submit" class="btn-primary">
-                            {t('gamblingSendInvite')}
-                        </button>
+                        <button type="submit">{t('gamblingSendInvite')}</button>
                     </div>
                     {error?.message && (
                         <p class="mwa-note mwa-note--error" role="alert">

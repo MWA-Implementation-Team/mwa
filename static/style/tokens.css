@@ -22,4 +22,6 @@
     --highlight-self: rgb(from var(--muted-foreground) r g b / 0.12);
     --tx-positive: #27df7d;
     --tx-negative: #ff7373;
+    --connect4-p1: #ff0000;
+    --connect4-p2: #00ff00;
 }
