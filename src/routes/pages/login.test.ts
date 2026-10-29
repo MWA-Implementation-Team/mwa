@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { Hono } from 'hono';
-import { redeemLoginToken } from '#src/db/sessions.js';
-import { createUser } from '#src/db/users.js';
+import { redeemLoginToken } from '#src/db/sessions/index.js';
+import { createUser } from '#src/db/users/index.js';
 import { registerLoginRoutes } from './login.js';
 import { LoginEmailProps, Mailer } from '#src/emails/mailer.js';
 import { createTestMwaState, MwaHono, setupHonoState } from '#src/state.js';

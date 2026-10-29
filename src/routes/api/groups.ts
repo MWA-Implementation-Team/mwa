@@ -10,7 +10,8 @@ import {
     listGroupMembers,
     MAX_GROUP_NAME_LENGTH,
     MAX_PHONE_NUMBER_LENGTH,
-} from '#src/db/groups.js';
+    MIN_GROUP_MEMBERS,
+} from '#src/db/groups/index.js';
 import { MwaContext, MwaHono } from '#src/state.js';
 
 async function readJsonBody(ctx: MwaContext) {
@@ -30,7 +31,6 @@ export function registerGroupsRoutes(app: MwaHono) {
         return ctx.json(listUserGroups(ctx.var, user.id));
     });
 
-    // Create new group
     app.post('/api/groups', async (ctx) => {
         const user = requireApiUser(ctx);
         if (user instanceof Response) return user;
@@ -40,16 +40,16 @@ export function registerGroupsRoutes(app: MwaHono) {
             return ctx.json({ error: 'invalid json body' }, 400);
         }
 
-        const { name, phone_number } = body;
+        const { name, phoneNumber } = body;
         if (
             typeof name !== 'string' ||
             name.trim() === '' ||
             name.length > MAX_GROUP_NAME_LENGTH ||
-            typeof phone_number !== 'string' ||
-            phone_number.trim() === '' ||
-            phone_number.length > MAX_PHONE_NUMBER_LENGTH
+            typeof phoneNumber !== 'string' ||
+            phoneNumber.trim() === '' ||
+            phoneNumber.length > MAX_PHONE_NUMBER_LENGTH
         ) {
-            return ctx.json({ error: 'invalid name or phone_number' }, 400);
+            return ctx.json({ error: 'invalid name or phoneNumber' }, 400);
         }
 
         if (listUserGroups(ctx.var, user.id).length > 0) {
@@ -57,15 +57,18 @@ export function registerGroupsRoutes(app: MwaHono) {
         }
 
         try {
-            // Automatically use the logged in users id as the owner
-            const group = createGroup(ctx.var, name.trim(), user.id, phone_number.trim());
+            // The logged-in user is always the owner
+            const group = createGroup(ctx.var, name.trim(), user.id, phoneNumber.trim());
             return ctx.json(group, 201);
-        } catch {
-            return ctx.json({ error: 'Failed to create group' }, 400);
+        } catch (error) {
+            // groups.name is UNIQUE — the only expected failure is a taken name
+            if (error instanceof Error && error.message.includes('UNIQUE')) {
+                return ctx.json({ error: 'a group with that name already exists' }, 409);
+            }
+            throw error;
         }
     });
 
-    // Get group details by id
     app.get('/api/groups/:id', (ctx) => {
         const user = requireApiUser(ctx);
         if (user instanceof Response) return user;
@@ -131,8 +134,14 @@ export function registerGroupsRoutes(app: MwaHono) {
             return ctx.json({ error: 'only group members can add members' }, 403);
         }
 
-        const result = addGroupMember(ctx.var, groupId, userId);
-        return ctx.json(result);
+        switch (addGroupMember(ctx.var, groupId, userId)) {
+            case 'added':
+                return ctx.json({ success: true });
+            case 'group_full':
+                return ctx.json({ error: 'group is full' }, 409);
+            case 'already_in_group':
+                return ctx.json({ error: 'member is already in a group' }, 409);
+        }
     });
 
     // Remove a member from a group — owner only
@@ -154,11 +163,21 @@ export function registerGroupsRoutes(app: MwaHono) {
             return ctx.json({ error: 'Only the group owner can remove members' }, 403);
         }
 
-        const result = removeGroupMember(ctx.var, groupId, userId);
-        return ctx.json(result);
+        switch (removeGroupMember(ctx.var, groupId, userId)) {
+            case 'removed':
+                return ctx.json({ success: true });
+            case 'group_not_found':
+                return ctx.json({ error: 'group not found' }, 404);
+            case 'is_owner':
+                return ctx.json({ error: 'cannot remove the group owner' }, 400);
+            case 'below_minimum':
+                return ctx.json(
+                    { error: `groups must keep at least ${MIN_GROUP_MEMBERS} members` },
+                    409,
+                );
+        }
     });
 
-    // List all members of a group
     app.get('/api/groups/:id/members', (ctx) => {
         const user = requireApiUser(ctx);
         if (user instanceof Response) return user;

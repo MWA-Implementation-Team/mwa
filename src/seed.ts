@@ -1,10 +1,10 @@
 import { createDefaultMwaState } from '#src/state.js';
-import type { UserRole } from '#src/db/users.js';
+import type { UserRole } from '#src/db/users/index.js';
 import { runTransaction } from './db/transaction.js';
-import { syncActivities } from './db/activities.js';
-import { acceptGamblingSession, initCoinFlip, winCoinFlip } from './db/gambling.js';
-import { callNextGroups, joinQueue } from './db/queue.js';
-import { getOrCreateInteractToken } from './db/interactions.js';
+import { syncActivities } from './db/activities/index.js';
+import { acceptGamblingSession, initCoinFlip, winCoinFlip } from './db/gambling/index.js';
+import { callNextGroups, joinQueue } from './db/queue/index.js';
+import { getOrCreateInteractToken } from './db/interactions/index.js';
 
 // Seed the database with sample data. Run via `npm run seed`.
 // Refuses to run if the users table isn't empty — delete db.sqlite

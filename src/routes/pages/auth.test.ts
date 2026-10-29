@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { Hono } from 'hono';
-import { createUser, findUserByEmail } from '#src/db/users.js';
-import { createLoginToken } from '#src/db/sessions.js';
+import { createUser, findUserByEmail } from '#src/db/users/index.js';
+import { createLoginToken } from '#src/db/sessions/index.js';
 import { registerAuthRoutes } from './auth.js';
 import { registerAppRoutes } from './app.js';
 import { registerLoginRoutes } from './login.js';

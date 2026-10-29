@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { createUser, findUserById, queryUserNotification } from './users.js';
-import { giveCoins } from './transactions.js';
+import { createUser, findUserById, queryUserNotification } from '../users/index.js';
+import { giveCoins } from '../transactions/index.js';
 import {
     acceptGamblingSession,
     cancelGamblingSession,
@@ -12,7 +12,7 @@ import {
     queryGamblingInvitations,
     winCoinFlip,
     winGamblingSession,
-} from './gambling.js';
+} from './index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});

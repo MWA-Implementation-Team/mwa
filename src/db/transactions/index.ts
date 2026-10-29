@@ -1,6 +1,6 @@
 import { MwaState } from '#src/state.js';
-import { runTransaction } from './transaction.js';
-import { findUserGroup } from './groups.js';
+import { runTransaction } from '../transaction.js';
+import { findUserGroup } from '../groups/index.js';
 
 export type TransactionKind =
     'transfer' | 'purchase' | 'system' | 'gambling_deduction' | 'gambling_winnings' | 'host_grant';

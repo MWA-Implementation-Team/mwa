@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
-import { createUser } from './users.js';
-import { addGroupMember, createGroup } from './groups.js';
+import { createUser } from '../users/index.js';
+import { addGroupMember, createGroup } from '../groups/index.js';
 import {
     callNextGroups,
     getQueuePosition,
@@ -12,7 +12,7 @@ import {
     listStationGroups,
     listWaitingQueue,
     markEntryDone,
-} from './queue.js';
+} from './index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});
@@ -28,6 +28,12 @@ function queuedGroup(memberNames: string[]): number {
     return group.id;
 }
 
+function mustJoin(groupId: number) {
+    const result = joinQueue(state, groupId);
+    if (result.type !== 'joined') throw new Error('expected join to succeed');
+    return result.entry;
+}
+
 describe('db/queue', () => {
     // tests share one in-memory db — clear the line so leftovers from a
     // previous test don't shift position assertions
@@ -35,39 +41,37 @@ describe('db/queue', () => {
 
     it('joins the queue as a waiting entry', () => {
         const groupId = queuedGroup([]);
-        const { success, entry } = joinQueue(state, groupId);
-        assert.equal(success, true);
-        assert.equal(entry!.status, 'waiting');
-        assert.equal(entry!.closedAt, null);
-        assert.equal(entry!.activitySlug, null);
+        const entry = mustJoin(groupId);
+        assert.equal(entry.status, 'waiting');
+        assert.equal(entry.closedAt, null);
+        assert.equal(entry.activitySlug, null);
     });
 
     it('rejects a second join while the group is waiting', () => {
         const groupId = queuedGroup([]);
-        assert.equal(joinQueue(state, groupId).success, true);
-        const second = joinQueue(state, groupId);
-        assert.equal(second.success, false);
+        assert.equal(joinQueue(state, groupId).type, 'joined');
+        assert.equal(joinQueue(state, groupId).type, 'already_queued');
         assert.equal(listWaitingQueue(state).filter((e) => e.groupId === groupId).length, 1);
     });
 
     it('orders positions by join order', () => {
         const a = queuedGroup([]);
         const b = queuedGroup([]);
-        const ea = joinQueue(state, a).entry!;
-        const eb = joinQueue(state, b).entry!;
+        const ea = mustJoin(a);
+        const eb = mustJoin(b);
         assert.equal(getQueuePosition(state, ea.id), 1);
         assert.equal(getQueuePosition(state, eb.id), 2);
     });
 
     it('leave marks the entry instead of deleting it', () => {
         const groupId = queuedGroup([]);
-        const { entry } = joinQueue(state, groupId);
+        const entry = mustJoin(groupId);
         assert.equal(leaveQueue(state, groupId), true);
         assert.equal(getWaitingEntry(state, groupId), null);
 
         const row = state
             .prepare(`SELECT status, closed_at FROM queue_entries WHERE id = ?`)
-            .get(entry!.id);
+            .get(entry.id);
         assert.equal(row?.status, 'left');
         assert.equal(typeof row?.closed_at, 'string');
     });
@@ -76,7 +80,7 @@ describe('db/queue', () => {
         const a = queuedGroup([]);
         const b = queuedGroup([]);
         joinQueue(state, a);
-        const eb = joinQueue(state, b).entry!;
+        const eb = mustJoin(b);
         assert.equal(getQueuePosition(state, eb.id), 2);
         leaveQueue(state, a);
         assert.equal(getQueuePosition(state, eb.id), 1);
@@ -86,9 +90,9 @@ describe('db/queue', () => {
         const a = queuedGroup([]);
         const b = queuedGroup([]);
         joinQueue(state, a);
-        const eb = joinQueue(state, b).entry!;
+        const eb = mustJoin(b);
         leaveQueue(state, a);
-        const rejoined = joinQueue(state, a).entry!;
+        const rejoined = mustJoin(a);
         assert.equal(getQueuePosition(state, eb.id), 1);
         assert.equal(getQueuePosition(state, rejoined.id), 2);
     });
@@ -105,7 +109,7 @@ describe('db/queue', () => {
         assert.equal(getUserWaitingEntry(state, user.id), null);
 
         const group = createGroup(state, `member group ${groupSeq++}`, user.id, '555');
-        const entry = joinQueue(state, group.id).entry!;
+        const entry = mustJoin(group.id);
         assert.equal(getUserWaitingEntry(state, user.id)?.id, entry.id);
     });
 
@@ -113,9 +117,9 @@ describe('db/queue', () => {
         const a = queuedGroup([]);
         const b = queuedGroup([]);
         const c = queuedGroup([]);
-        const ea = joinQueue(state, a).entry!;
-        const eb = joinQueue(state, b).entry!;
-        const ec = joinQueue(state, c).entry!;
+        const ea = mustJoin(a);
+        const eb = mustJoin(b);
+        const ec = mustJoin(c);
 
         state.prepare(`INSERT INTO activities (slug) VALUES ('test-station')`).run();
         const called = callNextGroups(state, 2, 'test-station');
@@ -171,8 +175,8 @@ describe('db/queue', () => {
 
     it('markEntryDone refuses entries that are not at a station', () => {
         const groupId = queuedGroup([]);
-        const { entry } = joinQueue(state, groupId);
-        assert.equal(markEntryDone(state, entry!.id), false);
+        const entry = mustJoin(groupId);
+        assert.equal(markEntryDone(state, entry.id), false);
         assert.equal(markEntryDone(state, 999999), false);
     });
 

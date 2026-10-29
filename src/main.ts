@@ -1,4 +1,4 @@
-import { syncActivities } from '#src/db/activities.js';
+import { syncActivities } from '#src/db/activities/index.js';
 import { registerNodeModulesRoutes, writeErrorPage } from '#src/pages.js';
 import { registerLoginRoutes } from '#src/routes/pages/login.js';
 import { registerAuthRoutes } from '#src/routes/pages/auth.js';

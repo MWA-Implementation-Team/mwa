@@ -1,6 +1,6 @@
 import { cookieSession } from '#src/client/constants.js';
-import { findSessionUserId } from '#src/db/sessions.js';
-import { findUserById, User, UserRole } from '#src/db/users.js';
+import { findSessionUserId } from '#src/db/sessions/index.js';
+import { findUserById, User, UserRole } from '#src/db/users/index.js';
 import { writeErrorPage } from '#src/pages.js';
 import { getCookie } from 'hono/cookie';
 import { MwaContext } from './state.js';

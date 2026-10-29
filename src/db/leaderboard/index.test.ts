@@ -1,13 +1,9 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import {
-    listGroupLeaderboard,
-    listPlayerLeaderboard,
-    type LeaderboardBoard,
-} from './leaderboard.js';
-import { addGroupMember, createGroup, deleteGroup, removeGroupMember } from './groups.js';
-import { createUser } from './users.js';
-import { giveCoins, insertTransaction } from './transactions.js';
+import { listGroupLeaderboard, listPlayerLeaderboard, type LeaderboardBoard } from './index.js';
+import { addGroupMember, createGroup, deleteGroup, removeGroupMember } from '../groups/index.js';
+import { createUser } from '../users/index.js';
+import { giveCoins, insertTransaction } from '../transactions/index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});
@@ -158,7 +154,7 @@ describe('db/leaderboard listGroupLeaderboard', () => {
         addGroupMember(state, group.id, a.id);
         addGroupMember(state, group.id, b.id);
         giveCoins(state, a.id, 40);
-        assert.ok(removeGroupMember(state, group.id, a.id).success);
+        assert.equal(removeGroupMember(state, group.id, a.id), 'removed');
 
         const row = listGroupLeaderboard(state, 'activity').find((g) => g.id === group.id)!;
         assert.equal(row.score, 40);

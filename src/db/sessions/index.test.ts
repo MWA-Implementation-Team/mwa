@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { describe, it } from 'node:test';
-import { createUser } from './users.js';
+import { createUser } from '../users/index.js';
 import {
     confirmLoginTokenSent,
     createLoginToken,
@@ -14,7 +14,7 @@ import {
     pruneLoginTokens,
     redeemLoginCode,
     redeemLoginToken,
-} from './sessions.js';
+} from './index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});

@@ -21,7 +21,7 @@ Follow `GET /` through the code:
 2. **The route resolves the user.** `currentUser(ctx)` (`src/auth.ts`) reads the
    `mwa-session` cookie and resolves it through the `sessions` table to a `users`
    row — see [auth](guides/auth.md).
-3. **The route loads data.** It calls typed functions from `src/db/*.ts` (e.g.
+3. **The route loads data.** It calls typed functions from `src/db/<domain>/index.ts` (e.g.
    `listUsers(ctx.var)`), which wrap prepared statements. The results become _page props_.
 4. **`writePage` renders the page.** `writePage(ctx, 'landing', { users })` in
    `src/pages.tsx` builds `ctxInit = { lang, user, notification }` (lang from the
@@ -102,7 +102,7 @@ missing props are a compile error caught by `npm run lint`, not a runtime surpri
 `registeredActivities` in `src/client/activities.ts` plays the same role for activity
 stations: `ActivitySlug` is derived from its keys, the `/app/activities/:slug` route
 validates the param against it (unknown slug → 404), and `syncActivities(state)`
-(`src/db/activities.ts`) inserts every slug into the `activities` table on server
+(`src/db/activities/index.ts`) inserts every slug into the `activities` table on server
 start so queue/badge rows can foreign-key them.
 
 ## Interactions and gambling
@@ -121,7 +121,7 @@ stacking invites. Session pages live at `/app/gambling/sessions/:id`, with POST
 `/accept` and `/reject` actions restricted to the invited player. Any signed-in
 user can view a session.
 
-`src/db/gambling.ts` owns the lifecycle, persisted by `06_gambling.sql`:
+`src/db/gambling/index.ts` owns the lifecycle, persisted by `06_gambling.sql`:
 
 - Creating a `pending` session deducts the challenger's positive integer stake.
 - Acceptance checks funds, deducts the opponent's equal stake, and marks it `running`.
@@ -157,7 +157,7 @@ attribute coins to the group the user belonged to when the delta was recorded:
 switching groups never moves past earnings, and coins earned while groupless count
 for no group.
 
-Board definitions (`src/db/leaderboard.ts`):
+Board definitions (`src/db/leaderboard/index.ts`):
 
 - **activity** — coins minted into the economy: positive deltas whose parent kind
   is `system` or `host_grant` (an allowlist — transfers, purchases and gambling only

@@ -45,8 +45,10 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
     │   └── mailer.tsx         Mailer interface + SMTP, console, and no-op implementations
     ├── seed.ts                `npm run seed` — sample data; refuses if users exist
     │
-    ├── db/                    one module per domain: row type + prepared statements + functions
-    │   └── migrate.ts         the migrator — reads migrations/*.sql, applies what's new
+    ├── db/                    one folder per domain — index.ts: row type + prepared statements
+    │   │                      + functions; index.test.ts: its tests
+    │   ├── migrate.ts         the migrator — reads migrations/*.sql, applies what's new
+    │   └── transaction.ts     runTransaction() — sync BEGIN/COMMIT/ROLLBACK wrapper
     ├── routes/                one file per route group, each exporting register*Routes(app)
     │   ├── pages/             HTML routes — handlers end in writePage()
     │   └── api/               JSON routes and notification SSE

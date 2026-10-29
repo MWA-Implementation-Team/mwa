@@ -6,8 +6,13 @@ import {
     redeemLoginCode,
     redeemLoginToken,
     sessionTtlDays,
-} from '#src/db/sessions.js';
-import { createUser, deriveUsername, findUserByEmail, markEmailVerified } from '#src/db/users.js';
+} from '#src/db/sessions/index.js';
+import {
+    createUser,
+    deriveUsername,
+    findUserByEmail,
+    markEmailVerified,
+} from '#src/db/users/index.js';
 import { writePage } from '#src/pages.js';
 import { safeGoto } from '#src/routes/pages/login.js';
 import { MwaContext, MwaHono } from '#src/state.js';
@@ -28,7 +33,7 @@ export function registerAuthRoutes(app: MwaHono) {
     });
 
     // The paste-the-code fallback on the "we sent it" page. Wrong codes count
-    // against the token — too many kills it (see db/sessions.ts).
+    // against the token — too many kills it (see db/sessions/index.ts).
     app.post('/auth/verify', async (ctx) => {
         const form = await ctx.req.formData().catch(() => null);
         if (!form) {

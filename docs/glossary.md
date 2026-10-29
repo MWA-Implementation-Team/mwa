@@ -52,7 +52,7 @@ append-only.
 
 A SQL query compiled once with parameter placeholders (`?`) and executed many times —
 faster, and parameters are bound safely instead of string-concatenated. Domain functions in
-`db/*.ts` accept `MwaState` and call `state.prepare(sql)` when invoked. Each state
+`db/<domain>/index.ts` accept `MwaState` and call `state.prepare(sql)` when invoked. Each state
 caches statements by SQL string for reuse on its own connection.
 
 ## MwaState
@@ -89,7 +89,7 @@ them into a table at startup (`syncActivities` → `activities`).
 
 A permanent, unguessable string identifying a user for the personal-QR flow — the
 `<token>` in `/app/interact/<token>`. Minted lazily by `getOrCreateInteractToken`
-(`src/db/interactions.ts`) on the owner's first `/app` render and stored raw in
+(`src/db/interactions/index.ts`) on the owner's first `/app` render and stored raw in
 `interact_tokens` (like `system_qr_codes.secret`), because the QR needs the real
 value every render. It identifies the target but authorizes nothing — the
 scanner's session and role decide what they can do.
@@ -106,7 +106,7 @@ graduate to a registry like `registeredActivities`.
 ## Queue entry
 
 One row in `queue_entries` — a group's spot in the single event-wide queue
-(`src/db/queue.ts`). The dashboard uses forms to join via
+(`src/db/queue/index.ts`). The dashboard uses forms to join via
 `POST /app/queue/join` and leave via `POST /app/queue/leave`, redirecting
 back to `/app` with the updated position or a localized error.
 Both actions use the caller's own group; any member may act.
