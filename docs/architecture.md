@@ -172,7 +172,7 @@ Player boards only rank `role = 'user'` accounts — admins and hosts never appe
 Group boards rank every group by stamped score with member count. The page renders
 a dense table: when a board lists more than 20 rows, the viewer's own standing is
 pinned in a bold `mwa-lb-you` header row, their in-list row gets `mwa-lb--self`,
-and their groupmates get a dimmed `mwa-lb-tag` ("*group") after the name (on the
-groups board, `mwa-lb--self` marks the viewer's group).
+and their groupmates get a dimmed `*group` tag (`mwa-standing-hint`) after the
+name (on the groups board, `mwa-lb--self` marks the viewer's group).
 Zero-sum kinds (transfers, gambling) can't move net-based boards at all — collusion
 shows up as coin concentration, not score inflation.

@@ -136,7 +136,9 @@ function PlayersTable({
                                 <td>
                                     {displayActor(row.username, user, t)}
                                     {isGroupmate && (
-                                        <small class="mwa-muted"> {t('leaderboardGroupTag')}</small>
+                                        <small class="mwa-standing-hint">
+                                            {t('leaderboardGroupTag')}
+                                        </small>
                                     )}
                                 </td>
                                 {games && <td class="mwa-tx-amount">{row.gamesPlayed ?? 0}</td>}

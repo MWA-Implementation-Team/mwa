@@ -914,9 +914,10 @@
 .mwa-lb tr.mwa-lb--self td {
     background: rgb(from var(--shell-soft) r g b / 0.12);
 }
-.mwa-lb-tag {
-    color: var(--shell-soft);
-    font-size: 11px;
+/* groupmate tag after a player name — shares the dimmed standing-hint look,
+   margin scoped here so the home-page hints keep their own spacing. */
+.mwa-lb .mwa-standing-hint {
+    margin-left: 6px;
 }
 @media (min-width: 580px) {
     .mwa {

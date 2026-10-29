@@ -63,7 +63,7 @@ describe('GET /app/leaderboard', () => {
         const res = await app.request('/app/leaderboard', { headers: authCookie(me.id) });
         const html = await res.text();
 
-        assert.equal((html.match(/mwa-lb-tag/g) ?? []).length, 1, 'one groupmate tag');
+        assert.equal((html.match(/mwa-standing-hint/g) ?? []).length, 1, 'one groupmate tag');
         assert.equal((html.match(/mwa-lb--self/g) ?? []).length, 1, 'one self row');
     });
 
