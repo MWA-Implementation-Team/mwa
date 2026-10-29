@@ -5,7 +5,7 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function StoneAgeCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card stone-age"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
@@ -13,8 +13,8 @@ export function StoneAgeCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#f0dbc8',
-                background: 'linear-gradient(150deg, #7a4a30, #452616)',
-                border: '2px solid #6b4530',
+                background: 'linear-gradient(150deg, #222222, #2c2c2c)',
+                border: '3px solid #6b4530',
             }}
         >
             <span
@@ -48,12 +48,11 @@ export function StoneAgeCard({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '83px 0 0',
-                    fontFamily: 'Georgia, serif',
                     fontSize: 33,
                     fontWeight: 800,
                 }}
             >
-                Akmens amžius
+                Urvinio Miciaus laikai
             </h2>
         </article>
     );

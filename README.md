@@ -33,7 +33,7 @@ the login link printed in the server console (dev "email" goes to logs, see
 | `npm start`      | run the compiled server (`dist/main.js`, production mode)                |
 | `npm run seed`   | fill `db.sqlite` with sample data (no-op if the users table isn't empty) |
 | `npm test`       | build + run `node:test` suites on an in-memory database                  |
-| `npm run lint`   | typecheck + prettier check — what CI runs                                |
+| `npm run lint`   | typecheck + prettier check + CSS lint — what CI runs                     |
 | `npm run format` | auto-format everything with prettier                                     |
 
 ## Documentation

@@ -3,7 +3,7 @@ import { EgyptCard } from './Card.js';
 import { EgyptDetail } from './Detail.js';
 
 export const egyptActivity: Activity = {
-    name: 'Egiptas',
+    name: 'Miauripto piramidės',
     Card: EgyptCard,
     Detail: EgyptDetail,
 };

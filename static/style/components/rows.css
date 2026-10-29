@@ -1,0 +1,42 @@
+.mwa-rows {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mwa-rows > li {
+    padding: var(--space-3) 0;
+
+    /* --border is a near-invisible black in this theme — row separators
+       need a faint tint of the soft blue instead. */
+    border-top: 1px dashed var(--divider);
+}
+
+.mwa-rows > li:first-child {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.mwa-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.mwa-row strong {
+    color: var(--primary);
+    overflow-wrap: anywhere;
+}
+
+.mwa-row small {
+    display: block;
+    color: var(--muted-foreground);
+    overflow-wrap: anywhere;
+}
+
+.mwa-row-tag {
+    margin-left: var(--space-2);
+    color: var(--muted-foreground);
+}

@@ -2,13 +2,20 @@ import { Trans } from '#src/client/ui/Trans.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
-import { CoinFlipGame, CoinSide, Connect4Game, Gambler, RunningGame } from '#src/db/gambling.js';
-import { useContext, useEffect, useState } from 'preact/hooks';
+import {
+    CoinFlipGame,
+    CoinSide,
+    Connect4Game,
+    Gambler,
+    RunningGame,
+} from '#src/db/gambling/index.js';
 import { Language, TranslateFn } from '#src/client/language.js';
-import PageShell from '../PageShell.js';
 import { C4Cell, c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
 import { ComponentChildren } from 'preact';
 import { calcTurnTimeLeftMs, PlayerTurnTime } from '#src/client/gambling/turns.js';
+import { useContext, useEffect, useState } from 'preact/hooks';
+import PageShell from '#src/client/pages/app/PageShell.js';
+import { displayActor } from '#src/client/display.js';
 
 type GamblingSessionPageProps = {
     sessionId: number;
@@ -84,7 +91,6 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                 <p>{t('gamblingAcceptQuestion')}</p>
                                 <form method="POST" class="mwa-actions">
                                     <button
-                                        class="btn-primary"
                                         formaction={`/app/gambling/sessions/${sessionId}/accept`}
                                         type="submit"
                                     >
@@ -112,7 +118,11 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                         {disconnected}
                         <section class="mwa-panel">
                             <div class="mwa-panel-head">
-                                <h2>{t('gamblingWaiting', { player: currentGame.p2Name })}</h2>
+                                <h2>
+                                    {t('gamblingWaiting', {
+                                        player: displayActor(currentGame.p2Name, user, t),
+                                    })}
+                                </h2>
                             </div>
                             <div class="mwa-panel-body">
                                 <p class="mwa-muted">{t('gamblingWaitingHelp')}</p>
@@ -132,7 +142,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                         <div class="mwa-panel-body">
                             <p class="mwa-muted">
                                 {t('gamblingExpiryDetails', {
-                                    player: currentGame.p2Name,
+                                    player: displayActor(currentGame.p2Name, user, t),
                                     minutes: String(gamblingPendingExpiryMinutes),
                                 })}
                             </p>
@@ -150,7 +160,9 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                         </div>
                         <div class="mwa-panel-body">
                             <p class="mwa-muted">
-                                {t('gamblingRejectedDetails', { player: currentGame.p2Name })}
+                                {t('gamblingRejectedDetails', {
+                                    player: displayActor(currentGame.p2Name, user, t),
+                                })}
                             </p>
                         </div>
                     </section>
@@ -185,13 +197,15 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
 }
 
 function PendingProposal({ t, currentGame }: { t: TranslateFn; currentGame: RunningGame }) {
+    const { user } = useContext(ClientContext);
+
     switch (currentGame.gameType) {
         case 'coin_flip':
             return (
                 <>
                     <p class="mwa-intro">
                         {t('gamblingCoinFlipChallenged', {
-                            player: currentGame.p1Name,
+                            player: displayActor(currentGame.p1Name, user, t),
                         })}
                     </p>
                     <p>
@@ -220,7 +234,7 @@ function PendingProposal({ t, currentGame }: { t: TranslateFn; currentGame: Runn
                         <Trans
                             id="gamblingConnect4Challenged"
                             values={{
-                                player: currentGame.p1Name,
+                                player: displayActor(currentGame.p1Name, user, t),
                                 amount: <strong>{currentGame.betAmount}</strong>,
                             }}
                         />
@@ -239,6 +253,8 @@ function CoinFlipping({
     currentGame: CoinFlipGame;
     side: Gambler | null;
 }) {
+    const { user } = useContext(ClientContext);
+
     return (
         <>
             <div class="mwa-panel-head">
@@ -247,8 +263,8 @@ function CoinFlipping({
             <div class="mwa-panel-body">
                 <p class="mwa-intro">
                     {t('gamblingVersus', {
-                        p1: currentGame.p1Name,
-                        p2: currentGame.p2Name,
+                        p1: displayActor(currentGame.p1Name, user, t),
+                        p2: displayActor(currentGame.p2Name, user, t),
                     })}
                 </p>
                 {currentGame.status.type === 'ended' ? (
@@ -258,7 +274,11 @@ function CoinFlipping({
                             {side === currentGame.status.winner
                                 ? t('gamblingYouWin')
                                 : t('gamblingWinner', {
-                                      player: sideName(currentGame, currentGame.status.winner),
+                                      player: displayActor(
+                                          sideName(currentGame, currentGame.status.winner),
+                                          user,
+                                          t,
+                                      ),
                                   })}
                         </p>
                     </>
@@ -281,6 +301,8 @@ function Connect4View({
     currentGame: Connect4Game;
     side: Gambler | null;
 }) {
+    const { user } = useContext(ClientContext);
+
     const board = Connect4Board.fromString(currentGame.boardStr);
 
     function color(side: Gambler | C4Cell) {
@@ -308,7 +330,11 @@ function Connect4View({
             status = (
                 <h1>
                     {t('gamblingWinner', {
-                        player: sideName(currentGame, currentGame.status.winner),
+                        player: displayActor(
+                            sideName(currentGame, currentGame.status.winner),
+                            user,
+                            t,
+                        ),
                     })}
                 </h1>
             );
@@ -317,16 +343,12 @@ function Connect4View({
         status = (
             <div>
                 <span style={{ color: color('p1') }}>
-                    {side === 'p1'
-                        ? t('gamblingPlayerYou', { player: currentGame.p1Name })
-                        : currentGame.p1Name}
+                    {displayActor(currentGame.p1Name, user, t)}
                 </span>
                 <TurnTimeLeftDisplay turn={currentGame.p1TurnTime} />
 
                 <span style={{ color: color('p2') }}>
-                    {side === 'p2'
-                        ? t('gamblingPlayerYou', { player: currentGame.p2Name })
-                        : currentGame.p2Name}
+                    {displayActor(currentGame.p2Name, user, t)}
                 </span>
                 <TurnTimeLeftDisplay turn={currentGame.p2TurnTime} />
             </div>

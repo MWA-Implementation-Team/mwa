@@ -11,9 +11,9 @@ import { StatusCode } from 'hono/utils/http-status';
 import { BootData } from './client/bootstrap.js';
 import { getRequestLanguage } from './utils.js';
 import { MwaContext, MwaHono } from './state.js';
-import { getOrCreateInteractToken } from '#src/db/interactions.js';
+import { getOrCreateInteractToken } from '#src/db/interactions/index.js';
 import { renderSVG } from 'uqr';
-import { queryUserNotification } from './db/users.js';
+import { queryUserNotification } from './db/users/index.js';
 
 export function writePage<P extends RegisteredPageId>(
     ctx: MwaContext,
@@ -138,7 +138,6 @@ export function Root<P extends RegisteredPageId>({
                 {isDevMode && <script src="/reload.js" defer />}
             </head>
             <body style={bodyStyle}>
-                <div class="page-effect" aria-hidden="true" />
                 <div id="app">
                     <ClientContextWrapper
                         pageId={pageId}

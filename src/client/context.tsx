@@ -5,7 +5,7 @@ import { defaultLanguage, LanguageCode, translate, TranslateFn } from './languag
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
 import { reviveUser, User, UserJson } from '#src/client/api/users.js';
 
-import type { Notification } from '#src/db/users.js';
+import type { Notification } from '#src/db/users/index.js';
 export type { Notification };
 
 export type ClientContextType = {

@@ -3,7 +3,7 @@ import { MiddleAgesCard } from './Card.js';
 import { MiddleAgesDetail } from './Detail.js';
 
 export const middleAgesActivity: Activity = {
-    name: 'Viduramžiai',
+    name: 'Micius viduramžiuose',
     Card: MiddleAgesCard,
     Detail: MiddleAgesDetail,
 };

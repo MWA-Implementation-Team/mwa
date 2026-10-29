@@ -1,6 +1,6 @@
 import { translate } from '#src/client/language.js';
 import { redirectIfAuthed } from '#src/auth.js';
-import { findUserByEmail } from '#src/db/users.js';
+import { findUserByEmail } from '#src/db/users/index.js';
 import {
     confirmLoginTokenSent,
     createLoginToken,
@@ -8,7 +8,7 @@ import {
     discardLoginToken,
     lastLoginTokenSentAt,
     pruneLoginTokens,
-} from '#src/db/sessions.js';
+} from '#src/db/sessions/index.js';
 import { MwaContext, MwaHono } from '#src/state.js';
 import { writePage } from '#src/pages.js';
 import { getRequestLanguage } from '#src/utils.js';

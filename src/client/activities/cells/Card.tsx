@@ -5,7 +5,7 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function CellsCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card cells"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
@@ -13,8 +13,11 @@ export function CellsCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#dff3ea',
-                background: 'linear-gradient(135deg, #2e5f52, #173d33)',
-                border: '2px solid #57a68f',
+                backgroundImage: 'url("/img/activities/cells.webp")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '3px dotted #0000006d',
             }}
         >
             <div
@@ -52,11 +55,10 @@ export function CellsCard({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '90px 0 0',
-                    fontFamily: 'Georgia, serif',
                     fontSize: 35,
                 }}
             >
-                Ląstelės
+                Miautohondrija
             </h2>
         </article>
     );

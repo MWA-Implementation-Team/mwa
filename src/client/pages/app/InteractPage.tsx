@@ -2,6 +2,7 @@ import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import PageShell from './PageShell.js';
+import { displayUsername } from '#src/client/display.js';
 
 // Extra target fields shown only to elevated roles — the route populates
 // this solely for host/admin scanners, so `detail` being non-null is the gate.
@@ -43,13 +44,13 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
             {/* Stub — real transfers land with the pending/confirm flow. */}
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
-                    <h2>{t('interactHeading', { name: target.username })}</h2>
+                    <h2>{t('interactHeading', { name: displayUsername(target.username) })}</h2>
                 </div>
                 <div class="mwa-panel-body">
                     <div class="mwa-actions">
                         <button disabled>{t('interactSendMoneyTitle')}</button>
                         <a
-                            class="btn-primary"
+                            class="button"
                             href={`/app/interact/${encodeURIComponent(token)}/gamble`}
                         >
                             {t('gamblingAction')} 💲🤑🎰🤑💲

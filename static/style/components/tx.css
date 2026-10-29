@@ -1,0 +1,54 @@
+/* Transaction table — oat .table markup, compacted. Left-edge sign bars
+   tint positive rows green and negative rows red. */
+.mwa-tx {
+    min-width: 0;
+
+    /* .table's overflow-x:auto also computes overflow-y:auto, which can show
+       a phantom vertical scrollbar — these tables fit their cells anyway. */
+    overflow: visible;
+}
+
+.mwa-tx table {
+    font-size: var(--text-7);
+}
+
+.mwa-tx th,
+.mwa-tx td {
+    padding: var(--space-1) var(--space-2);
+    line-height: 1.3;
+}
+
+.mwa-tx th {
+    color: var(--muted-foreground);
+    font-size: var(--text-8);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.mwa-tx td {
+    color: var(--foreground);
+}
+
+.mwa-tx thead,
+.mwa-tx tbody tr {
+    /* see .mwa-rows — --border is too dark to read as a separator */
+    border-color: var(--divider);
+}
+
+.mwa-tx-date {
+    color: var(--muted-foreground);
+    white-space: nowrap;
+}
+
+.mwa-tx-amount {
+    text-align: end;
+    white-space: nowrap;
+}
+
+.mwa-tx--pos td:first-child {
+    box-shadow: inset 3px 0 0 var(--tx-positive);
+}
+
+.mwa-tx--neg td:first-child {
+    box-shadow: inset 3px 0 0 var(--tx-negative);
+}

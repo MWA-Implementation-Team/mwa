@@ -5,16 +5,19 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function EgyptCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card egypt"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#f0e2c4',
-                background: 'linear-gradient(135deg, #6b4f2e, #3f2c17)',
-                border: '2px solid #7a5c38',
+                color: '#dff3ea',
+                backgroundImage: 'url("/img/activities/egypt.webp")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '3px dotted #0000006d',
             }}
         >
             <div
@@ -61,12 +64,11 @@ export function EgyptCard({}: ActivityProps) {
                 style={{
                     position: 'relative',
                     margin: '82px 0 0',
-                    fontFamily: 'Georgia, serif',
                     fontSize: 34,
                     letterSpacing: 1,
                 }}
             >
-                Egiptas
+                Miauripto piramidės
             </h2>
         </article>
     );

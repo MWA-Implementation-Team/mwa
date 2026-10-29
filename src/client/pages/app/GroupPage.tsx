@@ -39,7 +39,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
         setError(null);
         setSuccessMsg(null);
         try {
-            const group = await createGroup(groupName, 0, phoneNumber);
+            const group = await createGroup(groupName, phoneNumber);
             setGroups((currentGroups) => [...(currentGroups ?? []), group]);
             setSuccessMsg(t('groupCreated'));
             setGroupName('');
@@ -75,12 +75,12 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                                     <div class="mwa-row">
                                         <div>
                                             <strong>{group.name}</strong>
-                                            <small>{group.phone_number}</small>
+                                            <small>{group.phoneNumber}</small>
                                         </div>
                                         {group.ownerId === user?.id && (
                                             <button
                                                 type="button"
-                                                class="mwa-danger"
+                                                data-variant="danger"
                                                 onClick={() => handleDeleteGroup(group.id)}
                                             >
                                                 {t('groupDelete')}
@@ -122,9 +122,7 @@ function GroupsComponent({ initialGroups = null }: GroupsPageProps) {
                             />
                         </div>
                         <div class="mwa-actions">
-                            <button type="submit" class="btn-primary">
-                                {t('groupCreate')}
-                            </button>
+                            <button type="submit">{t('groupCreate')}</button>
                         </div>
                     </form>
                 </div>

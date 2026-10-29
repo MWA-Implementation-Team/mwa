@@ -5,16 +5,19 @@ import type { ActivityProps } from '#src/client/activities.js';
 export function MiciausRevolutionCard({}: ActivityProps) {
     return (
         <article
-            class="card"
+            class="card miciaus-revolution"
             style={{
                 position: 'relative',
                 overflow: 'hidden',
                 minHeight: 180,
                 padding: 24,
                 borderRadius: 14,
-                color: '#fff1df',
-                background: 'linear-gradient(125deg, #a34848, #7d353e)',
-                border: '2px solid #662e35',
+                color: '#f3ff47',
+                backgroundImage: 'url("/img/activities/miciaus-revolution.webp")',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                border: '3px solid #ffffff6d',
             }}
         >
             <div
@@ -25,7 +28,7 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                     top: 32,
                     width: 190,
                     height: 15,
-                    background: '#e5b6a0',
+                    background: '#8b2c00',
                     opacity: 0.25,
                     transform: 'rotate(-24deg)',
                 }}
@@ -38,7 +41,7 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                     right: 22,
                     top: 5,
                     fontSize: 88,
-                    color: '#f3bf8a',
+                    color: '#ff1616',
                     opacity: 0.8,
                 }}
             >
@@ -50,9 +53,9 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                     position: 'relative',
                     margin: '79px 0 0',
                     maxWidth: 280,
-                    fontFamily: 'Georgia, serif',
                     fontSize: 29,
                     lineHeight: 1.1,
+                    color: '#f3ff47',
                 }}
             >
                 Didžioji Miciaus revoliucija

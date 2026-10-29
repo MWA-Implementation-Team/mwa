@@ -2,9 +2,10 @@ import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import Dialog from '#src/client/ui/Dialog.js';
-import { GameType } from '#src/db/gambling.js';
+import { GameType } from '#src/db/gambling/index.js';
 import { Language } from '#src/client/language.js';
 import PageShell from '../PageShell.js';
+import { displayUsername } from '#src/client/display.js';
 
 export type InviteToGamblePageProps = {
     targetUsername: string;
@@ -16,7 +17,8 @@ export type InviteToGamblePageProps = {
 
 export const inviteToGamblePage: Page<InviteToGamblePageProps> = {
     Component: InviteToGamblePage,
-    title: (t, { targetUsername }) => t('titleGamblingInvite', { name: targetUsername }),
+    title: (t, { targetUsername }) =>
+        t('titleGamblingInvite', { name: displayUsername(targetUsername) }),
 };
 
 function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) {
@@ -27,7 +29,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
         <PageShell section="gambling">
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
-                    <h2>{t('gamblingWith', { name: targetUsername })}</h2>
+                    <h2>{t('gamblingWith', { name: displayUsername(targetUsername) })}</h2>
                 </div>
                 <div class="mwa-panel-body">
                     <p class="mwa-intro">
@@ -35,7 +37,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                     </p>
                     <p class="mwa-muted">{t('gamblingCoinFlipDescription')}</p>
                     <div class="mwa-actions">
-                        <button class="btn-primary" onClick={() => setOpenDialog('coin_flip')}>
+                        <button onClick={() => setOpenDialog('coin_flip')}>
                             {t('gamblingChallenge')}
                         </button>
                     </div>
@@ -81,9 +83,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                         </select>
                     </div>
                     <div class="mwa-actions">
-                        <button type="submit" class="btn-primary">
-                            {t('gamblingSendInvite')}
-                        </button>
+                        <button type="submit">{t('gamblingSendInvite')}</button>
                     </div>
                     {error?.message && (
                         <p class="mwa-note mwa-note--error" role="alert">
