@@ -14,7 +14,7 @@
         "tsc-watch": "tsc --watch --preserveWatchOutput",
         "format": "prettier --write .",
         "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && prettier --check . && npm run lint:css",
-        "lint:css": "stylelint \"static/style/**/*.css\"",
+        "lint:css": "stylelint \"static/style/**/*.css\" && node scripts/check-css-usage.mjs",
         "check:migrations": "bash scripts/check-migrations.sh"
     },
     "devDependencies": {
