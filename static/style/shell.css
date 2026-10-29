@@ -409,33 +409,31 @@
 }
 
 /* Menu buttons share the .landing-login button look used on the landing
-   page — left-aligned soft-colored label on a panel-light block. */
-.landing-menu :is(a, button) {
+   page — left-aligned soft-colored label on a panel-light block. Scoped
+   under .mwa so the logout <button> matches the links and doesn't fall
+   back to the generic .mwa button padding/color/hover. */
+.mwa .landing-menu :is(a, button) {
     display: block;
     width: 100%;
+    min-height: 0;
     padding: 6px 14px;
     text-align: left;
-    color: var(--shell-soft);
     text-decoration: none;
-    background: var(--shell-panel-light);
-    border: 3px solid var(--shell-border);
-}
-
-.mwa .landing-menu :is(a, button) {
-    min-height: 0;
-    border-radius: 0;
     font: inherit;
     line-height: normal;
-    /* beat .mwa :is(button, ...)'s text-align: center on the logout <button> */
-    text-align: left;
+    color: var(--shell-soft);
+    background: var(--shell-panel-light);
+    border: 3px solid var(--shell-border);
+    border-radius: 0;
 }
 
-.landing-menu a:hover {
+.mwa .landing-menu :is(a, button):hover {
     color: var(--shell-white);
+    background: var(--shell-panel-light);
     border-color: var(--shell-pink);
 }
 
-.landing-menu a[aria-current='page'] {
+.mwa .landing-menu a[aria-current='page'] {
     color: var(--shell-white);
     border-color: rgb(from var(--shell-pink) r g b / 0.4);
 }
