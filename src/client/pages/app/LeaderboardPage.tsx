@@ -131,18 +131,14 @@ function PlayersTable({
                         const isGroupmate =
                             !isSelf && viewerGroupId !== null && row.groupId === viewerGroupId;
                         return (
-                            <tr
-                                key={row.userId}
-                                class={
-                                    isSelf
-                                        ? 'mwa-lb--self'
-                                        : isGroupmate
-                                          ? 'mwa-lb--group'
-                                          : undefined
-                                }
-                            >
+                            <tr key={row.userId} class={isSelf ? 'mwa-lb--self' : undefined}>
                                 <td class="mwa-lb-rank">{index + 1}</td>
-                                <td>{displayActor(row.username, user, t)}</td>
+                                <td>
+                                    {displayActor(row.username, user, t)}
+                                    {isGroupmate && (
+                                        <small class="mwa-muted"> {t('leaderboardGroupTag')}</small>
+                                    )}
+                                </td>
                                 {games && <td class="mwa-tx-amount">{row.gamesPlayed ?? 0}</td>}
                                 <td class="mwa-tx-amount">{row.score.toFixed(2)}</td>
                             </tr>

@@ -158,7 +158,6 @@ function HomePage({
                         </strong>
                     </p>
 
-                    <h3>{t('dashTransactions')}</h3>
                     {transactions.length === 0 ? (
                         <p class="mwa-muted">{t('dashNoTransactions')}</p>
                     ) : (
@@ -180,7 +179,14 @@ function HomePage({
                                             }
                                         >
                                             <td class="mwa-tx-date">
-                                                {new Date(tx.createdAt).toLocaleDateString(lang)}
+                                                {new Date(tx.createdAt).toLocaleString(lang, {
+                                                    year: 'numeric',
+                                                    month: '2-digit',
+                                                    day: '2-digit',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    hour12: false,
+                                                })}
                                             </td>
                                             <td>{t(transactionKindKey[tx.kind])}</td>
                                             <td class="mwa-tx-amount">

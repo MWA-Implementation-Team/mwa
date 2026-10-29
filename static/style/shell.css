@@ -610,16 +610,6 @@
     border-bottom: 1px solid var(--shell-border);
 }
 
-.landing-section > h2::before,
-.mwa-panel-head :is(h2, h3)::before {
-    content: '';
-    flex: none;
-    width: 8px;
-    height: 8px;
-    background: var(--shell-pink);
-    border: 3px solid rgba(255, 255, 255, 0.55);
-}
-
 .landing-section > *:not(h2) {
     padding: 12px 12px 0;
 }
@@ -924,8 +914,9 @@
 .mwa-lb tr.mwa-lb--self td {
     background: rgb(from var(--shell-soft) r g b / 0.12);
 }
-.mwa-lb tr.mwa-lb--group td:first-child {
-    box-shadow: inset 3px 0 0 var(--shell-accent);
+.mwa-lb-tag {
+    color: var(--shell-soft);
+    font-size: 11px;
 }
 @media (min-width: 580px) {
     .mwa {

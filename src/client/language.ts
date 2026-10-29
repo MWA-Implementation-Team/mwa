@@ -68,7 +68,6 @@ export type Language = {
     dashFinances: string;
     dashBalance: string;
     currencyName: string;
-    dashTransactions: string;
     dashNoTransactions: string;
     txTransfer: string;
     txPurchase: string;
@@ -139,6 +138,7 @@ export type Language = {
     leaderboardNoPlayers: string;
     leaderboardMemberCount: string;
     leaderboardGames: string;
+    leaderboardGroupTag: string;
     leaderboardYou: string;
 
     accountProfile: string;
@@ -295,7 +295,6 @@ export const languages: Record<LanguageCode, Language> = {
         dashFinances: 'Your finances',
         dashBalance: 'Current balance',
         currencyName: 'micius koinai',
-        dashTransactions: 'Transaction history',
         dashNoTransactions: 'No transactions yet',
         txTransfer: 'Transfer',
         txPurchase: 'Purchase',
@@ -344,7 +343,7 @@ export const languages: Record<LanguageCode, Language> = {
         shellNavLabel: 'Main navigation',
         navTitle: 'Menu',
 
-        activitiesDirectory: 'activity directory',
+        activitiesDirectory: 'Activity directory',
         activitiesEmpty: 'No activities listed yet.',
         activityInfoTitle: 'activity information',
         activityBack: '← back to activities',
@@ -366,6 +365,7 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardNoPlayers: 'No players yet.',
         leaderboardMemberCount: '{n} member(s)',
         leaderboardGames: '{n} game(s)',
+        leaderboardGroupTag: '*group',
         leaderboardYou: 'You',
 
         accountProfile: 'Profile',
@@ -523,7 +523,6 @@ export const languages: Record<LanguageCode, Language> = {
         dashFinances: 'Tavo finansai',
         dashBalance: 'Dabartinis balansas',
         currencyName: 'micius koinai',
-        dashTransactions: 'Operacijų istorija',
         dashNoTransactions: 'Operacijų dar nėra',
         txTransfer: 'Pervedimas',
         txPurchase: 'Pirkimas',
@@ -572,7 +571,7 @@ export const languages: Record<LanguageCode, Language> = {
         shellNavLabel: 'Pagrindinė navigacija',
         navTitle: 'Meniu',
 
-        activitiesDirectory: 'veiklų katalogas',
+        activitiesDirectory: 'Veiklų katalogas',
         activitiesEmpty: 'Veiklų dar nėra.',
         activityInfoTitle: 'veiklos informacija',
         activityBack: '← atgal į veiklas',
@@ -594,6 +593,7 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardNoPlayers: 'Žaidėjų kol kas nėra.',
         leaderboardMemberCount: 'Nariai: {n}',
         leaderboardGames: 'Žaidimai: {n}',
+        leaderboardGroupTag: '*grupė',
         leaderboardYou: 'Jūs',
 
         accountProfile: 'Profilis',
