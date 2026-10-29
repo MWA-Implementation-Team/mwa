@@ -37,9 +37,7 @@
     pointer-events: none;
 
     background-color: var(--background);
-    background-image:
-        var(--backdrop-scrim),
-        url('https://i.pinimg.com/originals/1d/15/d8/1d15d8da8b3b6f3a895828ba2663f409.gif');
+    background-image: var(--backdrop-scrim), url('/img/backdrop.webp');
     background-size: cover, cover;
     background-position: center, center;
     background-repeat: no-repeat, no-repeat;

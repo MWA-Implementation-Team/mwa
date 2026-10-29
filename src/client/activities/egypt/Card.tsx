@@ -13,7 +13,7 @@ export function EgyptCard({}: ActivityProps) {
                 padding: 24,
                 borderRadius: 14,
                 color: '#dff3ea',
-                backgroundImage: 'url("https://i.redd.it/h9q1rf0xtma81.gif")',
+                backgroundImage: 'url("/img/activities/egypt.webp")',
                 backgroundPosition: 'center',
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
