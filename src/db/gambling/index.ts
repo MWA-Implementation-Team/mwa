@@ -234,8 +234,8 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
                 };
             });
 
-            const p1TurnTime = calcPlayerTurnTime(turns, 'p1', chessPlayerTurnTime);
-            const p2TurnTime = calcPlayerTurnTime(turns, 'p2', chessPlayerTurnTime);
+            const p1TurnTime = calcPlayerTurnTime(turns, 'p1', c4PlayerTurnTime);
+            const p2TurnTime = calcPlayerTurnTime(turns, 'p2', c4PlayerTurnTime);
 
             if (status.type === 'ended') {
                 p1TurnTime.baseTimeLeftMs = calcTurnTimeLeftMs(p1TurnTime);

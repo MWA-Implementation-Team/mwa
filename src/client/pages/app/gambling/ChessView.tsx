@@ -91,6 +91,7 @@ export function ChessView({
                                                     data-dark={(row + col) % 2 !== 0}
                                                     data-legal={canMoveTo}
                                                     disabled={!canMoveTo && !canSelect}
+                                                    aria-label={square}
                                                     onClick={() => {
                                                         if (!canMoveTo) {
                                                             setSelected(
