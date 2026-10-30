@@ -227,25 +227,7 @@ function HomePage({
                         </p>
                     )}
                     {groupMembers.length === 0 ? (
-                        <form method="POST" action="/app/group/create" class="mwa-form">
-                            <p class="mwa-muted">{t('groupNone')}</p>
-                            <div class="mwa-field">
-                                <label for="mwa-group-name">{t('groupName')}</label>
-                                <input id="mwa-group-name" name="name" type="text" required />
-                            </div>
-                            <div class="mwa-field">
-                                <label for="mwa-group-phone">{t('groupPhone')}</label>
-                                <input
-                                    id="mwa-group-phone"
-                                    name="phone_number"
-                                    type="tel"
-                                    required
-                                />
-                            </div>
-                            <div class="mwa-actions">
-                                <button type="submit">{t('groupCreate')}</button>
-                            </div>
-                        </form>
+                        <p class="mwa-muted">{t('groupNone')}</p>
                     ) : (
                         <div class="table mwa-tx">
                             <table>

@@ -124,8 +124,6 @@ target sees it as a `group_invite` notification. Accepting
 if the accepter has none, a group is created in one transaction — the accepter
 owns it, the name is a random `team-…` placeholder and the phone empty until
 the owner edits them from the home table's dialog (`POST /app/group/edit`).
-The same table also offers a manual create form (`POST /app/group/create`) for
-groupless users.
 
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
 invitations. `/app/interact/:token/gamble` creates a challenge; re-challenging the

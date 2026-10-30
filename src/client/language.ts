@@ -163,10 +163,8 @@ export type Language = {
     groupLeaveFailed: string;
     groupName: string;
     groupPhone: string;
-    groupCreate: string;
     groupDelete: string;
     groupDeleteConfirm: string;
-    groupCreateFailed: string;
     groupDeleteFailed: string;
     groupRequestJoin: string;
     groupRequestSent: string;
@@ -401,10 +399,8 @@ export const languages: Record<LanguageCode, Language> = {
         groupLeaveFailed: 'Could not leave the group',
         groupName: 'Group Name',
         groupPhone: 'Enter emergency phone Number',
-        groupCreate: 'Create Group',
         groupDelete: 'Delete group',
         groupDeleteConfirm: 'Delete group?',
-        groupCreateFailed: 'failed to create group',
         groupDeleteFailed: 'failed to delete group',
         groupRequestJoin: 'Join their team',
         groupRequestSent: 'Join request sent.',
@@ -642,10 +638,8 @@ export const languages: Record<LanguageCode, Language> = {
         groupLeaveFailed: 'Nepavyko išeiti iš grupės',
         groupName: 'Grupės pavadinimas',
         groupPhone: 'Įveskite skubios pagalbos telefono numerį',
-        groupCreate: 'Sukurti grupę',
         groupDelete: 'Ištrinti grupę',
         groupDeleteConfirm: 'Ištrinti grupę?',
-        groupCreateFailed: 'nepavyko sukurti grupės',
         groupDeleteFailed: 'nepavyko ištrinti grupės',
         groupRequestJoin: 'Prisijungti prie komandos',
         groupRequestSent: 'Prašymas išsiųstas.',

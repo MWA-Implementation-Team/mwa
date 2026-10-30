@@ -8,7 +8,6 @@ import {
 } from '#src/db/leaderboard/index.js';
 import {
     acceptGroupInvite,
-    createGroup,
     createGroupInvite,
     deleteGroup,
     deleteGroupInvite,
@@ -72,7 +71,6 @@ export function registerAppRoutes(app: MwaHono) {
             groupError !== 'groupKickFailed' &&
             groupError !== 'groupLeaveFailed' &&
             groupError !== 'groupDeleteFailed' &&
-            groupError !== 'groupCreateFailed' &&
             groupError !== 'groupEditFailed' &&
             groupError !== 'groupNameTaken' &&
             groupError !== 'groupAcceptFailed'
@@ -107,35 +105,6 @@ export function registerAppRoutes(app: MwaHono) {
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
             standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
         });
-    });
-
-    // Group creation lives on the home panel's empty state — the caller
-    // becomes the owner (and first member).
-    app.post('/app/group/create', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        const form = await ctx.req.formData().catch(() => null);
-        const name = String(form?.get('name') ?? '').trim();
-        const phoneNumber = String(form?.get('phone_number') ?? '').trim();
-
-        let ok = false;
-        if (
-            name !== '' &&
-            name.length <= MAX_GROUP_NAME_LENGTH &&
-            phoneNumber !== '' &&
-            phoneNumber.length <= MAX_PHONE_NUMBER_LENGTH &&
-            !findUserGroup(ctx.var, user.id)
-        ) {
-            try {
-                createGroup(ctx.var, name, user.id, phoneNumber);
-                ok = true;
-            } catch {
-                // groups.name is UNIQUE — a taken name lands on the same error
-            }
-        }
-
-        return ctx.redirect(ok ? '/app' : '/app?groupError=groupCreateFailed', 303);
     });
 
     // Members can only remove themselves; the owner can't leave — deleting
