@@ -176,10 +176,17 @@ function randomGroupName(): string {
     return `team-${randomBytes(3).toString('hex')}`;
 }
 
-export type AcceptGroupInviteResult = 'accepted' | 'not_found' | 'forbidden' | 'grouped';
+export type AcceptGroupInviteResult =
+    | 'accepted'
+    | 'not_found'
+    | 'forbidden'
+    | 'grouped'
+    | 'full';
 
-// Accepting creates the group on the spot: the accepter owns it, both users
-// are members, name is random and phone empty until the owner edits them.
+// The requester wants into the accepter's team: if the accepter already has
+// one the requester joins it; if not, a group is created on the spot —
+// the accepter owns it, name is random and phone empty until the owner edits
+// them from the home table.
 export function acceptGroupInvite(
     state: MwaState,
     inviteId: number,
@@ -189,10 +196,26 @@ export function acceptGroupInvite(
     if (!invite) return 'not_found';
     if (invite.toUserId !== accepterId) return 'forbidden';
 
-    // Either side may have grouped since the request — drop the stale invite.
-    if (findUserGroup(state, accepterId) || findUserGroup(state, invite.fromUserId)) {
-        state.prepare(`DELETE FROM group_invites WHERE id = ?`).run(inviteId);
+    const deleteInviteQuery = state.prepare(`DELETE FROM group_invites WHERE id = ?`);
+
+    // The requester may have grouped since the request — drop the stale
+    // invite. The accepter's own group is fine: the requester joins it.
+    if (findUserGroup(state, invite.fromUserId)) {
+        deleteInviteQuery.run(inviteId);
         return 'grouped';
+    }
+
+    const existing = findUserGroup(state, accepterId);
+    if (existing) {
+        return runTransaction(state.db, () => {
+            const res = addGroupMember(state, existing.id, invite.fromUserId);
+            if (res === 'added') {
+                deleteInviteQuery.run(inviteId);
+                return 'accepted';
+            }
+            deleteInviteQuery.run(inviteId);
+            return res === 'group_full' ? 'full' : 'grouped';
+        });
     }
 
     const createGroupQuery = state.prepare(`
@@ -204,7 +227,6 @@ export function acceptGroupInvite(
         INSERT INTO group_members (group_id, user_id)
         VALUES (?, ?)
     `);
-    const deleteInviteQuery = state.prepare(`DELETE FROM group_invites WHERE id = ?`);
 
     return runTransaction(state.db, () => {
         let groupId: number | null = null;

@@ -117,13 +117,15 @@ challenge another user; hosts/admins also see their email, balance, and join dat
 Self-scans show no actions, and money transfers remain a placeholder.
 
 Teaming up works through invites (`10_group_invites.sql`): `POST
-/app/interact/:token/group-request` creates a pending `group_invites` row when
-both sides are groupless, and the target sees it as a `group_invite`
-notification. Accepting (`/app/groups/invites/:id/accept`) creates the group in
-one transaction — the accepter owns it, both users are members, the name is a
-random `team-…` placeholder and the phone empty until the owner edits them from
-the home table's dialog (`POST /app/group/edit`). The same table also offers a
-manual create form (`POST /app/group/create`) for groupless users.
+/app/interact/:token/group-request` creates a pending `group_invites` row
+asking to join the target's team (the requester must be groupless), and the
+target sees it as a `group_invite` notification. Accepting
+(`/app/groups/invites/:id/accept`) adds the requester to the accepter's team;
+if the accepter has none, a group is created in one transaction — the accepter
+owns it, the name is a random `team-…` placeholder and the phone empty until
+the owner edits them from the home table's dialog (`POST /app/group/edit`).
+The same table also offers a manual create form (`POST /app/group/create`) for
+groupless users.
 
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
 invitations. `/app/interact/:token/gamble` creates a challenge; re-challenging the

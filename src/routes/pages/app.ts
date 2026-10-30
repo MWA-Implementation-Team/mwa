@@ -209,8 +209,9 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect('/app', 303);
     });
 
-    // Team-up request from the interact page — both sides must be groupless;
-    // the target sees it as a notification.
+    // Join request from the interact page — the requester asks into the
+    // target's team (must be groupless themselves); the target sees it as a
+    // notification.
     app.post('/app/interact/:token/group-request', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
@@ -220,7 +221,7 @@ export function registerAppRoutes(app: MwaHono) {
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
 
         const back = `/app/interact/${encodeURIComponent(token)}`;
-        if (findUserGroup(ctx.var, user.id) || findUserGroup(ctx.var, target.id)) {
+        if (findUserGroup(ctx.var, user.id)) {
             return ctx.redirect(`${back}?interactError=groupRequestFailed`, 303);
         }
 
