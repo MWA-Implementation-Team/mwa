@@ -1,3 +1,4 @@
+import { initChess, chessTakeTurn, settleBoardGameTimeout } from '#src/db/gambling/index.js';
 import { requireApiUser, requireUser } from '#src/auth.js';
 import { InviteToGamblePageProps } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
 import {
@@ -17,10 +18,6 @@ import {
     queryExpiringGamblingSessions,
     initConnect4,
     connect4TakeTurn,
-    Gambler,
-    winGamblingSession,
-    queryPendingConnect4Matches,
-    Connect4Game,
 } from '#src/db/gambling/index.js';
 import { findUserByInteractToken } from '#src/db/interactions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
@@ -30,8 +27,8 @@ import { streamSSE } from 'hono/streaming';
 import { safeGoto } from './login.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { Language } from '#src/client/language.js';
-import { C4Player, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
-import { calcTurnTimeLeftMs, PlayerTurnTime } from '#src/client/gambling/turns.js';
+import { c4Width } from '#src/client/gambling/connect4.js';
+import { calcTurnTimeLeftMs } from '#src/client/gambling/turns.js';
 
 // error_type values pages render as an inline message
 const gambleErrorMessages = {
@@ -65,7 +62,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         const message =
             gambleErrorMessages[ctx.req.query('error_type') as keyof typeof gambleErrorMessages];
         let error: InviteToGamblePageProps['error'] | undefined = undefined;
-        if (errorGame === 'coin_flip' || errorGame === 'connect_4') {
+        if (errorGame === 'coin_flip' || errorGame === 'connect_4' || errorGame === 'chess') {
             error = { dialog: errorGame, message };
         }
 
@@ -87,7 +84,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (!form) return writeErrorPage(ctx, 400);
 
         const gameType = form.get('game_type') as GameType;
-        if (gameType !== 'coin_flip' && gameType !== 'connect_4') {
+        if (gameType !== 'coin_flip' && gameType !== 'connect_4' && gameType !== 'chess') {
             return writeErrorPage(ctx, 400);
         }
 
@@ -117,6 +114,9 @@ export function registerGamblingRoutes(app: MwaHono) {
                 });
                 break;
             }
+            case 'chess':
+                sessionId = initChess(ctx.var, { p1: user.id, p2: target.id, betAmount });
+                break;
             case 'connect_4': {
                 sessionId = initConnect4(ctx.var, {
                     p1: user.id,
@@ -227,12 +227,9 @@ export function registerGamblingRoutes(app: MwaHono) {
                     acceptedTime: new Date(),
                 });
                 break;
+            case 'chess':
             case 'connect_4':
-                scheduleConnect4Timeout(
-                    ctx.var,
-                    sessionId,
-                    game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime,
-                );
+                scheduleBoardGameTimeout(ctx.var, sessionId);
                 break;
         }
 
@@ -282,62 +279,57 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 400);
         }
 
-        if (game.status.type !== 'running' || updateConnect4Times(ctx.var, sessionId, game)) {
-            return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
-        }
-
         const x = Number(form.get('x'));
         if (!Number.isSafeInteger(x) || x < 0 || x >= c4Width) {
             return writeErrorPage(ctx, 400);
         }
 
-        const gambler: Gambler = game.p1 === user.id ? 'p1' : 'p2';
-        const c4Player: C4Player = gambler === 'p1' ? 'x' : 'o';
-        const board = Connect4Board.fromString(game.boardStr);
-
-        if (!board.place(x, c4Player)) {
-            return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
-        }
-
-        if (connect4TakeTurn(ctx.var, sessionId, gambler, board)) {
-            updateConnect4Board(ctx.var, sessionId, board);
+        if (connect4TakeTurn(ctx.var, sessionId, user.id, x)) {
             broadcastSessionUpdate(ctx.var, sessionId);
-
-            const newGame = findGamblingSessionById(ctx.var, sessionId) as Connect4Game;
-            scheduleConnect4Timeout(
-                ctx.var,
-                sessionId,
-                newGame.nextTurn === 'p1' ? newGame.p1TurnTime : newGame.p2TurnTime,
-            );
+            scheduleBoardGameTimeout(ctx.var, sessionId);
         }
 
         return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
     });
-}
 
-function updateConnect4Board(state: MwaState, sessionId: number, board: Connect4Board): boolean {
-    const win = board.winner();
-    if (win) {
-        winGamblingSession(state, sessionId, win.player === 'x' ? 'p1' : 'p2');
-        return true;
-    } else if (board.isFull()) {
-        winGamblingSession(state, sessionId, 'draw');
-        return true;
-    }
-    return false;
-}
+    app.post('/app/gambling/sessions/:id/chess-move', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
 
-function updateConnect4Times(state: MwaState, sessionId: number, newGame: Connect4Game): boolean {
-    if (calcTurnTimeLeftMs(newGame.p1TurnTime) <= 0) {
-        winGamblingSession(state, sessionId, 'p2');
-        broadcastSessionUpdate(state, sessionId);
-        return true;
-    } else if (calcTurnTimeLeftMs(newGame.p2TurnTime) <= 0) {
-        winGamblingSession(state, sessionId, 'p1');
-        broadcastSessionUpdate(state, sessionId);
-        return true;
-    }
-    return false;
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) return writeErrorPage(ctx, 400);
+
+        const sessionId = Number(ctx.req.param('id'));
+        const game = findGamblingSessionById(ctx.var, sessionId);
+        if (!game) return writeErrorPage(ctx, 404);
+
+        if (game.gameType !== 'chess' || (user.id !== game.p1 && user.id !== game.p2))
+            return writeErrorPage(ctx, 400);
+
+        const from = form.get('from');
+        const to = form.get('to');
+        const promotion = form.get('promotion');
+        const moveCountStr = form.get('move_count'); // to prevent moves when client is desynced with server
+        if (
+            typeof from !== 'string' ||
+            typeof to !== 'string' ||
+            (promotion !== null && typeof promotion !== 'string') ||
+            typeof moveCountStr !== 'string' ||
+            !Number.isSafeInteger(Number(moveCountStr))
+        ) {
+            return writeErrorPage(ctx, 400);
+        }
+
+        const move = { from, to, promotion: promotion ?? undefined };
+        const moveCount = Number(moveCountStr);
+
+        if (chessTakeTurn(ctx.var, sessionId, user.id, move, moveCount)) {
+            broadcastSessionUpdate(ctx.var, sessionId);
+            scheduleBoardGameTimeout(ctx.var, sessionId);
+        }
+
+        return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
+    });
 }
 
 export function scheduleGamblingTimers(state: MwaState) {
@@ -347,17 +339,13 @@ export function scheduleGamblingTimers(state: MwaState) {
     const coinFlips = queryPendingCoinFlips(state);
     coinFlips.forEach((flip) => scheduleCoinFlipWinner(state, flip));
 
-    const pendingConnect4s = queryPendingConnect4Matches(state);
-    for (const pending of pendingConnect4s) {
-        const game = findGamblingSessionById(state, pending.sessionId) as Connect4Game;
-        if (!game) continue;
-        const board = Connect4Board.fromString(game.boardStr);
-        if (updateConnect4Board(state, pending.sessionId, board)) continue;
-        scheduleConnect4Timeout(
-            state,
-            pending.sessionId,
-            game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime,
-        );
+    for (const summary of queryGamblingSessions(state)) {
+        switch (summary.type) {
+            case 'connect_4':
+            case 'chess':
+                scheduleBoardGameTimeout(state, summary.id);
+                break;
+        }
     }
 }
 
@@ -395,21 +383,20 @@ function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
     });
 }
 
-function scheduleConnect4Timeout(state: MwaState, sessionId: number, turnTime: PlayerTurnTime) {
-    const timeLeftMs = calcTurnTimeLeftMs(turnTime);
+function scheduleBoardGameTimeout(state: MwaState, sessionId: number) {
+    const game = findGamblingSessionById(state, sessionId);
+    if (!game || game.status.type !== 'running') return;
+    if (game.gameType !== 'connect_4' && game.gameType !== 'chess') return;
 
-    scheduleAfter(`c4-${sessionId}`, Date.now() + timeLeftMs, () => {
-        const newGame = findGamblingSessionById(state, sessionId) as Connect4Game;
-        if (newGame.status.type !== 'running') return;
-        if (!updateConnect4Times(state, sessionId, newGame)) {
+    const timer = game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime;
+    scheduleAfter(`board-${sessionId}`, Date.now() + calcTurnTimeLeftMs(timer), () => {
+        if (settleBoardGameTimeout(state, sessionId)) {
+            broadcastSessionUpdate(state, sessionId);
+        } else {
             // this theoretically (?) shouldn't happen
             // because setTimeout should only call after at least
             // the specified duration. but just to be safe
-            scheduleConnect4Timeout(
-                state,
-                sessionId,
-                newGame.nextTurn === 'p1' ? newGame.p1TurnTime : newGame.p2TurnTime,
-            );
+            scheduleBoardGameTimeout(state, sessionId);
         }
     });
 }

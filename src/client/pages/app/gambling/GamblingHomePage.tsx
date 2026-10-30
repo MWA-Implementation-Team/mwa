@@ -77,6 +77,8 @@ function gameTrans(type: GameType): keyof Language {
     switch (type) {
         case 'coin_flip':
             return 'gamblingCoinFlip';
+        case 'chess':
+            return 'gamblingChess';
         case 'connect_4':
             return 'gamblingConnect4';
     }

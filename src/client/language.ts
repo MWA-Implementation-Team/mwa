@@ -233,6 +233,21 @@ export type Language = {
     gamblingConnect4: string;
     gamblingConnect4Description: string;
     gamblingConnect4Challenged: string;
+
+    gamblingChess: string;
+    gamblingChessDescription: string;
+    gamblingChessChallenged: string;
+    gamblingChessTurn: string;
+    gamblingChessCheck: string;
+    gamblingChessWhite: string;
+    gamblingChessBlack: string;
+    gamblingChessPromotion: string;
+    gamblingChessPawn: string;
+    gamblingChessKnight: string;
+    gamblingChessBishop: string;
+    gamblingChessRook: string;
+    gamblingChessQueen: string;
+    gamblingChessKing: string;
 };
 
 export const languages: Record<LanguageCode, Language> = {
@@ -466,6 +481,20 @@ export const languages: Record<LanguageCode, Language> = {
             'If they are right, you lose {amount} coins. If they are wrong, you win {amount} coins.',
         gamblingCoinFlipping: 'Flipping the coin...',
 
+        gamblingChess: 'Chess',
+        gamblingChessDescription: 'Play regular chess. Each player has five minutes.',
+        gamblingChessChallenged: '{player} challenged you to chess for {amount} coins.',
+        gamblingChessTurn: '{player} to move',
+        gamblingChessCheck: 'Check',
+        gamblingChessWhite: 'White',
+        gamblingChessBlack: 'Black',
+        gamblingChessPromotion: 'Promote pawn to',
+        gamblingChessPawn: 'Pawn',
+        gamblingChessKnight: 'Knight',
+        gamblingChessBishop: 'Bishop',
+        gamblingChessRook: 'Rook',
+        gamblingChessQueen: 'Queen',
+        gamblingChessKing: 'King',
         gamblingConnect4: 'Connect 4',
         gamblingConnect4Description:
             'Be the first to connect four of your pieces horizontally, vertically, or diagonally.',
@@ -705,6 +734,20 @@ export const languages: Record<LanguageCode, Language> = {
             'Jei spėjimas teisingas, prarasi {amount} monetų. Jei klaidingas, laimėsi {amount} monetų.',
         gamblingCoinFlipping: 'Metama moneta...',
 
+        gamblingChess: 'Šachmatai',
+        gamblingChessDescription: 'Žaiskite šachmatais. Kiekvienam skiriamos penkios minutės.',
+        gamblingChessChallenged: '{player} kviečia žaisti šachmatais iš {amount} monetų.',
+        gamblingChessTurn: '{player} eilė eiti',
+        gamblingChessCheck: 'Šachas',
+        gamblingChessWhite: 'Baltieji',
+        gamblingChessBlack: 'Juodieji',
+        gamblingChessPromotion: 'Pėstininką pakeisti į',
+        gamblingChessPawn: 'Pėstininkas',
+        gamblingChessKnight: 'Žirgas',
+        gamblingChessBishop: 'Rikis',
+        gamblingChessRook: 'Bokštas',
+        gamblingChessQueen: 'Valdovė',
+        gamblingChessKing: 'Karalius',
         gamblingConnect4: 'Keturi iš eilės',
         gamblingConnect4Description:
             'Pirmas sudėk keturis savo žetonus į eilę horizontaliai, vertikaliai arba įstrižai.',

@@ -4,9 +4,12 @@ import { insertTransaction } from '#src/db/transactions/index.js';
 import { findUserById } from '#src/db/users/index.js';
 import { Connect4Board } from '#src/client/gambling/connect4.js';
 import { calcPlayerTurnTime, MatchTurn, PlayerTurnTime } from '#src/client/gambling/turns.js';
+import { Move } from 'chess.js';
+import { restoreChess } from '#src/client/gambling/chess.js';
+import { calcTurnTimeLeftMs } from '#src/client/gambling/turns.js';
 import { runTransaction } from '#src/db/transaction.js';
 
-export type GameType = 'coin_flip' | 'connect_4';
+export type GameType = 'coin_flip' | 'connect_4' | 'chess';
 
 export type SessionSummary = {
     id: number;
@@ -34,36 +37,47 @@ type RunningGameCommon = {
 export type CoinFlipGame = RunningGameCommon & {
     gameType: 'coin_flip';
     status:
-        | { type: 'pending' }
-        | { type: 'expired' }
-        | { type: 'rejected' }
-        | { type: 'running' }
-        | {
-              type: 'ended';
-              winner: Gambler;
-              flipResult: CoinSide;
-          };
+    | { type: 'pending' }
+    | { type: 'expired' }
+    | { type: 'rejected' }
+    | { type: 'running' }
+    | {
+        type: 'ended';
+        winner: Gambler;
+        flipResult: CoinSide;
+    };
     p1Guess: CoinSide;
 };
 
-export type Connect4Game = RunningGameCommon & {
-    gameType: 'connect_4';
-    status:
-        | { type: 'pending' }
-        | { type: 'expired' }
-        | { type: 'rejected' }
-        | { type: 'running' }
-        | {
-              type: 'ended';
-              winner: Gambler | 'draw';
-          };
-    boardStr: string;
-    nextTurn: Gambler;
+type BoardGameStatus =
+    | { type: 'pending' }
+    | { type: 'expired' }
+    | { type: 'rejected' }
+    | { type: 'running' }
+    | {
+        type: 'ended';
+        winner: Gambler | 'draw';
+    };
+
+type BoardGame = RunningGameCommon & {
+    status: BoardGameStatus;
     p1TurnTime: PlayerTurnTime;
     p2TurnTime: PlayerTurnTime;
+    nextTurn: Gambler;
 };
 
-export type RunningGame = CoinFlipGame | Connect4Game;
+export type Connect4Game = BoardGame & {
+    gameType: 'connect_4';
+    boardStr: string;
+};
+
+export type ChessGame = BoardGame & {
+    gameType: 'chess';
+    whitePlayer: Gambler;
+    moves: string[];
+};
+
+export type RunningGame = CoinFlipGame | Connect4Game | ChessGame;
 
 export type Invitation = {
     id: number;
@@ -189,7 +203,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
             };
         }
         case 'connect_4': {
-            let status: Connect4Game['status'];
+            let status: BoardGameStatus;
             switch (statusRow) {
                 case 'pending':
                 case 'expired':
@@ -209,11 +223,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
 
             const turnRows = state
                 .prepare(
-                    `
-            SELECT created_at, player, new_board from connect_4_turns
-            WHERE session = ?
-            ORDER BY id ASC
-            `,
+                    'SELECT created_at, player, new_board from connect_4_turns WHERE session = ? ORDER BY id ASC',
                 )
                 .all(sessionId);
 
@@ -224,6 +234,16 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
                 };
             });
 
+            const p1TurnTime = calcPlayerTurnTime(turns, 'p1', chessPlayerTurnTime);
+            const p2TurnTime = calcPlayerTurnTime(turns, 'p2', chessPlayerTurnTime);
+
+            if (status.type === 'ended') {
+                p1TurnTime.baseTimeLeftMs = calcTurnTimeLeftMs(p1TurnTime);
+                p2TurnTime.baseTimeLeftMs = calcTurnTimeLeftMs(p2TurnTime);
+                delete p1TurnTime.turnStartedTimeMs;
+                delete p2TurnTime.turnStartedTimeMs;
+            }
+
             const lastTurn = turnRows[turnRows.length - 1];
 
             return {
@@ -231,8 +251,65 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
                 boardStr: (lastTurn?.new_board as string) ?? new Connect4Board().asString(),
                 nextTurn: lastTurn?.player === 'p1' ? 'p2' : 'p1',
                 status,
-                p1TurnTime: calcPlayerTurnTime(turns, 'p1', c4PlayerTurnTime),
-                p2TurnTime: calcPlayerTurnTime(turns, 'p2', c4PlayerTurnTime),
+                p1TurnTime,
+                p2TurnTime,
+                ...common,
+            };
+        }
+        case 'chess': {
+            let status: BoardGameStatus;
+            switch (statusRow) {
+                case 'pending':
+                case 'expired':
+                case 'rejected':
+                case 'running':
+                    status = { type: statusRow };
+                    break;
+                case 'ended':
+                    status = {
+                        type: 'ended',
+                        winner: row.winner as Gambler | 'draw',
+                    };
+                    break;
+                default:
+                    throw new Error(`Unknown session status ${row.status}`);
+            }
+
+            const turnRows = state
+                .prepare(
+                    'SELECT created_at, player, move from chess_turns WHERE session = ? ORDER BY id ASC'
+                )
+                .all(sessionId);
+
+            const turns: MatchTurn[] = turnRows.map((row) => {
+                return {
+                    player: row.player as Gambler,
+                    timeMs: new Date(row.created_at as string).getTime(),
+                };
+            });
+
+            // First turn (move = null) is black and starts white's timer
+            const whitePlayer: Gambler = turnRows[0]?.player === 'p1' ? 'p2' : 'p1';
+
+            const moves = turnRows.flatMap((turn) => turn.move ? [turn.move as string] : []);
+            const p1TurnTime = calcPlayerTurnTime(turns, 'p1', chessPlayerTurnTime);
+            const p2TurnTime = calcPlayerTurnTime(turns, 'p2', chessPlayerTurnTime);
+
+            if (status.type === 'ended') {
+                p1TurnTime.baseTimeLeftMs = calcTurnTimeLeftMs(p1TurnTime);
+                p2TurnTime.baseTimeLeftMs = calcTurnTimeLeftMs(p2TurnTime);
+                delete p1TurnTime.turnStartedTimeMs;
+                delete p2TurnTime.turnStartedTimeMs;
+            }
+
+            return {
+                gameType: 'chess',
+                moves,
+                whitePlayer,
+                nextTurn: turnRows[turnRows.length - 1]?.player === 'p1' ? 'p2' : 'p1',
+                status,
+                p1TurnTime,
+                p2TurnTime,
                 ...common,
             };
         }
@@ -281,15 +358,18 @@ export function acceptGamblingSession(
         update.run(deductResult.parentId, sessionId);
 
         switch (gameType) {
+            case 'chess':
+                state
+                    .prepare('INSERT INTO chess_turns (session, player, move) VALUES (?, ?, NULL)')
+                    .run(sessionId, randomInt(2) === 0 ? 'p1' : 'p2');
+                break;
             case 'connect_4': {
                 const secondTurn: Gambler = randomInt(2) === 0 ? 'p1' : 'p2';
                 const initialBoard = new Connect4Board().asString();
 
                 state
                     .prepare(
-                        `
-                INSERT INTO connect_4_turns (session, player, new_board) VALUES (?, ?, ?)
-                `,
+                        'INSERT INTO connect_4_turns (session, player, new_board) VALUES (?, ?, ?)',
                     )
                     .run(sessionId, secondTurn, initialBoard);
                 break;
@@ -339,69 +419,73 @@ export function cancelGamblingSession(
     });
 }
 
+export function settleBoardGameTimeout(state: MwaState, sessionId: number): boolean {
+    const game = findGamblingSessionById(state, sessionId);
+    if (!game || game.status.type !== 'running') return false;
+    if (game.gameType !== 'connect_4' && game.gameType !== 'chess') return false;
+
+    const timer = game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime;
+    if (calcTurnTimeLeftMs(timer) > 0) return false;
+
+    winGamblingSession(state, sessionId, game.nextTurn === 'p1' ? 'p2' : 'p1');
+    return true;
+}
+
 export function winGamblingSession(state: MwaState, sessionId: number, winner: Gambler | 'draw') {
-    runTransaction(state.db, () => {
-        const sessionQuery = state.prepare(`
-        SELECT p1, p2, bet_amount FROM gambling_sessions
-        WHERE id = ? AND status = 'running'
-        `);
-        const row = sessionQuery.get(sessionId);
-        if (!row) {
-            return;
+    runTransaction(state.db, () => settleGamblingSession(state, sessionId, winner));
+}
+
+function settleGamblingSession(state: MwaState, sessionId: number, winner: Gambler | 'draw') {
+    const sessionQuery = state.prepare(`
+    SELECT p1, p2, bet_amount FROM gambling_sessions
+    WHERE id = ? AND status = 'running'
+    `);
+    const row = sessionQuery.get(sessionId);
+    if (!row) {
+        return;
+    }
+    const betAmount = row.bet_amount as number;
+
+    switch (winner) {
+        case 'p1':
+        case 'p2': {
+            const userId = winner === 'p1' ? row.p1 : row.p2;
+            const parentId = insertTransaction(
+                state,
+                'gambling_winnings',
+                userId as number,
+                betAmount * 2,
+            );
+
+            state
+                .prepare(
+                    "UPDATE gambling_sessions SET status = 'ended', winner = ?, winner_tx = ? WHERE id = ?"
+                )
+                .run(winner, parentId, sessionId);
+            break;
         }
-        const betAmount = row.bet_amount as number;
+        case 'draw': {
+            const row = state
+                .prepare(
+                    "SELECT p1_deposit_tx, p2_deposit_tx FROM gambling_sessions WHERE id = ? AND status = 'running'",
+                )
+                .get(sessionId);
+            if (!row) return;
 
-        switch (winner) {
-            case 'p1':
-            case 'p2': {
-                const userId = winner === 'p1' ? row.p1 : row.p2;
-                const parentId = insertTransaction(
-                    state,
-                    'gambling_winnings',
-                    userId as number,
-                    betAmount * 2,
-                );
+            state
+                .prepare(
+                "UPDATE gambling_sessions SET status = ?, winner = 'draw', p1_deposit_tx = NULL, p2_deposit_tx = NULL WHERE id = ?"
+                )
+                .run('ended', sessionId);
 
-                state
-                    .prepare(
-                        `
-                UPDATE gambling_sessions SET status = 'ended', winner = ?, winner_tx = ? WHERE id = ?
-                `,
-                    )
-                    .run(winner, parentId, sessionId);
-                break;
-            }
-            case 'draw': {
-                const row = state
-                    .prepare(
-                        `
-                SELECT p1_deposit_tx, p2_deposit_tx FROM gambling_sessions
-                WHERE id = ? AND status = 'running'
-                `,
-                    )
-                    .get(sessionId);
-                if (!row) return;
-
-                state
-                    .prepare(
-                        `
-                UPDATE gambling_sessions SET status = ?, winner = 'draw', p1_deposit_tx = NULL, p2_deposit_tx = NULL
-                WHERE id = ?
-                `,
-                    )
-                    .run('ended', sessionId);
-
-                state
-                    .prepare(
-                        `
-                DELETE FROM parent_transactions WHERE id = ? OR id = ?;
-                `,
-                    )
-                    .run(row.p1_deposit_tx, row.p2_deposit_tx);
-                break;
-            }
+            state
+                .prepare(
+                    'DELETE FROM parent_transactions WHERE id = ? OR id = ?;'
+                )
+                .run(row.p1_deposit_tx, row.p2_deposit_tx);
+            break;
         }
-    });
+    }
 }
 
 export type ExpiringGamblingSession = {
@@ -437,12 +521,12 @@ function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOp
 
 export type DeductCoinsResult =
     | {
-          type: 'success';
-          parentId: number;
-      }
+        type: 'success';
+        parentId: number;
+    }
     | {
-          type: 'too_broke';
-      };
+        type: 'too_broke';
+    };
 
 // this is expected to run in a transaction
 function deductCoinsForGambling(
@@ -534,44 +618,76 @@ export function initConnect4(state: MwaState, opts: CommonGameOpts): number | nu
 export function connect4TakeTurn(
     state: MwaState,
     sessionId: number,
-    player: Gambler,
-    newBoard: Connect4Board,
+    userId: number,
+    column: number,
 ): boolean {
-    return runTransaction(state.db, () => {
-        const row = state
-            .prepare(
-                `
-        SELECT player from connect_4_turns
-        WHERE session = ?
-        ORDER BY id DESC LIMIT 1
-        `,
-            )
-            .get(sessionId);
-        if (!row) return false;
-        const nextPlayer: Gambler = row.player === 'p1' ? 'p2' : 'p1';
-        if (player !== nextPlayer) return false;
+    const game = findGamblingSessionById(state, sessionId);
+    if (game?.gameType !== 'connect_4' || game.status.type !== 'running') return false;
 
+    const nextTurnUid = game.nextTurn === 'p1' ? game.p1 : game.p2;
+    if (userId !== nextTurnUid || settleBoardGameTimeout(state, sessionId)) return false;
+
+    const board = Connect4Board.fromString(game.boardStr);
+    if (!board.place(column, game.nextTurn === 'p1' ? 'x' : 'o')) return false;
+
+    runTransaction(state.db, () => {
         state
-            .prepare(
-                `
-        INSERT INTO connect_4_turns (session, player, new_board) VALUES (?, ?, ?)
-        `,
-            )
-            .run(sessionId, player, newBoard.asString());
-        return true;
+            .prepare('INSERT INTO connect_4_turns (session, player, new_board) VALUES (?, ?, ?)')
+            .run(sessionId, game.nextTurn, board.asString());
+
+        const win = board.winner();
+        if (win) {
+            settleGamblingSession(state, sessionId, win.player === 'x' ? 'p1' : 'p2');
+        } else if (board.isFull()) {
+            settleGamblingSession(state, sessionId, 'draw');
+        }
+    });
+
+    return true;
+}
+
+// --- CHESS GAME ---
+export const chessPlayerTurnTime = 5 * 60 * 1000;
+
+export function initChess(state: MwaState, opts: CommonGameOpts): number | null {
+    return runTransaction(state.db, () => {
+        return initGamblingSession(state, 'chess', opts);
     });
 }
 
-export type PendingConnect4Match = {
-    sessionId: number;
-};
+export function chessTakeTurn(
+    state: MwaState,
+    sessionId: number,
+    userId: number,
+    move: { from: string; to: string; promotion?: string },
+    clientMovesCount: number,
+): boolean {
+    const game = findGamblingSessionById(state, sessionId);
+    if (game?.gameType !== 'chess' || game.status.type !== 'running') return false;
+    if (clientMovesCount !== game.moves.length) return false;
 
-export function queryPendingConnect4Matches(state: MwaState): PendingConnect4Match[] {
-    const select = state.prepare(`
-    SELECT id FROM gambling_sessions
-    WHERE game_type = 'connect_4' AND status = 'running'
-    `);
-    return select.all().map((row) => ({
-        sessionId: row.id as number,
-    }));
+    const nextTurnUid = game.nextTurn === 'p1' ? game.p1 : game.p2;
+    if (userId !== nextTurnUid || settleBoardGameTimeout(state, sessionId)) return false;
+
+    const chess = restoreChess(game.moves);
+    let result: Move;
+    try {
+        result = chess.move(move);
+    } catch {
+        return false;
+    }
+
+    runTransaction(state.db, () => {
+        state
+            .prepare('INSERT INTO chess_turns (session, player, move) VALUES (?, ?, ?)')
+            .run(sessionId, game.nextTurn, result.san);
+
+        if (chess.isCheckmate()) {
+            settleGamblingSession(state, sessionId, game.nextTurn);
+        } else if (chess.isDraw()) {
+            settleGamblingSession(state, sessionId, 'draw');
+        }
+    });
+
+    return true;
 }
