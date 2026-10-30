@@ -12,7 +12,7 @@ import {
     findPendingGamblingSession,
     initCoinFlip,
     initConnect4,
-    queryPendingConnect4Matches,
+    queryGamblingSessions,
     queryGamblingInvitations,
     winCoinFlip,
     winGamblingSession,
@@ -77,7 +77,11 @@ describe('db/gambling', () => {
         assert.equal(pending.boardStr, new Connect4Board().asString());
         assert.equal(balance(p1.id), 70);
         assert.equal(balance(p2.id), 100);
-        assert.ok(!queryPendingConnect4Matches(state).some((match) => match.sessionId === id));
+        assert.ok(
+            !queryGamblingSessions(state).some(
+                (match) => match.id === id && match.type === 'connect_4',
+            ),
+        );
 
         assert.equal(acceptGamblingSession(state, id, p2.id), 'success');
         const game = findGamblingSessionById(state, id);
@@ -85,7 +89,11 @@ describe('db/gambling', () => {
         assert.equal(game.status.type, 'running');
         assert.equal(game.boardStr, pending.boardStr);
         assert.equal(balance(p2.id), 70);
-        assert.ok(queryPendingConnect4Matches(state).some((match) => match.sessionId === id));
+        assert.ok(
+            queryGamblingSessions(state).some(
+                (match) => match.id === id && match.type === 'connect_4',
+            ),
+        );
         const active = game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime;
         const waiting = game.nextTurn === 'p1' ? game.p2TurnTime : game.p1TurnTime;
         assert.equal(active.baseTimeLeftMs, c4PlayerTurnTime);
@@ -108,16 +116,16 @@ describe('db/gambling', () => {
         const board = Connect4Board.fromString(game.boardStr);
         board.place(0, first === 'p1' ? 'x' : 'o');
 
-        assert.equal(connect4TakeTurn(state, id, second, board), false);
+        assert.equal(connect4TakeTurn(state, id, second === 'p1' ? p1.id : p2.id, 0), false);
         assert.deepEqual(findGamblingSessionById(state, id), game);
-        assert.equal(connect4TakeTurn(state, id, first, board), true);
+        assert.equal(connect4TakeTurn(state, id, first === 'p1' ? p1.id : p2.id, 0), true);
         const updated = findGamblingSessionById(state, id);
         assert.equal(updated?.gameType, 'connect_4');
         assert.equal(updated.boardStr, board.asString());
         assert.equal(updated.nextTurn, second);
 
         board.place(1, first === 'p1' ? 'x' : 'o');
-        assert.equal(connect4TakeTurn(state, id, first, board), false);
+        assert.equal(connect4TakeTurn(state, id, first === 'p1' ? p1.id : p2.id, 0), false);
         assert.deepEqual(findGamblingSessionById(state, id), updated);
     });
 
@@ -134,7 +142,11 @@ describe('db/gambling', () => {
         assert.equal(game?.gameType, 'connect_4');
         assert.deepEqual(game.status, { type: 'ended', winner: 'draw' });
         assert.equal(game.boardStr, new Connect4Board().asString());
-        assert.ok(!queryPendingConnect4Matches(state).some((match) => match.sessionId === id));
+        assert.ok(
+            !queryGamblingSessions(state).some(
+                (match) => match.id === id && match.type === 'connect_4',
+            ),
+        );
 
         winGamblingSession(state, id, 'draw');
         winGamblingSession(state, id, 'p1');

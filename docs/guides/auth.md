@@ -88,8 +88,9 @@ sqlite3 db.sqlite "UPDATE users SET role = 'host' WHERE username = 'alice';"
 crediting a `system` transaction through `giveCoins`. In dev, any logged-in
 user can visit `/admin` directly; the navigation link remains admin-only.
 
-Connect 4's `POST /app/gambling/sessions/:id/c4-place` requires a signed-in
-participant and only accepts moves on that player's turn in a running game.
+Connect 4's `POST /app/gambling/sessions/:id/c4-place` and chess's
+`POST /app/gambling/sessions/:id/chess-move` require a signed-in participant and
+only accept moves on that player's turn in a running game.
 
 ## How to verify (dev)
 
