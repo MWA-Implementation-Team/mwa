@@ -124,7 +124,7 @@ stacking invites. Session pages live at `/app/gambling/sessions/:id`, with POST
 user can view a session.
 
 `src/db/gambling/index.ts` owns the shared lifecycle for coin flip and Connect 4,
-persisted by `06_gambling.sql` and `08_connect_4.sql`:
+persisted by `06_gambling.sql` and `09_connect_4.sql`:
 
 - Creating a `pending` session deducts the challenger's positive integer stake.
 - Acceptance checks funds, deducts the opponent's equal stake, and marks it `running`.
