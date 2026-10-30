@@ -28,6 +28,7 @@ import { serialize } from '#src/client/serialize.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
 import { findUserByInteractToken } from '#src/db/interactions/index.js';
+import { updateUsername } from '#src/db/users/index.js';
 import { deleteSession } from '#src/db/sessions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { MwaHono } from '#src/state.js';
@@ -67,6 +68,11 @@ export function registerAppRoutes(app: MwaHono) {
             groupError = undefined;
         }
 
+        let youError: keyof Language | undefined = ctx.req.query('youError') as keyof Language;
+        if (youError !== 'youUsernameTaken' && youError !== 'youUsernameInvalid') {
+            youError = undefined;
+        }
+
         // owner first, then join order — the member table reads top-down
         const groupMembers = group ? listGroupMemberInfos(ctx.var, group.id) : [];
         if (group) {
@@ -83,6 +89,7 @@ export function registerAppRoutes(app: MwaHono) {
             groupOwnerId: group?.ownerId ?? null,
             groupMembers,
             groupError,
+            youError,
             queueError,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
             standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
@@ -130,6 +137,21 @@ export function registerAppRoutes(app: MwaHono) {
             removeGroupMember(ctx.var, group.id, memberId) !== 'removed'
         ) {
             return ctx.redirect('/app?groupError=groupKickFailed', 303);
+        }
+        return ctx.redirect('/app', 303);
+    });
+
+    // Username edits come from the you tab's modal on /app; a bad name bounces
+    // back with an error the reopened dialog shows.
+    app.post('/app/you/username', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const form = await ctx.req.formData().catch(() => null);
+        const result = updateUsername(ctx.var, user.id, String(form?.get('username') ?? ''));
+        if (result !== 'updated') {
+            const error = result === 'taken' ? 'youUsernameTaken' : 'youUsernameInvalid';
+            return ctx.redirect(`/app?youError=${error}`, 303);
         }
         return ctx.redirect('/app', 303);
     });
@@ -184,13 +206,6 @@ export function registerAppRoutes(app: MwaHono) {
         if (!isActivitySlug(slug)) return writeErrorPage(ctx, 404);
 
         return writePage(ctx, 'activity', { slug });
-    });
-
-    app.get('/app/account', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        return writePage(ctx, 'account', {});
     });
 
     app.get('/app/leaderboard', async (ctx) => {

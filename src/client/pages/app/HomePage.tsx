@@ -4,6 +4,7 @@ import { ClientContext } from '#src/client/context.js';
 import { Transaction, TransactionKind } from '#src/client/api/transactions.js';
 import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
 import PageShell from './PageShell.js';
+import Dialog from '#src/client/ui/Dialog.js';
 import { Language } from '#src/client/language.js';
 import type { LeaderboardBoard, ViewerStanding } from '#src/db/leaderboard/index.js';
 import { displayActor, displayUsername } from '#src/client/display.js';
@@ -16,6 +17,7 @@ type HomePageProps = {
     groupOwnerId: number | null;
     groupMembers: { userId: number; username: string }[];
     groupError?: keyof Language;
+    youError?: keyof Language;
     queuePosition: number | null;
     queueError?: keyof Language;
     standings: ViewerStanding[];
@@ -55,12 +57,14 @@ function HomePage({
     groupOwnerId,
     groupMembers,
     groupError,
+    youError,
     queuePosition,
     queueError,
     standings,
 }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
+    const [usernameDialogOpen, setUsernameDialogOpen] = useState(youError !== undefined);
 
     return (
         <PageShell section="home">
@@ -305,6 +309,43 @@ function HomePage({
 
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
+                    <h2>{t('dashYou')}</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    <div class="table mwa-tx">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>{t('youUsername')}</td>
+                                    <td>{displayUsername(user!.username)}</td>
+                                    <td class="mwa-tx-amount">
+                                        <button
+                                            type="button"
+                                            class="lang-link"
+                                            onClick={() => setUsernameDialogOpen(true)}
+                                        >
+                                            {t('youEdit')}
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{t('youEmail')}</td>
+                                    <td colSpan={2}>{user!.email}</td>
+                                </tr>
+                                <tr>
+                                    <td>{t('youRole')}</td>
+                                    <td colSpan={2}>
+                                        {user!.role.charAt(0).toUpperCase() + user!.role.slice(1)}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('dashSupport')}</h2>
                 </div>
                 <div class="mwa-panel-body">
@@ -323,6 +364,39 @@ function HomePage({
                     {guideOpen && <p class="mwa-muted">{t('dashGuideBody')}</p>}
                 </div>
             </section>
+
+            <Dialog isOpen={usernameDialogOpen} onClose={() => setUsernameDialogOpen(false)}>
+                <form method="POST" action="/app/you/username" class="mwa-form">
+                    <div class="mwa-field">
+                        <label for="mwa-you-username">{t('youUsername')}</label>
+                        <input
+                            id="mwa-you-username"
+                            name="username"
+                            type="text"
+                            defaultValue={user!.username}
+                            maxLength={16}
+                            required
+                        />
+                    </div>
+                    {youError && (
+                        <p class="mwa-note mwa-note--error" role="alert">
+                            {t(youError)}
+                        </p>
+                    )}
+                    <footer>
+                        <button
+                            type="button"
+                            class="mwa-button"
+                            onClick={() => setUsernameDialogOpen(false)}
+                        >
+                            {t('dialogClose')}
+                        </button>
+                        <button type="submit" class="mwa-button">
+                            {t('youSave')}
+                        </button>
+                    </footer>
+                </form>
+            </Dialog>
         </PageShell>
     );
 }

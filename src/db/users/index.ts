@@ -86,6 +86,22 @@ export function createUser(state: MwaState, email: string, username: string): Us
     return findUserById(state, id)!;
 }
 
+// Self-serve rename from /app's you tab — same charset as deriveUsername, so a
+// rename can't produce a name signup never would.
+export function updateUsername(
+    state: MwaState,
+    userId: number,
+    raw: string,
+): 'updated' | 'taken' | 'invalid' {
+    const username = raw.trim().toLowerCase();
+    if (!/^[a-z0-9_-]{1,16}$/.test(username)) return 'invalid';
+    const clash = findUserByUsername(state, username);
+    if (clash && clash.id !== userId) return 'taken';
+
+    state.prepare(`UPDATE users SET username = ? WHERE id = ?`).run(username, userId);
+    return 'updated';
+}
+
 // Called by the sessions module when a login link is consumed.
 export function markEmailVerified(state: MwaState, userId: number) {
     const markEmailVerifiedQuery = state.prepare(
@@ -97,7 +113,7 @@ export function markEmailVerified(state: MwaState, userId: number) {
 }
 
 // New accounts are created from an email link, so nobody picks a username at
-// signup — derive one from the email's local part. Users fix it on /app/account.
+// signup — derive one from the email's local part. Users fix it on /app's you tab.
 export function deriveUsername(state: MwaState, email: string): string {
     const local = email.split('@')[0].toLowerCase();
     const base = local.replace(/[^a-z0-9_-]/g, '_').replace(/^_+|_+$/g, '') || 'user';

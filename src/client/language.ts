@@ -10,7 +10,6 @@ export type Language = {
     titleHome: string;
     titleActivities: string;
     titleActivity: string;
-    titleAccount: string;
     titleLeaderboard: string;
     titleGroup: string;
     titleGambling: string;
@@ -29,7 +28,6 @@ export type Language = {
     headerActivities: string;
     headerLeaderboard: string;
     headerGambling: string;
-    headerAccount: string;
     headerHost: string;
     headerAdmin: string;
 
@@ -143,13 +141,14 @@ export type Language = {
     leaderboardGroupTag: string;
     leaderboardYou: string;
 
-    accountProfile: string;
-    accountUsername: string;
-    accountEdit: string;
-    accountEmail: string;
-    accountRole: string;
-    accountJoined: string;
-    accountLifetimeEarned: string;
+    dashYou: string;
+    youUsername: string;
+    youEdit: string;
+    youEmail: string;
+    youRole: string;
+    youSave: string;
+    youUsernameTaken: string;
+    youUsernameInvalid: string;
     adminPanelHead: string;
     adminPanelTodo: string;
 
@@ -245,7 +244,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleHome: 'first years | App',
         titleActivities: 'first years | Activities',
         titleActivity: 'first years | {name}',
-        titleAccount: 'first years | Account',
         titleLeaderboard: 'first years | Leaderboard',
         titleGroup: 'first years | Group',
         titleGambling: 'first years | Gambling',
@@ -264,7 +262,6 @@ export const languages: Record<LanguageCode, Language> = {
         headerActivities: 'Activities',
         headerLeaderboard: 'Leaderboard',
         headerGambling: 'Gambling',
-        headerAccount: 'Account',
         headerHost: 'Host tools',
         headerAdmin: 'Admin',
 
@@ -378,13 +375,14 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardGroupTag: '*group',
         leaderboardYou: 'You',
 
-        accountProfile: 'Profile',
-        accountUsername: 'Username',
-        accountEdit: 'Edit',
-        accountEmail: 'Email',
-        accountRole: 'Role',
-        accountJoined: 'Joined',
-        accountLifetimeEarned: 'Lifetime earned',
+        dashYou: 'You',
+        youUsername: 'Username',
+        youEdit: 'Edit',
+        youEmail: 'Email',
+        youRole: 'Role',
+        youSave: 'Save',
+        youUsernameTaken: 'That username is taken',
+        youUsernameInvalid: 'Usernames are 1–16 lowercase letters, numbers, _ or -',
         adminPanelHead: 'administration',
         adminPanelTodo: 'TODO: admin panel.',
 
@@ -481,7 +479,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleHome: 'pirmakursiu | Programa',
         titleActivities: 'pirmakursiu | Veiklos',
         titleActivity: 'pirmakursiu | {name}',
-        titleAccount: 'pirmakursiu | Paskyra',
         titleLeaderboard: 'pirmakursiu | Lyderių lentelė',
         titleGroup: 'pirmakursiu | Grupė',
         titleGambling: 'pirmakursiu | Lošimai',
@@ -500,7 +497,6 @@ export const languages: Record<LanguageCode, Language> = {
         headerActivities: 'Veiklos',
         headerLeaderboard: 'Lyderių lentelė',
         headerGambling: 'Lošimai',
-        headerAccount: 'Paskyra',
         headerHost: 'Vedėjo įrankiai',
         headerAdmin: 'Administravimas',
 
@@ -615,13 +611,14 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardGroupTag: '*grupė',
         leaderboardYou: 'Jūs',
 
-        accountProfile: 'Profilis',
-        accountUsername: 'Vartotojo vardas',
-        accountEdit: 'Redaguoti',
-        accountEmail: 'El. paštas',
-        accountRole: 'Rolė',
-        accountJoined: 'Prisijungė',
-        accountLifetimeEarned: 'Viso uždirbta',
+        dashYou: 'Tu',
+        youUsername: 'Vartotojo vardas',
+        youEdit: 'Redaguoti',
+        youEmail: 'El. paštas',
+        youRole: 'Rolė',
+        youSave: 'Išsaugoti',
+        youUsernameTaken: 'Šis vartotojo vardas užimtas',
+        youUsernameInvalid: 'Varde gali būti 1–16 mažųjų raidžių, skaičių, _ arba -',
 
         adminPanelHead: 'administravimas',
         adminPanelTodo: 'TODO: administravimo skydelis.',

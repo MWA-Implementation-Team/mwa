@@ -10,7 +10,6 @@ export type Section =
     | 'activities'
     | 'group'
     | 'leaderboard'
-    | 'account'
     | 'host'
     | 'admin'
     | 'gambling'
@@ -49,7 +48,6 @@ export default function PageShell({
             href: '/app/leaderboard?type=team',
         },
         { section: 'gambling', label: t('headerGambling'), href: '/app/gambling' },
-        { section: 'account', label: t('headerAccount'), href: '/app/account' },
     ];
     if (user && (user.role === 'host' || user.role === 'admin')) {
         navigation.push({ section: 'host', label: t('headerHost'), href: '/app/host' });
