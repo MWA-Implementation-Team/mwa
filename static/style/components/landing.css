@@ -76,6 +76,13 @@
     font-size: var(--text-7);
 }
 
+/* Oat gives every li a margin-block-end; grid gap already spaces these. */
+.landing-menu > li,
+.landing-sponsors > li,
+.landing-socials > li {
+    margin-block-end: 0;
+}
+
 .landing-menu-logout {
     display: block;
     width: 100%;
