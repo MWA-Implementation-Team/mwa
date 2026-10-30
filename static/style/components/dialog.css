@@ -1,13 +1,22 @@
 /* Oat pads each dialog region with --space-6; app modals stay compact. */
-dialog > header,
 dialog > footer,
 dialog > form > footer,
 dialog > form > :is(p, div, section) {
     padding: var(--space-4);
 }
 
+/* Title strip matches the sidebar tab headers (.landing-section > h2). */
 dialog > header {
-    padding-block-end: 0;
+    padding: var(--space-1) var(--space-3);
+    border-bottom: 1px solid var(--border);
+    background: var(--section-head-bg);
+}
+
+dialog > header > h2 {
+    margin: 0;
+    color: var(--foreground);
+    font-size: var(--text-8);
+    letter-spacing: 0.06em;
 }
 
 dialog > footer,

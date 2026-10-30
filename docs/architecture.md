@@ -157,7 +157,7 @@ elapsed downtime counts toward the active clock. Chess remains future work.
 `src/pubsub.ts` provides in-process channels for SSE: `/api/notifications` sends
 the user's current notification, and `/app/gambling/sessions/:id/watch` sends session
 snapshots. Both send initial state on connection and updates after changes. The
-client uses `EventSource`; the notification banner in `PageShell` prioritizes a
+client uses `EventSource`; the notification modal in `PageShell` prioritizes a
 running game over the oldest invitation. Multiple games per player are allowed, but only one notification is
 shown. Timers and pubsub assume a single server process.
 

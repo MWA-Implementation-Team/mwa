@@ -1,6 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { ClientContext, Notification } from '#src/client/context.js';
+import Dialog from '#src/client/ui/Dialog.js';
 import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 import QrPane from '#src/client/ui/QrPane.js';
 import { displayActor } from '#src/client/display.js';
@@ -21,7 +22,7 @@ export type Section =
 type PageShellProps = {
     section: Section;
     nav?: boolean;
-    // hides the live notification banner — gambling session pages suppress it
+    // hides the live notification modal — gambling session pages suppress it
     // so an invite doesn't render inside its own session view
     hideNotification?: boolean;
     // replaces the default sidebar (logo + nav + qr + language panes)
@@ -38,6 +39,8 @@ export default function PageShell({
     children,
 }: PageShellProps) {
     const { t, user, qr, notification } = useContext(ClientContext);
+
+    const showAlert = notification !== null && !hideNotification;
 
     const navigation = [
         { section: 'home', label: t('headerHome'), href: '/app' },
@@ -110,53 +113,60 @@ export default function PageShell({
                 <div class="landing-grid">
                     <div class="landing-col landing-col--side">{sidebar}</div>
                     <main id="mwa-main" class="landing-col landing-col--main">
-                        {notification && !hideNotification && (
-                            <NotificationBanner notification={notification} />
-                        )}
                         {children}
                     </main>
                 </div>
             </div>
+            {showAlert && (
+                <Dialog
+                    isOpen
+                    closable={false}
+                    title={t('shellAlert')}
+                    actions={<NotificationActions notification={notification} />}
+                >
+                    <div>
+                        <NotificationBody notification={notification} />
+                    </div>
+                </Dialog>
+            )}
         </div>
     );
 }
 
-// Live notification (gambling invite / running game) pinned to the top of the
-// main column — fed by /api/notifications through ClientContext.
-function NotificationBanner({ notification }: { notification: Notification }) {
+// Live notification (gambling invite / running game) fed by /api/notifications
+// through ClientContext — shown as a modal.
+function NotificationBody({ notification }: { notification: Notification }) {
     const { t, user } = useContext(ClientContext);
-    const sessionHref = `/app/gambling/sessions/${encodeURIComponent(notification.sessionId)}`;
 
     return (
-        <section class="mwa-panel">
-            <div class="mwa-panel-body">
-                {notification.type === 'gambling_invite' ? (
-                    <>
-                        <p class="mwa-intro">
-                            {t('gamblingNotificationInvite', {
-                                player: displayActor(notification.inviterName, user, t),
-                            })}
-                        </p>
-                        <div class="mwa-actions">
-                            <a class="button" href={sessionHref}>
-                                {t('gamblingOpen')}
-                            </a>
-                            <form method="POST" action={`${sessionHref}/reject`}>
-                                <button type="submit">{t('gamblingReject')}</button>
-                            </form>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <p class="mwa-intro">{t('gamblingInProgress')}</p>
-                        <div class="mwa-actions">
-                            <a class="button" href={sessionHref}>
-                                {t('gamblingReturn')}
-                            </a>
-                        </div>
-                    </>
-                )}
-            </div>
-        </section>
+        <p class="mwa-intro">
+            {notification.type === 'gambling_invite'
+                ? t('gamblingNotificationInvite', {
+                      player: displayActor(notification.inviterName, user, t),
+                  })
+                : t('gamblingInProgress')}
+        </p>
+    );
+}
+
+function NotificationActions({ notification }: { notification: Notification }) {
+    const { t } = useContext(ClientContext);
+    const sessionHref = `/app/gambling/sessions/${encodeURIComponent(notification.sessionId)}`;
+
+    return notification.type === 'gambling_invite' ? (
+        <>
+            <a class="mwa-button" href={sessionHref}>
+                {t('gamblingOpen')}
+            </a>
+            <form method="POST" action={`${sessionHref}/reject`}>
+                <button type="submit" class="mwa-button">
+                    {t('gamblingReject')}
+                </button>
+            </form>
+        </>
+    ) : (
+        <a class="mwa-button" href={sessionHref}>
+            {t('gamblingReturn')}
+        </a>
     );
 }

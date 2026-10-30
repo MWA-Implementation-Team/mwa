@@ -114,6 +114,7 @@ export type Language = {
     shellLogoAlt: string;
     shellNavLabel: string;
     navTitle: string;
+    shellAlert: string;
     dialogClose: string;
 
     activitiesDirectory: string;
@@ -348,6 +349,7 @@ export const languages: Record<LanguageCode, Language> = {
         shellLogoAlt: 'first years Event home',
         shellNavLabel: 'Main navigation',
         navTitle: 'Menu',
+        shellAlert: 'Alert',
         dialogClose: 'Close',
 
         activitiesDirectory: 'Activity directory',
@@ -584,6 +586,7 @@ export const languages: Record<LanguageCode, Language> = {
         shellLogoAlt: 'pirmakursiu renginio pradžia',
         shellNavLabel: 'Pagrindinė navigacija',
         navTitle: 'Meniu',
+        shellAlert: 'Pranešimas',
         dialogClose: 'Uždaryti',
 
         activitiesDirectory: 'Veiklų katalogas',
