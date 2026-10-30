@@ -374,7 +374,7 @@ function Connect4View({
                     </tbody>
                 </table>
 
-                <h2>{status}</h2>
+                {status}
             </form>
         </>
     );
