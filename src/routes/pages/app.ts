@@ -427,10 +427,6 @@ export function registerAppRoutes(app: MwaHono) {
                   }
                 : null;
 
-        // Whether the target already has a team — the join request creates
-        // one on accept when they don't, and the page says so.
-        const targetInGroup = findUserGroup(ctx.var, target.id) !== null;
-
         // Feedback for the team-up request POST bouncing back here.
         const interactError: keyof Language | undefined =
             ctx.req.query('interactError') === 'groupRequestFailed'
@@ -446,7 +442,6 @@ export function registerAppRoutes(app: MwaHono) {
             self,
             target: { username: target.username },
             detail,
-            targetInGroup,
             interactError,
             interactNotice,
         });

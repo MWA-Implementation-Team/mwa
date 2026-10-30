@@ -167,7 +167,7 @@ export type Language = {
     groupDeleteConfirm: string;
     groupDeleteFailed: string;
     groupRequestJoin: string;
-    groupRequestCreates: string;
+    groupInviteCreates: string;
     groupRequestSent: string;
     groupRequestFailed: string;
     groupInviteNotice: string;
@@ -404,7 +404,7 @@ export const languages: Record<LanguageCode, Language> = {
         groupDeleteConfirm: 'Delete group?',
         groupDeleteFailed: 'failed to delete group',
         groupRequestJoin: 'Join their team',
-        groupRequestCreates: 'They have no team — a new one is created when they accept.',
+        groupInviteCreates: 'Accepting creates a new team with you as the owner.',
         groupRequestSent: 'Join request sent.',
         groupRequestFailed: 'Could not send the join request.',
         groupInviteNotice: '{player} wants to join your team!',
@@ -644,7 +644,7 @@ export const languages: Record<LanguageCode, Language> = {
         groupDeleteConfirm: 'Ištrinti grupę?',
         groupDeleteFailed: 'nepavyko ištrinti grupės',
         groupRequestJoin: 'Prisijungti prie komandos',
-        groupRequestCreates: 'Jie neturi komandos — priėmus prašymą bus sukurta nauja.',
+        groupInviteCreates: 'Priėmus bus sukurta nauja komanda, kurios savininkas būsi tu.',
         groupRequestSent: 'Prašymas išsiųstas.',
         groupRequestFailed: 'Nepavyko išsiųsti prašymo.',
         groupInviteNotice: '{player} nori prisijungti prie tavo komandos!',

@@ -137,17 +137,28 @@ export default function PageShell({
 function NotificationBody({ notification }: { notification: Notification }) {
     const { t, user } = useContext(ClientContext);
 
+    if (notification.type === 'group_invite') {
+        return (
+            <>
+                <p class="mwa-intro">
+                    {t('groupInviteNotice', {
+                        player: displayActor(notification.inviterName, user, t),
+                    })}
+                </p>
+                {notification.createsTeam && (
+                    <p class="mwa-muted">{t('groupInviteCreates')}</p>
+                )}
+            </>
+        );
+    }
+
     return (
         <p class="mwa-intro">
             {notification.type === 'gambling_invite'
                 ? t('gamblingNotificationInvite', {
                       player: displayActor(notification.inviterName, user, t),
                   })
-                : notification.type === 'group_invite'
-                  ? t('groupInviteNotice', {
-                        player: displayActor(notification.inviterName, user, t),
-                    })
-                  : t('gamblingInProgress')}
+                : t('gamblingInProgress')}
         </p>
     );
 }

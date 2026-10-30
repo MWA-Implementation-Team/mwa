@@ -1,7 +1,7 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
 import { queryActiveGamblingSession, queryGamblingInvitations } from '../gambling/index.js';
-import { queryUserGroupInvite } from '../groups/index.js';
+import { findUserGroup, queryUserGroupInvite } from '../groups/index.js';
 
 export type UserRole = 'admin' | 'host' | 'user';
 
@@ -21,6 +21,8 @@ export type Notification =
           type: 'group_invite';
           inviterName: string;
           inviteId: number;
+          // target is groupless — accepting creates a new team they own
+          createsTeam: boolean;
       };
 
 export type User = {
@@ -173,6 +175,7 @@ export function queryUserNotification(state: MwaState, userId?: number): Notific
             type: 'group_invite',
             inviterName: groupInvite.fromUsername,
             inviteId: groupInvite.id,
+            createsTeam: findUserGroup(state, userId) === null,
         };
     }
 
