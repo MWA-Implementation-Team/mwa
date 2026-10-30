@@ -9,7 +9,6 @@ import { displayActor } from '#src/client/display.js';
 export type Section =
     | 'home'
     | 'activities'
-    | 'group'
     | 'leaderboard'
     | 'host'
     | 'admin'

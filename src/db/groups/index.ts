@@ -100,19 +100,6 @@ export function findUserGroup(state: MwaState, userId: number): Group | null {
     return mapGroup(row);
 }
 
-export function listUserGroups(state: MwaState, userId: number): Group[] {
-    const getUserGroupsQuery = state.prepare(`
-        SELECT groups.id, groups.name, groups.owner_id, groups.phone_number, groups.created_at
-        FROM groups
-        JOIN group_members ON groups.id = group_members.group_id
-        WHERE group_members.user_id = ?
-        ORDER BY groups.created_at DESC
-    `);
-
-    const rows = getUserGroupsQuery.all(userId);
-    return rows.map((row) => mapGroup(row));
-}
-
 export type AddGroupMemberResult = 'added' | 'group_full' | 'already_in_group';
 
 export function addGroupMember(

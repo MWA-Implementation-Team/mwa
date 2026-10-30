@@ -11,7 +11,6 @@ export type Language = {
     titleActivities: string;
     titleActivity: string;
     titleLeaderboard: string;
-    titleGroup: string;
     titleGambling: string;
     titleInteract: string;
     titleHost: string;
@@ -87,7 +86,6 @@ export type Language = {
     queueLeave: string;
     queueGroupSize: string;
     queueNeedGroup: string;
-    queueGoGroup: string;
     queueJoinFailed: string;
     queueLeaveFailed: string;
     dashStandings: string;
@@ -166,12 +164,8 @@ export type Language = {
     groupName: string;
     groupPhone: string;
     groupCreate: string;
-    groupYourGroups: string;
-    groupEmpty: string;
     groupDelete: string;
     groupDeleteConfirm: string;
-    groupCreated: string;
-    groupDeleted: string;
     groupCreateFailed: string;
     groupDeleteFailed: string;
 
@@ -246,7 +240,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleActivities: 'first years | Activities',
         titleActivity: 'first years | {name}',
         titleLeaderboard: 'first years | Leaderboard',
-        titleGroup: 'first years | Group',
         titleGambling: 'first years | Gambling',
         titleInteract: 'first years | Interact',
         titleHost: 'first years | Host',
@@ -322,7 +315,6 @@ export const languages: Record<LanguageCode, Language> = {
         queueLeave: 'Leave the queue',
         queueGroupSize: '{n} people in the group',
         queueNeedGroup: 'You need a group to join the queue.',
-        queueGoGroup: 'Go to your group',
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
         dashStandings: 'Your standings',
@@ -401,12 +393,8 @@ export const languages: Record<LanguageCode, Language> = {
         groupName: 'Group Name',
         groupPhone: 'Enter emergency phone Number',
         groupCreate: 'Create Group',
-        groupYourGroups: 'your Groups',
-        groupEmpty: 'no groups found',
         groupDelete: 'Delete group',
         groupDeleteConfirm: 'Delete group?',
-        groupCreated: 'Group created successfully!',
-        groupDeleted: 'Group deleted successfully!',
         groupCreateFailed: 'failed to create group',
         groupDeleteFailed: 'failed to delete group',
 
@@ -482,7 +470,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleActivities: 'pirmakursiu | Veiklos',
         titleActivity: 'pirmakursiu | {name}',
         titleLeaderboard: 'pirmakursiu | Lyderių lentelė',
-        titleGroup: 'pirmakursiu | Grupė',
         titleGambling: 'pirmakursiu | Lošimai',
         titleInteract: 'pirmakursiu | Sąveika',
         titleHost: 'pirmakursiu | Vedėjas',
@@ -559,7 +546,6 @@ export const languages: Record<LanguageCode, Language> = {
         queueLeave: 'Palikti eilę',
         queueGroupSize: '{n} nariai grupėje',
         queueNeedGroup: 'Norint stoti į eilę, reikia grupės.',
-        queueGoGroup: 'Eiti į grupę',
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
         dashStandings: 'Tavo pozicijos',
@@ -639,12 +625,8 @@ export const languages: Record<LanguageCode, Language> = {
         groupName: 'Grupės pavadinimas',
         groupPhone: 'Įveskite skubios pagalbos telefono numerį',
         groupCreate: 'Sukurti grupę',
-        groupYourGroups: 'tavo grupės',
-        groupEmpty: 'grupių nerasta',
         groupDelete: 'Ištrinti grupę',
         groupDeleteConfirm: 'Ištrinti grupę?',
-        groupCreated: 'Grupė sėkmingai sukurta!',
-        groupDeleted: 'Grupė sėkmingai ištrinta!',
         groupCreateFailed: 'nepavyko sukurti grupės',
         groupDeleteFailed: 'nepavyko ištrinti grupės',
 

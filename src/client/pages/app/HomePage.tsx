@@ -106,9 +106,7 @@ function HomePage({
                                 </button>
                             </form>
                         ) : (
-                            <p class="mwa-muted mwa-queue-cta">
-                                {t('queueNeedGroup')} <a href="/app/group">{t('queueGoGroup')}</a>
-                            </p>
+                            <p class="mwa-muted mwa-queue-cta">{t('queueNeedGroup')}</p>
                         )}
                     </div>
 
@@ -217,9 +215,25 @@ function HomePage({
                         </p>
                     )}
                     {groupMembers.length === 0 ? (
-                        <p class="mwa-muted">
-                            {t('groupNone')} <a href="/app/group">{t('queueGoGroup')}</a>
-                        </p>
+                        <form method="POST" action="/app/group/create" class="mwa-form">
+                            <p class="mwa-muted">{t('groupNone')}</p>
+                            <div class="mwa-field">
+                                <label for="mwa-group-name">{t('groupName')}</label>
+                                <input id="mwa-group-name" name="name" type="text" required />
+                            </div>
+                            <div class="mwa-field">
+                                <label for="mwa-group-phone">{t('groupPhone')}</label>
+                                <input
+                                    id="mwa-group-phone"
+                                    name="phone_number"
+                                    type="tel"
+                                    required
+                                />
+                            </div>
+                            <div class="mwa-actions">
+                                <button type="submit">{t('groupCreate')}</button>
+                            </div>
+                        </form>
                     ) : (
                         <div class="table mwa-tx">
                             <table>

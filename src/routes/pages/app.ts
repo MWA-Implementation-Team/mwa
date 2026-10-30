@@ -7,11 +7,13 @@ import {
     listViewerStandings,
 } from '#src/db/leaderboard/index.js';
 import {
+    createGroup,
     deleteGroup,
     findUserGroup,
     listGroupMemberInfos,
     listGroupMembers,
-    listUserGroups,
+    MAX_GROUP_NAME_LENGTH,
+    MAX_PHONE_NUMBER_LENGTH,
     removeGroupMember,
 } from '#src/db/groups/index.js';
 import {
@@ -24,7 +26,6 @@ import {
     listWaitingQueue,
     listStationGroups,
 } from '#src/db/queue/index.js';
-import { serialize } from '#src/client/serialize.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
 import { findUserByInteractToken } from '#src/db/interactions/index.js';
@@ -63,7 +64,8 @@ export function registerAppRoutes(app: MwaHono) {
         if (
             groupError !== 'groupKickFailed' &&
             groupError !== 'groupLeaveFailed' &&
-            groupError !== 'groupDeleteFailed'
+            groupError !== 'groupDeleteFailed' &&
+            groupError !== 'groupCreateFailed'
         ) {
             groupError = undefined;
         }
@@ -96,8 +98,37 @@ export function registerAppRoutes(app: MwaHono) {
         });
     });
 
+    // Group creation lives on the home panel's empty state — the caller
+    // becomes the owner (and first member).
+    app.post('/app/group/create', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const form = await ctx.req.formData().catch(() => null);
+        const name = String(form?.get('name') ?? '').trim();
+        const phoneNumber = String(form?.get('phone_number') ?? '').trim();
+
+        let ok = false;
+        if (
+            name !== '' &&
+            name.length <= MAX_GROUP_NAME_LENGTH &&
+            phoneNumber !== '' &&
+            phoneNumber.length <= MAX_PHONE_NUMBER_LENGTH &&
+            !findUserGroup(ctx.var, user.id)
+        ) {
+            try {
+                createGroup(ctx.var, name, user.id, phoneNumber);
+                ok = true;
+            } catch {
+                // groups.name is UNIQUE — a taken name lands on the same error
+            }
+        }
+
+        return ctx.redirect(ok ? '/app' : '/app?groupError=groupCreateFailed', 303);
+    });
+
     // Members can only remove themselves; the owner can't leave — deleting
-    // the group (on /app/group) is the only way out for them.
+    // the group is the only way out for them.
     app.post('/app/group/leave', (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
@@ -230,15 +261,6 @@ export function registerAppRoutes(app: MwaHono) {
             scope,
             groups: listGroupLeaderboard(ctx.var, board),
             viewerGroupId,
-        });
-    });
-
-    app.get('/app/group', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        return writePage(ctx, 'group', {
-            initialGroups: listUserGroups(ctx.var, user.id).map(serialize),
         });
     });
 
