@@ -117,12 +117,20 @@ export function ChessView({
 
                     <div class="mwa-actions">
                         <div>
-                            {t(game.whitePlayer === 'p1' ? 'gamblingChessWhite' : 'gamblingChessBlack')}
+                            {t(
+                                game.whitePlayer === 'p1'
+                                    ? 'gamblingChessWhite'
+                                    : 'gamblingChessBlack',
+                            )}
                             : {displayActor(game.p1Name, user, t)}
                             <TurnTimeLeftDisplay turn={game.p1TurnTime} />
                         </div>
                         <div>
-                            {t(game.whitePlayer === 'p2' ? 'gamblingChessWhite' : 'gamblingChessBlack')}
+                            {t(
+                                game.whitePlayer === 'p2'
+                                    ? 'gamblingChessWhite'
+                                    : 'gamblingChessBlack',
+                            )}
                             : {displayActor(game.p2Name, user, t)}
                             <TurnTimeLeftDisplay turn={game.p2TurnTime} />
                         </div>

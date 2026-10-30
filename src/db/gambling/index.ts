@@ -37,15 +37,15 @@ type RunningGameCommon = {
 export type CoinFlipGame = RunningGameCommon & {
     gameType: 'coin_flip';
     status:
-    | { type: 'pending' }
-    | { type: 'expired' }
-    | { type: 'rejected' }
-    | { type: 'running' }
-    | {
-        type: 'ended';
-        winner: Gambler;
-        flipResult: CoinSide;
-    };
+        | { type: 'pending' }
+        | { type: 'expired' }
+        | { type: 'rejected' }
+        | { type: 'running' }
+        | {
+              type: 'ended';
+              winner: Gambler;
+              flipResult: CoinSide;
+          };
     p1Guess: CoinSide;
 };
 
@@ -55,9 +55,9 @@ type BoardGameStatus =
     | { type: 'rejected' }
     | { type: 'running' }
     | {
-        type: 'ended';
-        winner: Gambler | 'draw';
-    };
+          type: 'ended';
+          winner: Gambler | 'draw';
+      };
 
 type BoardGame = RunningGameCommon & {
     status: BoardGameStatus;
@@ -277,7 +277,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
 
             const turnRows = state
                 .prepare(
-                    'SELECT created_at, player, move from chess_turns WHERE session = ? ORDER BY id ASC'
+                    'SELECT created_at, player, move from chess_turns WHERE session = ? ORDER BY id ASC',
                 )
                 .all(sessionId);
 
@@ -291,7 +291,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
             // First turn (move = null) is black and starts white's timer
             const whitePlayer: Gambler = turnRows[0]?.player === 'p1' ? 'p2' : 'p1';
 
-            const moves = turnRows.flatMap((turn) => turn.move ? [turn.move as string] : []);
+            const moves = turnRows.flatMap((turn) => (turn.move ? [turn.move as string] : []));
             const p1TurnTime = calcPlayerTurnTime(turns, 'p1', chessPlayerTurnTime);
             const p2TurnTime = calcPlayerTurnTime(turns, 'p2', chessPlayerTurnTime);
 
@@ -459,7 +459,7 @@ function settleGamblingSession(state: MwaState, sessionId: number, winner: Gambl
 
             state
                 .prepare(
-                    "UPDATE gambling_sessions SET status = 'ended', winner = ?, winner_tx = ? WHERE id = ?"
+                    "UPDATE gambling_sessions SET status = 'ended', winner = ?, winner_tx = ? WHERE id = ?",
                 )
                 .run(winner, parentId, sessionId);
             break;
@@ -474,14 +474,12 @@ function settleGamblingSession(state: MwaState, sessionId: number, winner: Gambl
 
             state
                 .prepare(
-                "UPDATE gambling_sessions SET status = ?, winner = 'draw', p1_deposit_tx = NULL, p2_deposit_tx = NULL WHERE id = ?"
+                    "UPDATE gambling_sessions SET status = ?, winner = 'draw', p1_deposit_tx = NULL, p2_deposit_tx = NULL WHERE id = ?",
                 )
                 .run('ended', sessionId);
 
             state
-                .prepare(
-                    'DELETE FROM parent_transactions WHERE id = ? OR id = ?;'
-                )
+                .prepare('DELETE FROM parent_transactions WHERE id = ? OR id = ?;')
                 .run(row.p1_deposit_tx, row.p2_deposit_tx);
             break;
         }
@@ -521,12 +519,12 @@ function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOp
 
 export type DeductCoinsResult =
     | {
-        type: 'success';
-        parentId: number;
-    }
+          type: 'success';
+          parentId: number;
+      }
     | {
-        type: 'too_broke';
-    };
+          type: 'too_broke';
+      };
 
 // this is expected to run in a transaction
 function deductCoinsForGambling(

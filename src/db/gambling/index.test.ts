@@ -373,4 +373,3 @@ describe('db/gambling', () => {
         assert.equal(queryUserNotification(state, p2.id), null);
     });
 });
-

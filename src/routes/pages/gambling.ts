@@ -284,10 +284,9 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 400);
         }
 
-        if (connect4TakeTurn(ctx.var, sessionId, user.id, x)) {
-            broadcastSessionUpdate(ctx.var, sessionId);
-            scheduleBoardGameTimeout(ctx.var, sessionId);
-        }
+        connect4TakeTurn(ctx.var, sessionId, user.id, x);
+        broadcastSessionUpdate(ctx.var, sessionId);
+        scheduleBoardGameTimeout(ctx.var, sessionId);
 
         return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
     });
@@ -323,10 +322,9 @@ export function registerGamblingRoutes(app: MwaHono) {
         const move = { from, to, promotion: promotion ?? undefined };
         const moveCount = Number(moveCountStr);
 
-        if (chessTakeTurn(ctx.var, sessionId, user.id, move, moveCount)) {
-            broadcastSessionUpdate(ctx.var, sessionId);
-            scheduleBoardGameTimeout(ctx.var, sessionId);
-        }
+        chessTakeTurn(ctx.var, sessionId, user.id, move, moveCount);
+        broadcastSessionUpdate(ctx.var, sessionId);
+        scheduleBoardGameTimeout(ctx.var, sessionId);
 
         return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
     });
