@@ -123,8 +123,8 @@ stacking invites. Session pages live at `/app/gambling/sessions/:id`, with POST
 `/accept` and `/reject` actions restricted to the invited player. Any signed-in
 user can view a session.
 
-`src/db/gambling/index.ts` owns the shared lifecycle for coin flip and Connect 4,
-persisted by `06_gambling.sql` and `09_connect_4.sql`:
+`src/db/gambling/index.ts` owns the shared lifecycle for coin flip, Connect 4, and
+chess, persisted by `06_gambling.sql`, `09_connect_4.sql`, and `10_chess.sql`:
 
 - Creating a `pending` session deducts the challenger's positive integer stake.
 - Acceptance checks funds, deducts the opponent's equal stake, and marks it `running`.
@@ -147,12 +147,23 @@ has **30 seconds total**, counting only their own turns (`c4PlayerTurnTime`,
 temporarily reduced for testing); running out awards the opponent the win.
 Game labels, invitations, and results use English/Lithuanian translations.
 
-These balance/status changes are transactional. Invitations expire after five
+Chess randomly assigns colours on acceptance and gives each player **five minutes
+without increment** (`chessPlayerTurnTime`). `chess_turns` stores timestamped SAN
+moves; an initial null move attributed to Black starts White's clock. The shared
+`src/client/gambling/chess.ts` replays moves with chess.js, preserving repetition
+history. Players POST `from`, `to`, optional `promotion`, and `move_count` to
+`/app/gambling/sessions/:id/chess-move`; the server checks turn, clock, move count,
+and legality. Checkmate or timeout pays the winner the pot; chess.js draw conditions
+refund both stakes. The UI offers legal destinations, promotion, and Black's view.
+
+Both board games save moves and any resulting settlement in one database transaction.
+Invitations expire after five
 minutes (`gamblingPendingExpiryMinutes`); accepted flips settle after five seconds.
 `scheduleGamblingTimers` in `src/routes/pages/gambling.ts` restores timers on startup
-from session/deposit timestamps and Connect 4 turn history, settling completed
-boards and scheduling the active player's timeout. Moves replace that timeout;
-elapsed downtime counts toward the active clock. Chess remains future work.
+from session/deposit timestamps and board-game turn history, scheduling the active
+player's timeout through the shared `scheduleBoardGameTimeout` and
+`settleBoardGameTimeout` functions. Moves replace that timeout; elapsed downtime
+counts toward the active clock.
 
 `src/pubsub.ts` provides in-process channels for SSE: `/api/notifications` sends
 the user's current notification, and `/app/gambling/sessions/:id/watch` sends session
