@@ -5,15 +5,20 @@ import { giveCoins } from '../transactions/index.js';
 import {
     acceptGamblingSession,
     cancelGamblingSession,
+    c4PlayerTurnTime,
     CoinSide,
+    connect4TakeTurn,
     findGamblingSessionById,
     findPendingGamblingSession,
     initCoinFlip,
+    initConnect4,
+    queryPendingConnect4Matches,
     queryGamblingInvitations,
     winCoinFlip,
     winGamblingSession,
 } from './index.js';
 import { createTestMwaState } from '#src/state.js';
+import { Connect4Board } from '#src/client/gambling/connect4.js';
 
 const state = createTestMwaState({});
 
@@ -43,6 +48,7 @@ describe('db/gambling', () => {
         assert.equal(balance(p2.id), 0);
 
         const game = findGamblingSessionById(state, sessionId);
+        assert.equal(game?.gameType, 'coin_flip');
         assert.equal(game?.status.type, 'pending');
         assert.equal(game?.betAmount, 30);
         assert.equal(game?.p1Guess, 'heads');
@@ -55,6 +61,86 @@ describe('db/gambling', () => {
 
         assert.equal(initCoinFlip(state, 'tails', { p1: p1.id, p2: p2.id, betAmount: 30 }), null);
         assert.equal(balance(p1.id), 10);
+    });
+
+    it('creates and accepts a Connect 4 game with an empty board and an active timer', () => {
+        const p1 = fundedUser('c4a1@example.com', 'c4a1', 100);
+        const p2 = fundedUser('c4a2@example.com', 'c4a2', 100);
+        const opts = { p1: p1.id, p2: p2.id, betAmount: 30 };
+        assert.equal(initConnect4(state, { ...opts, betAmount: 101 }), null);
+        assert.equal(balance(p1.id), 100);
+
+        const id = initConnect4(state, opts)!;
+        const pending = findGamblingSessionById(state, id);
+        assert.equal(pending?.gameType, 'connect_4');
+        assert.equal(pending.status.type, 'pending');
+        assert.equal(pending.boardStr, new Connect4Board().asString());
+        assert.equal(balance(p1.id), 70);
+        assert.equal(balance(p2.id), 100);
+        assert.ok(!queryPendingConnect4Matches(state).some((match) => match.sessionId === id));
+
+        assert.equal(acceptGamblingSession(state, id, p2.id), 'success');
+        const game = findGamblingSessionById(state, id);
+        assert.equal(game?.gameType, 'connect_4');
+        assert.equal(game.status.type, 'running');
+        assert.equal(game.boardStr, pending.boardStr);
+        assert.equal(balance(p2.id), 70);
+        assert.ok(queryPendingConnect4Matches(state).some((match) => match.sessionId === id));
+        const active = game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime;
+        const waiting = game.nextTurn === 'p1' ? game.p2TurnTime : game.p1TurnTime;
+        assert.equal(active.baseTimeLeftMs, c4PlayerTurnTime);
+        assert.equal(typeof active.turnStartedTimeMs, 'number');
+        assert.deepEqual(waiting, {
+            baseTimeLeftMs: c4PlayerTurnTime,
+            turnStartedTimeMs: undefined,
+        });
+    });
+
+    it('persists Connect 4 moves and rejects out-of-turn moves', () => {
+        const p1 = fundedUser('c4t1@example.com', 'c4t1', 100);
+        const p2 = fundedUser('c4t2@example.com', 'c4t2', 100);
+        const id = initConnect4(state, { p1: p1.id, p2: p2.id, betAmount: 10 })!;
+        acceptGamblingSession(state, id, p2.id);
+        const game = findGamblingSessionById(state, id);
+        assert.equal(game?.gameType, 'connect_4');
+        const first = game.nextTurn;
+        const second = first === 'p1' ? 'p2' : 'p1';
+        const board = Connect4Board.fromString(game.boardStr);
+        board.place(0, first === 'p1' ? 'x' : 'o');
+
+        assert.equal(connect4TakeTurn(state, id, second, board), false);
+        assert.deepEqual(findGamblingSessionById(state, id), game);
+        assert.equal(connect4TakeTurn(state, id, first, board), true);
+        const updated = findGamblingSessionById(state, id);
+        assert.equal(updated?.gameType, 'connect_4');
+        assert.equal(updated.boardStr, board.asString());
+        assert.equal(updated.nextTurn, second);
+
+        board.place(1, first === 'p1' ? 'x' : 'o');
+        assert.equal(connect4TakeTurn(state, id, first, board), false);
+        assert.deepEqual(findGamblingSessionById(state, id), updated);
+    });
+
+    it('refunds both Connect 4 stakes on a draw', () => {
+        const p1 = fundedUser('c4d1@example.com', 'c4d1', 100);
+        const p2 = fundedUser('c4d2@example.com', 'c4d2', 100);
+        const id = initConnect4(state, { p1: p1.id, p2: p2.id, betAmount: 30 })!;
+        acceptGamblingSession(state, id, p2.id);
+        assert.equal(balance(p1.id), 70);
+        assert.equal(balance(p2.id), 70);
+
+        winGamblingSession(state, id, 'draw');
+        const game = findGamblingSessionById(state, id);
+        assert.equal(game?.gameType, 'connect_4');
+        assert.deepEqual(game.status, { type: 'ended', winner: 'draw' });
+        assert.equal(game.boardStr, new Connect4Board().asString());
+        assert.ok(!queryPendingConnect4Matches(state).some((match) => match.sessionId === id));
+
+        winGamblingSession(state, id, 'draw');
+        winGamblingSession(state, id, 'p1');
+        assert.equal(balance(p1.id), 100);
+        assert.equal(balance(p2.id), 100);
+        assert.deepEqual(findGamblingSessionById(state, id), game);
     });
 
     it('findPendingGamblingSession finds only an open invite between the pair', () => {
@@ -231,6 +317,7 @@ describe('db/gambling', () => {
 
         const row = coinFlipRow(sessionId);
         const game = findGamblingSessionById(state, sessionId);
+        assert.equal(game?.gameType, 'coin_flip');
         assert.equal(game?.status.type, 'ended');
         if (game?.status.type !== 'ended') return;
 

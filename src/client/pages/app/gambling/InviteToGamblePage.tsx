@@ -44,6 +44,23 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                 </div>
             </section>
 
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
+                    <h2>{t('gamblingWith', { name: displayUsername(targetUsername) })}</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    <p class="mwa-intro">
+                        <strong>{t('gamblingConnect4')}</strong>
+                    </p>
+                    <p class="mwa-muted">{t('gamblingConnect4Description')}</p>
+                    <div class="mwa-actions">
+                        <button onClick={() => setOpenDialog('connect_4')}>
+                            {t('gamblingChallenge')}
+                        </button>
+                    </div>
+                </div>
+            </section>
+
             <Dialog isOpen={openDialog === 'coin_flip'} onClose={() => setOpenDialog(null)}>
                 <form method="POST" class="mwa-form">
                     <h2>{t('gamblingCoinFlip')}</h2>
@@ -64,6 +81,31 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             <option value="heads">{t('gamblingHeads')}</option>
                             <option value="tails">{t('gamblingTails')}</option>
                         </select>
+                    </div>
+                    <div class="mwa-actions">
+                        <button type="submit">{t('gamblingSendInvite')}</button>
+                    </div>
+                    {error?.message && (
+                        <p class="mwa-note mwa-note--error" role="alert">
+                            {t(error.message)}
+                        </p>
+                    )}
+                </form>
+            </Dialog>
+
+            <Dialog isOpen={openDialog === 'connect_4'} onClose={() => setOpenDialog(null)}>
+                <form method="POST" class="mwa-form">
+                    <h2>{t('gamblingConnect4')}</h2>
+                    <input type="hidden" name="game_type" value="connect_4" />
+                    <div class="mwa-field">
+                        <label for="mwa-c4-bet-amount">{t('gamblingBetAmount')}</label>
+                        <input
+                            id="mwa-c4-bet-amount"
+                            type="number"
+                            min="1"
+                            name="bet_amount"
+                            required
+                        />
                     </div>
                     <div class="mwa-actions">
                         <button type="submit">{t('gamblingSendInvite')}</button>

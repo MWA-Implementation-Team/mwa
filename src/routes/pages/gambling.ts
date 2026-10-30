@@ -15,6 +15,12 @@ import {
     winCoinFlip,
     ExpiringGamblingSession,
     queryExpiringGamblingSessions,
+    initConnect4,
+    connect4TakeTurn,
+    Gambler,
+    winGamblingSession,
+    queryPendingConnect4Matches,
+    Connect4Game,
 } from '#src/db/gambling/index.js';
 import { findUserByInteractToken } from '#src/db/interactions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
@@ -24,6 +30,8 @@ import { streamSSE } from 'hono/streaming';
 import { safeGoto } from './login.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { Language } from '#src/client/language.js';
+import { C4Player, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
+import { calcTurnTimeLeftMs, PlayerTurnTime } from '#src/client/gambling/turns.js';
 
 // error_type values pages render as an inline message
 const gambleErrorMessages = {
@@ -53,13 +61,13 @@ export function registerGamblingRoutes(app: MwaHono) {
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
 
-        const errorGame = ctx.req.query('error_game');
+        const errorGame = ctx.req.query('error_game') as GameType;
         const message =
             gambleErrorMessages[ctx.req.query('error_type') as keyof typeof gambleErrorMessages];
-        const error: InviteToGamblePageProps['error'] | undefined =
-            errorGame === 'coin_flip' && message !== undefined
-                ? { dialog: errorGame, message }
-                : undefined;
+        let error: InviteToGamblePageProps['error'] | undefined = undefined;
+        if (errorGame === 'coin_flip' || errorGame === 'connect_4') {
+            error = { dialog: errorGame, message };
+        }
 
         return writePage(ctx, 'inviteToGamble', {
             targetUsername: target.username,
@@ -79,14 +87,15 @@ export function registerGamblingRoutes(app: MwaHono) {
         if (!form) return writeErrorPage(ctx, 400);
 
         const gameType = form.get('game_type') as GameType;
+        if (gameType !== 'coin_flip' && gameType !== 'connect_4') {
+            return writeErrorPage(ctx, 400);
+        }
+
         const betAmount = Number(form.get('bet_amount'));
         if (!Number.isSafeInteger(betAmount) || betAmount <= 0) {
-            if (gameType === 'coin_flip') {
-                return ctx.redirect(
-                    `/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=invalid`,
-                );
-            }
-            return writeErrorPage(ctx, 400);
+            return ctx.redirect(
+                `/app/interact/${encodeURIComponent(token)}/gamble?error_game=${gameType}&error_type=invalid`,
+            );
         }
 
         const pendingId = findPendingGamblingSession(ctx.var, user.id, target.id);
@@ -108,13 +117,19 @@ export function registerGamblingRoutes(app: MwaHono) {
                 });
                 break;
             }
-            default:
-                return writeErrorPage(ctx, 400);
+            case 'connect_4': {
+                sessionId = initConnect4(ctx.var, {
+                    p1: user.id,
+                    p2: target.id,
+                    betAmount,
+                });
+                break;
+            }
         }
 
         if (sessionId === null) {
             return ctx.redirect(
-                `/app/interact/${encodeURIComponent(token)}/gamble?error_game=coin_flip&error_type=broke`,
+                `/app/interact/${encodeURIComponent(token)}/gamble?error_game=${gameType}&error_type=broke`,
             );
         }
 
@@ -190,10 +205,6 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const sessionId = Number(ctx.req.param('id'));
-        const game = findGamblingSessionById(ctx.var, sessionId);
-        if (!game) {
-            return writeErrorPage(ctx, 404);
-        }
 
         const result = acceptGamblingSession(ctx.var, sessionId, user.id);
         switch (result) {
@@ -202,15 +213,28 @@ export function registerGamblingRoutes(app: MwaHono) {
                     `/app/gambling/sessions/${encodeURIComponent(sessionId)}?error=broke`,
                 );
             case 'invalid_session':
-                return ctx.redirect('/app/gambling');
+                return writeErrorPage(ctx, 404);
         }
+
+        const game = findGamblingSessionById(ctx.var, sessionId)!;
 
         broadcastSessionUpdate(ctx.var, sessionId);
 
-        scheduleCoinFlipWinner(ctx.var, {
-            sessionId,
-            acceptedTime: new Date(),
-        });
+        switch (game.gameType) {
+            case 'coin_flip':
+                scheduleCoinFlipWinner(ctx.var, {
+                    sessionId,
+                    acceptedTime: new Date(),
+                });
+                break;
+            case 'connect_4':
+                scheduleConnect4Timeout(
+                    ctx.var,
+                    sessionId,
+                    game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime,
+                );
+                break;
+        }
 
         return ctx.redirect(`/app/gambling/sessions/${encodeURIComponent(sessionId)}`);
     });
@@ -224,13 +248,12 @@ export function registerGamblingRoutes(app: MwaHono) {
             return writeErrorPage(ctx, 400);
         }
 
-        // ?goto wins; else send them back to the page the form was used on
         let goto = ctx.req.query('goto');
         if (!goto) {
             try {
                 goto = new URL(ctx.req.header('Referer') ?? '').pathname;
             } catch {
-                // missing or malformed referer — fall back to /app below
+                // fallback below
             }
         }
 
@@ -239,6 +262,82 @@ export function registerGamblingRoutes(app: MwaHono) {
         broadcastSessionUpdate(ctx.var, sessionId);
         return ctx.redirect(safeGoto(ctx, goto) ?? '/app');
     });
+
+    app.post('/app/gambling/sessions/:id/c4-place', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) {
+            return writeErrorPage(ctx, 400);
+        }
+
+        const sessionId = Number(ctx.req.param('id'));
+        const game = findGamblingSessionById(ctx.var, sessionId);
+        if (!game) {
+            return writeErrorPage(ctx, 404);
+        }
+
+        if (game.gameType !== 'connect_4' || (user.id !== game.p1 && user.id !== game.p2)) {
+            return writeErrorPage(ctx, 400);
+        }
+
+        if (game.status.type !== 'running' || updateConnect4Times(ctx.var, sessionId, game)) {
+            return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
+        }
+
+        const x = Number(form.get('x'));
+        if (!Number.isSafeInteger(x) || x < 0 || x >= c4Width) {
+            return writeErrorPage(ctx, 400);
+        }
+
+        const gambler: Gambler = game.p1 === user.id ? 'p1' : 'p2';
+        const c4Player: C4Player = gambler === 'p1' ? 'x' : 'o';
+        const board = Connect4Board.fromString(game.boardStr);
+
+        if (!board.place(x, c4Player)) {
+            return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
+        }
+
+        if (connect4TakeTurn(ctx.var, sessionId, gambler, board)) {
+            updateConnect4Board(ctx.var, sessionId, board);
+            broadcastSessionUpdate(ctx.var, sessionId);
+
+            const newGame = findGamblingSessionById(ctx.var, sessionId) as Connect4Game;
+            scheduleConnect4Timeout(
+                ctx.var,
+                sessionId,
+                newGame.nextTurn === 'p1' ? newGame.p1TurnTime : newGame.p2TurnTime,
+            );
+        }
+
+        return ctx.redirect(`/app/gambling/sessions/${sessionId}`);
+    });
+}
+
+function updateConnect4Board(state: MwaState, sessionId: number, board: Connect4Board): boolean {
+    const win = board.winner();
+    if (win) {
+        winGamblingSession(state, sessionId, win.player === 'x' ? 'p1' : 'p2');
+        return true;
+    } else if (board.isFull()) {
+        winGamblingSession(state, sessionId, 'draw');
+        return true;
+    }
+    return false;
+}
+
+function updateConnect4Times(state: MwaState, sessionId: number, newGame: Connect4Game): boolean {
+    if (calcTurnTimeLeftMs(newGame.p1TurnTime) <= 0) {
+        winGamblingSession(state, sessionId, 'p2');
+        broadcastSessionUpdate(state, sessionId);
+        return true;
+    } else if (calcTurnTimeLeftMs(newGame.p2TurnTime) <= 0) {
+        winGamblingSession(state, sessionId, 'p1');
+        broadcastSessionUpdate(state, sessionId);
+        return true;
+    }
+    return false;
 }
 
 export function scheduleGamblingTimers(state: MwaState) {
@@ -247,24 +346,71 @@ export function scheduleGamblingTimers(state: MwaState) {
 
     const coinFlips = queryPendingCoinFlips(state);
     coinFlips.forEach((flip) => scheduleCoinFlipWinner(state, flip));
+
+    const pendingConnect4s = queryPendingConnect4Matches(state);
+    for (const pending of pendingConnect4s) {
+        const game = findGamblingSessionById(state, pending.sessionId) as Connect4Game;
+        if (!game) continue;
+        const board = Connect4Board.fromString(game.boardStr);
+        if (updateConnect4Board(state, pending.sessionId, board)) continue;
+        scheduleConnect4Timeout(
+            state,
+            pending.sessionId,
+            game.nextTurn === 'p1' ? game.p1TurnTime : game.p2TurnTime,
+        );
+    }
 }
 
-// Fires task at the given timestamp, or immediately if it already passed.
-function scheduleAfter(atMs: number, task: () => void) {
-    setTimeout(task, Math.max(0, atMs - Date.now()));
+const scheduledUpdates = new Map<string, ReturnType<typeof setTimeout>>();
+
+function scheduleAfter(key: string, atMs: number, task: () => void) {
+    if (scheduledUpdates.has(key)) {
+        clearTimeout(scheduledUpdates.get(key));
+    }
+    const id = setTimeout(
+        () => {
+            scheduledUpdates.delete(key);
+            task();
+        },
+        Math.max(0, atMs - Date.now()),
+    );
+    scheduledUpdates.set(key, id);
 }
 
 function scheduleExpiry(state: MwaState, expiring: ExpiringGamblingSession) {
-    scheduleAfter(expiring.creationTime.getTime() + gamblingPendingExpiryMinutes * 60000, () => {
-        cancelGamblingSession(state, expiring.id, 'expired');
-        broadcastSessionUpdate(state, expiring.id);
-    });
+    scheduleAfter(
+        `expire-${expiring.id}`,
+        expiring.creationTime.getTime() + gamblingPendingExpiryMinutes * 60000,
+        () => {
+            cancelGamblingSession(state, expiring.id, 'expired');
+            broadcastSessionUpdate(state, expiring.id);
+        },
+    );
 }
 
 function scheduleCoinFlipWinner(state: MwaState, pending: PendingCoinFlip) {
-    scheduleAfter(pending.acceptedTime.getTime() + 5000, () => {
+    scheduleAfter(`cf-${pending.sessionId}`, pending.acceptedTime.getTime() + 5000, () => {
         winCoinFlip(state, pending.sessionId);
         broadcastSessionUpdate(state, pending.sessionId);
+    });
+}
+
+function scheduleConnect4Timeout(state: MwaState, sessionId: number, turnTime: PlayerTurnTime) {
+    const timeLeftMs = calcTurnTimeLeftMs(turnTime);
+
+    scheduleAfter(`c4-${sessionId}`, Date.now() + timeLeftMs, () => {
+        const newGame = findGamblingSessionById(state, sessionId) as Connect4Game;
+        if (newGame.status.type !== 'running') return;
+        if (!updateConnect4Times(state, sessionId, newGame)) {
+            // this theoretically (?) shouldn't happen
+            // because setTimeout should only call after at least
+            // the specified duration. but just to be safe
+            scheduleConnect4Timeout(
+                state,
+                sessionId,
+                newGame.nextTurn === 'p1' ? newGame.p1TurnTime : newGame.p2TurnTime,
+            );
+        }
     });
 }
 

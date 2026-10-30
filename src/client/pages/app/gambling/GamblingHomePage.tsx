@@ -1,8 +1,9 @@
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
-import { Invitation, SessionSummary } from '#src/db/gambling/index.js';
+import { GameType, Invitation, SessionSummary } from '#src/db/gambling/index.js';
 import PageShell from '../PageShell.js';
+import { Language } from '#src/client/language.js';
 import { displayActor } from '#src/client/display.js';
 
 type GamblingPageProps = {
@@ -61,7 +62,7 @@ function GamblingPage({ sessions, invitations }: GamblingPageProps) {
                                             })}
                                         </strong>
                                     </a>
-                                    <small>{t('gamblingCoinFlip')}</small>
+                                    <small>{t(gameTrans(session.type))}</small>
                                 </li>
                             ))}
                         </ul>
@@ -70,4 +71,13 @@ function GamblingPage({ sessions, invitations }: GamblingPageProps) {
             </section>
         </PageShell>
     );
+}
+
+function gameTrans(type: GameType): keyof Language {
+    switch (type) {
+        case 'coin_flip':
+            return 'gamblingCoinFlip';
+        case 'connect_4':
+            return 'gamblingConnect4';
+    }
 }

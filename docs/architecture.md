@@ -86,6 +86,8 @@ In dev mode, `main.ts` also serves the whole repo root as static files (so sourc
 and sources resolve). In production it only serves `static/` and `dist/`, and refuses
 `.js.map` requests.
 
+Dev, production start, and tests enable Node source maps for TypeScript stack traces.
+
 ## Errors and 404s
 
 `app.notFound` and `app.onError` in `main.ts` both call `writeErrorPage(ctx, status)`,
@@ -121,7 +123,8 @@ stacking invites. Session pages live at `/app/gambling/sessions/:id`, with POST
 `/accept` and `/reject` actions restricted to the invited player. Any signed-in
 user can view a session.
 
-`src/db/gambling/index.ts` owns the lifecycle, persisted by `06_gambling.sql`:
+`src/db/gambling/index.ts` owns the shared lifecycle for coin flip and Connect 4,
+persisted by `06_gambling.sql` and `09_connect_4.sql`:
 
 - Creating a `pending` session deducts the challenger's positive integer stake.
 - Acceptance checks funds, deducts the opponent's equal stake, and marks it `running`.
@@ -130,12 +133,26 @@ user can view a session.
 - Coin flip chooses and stores a cryptographically random result at creation,
   hides it until settlement, then credits twice the stake to the winner and marks
   the session `ended`. Deductions and winnings have separate transaction kinds.
+- Connect 4 wins (including timeouts) pay the same pot. A full board without a win
+  ends in a draw and refunds both stakes by unlinking and deleting both deposits.
+
+Connect 4 randomly selects the starting player on acceptance. Players POST a
+zero-based column `x` to `/app/gambling/sessions/:id/c4-place`; the server checks
+participation, running status, time remaining, column capacity, and turn order.
+`src/client/gambling/connect4.ts` shares board parsing and win detection between
+server and UI. `connect_4_turns` stores timestamped board snapshots, starting with
+an empty board attributed to the second player. `src/client/gambling/turns.ts`
+derives each player's remaining clock from those timestamps. Each player currently
+has **30 seconds total**, counting only their own turns (`c4PlayerTurnTime`,
+temporarily reduced for testing); running out awards the opponent the win.
+Game labels, invitations, and results use English/Lithuanian translations.
 
 These balance/status changes are transactional. Invitations expire after five
 minutes (`gamblingPendingExpiryMinutes`); accepted flips settle after five seconds.
 `scheduleGamblingTimers` in `src/routes/pages/gambling.ts` restores timers on startup
-from session/deposit timestamps. Coin flip is the only implemented game; chess,
-Connect 4, and draw settlement are future work.
+from session/deposit timestamps and Connect 4 turn history, settling completed
+boards and scheduling the active player's timeout. Moves replace that timeout;
+elapsed downtime counts toward the active clock. Chess remains future work.
 
 `src/pubsub.ts` provides in-process channels for SSE: `/api/notifications` sends
 the user's current notification, and `/app/gambling/sessions/:id/watch` sends session
