@@ -202,9 +202,9 @@
         display: none;
     }
 
-    /* mwa: chunkier focus ring */
+    /* mwa: chunkier, dimmed focus ring (--focus-ring) */
     :focus-visible {
-        outline: 3px solid var(--ring);
+        outline: 3px solid var(--focus-ring);
         outline-offset: 3px;
     }
 
@@ -241,6 +241,9 @@
         --border: light-dark(#d4d4d8, rgb(0 0 0 / 0.306));
         --input: light-dark(#d4d4d8, rgb(0 0 0 / 0.306));
         --ring: light-dark(#574747, #c2dfff);
+        /* mwa: dimmed --ring for focus states only — the bright ring is too
+           loud as a focus outline */
+        --focus-ring: light-dark(#574747, #5d87ad);
         --primary-gradient: linear-gradient(
             90deg,
             #003d8dc5,
@@ -607,10 +610,11 @@
             color: var(--muted-foreground);
         }
 
+        /* mwa: dimmer focus colour (--focus-ring) */
         &:focus {
             outline: none;
-            border-color: var(--ring);
-            box-shadow: 0 0 0 2px rgb(from var(--ring) r g b / 0.2);
+            border-color: var(--focus-ring);
+            box-shadow: 0 0 0 2px rgb(from var(--focus-ring) r g b / 0.2);
             z-index: 1;
         }
 
@@ -1818,9 +1822,10 @@
         width: 100%;
         min-height: calc(1lh + var(--space-5));
 
+        /* mwa: dimmer focus colour (--focus-ring) */
         &:focus-within {
-            border-color: var(--ring);
-            box-shadow: 0 0 0 2px rgb(from var(--ring) r g b / 0.2);
+            border-color: var(--focus-ring);
+            box-shadow: 0 0 0 2px rgb(from var(--focus-ring) r g b / 0.2);
         }
 
         &[aria-disabled='true'] {
