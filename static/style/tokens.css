@@ -24,4 +24,6 @@
     --tx-negative: #ff7373;
     --connect4-p1: #ff0000;
     --connect4-p2: #00ff00;
+    --chess-square-light: #b8c3b7;
+    --chess-square-dark: #788b78;
 }

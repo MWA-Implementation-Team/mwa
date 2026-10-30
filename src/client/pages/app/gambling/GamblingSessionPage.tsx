@@ -1,3 +1,4 @@
+import { ChessView } from './ChessView.js';
 import { Trans } from '#src/client/ui/Trans.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { ClientContext } from '#src/client/context.js';
@@ -12,7 +13,7 @@ import {
 import { Language, TranslateFn } from '#src/client/language.js';
 import { c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
 import { ComponentChildren } from 'preact';
-import { calcTurnTimeLeftMs, PlayerTurnTime } from '#src/client/gambling/turns.js';
+import { TurnTimeLeftDisplay } from '#src/client/ui/TurnTimeLeftDisplay.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import PageShell from '#src/client/pages/app/PageShell.js';
 import { displayActor } from '#src/client/display.js';
@@ -42,6 +43,8 @@ function title(t: TranslateFn, game: RunningGame): string {
             switch (game.gameType) {
                 case 'coin_flip':
                     return t('titleGamblingCoinFlip');
+                case 'chess':
+                    return t('gamblingChess');
                 case 'connect_4':
                     return t('titleGamblingConnect4');
             }
@@ -179,15 +182,17 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                     {disconnected}
                     <section class="mwa-panel">
                         {currentGame.gameType === 'coin_flip' && (
-                            <CoinFlipping t={t} currentGame={currentGame} side={side} />
+                            <CoinFlipping currentGame={currentGame} side={side} />
                         )}
                         {currentGame.gameType === 'connect_4' && (
                             <Connect4View
                                 sessionId={sessionId}
-                                t={t}
                                 currentGame={currentGame}
                                 side={side}
                             />
+                        )}
+                        {currentGame.gameType === 'chess' && (
+                            <ChessView sessionId={sessionId} game={currentGame} side={side} />
                         )}
                     </section>
                 </PageShell>
@@ -241,19 +246,25 @@ function PendingProposal({ t, currentGame }: { t: TranslateFn; currentGame: Runn
                     </p>
                 </>
             );
+        case 'chess':
+            return (
+                <>
+                    <p class="mwa-intro">
+                        <Trans
+                            id="gamblingChessChallenged"
+                            values={{
+                                player: displayActor(currentGame.p1Name, user, t),
+                                amount: <strong>{currentGame.betAmount}</strong>,
+                            }}
+                        />
+                    </p>
+                </>
+            );
     }
 }
 
-function CoinFlipping({
-    t,
-    currentGame,
-    side,
-}: {
-    t: TranslateFn;
-    currentGame: CoinFlipGame;
-    side: Gambler | null;
-}) {
-    const { user } = useContext(ClientContext);
+function CoinFlipping({ currentGame, side }: { currentGame: CoinFlipGame; side: Gambler | null }) {
+    const { t, user } = useContext(ClientContext);
 
     return (
         <>
@@ -292,16 +303,14 @@ function CoinFlipping({
 
 function Connect4View({
     sessionId,
-    t,
     currentGame,
     side,
 }: {
     sessionId: number;
-    t: TranslateFn;
     currentGame: Connect4Game;
     side: Gambler | null;
 }) {
-    const { user } = useContext(ClientContext);
+    const { t, user } = useContext(ClientContext);
 
     const board = Connect4Board.fromString(currentGame.boardStr);
 
@@ -378,41 +387,6 @@ function Connect4View({
             </form>
         </>
     );
-}
-
-function TurnTimeLeftDisplay({ turn }: { turn: PlayerTurnTime }) {
-    const [, setTick] = useState(0);
-
-    function tick() {
-        setTick((t) => t + 1);
-    }
-
-    useEffect(() => {
-        if (turn.turnStartedTimeMs === undefined) return;
-
-        let intervalId: ReturnType<typeof setInterval> | undefined;
-        const msToNextSecond = 1000 - (Date.now() % 1000);
-        const timeoutId = setTimeout(() => {
-            tick();
-            intervalId = setInterval(tick, 1000);
-        }, msToNextSecond);
-
-        return () => {
-            clearTimeout(timeoutId);
-            if (intervalId !== undefined) clearInterval(intervalId);
-        };
-    }, [turn.turnStartedTimeMs]);
-
-    const timeLeftMs = calcTurnTimeLeftMs(turn);
-
-    return <p>{formatDuration(Math.floor(timeLeftMs / 1000))}</p>;
-}
-
-function formatDuration(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-
-    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 }
 
 function coinSideTrans(side: CoinSide) {

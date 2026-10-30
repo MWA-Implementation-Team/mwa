@@ -56,6 +56,7 @@ export function writeErrorPage(ctx: MwaContext, status: StatusCode): Response {
 }
 
 export function registerNodeModulesRoutes(app: MwaHono) {
+    app.get('/chess.module.js', serveStatic({ path: 'node_modules/chess.js/dist/esm/chess.js' }));
     app.get(
         '/preact.module.js',
         serveStatic({ path: 'node_modules/preact/dist/preact.module.js' }),
@@ -93,6 +94,7 @@ export function Root<P extends RegisteredPageId>({
         imports: {
             '#src/': '/',
             preact: '/preact.module.js',
+            'chess.js': '/chess.module.js',
             'preact/hooks': '/preact-hooks.module.js',
             'preact/jsx-runtime': '/preact-jsx-runtime.module.js',
         },
