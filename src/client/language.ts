@@ -491,7 +491,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingExpired: 'pirmakursiu | Kvietimas nebegalioja',
         titleGamblingRejected: 'pirmakursiu | Kvietimas atmestas',
         titleGamblingCoinFlip: 'pirmakursiu | Monetos metimas',
-        titleGamblingConnect4: 'first years | Keturi iš eilės',
+        titleGamblingConnect4: 'pirmakursiu | Keturi iš eilės',
         titleGamblingInvite: 'pirmakursiu | Lošk su {name}',
 
         headerHome: 'Programa',
