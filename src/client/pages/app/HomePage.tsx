@@ -12,6 +12,7 @@ import { displayActor, displayUsername } from '#src/client/display.js';
 type HomePageProps = {
     transactions: Transaction[];
     groupName: string | null;
+    groupPhone: string | null;
     groupEmoji: string;
     groupMemberCount: number | null;
     groupOwnerId: number | null;
@@ -52,6 +53,7 @@ const boardHintKey = {
 function HomePage({
     transactions,
     groupName,
+    groupPhone,
     groupEmoji,
     groupMemberCount,
     groupOwnerId,
@@ -65,6 +67,7 @@ function HomePage({
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
     const [usernameDialogOpen, setUsernameDialogOpen] = useState(youError !== undefined);
+    const [groupEditOpen, setGroupEditOpen] = useState(false);
 
     return (
         <PageShell section="home">
@@ -207,6 +210,15 @@ function HomePage({
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
                     <h2>{t('dashGroup')}</h2>
+                    {groupOwnerId === user!.id && groupMembers.length > 0 && (
+                        <button
+                            type="button"
+                            class="lang-link"
+                            onClick={() => setGroupEditOpen(true)}
+                        >
+                            {t('groupEdit')}
+                        </button>
+                    )}
                 </div>
                 <div class="mwa-panel-body">
                     {groupError && (
@@ -402,6 +414,46 @@ function HomePage({
                             type="button"
                             class="mwa-button"
                             onClick={() => setUsernameDialogOpen(false)}
+                        >
+                            {t('dialogClose')}
+                        </button>
+                        <button type="submit" class="mwa-button">
+                            {t('youSave')}
+                        </button>
+                    </footer>
+                </form>
+            </Dialog>
+
+            <Dialog
+                isOpen={groupEditOpen}
+                onClose={() => setGroupEditOpen(false)}
+                title={t('dashGroup')}
+            >
+                <form method="POST" action="/app/group/edit" class="mwa-form">
+                    <div class="mwa-field">
+                        <label for="mwa-group-edit-name">{t('groupName')}</label>
+                        <input
+                            id="mwa-group-edit-name"
+                            name="name"
+                            type="text"
+                            defaultValue={groupName ?? ''}
+                            required
+                        />
+                    </div>
+                    <div class="mwa-field">
+                        <label for="mwa-group-edit-phone">{t('groupPhone')}</label>
+                        <input
+                            id="mwa-group-edit-phone"
+                            name="phone_number"
+                            type="tel"
+                            defaultValue={groupPhone ?? ''}
+                        />
+                    </div>
+                    <footer>
+                        <button
+                            type="button"
+                            class="mwa-button"
+                            onClick={() => setGroupEditOpen(false)}
                         >
                             {t('dialogClose')}
                         </button>

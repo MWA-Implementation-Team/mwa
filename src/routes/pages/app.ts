@@ -7,14 +7,19 @@ import {
     listViewerStandings,
 } from '#src/db/leaderboard/index.js';
 import {
+    acceptGroupInvite,
     createGroup,
+    createGroupInvite,
     deleteGroup,
+    deleteGroupInvite,
+    findGroupInviteById,
     findUserGroup,
     listGroupMemberInfos,
     listGroupMembers,
     MAX_GROUP_NAME_LENGTH,
     MAX_PHONE_NUMBER_LENGTH,
     removeGroupMember,
+    updateGroup,
 } from '#src/db/groups/index.js';
 import {
     callNextGroups,
@@ -32,9 +37,11 @@ import { findUserByInteractToken } from '#src/db/interactions/index.js';
 import { updateUsername } from '#src/db/users/index.js';
 import { deleteSession } from '#src/db/sessions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
+import { notificationsChannel, publish } from '#src/pubsub.js';
 import { MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';
 import { Language } from '#src/client/language.js';
+import { safeGoto } from './login.js';
 
 // Emoji stand-ins until real per-group art ships. The pick is stable per
 // group — a mascot, not a slot machine — keyed off the group's id.
@@ -65,7 +72,10 @@ export function registerAppRoutes(app: MwaHono) {
             groupError !== 'groupKickFailed' &&
             groupError !== 'groupLeaveFailed' &&
             groupError !== 'groupDeleteFailed' &&
-            groupError !== 'groupCreateFailed'
+            groupError !== 'groupCreateFailed' &&
+            groupError !== 'groupEditFailed' &&
+            groupError !== 'groupNameTaken' &&
+            groupError !== 'groupAcceptFailed'
         ) {
             groupError = undefined;
         }
@@ -86,6 +96,7 @@ export function registerAppRoutes(app: MwaHono) {
         return writePage(ctx, 'home', {
             transactions: listUserTransactions(ctx.var, user.id),
             groupName: group?.name ?? null,
+            groupPhone: group?.phoneNumber ?? null,
             groupEmoji,
             groupMemberCount: group ? memberCount : null,
             groupOwnerId: group?.ownerId ?? null,
@@ -170,6 +181,94 @@ export function registerAppRoutes(app: MwaHono) {
             return ctx.redirect('/app?groupError=groupKickFailed', 303);
         }
         return ctx.redirect('/app', 303);
+    });
+
+    // The group's name/phone are edited from the home table's dialog —
+    // owner only.
+    app.post('/app/group/edit', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const form = await ctx.req.formData().catch(() => null);
+        const name = String(form?.get('name') ?? '').trim();
+        const phoneNumber = String(form?.get('phone_number') ?? '').trim();
+        const group = findUserGroup(ctx.var, user.id);
+
+        if (
+            !group ||
+            name === '' ||
+            name.length > MAX_GROUP_NAME_LENGTH ||
+            phoneNumber.length > MAX_PHONE_NUMBER_LENGTH
+        ) {
+            return ctx.redirect('/app?groupError=groupEditFailed', 303);
+        }
+
+        const result = updateGroup(ctx.var, group.id, user.id, name, phoneNumber);
+        if (result === 'taken') return ctx.redirect('/app?groupError=groupNameTaken', 303);
+        if (result !== 'updated') return ctx.redirect('/app?groupError=groupEditFailed', 303);
+        return ctx.redirect('/app', 303);
+    });
+
+    // Team-up request from the interact page — both sides must be groupless;
+    // the target sees it as a notification.
+    app.post('/app/interact/:token/group-request', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+
+        const back = `/app/interact/${encodeURIComponent(token)}`;
+        if (findUserGroup(ctx.var, user.id) || findUserGroup(ctx.var, target.id)) {
+            return ctx.redirect(`${back}?interactError=groupRequestFailed`, 303);
+        }
+
+        createGroupInvite(ctx.var, user.id, target.id);
+        publish(notificationsChannel(target.id), '');
+        return ctx.redirect(`${back}?interactNotice=groupRequestSent`, 303);
+    });
+
+    // Accepting a team-up invite forms the group immediately — the accepter
+    // owns it and can rename it from the home table.
+    app.post('/app/groups/invites/:id/accept', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const inviteId = Number(ctx.req.param('id'));
+        const invite = findGroupInviteById(ctx.var, inviteId);
+        const result = acceptGroupInvite(ctx.var, inviteId, user.id);
+
+        if (invite) {
+            publish(notificationsChannel(invite.fromUserId), '');
+            publish(notificationsChannel(invite.toUserId), '');
+        }
+        return ctx.redirect(
+            result === 'accepted' ? '/app' : '/app?groupError=groupAcceptFailed',
+            303,
+        );
+    });
+
+    app.post('/app/groups/invites/:id/reject', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const inviteId = Number(ctx.req.param('id'));
+        const invite = findGroupInviteById(ctx.var, inviteId);
+        if (!invite || !deleteGroupInvite(ctx.var, inviteId, user.id)) {
+            return writeErrorPage(ctx, 404);
+        }
+
+        publish(notificationsChannel(invite.fromUserId), '');
+        publish(notificationsChannel(invite.toUserId), '');
+
+        let goto: string | undefined;
+        try {
+            goto = new URL(ctx.req.header('Referer') ?? '').pathname;
+        } catch {
+            // fallback below
+        }
+        return ctx.redirect(safeGoto(ctx, goto) ?? '/app', 303);
     });
 
     // Username edits come from the you tab's modal on /app; a bad name bounces
@@ -358,11 +457,23 @@ export function registerAppRoutes(app: MwaHono) {
                   }
                 : null;
 
+        // Feedback for the team-up request POST bouncing back here.
+        const interactError: keyof Language | undefined =
+            ctx.req.query('interactError') === 'groupRequestFailed'
+                ? 'groupRequestFailed'
+                : undefined;
+        const interactNotice: keyof Language | undefined =
+            ctx.req.query('interactNotice') === 'groupRequestSent'
+                ? 'groupRequestSent'
+                : undefined;
+
         return writePage(ctx, 'interact', {
             token,
             self,
             target: { username: target.username },
             detail,
+            interactError,
+            interactNotice,
         });
     });
 }

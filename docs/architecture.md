@@ -116,6 +116,15 @@ it identifies the target but grants no permissions. Any signed-in scanner can
 challenge another user; hosts/admins also see their email, balance, and join date.
 Self-scans show no actions, and money transfers remain a placeholder.
 
+Teaming up works through invites (`10_group_invites.sql`): `POST
+/app/interact/:token/group-request` creates a pending `group_invites` row when
+both sides are groupless, and the target sees it as a `group_invite`
+notification. Accepting (`/app/groups/invites/:id/accept`) creates the group in
+one transaction — the accepter owns it, both users are members, the name is a
+random `team-…` placeholder and the phone empty until the owner edits them from
+the home table's dialog (`POST /app/group/edit`). The same table also offers a
+manual create form (`POST /app/group/create`) for groupless users.
+
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
 invitations. `/app/interact/:token/gamble` creates a challenge; re-challenging the
 same player while an invite is still open redirects to that session instead of

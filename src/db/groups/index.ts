@@ -1,5 +1,6 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
+import { randomBytes } from 'node:crypto';
 import { runTransaction } from '../transaction.js';
 
 export const MIN_GROUP_MEMBERS = 2;
@@ -101,6 +102,147 @@ export function findUserGroup(state: MwaState, userId: number): Group | null {
 }
 
 export type AddGroupMemberResult = 'added' | 'group_full' | 'already_in_group';
+
+export type GroupInvite = {
+    id: number;
+    fromUserId: number;
+    toUserId: number;
+    fromUsername: string;
+};
+
+function mapGroupInvite(row: Record<string, SQLOutputValue>): GroupInvite {
+    return {
+        id: row.id as number,
+        fromUserId: row.from_user_id as number,
+        toUserId: row.to_user_id as number,
+        fromUsername: row.from_username as string,
+    };
+}
+
+const selectInvite = `
+SELECT group_invites.id, from_user_id, to_user_id, users.username AS from_username
+FROM group_invites
+JOIN users ON users.id = group_invites.from_user_id
+`;
+
+// A groupless user's request to team up — UNIQUE(from, to) makes a repeat
+// request a no-op rather than a second pending invite.
+export function createGroupInvite(
+    state: MwaState,
+    fromUserId: number,
+    toUserId: number,
+): 'created' | 'duplicate' {
+    const createInviteQuery = state.prepare(`
+        INSERT INTO group_invites (from_user_id, to_user_id)
+        VALUES (?, ?)
+    `);
+
+    try {
+        createInviteQuery.run(fromUserId, toUserId);
+        return 'created';
+    } catch (error) {
+        if (error instanceof Error && error.message.includes('UNIQUE')) {
+            return 'duplicate';
+        }
+        throw error;
+    }
+}
+
+export function findGroupInviteById(state: MwaState, inviteId: number): GroupInvite | null {
+    const row = state.prepare(`${selectInvite} WHERE group_invites.id = ?`).get(inviteId);
+    return row?.id ? mapGroupInvite(row) : null;
+}
+
+// Oldest pending invite addressed to the user — feeds the notification modal.
+export function queryUserGroupInvite(state: MwaState, userId: number): GroupInvite | null {
+    const row = state
+        .prepare(`${selectInvite} WHERE to_user_id = ? ORDER BY group_invites.id`)
+        .get(userId);
+    return row?.id ? mapGroupInvite(row) : null;
+}
+
+// Only the recipient can reject — the row carries no state, deleting is the
+// whole answer.
+export function deleteGroupInvite(state: MwaState, inviteId: number, toUserId: number): boolean {
+    const result = state
+        .prepare(`DELETE FROM group_invites WHERE id = ? AND to_user_id = ?`)
+        .run(inviteId, toUserId);
+    return result.changes > 0;
+}
+
+// groups.name is UNIQUE — auto-created groups get a random placeholder the
+// owner renames from the home table.
+function randomGroupName(): string {
+    return `team-${randomBytes(3).toString('hex')}`;
+}
+
+export type AcceptGroupInviteResult = 'accepted' | 'not_found' | 'forbidden' | 'grouped';
+
+// Accepting creates the group on the spot: the accepter owns it, both users
+// are members, name is random and phone empty until the owner edits them.
+export function acceptGroupInvite(
+    state: MwaState,
+    inviteId: number,
+    accepterId: number,
+): AcceptGroupInviteResult {
+    const invite = findGroupInviteById(state, inviteId);
+    if (!invite) return 'not_found';
+    if (invite.toUserId !== accepterId) return 'forbidden';
+
+    // Either side may have grouped since the request — drop the stale invite.
+    if (findUserGroup(state, accepterId) || findUserGroup(state, invite.fromUserId)) {
+        state.prepare(`DELETE FROM group_invites WHERE id = ?`).run(inviteId);
+        return 'grouped';
+    }
+
+    const createGroupQuery = state.prepare(`
+        INSERT INTO groups (name, owner_id, phone_number)
+        VALUES (?, ?, '')
+        RETURNING id
+    `);
+    const addMemberQuery = state.prepare(`
+        INSERT INTO group_members (group_id, user_id)
+        VALUES (?, ?)
+    `);
+    const deleteInviteQuery = state.prepare(`DELETE FROM group_invites WHERE id = ?`);
+
+    return runTransaction(state.db, () => {
+        let groupId: number | null = null;
+        for (let attempt = 0; attempt < 5 && groupId === null; attempt++) {
+            try {
+                groupId = createGroupQuery.get(randomGroupName(), accepterId)!.id as number;
+            } catch (error) {
+                if (!(error instanceof Error && error.message.includes('UNIQUE'))) throw error;
+            }
+        }
+        if (groupId === null) throw new Error('could not generate a unique group name');
+
+        addMemberQuery.run(groupId, accepterId);
+        addMemberQuery.run(groupId, invite.fromUserId);
+        deleteInviteQuery.run(inviteId);
+        return 'accepted';
+    });
+}
+
+// Name/phone edits from the home table's dialog — owner only, so a member
+// can't hijack the group's public identity.
+export function updateGroup(
+    state: MwaState,
+    groupId: number,
+    ownerId: number,
+    name: string,
+    phoneNumber: string,
+): 'updated' | 'taken' | 'forbidden' {
+    try {
+        const result = state
+            .prepare(`UPDATE groups SET name = ?, phone_number = ? WHERE id = ? AND owner_id = ?`)
+            .run(name, phoneNumber, groupId, ownerId);
+        return result.changes > 0 ? 'updated' : 'forbidden';
+    } catch (error) {
+        if (error instanceof Error && error.message.includes('UNIQUE')) return 'taken';
+        throw error;
+    }
+}
 
 export function addGroupMember(
     state: MwaState,

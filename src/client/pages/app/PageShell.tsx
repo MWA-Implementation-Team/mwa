@@ -143,15 +143,37 @@ function NotificationBody({ notification }: { notification: Notification }) {
                 ? t('gamblingNotificationInvite', {
                       player: displayActor(notification.inviterName, user, t),
                   })
-                : t('gamblingInProgress')}
+                : notification.type === 'group_invite'
+                  ? t('groupInviteNotice', {
+                        player: displayActor(notification.inviterName, user, t),
+                    })
+                  : t('gamblingInProgress')}
         </p>
     );
 }
 
 function NotificationActions({ notification }: { notification: Notification }) {
     const { t } = useContext(ClientContext);
-    const sessionHref = `/app/gambling/sessions/${encodeURIComponent(notification.sessionId)}`;
 
+    if (notification.type === 'group_invite') {
+        const inviteHref = `/app/groups/invites/${encodeURIComponent(notification.inviteId)}`;
+        return (
+            <>
+                <form method="POST" action={`${inviteHref}/accept`}>
+                    <button type="submit" class="mwa-button">
+                        {t('groupInviteAccept')}
+                    </button>
+                </form>
+                <form method="POST" action={`${inviteHref}/reject`}>
+                    <button type="submit" class="mwa-button">
+                        {t('gamblingReject')}
+                    </button>
+                </form>
+            </>
+        );
+    }
+
+    const sessionHref = `/app/gambling/sessions/${encodeURIComponent(notification.sessionId)}`;
     return notification.type === 'gambling_invite' ? (
         <>
             <a class="mwa-button" href={sessionHref}>

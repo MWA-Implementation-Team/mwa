@@ -3,6 +3,7 @@ import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import PageShell from './PageShell.js';
 import { displayUsername } from '#src/client/display.js';
+import { Language } from '#src/client/language.js';
 
 // Extra target fields shown only to elevated roles — the route populates
 // this solely for host/admin scanners, so `detail` being non-null is the gate.
@@ -17,6 +18,8 @@ type InteractPageProps = {
     self: boolean;
     target: { username: string };
     detail: InteractProfileDetail | null;
+    interactError?: keyof Language;
+    interactNotice?: keyof Language;
 };
 
 export const interactPage: Page<InteractPageProps> = {
@@ -24,7 +27,14 @@ export const interactPage: Page<InteractPageProps> = {
     title: (t) => t('titleInteract'),
 };
 
-function InteractPage({ token, self, target, detail }: InteractPageProps) {
+function InteractPage({
+    token,
+    self,
+    target,
+    detail,
+    interactError,
+    interactNotice,
+}: InteractPageProps) {
     const { t } = useContext(ClientContext);
 
     if (self) {
@@ -47,6 +57,12 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
                     <h2>{t('interactHeading', { name: displayUsername(target.username) })}</h2>
                 </div>
                 <div class="mwa-panel-body">
+                    {interactError && (
+                        <p class="mwa-note mwa-note--error" role="alert">
+                            {t(interactError)}
+                        </p>
+                    )}
+                    {interactNotice && <p class="mwa-muted">{t(interactNotice)}</p>}
                     <div class="mwa-actions">
                         <button disabled>{t('interactSendMoneyTitle')}</button>
                         <a
@@ -55,6 +71,12 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
                         >
                             {t('gamblingAction')} 💲🤑🎰🤑💲
                         </a>
+                        <form
+                            method="POST"
+                            action={`/app/interact/${encodeURIComponent(token)}/group-request`}
+                        >
+                            <button type="submit">{t('groupRequestJoin')}</button>
+                        </form>
                     </div>
                     <p class="mwa-muted">{t('interactComingSoon')}</p>
                 </div>

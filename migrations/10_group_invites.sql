@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS group_invites (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    from_user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    to_user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (from_user_id, to_user_id)
+);

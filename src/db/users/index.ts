@@ -1,6 +1,7 @@
 import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
 import { queryActiveGamblingSession, queryGamblingInvitations } from '../gambling/index.js';
+import { queryUserGroupInvite } from '../groups/index.js';
 
 export type UserRole = 'admin' | 'host' | 'user';
 
@@ -15,6 +16,11 @@ export type Notification =
           type: 'return_to_gambling';
           opponentName: string;
           sessionId: number;
+      }
+    | {
+          type: 'group_invite';
+          inviterName: string;
+          inviteId: number;
       };
 
 export type User = {
@@ -158,6 +164,15 @@ export function queryUserNotification(state: MwaState, userId?: number): Notific
             type: 'gambling_invite',
             inviterName: invitations[0].p1Name,
             sessionId: invitations[0].id,
+        };
+    }
+
+    const groupInvite = queryUserGroupInvite(state, userId);
+    if (groupInvite !== null) {
+        return {
+            type: 'group_invite',
+            inviterName: groupInvite.fromUsername,
+            inviteId: groupInvite.id,
         };
     }
 

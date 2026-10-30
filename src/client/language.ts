@@ -168,6 +168,15 @@ export type Language = {
     groupDeleteConfirm: string;
     groupCreateFailed: string;
     groupDeleteFailed: string;
+    groupRequestJoin: string;
+    groupRequestSent: string;
+    groupRequestFailed: string;
+    groupInviteNotice: string;
+    groupInviteAccept: string;
+    groupAcceptFailed: string;
+    groupEdit: string;
+    groupEditFailed: string;
+    groupNameTaken: string;
 
     loginInvalidEmail: string;
     loginSendFailed: string;
@@ -397,6 +406,15 @@ export const languages: Record<LanguageCode, Language> = {
         groupDeleteConfirm: 'Delete group?',
         groupCreateFailed: 'failed to create group',
         groupDeleteFailed: 'failed to delete group',
+        groupRequestJoin: 'Team up',
+        groupRequestSent: 'Team-up request sent.',
+        groupRequestFailed: 'Could not send the team-up request.',
+        groupInviteNotice: '{player} wants to team up with you!',
+        groupInviteAccept: 'Accept',
+        groupAcceptFailed: 'Could not form the group.',
+        groupEdit: 'Edit',
+        groupEditFailed: 'Could not update the group.',
+        groupNameTaken: 'That group name is already taken.',
 
         loginInvalidEmail: 'Enter a valid email',
         loginSendFailed: 'Could not send the email — try again in a moment',
@@ -629,6 +647,15 @@ export const languages: Record<LanguageCode, Language> = {
         groupDeleteConfirm: 'Ištrinti grupę?',
         groupCreateFailed: 'nepavyko sukurti grupės',
         groupDeleteFailed: 'nepavyko ištrinti grupės',
+        groupRequestJoin: 'Burtis į komandą',
+        groupRequestSent: 'Prašymas išsiųstas.',
+        groupRequestFailed: 'Nepavyko išsiųsti prašymo.',
+        groupInviteNotice: '{player} kviečia tave į komandą!',
+        groupInviteAccept: 'Priimti',
+        groupAcceptFailed: 'Nepavyko suformuoti komandos.',
+        groupEdit: 'Redaguoti',
+        groupEditFailed: 'Nepavyko atnaujinti grupės.',
+        groupNameTaken: 'Grupės pavadinimas jau užimtas.',
 
         loginInvalidEmail: 'Įveskite galiojantį el. pašto adresą',
         loginSendFailed: 'Nepavyko išsiųsti el. laiško — netrukus bandykite dar kartą',
