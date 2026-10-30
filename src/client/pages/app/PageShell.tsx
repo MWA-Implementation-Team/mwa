@@ -72,7 +72,7 @@ export default function PageShell({
                             {navigation.map((item) => (
                                 <li key={item.section}>
                                     <a
-                                        class="mwa-navbar-menu"
+                                        class="mwa-button"
                                         href={item.href}
                                         aria-current={item.section === section ? 'page' : undefined}
                                     >
@@ -83,7 +83,7 @@ export default function PageShell({
                             {user && (
                                 <li>
                                     <form method="POST" action="/app" class="landing-menu-logout">
-                                        <button type="submit" class="mwa-navbar-menu">
+                                        <button type="submit" class="mwa-button">
                                             {t('logOut')}
                                         </button>
                                     </form>
