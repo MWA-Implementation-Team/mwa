@@ -78,7 +78,6 @@ function InteractPage({
                             <button type="submit">{t('groupRequestJoin')}</button>
                         </form>
                     </div>
-                    <p class="mwa-muted">{t('interactComingSoon')}</p>
                 </div>
             </section>
 

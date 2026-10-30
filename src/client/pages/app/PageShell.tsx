@@ -145,9 +145,7 @@ function NotificationBody({ notification }: { notification: Notification }) {
                         player: displayActor(notification.inviterName, user, t),
                     })}
                 </p>
-                {notification.createsTeam && (
-                    <p class="mwa-muted">{t('groupInviteCreates')}</p>
-                )}
+                {notification.createsTeam && <p class="mwa-muted">{t('groupInviteCreates')}</p>}
             </>
         );
     }

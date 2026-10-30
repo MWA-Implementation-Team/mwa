@@ -433,9 +433,7 @@ export function registerAppRoutes(app: MwaHono) {
                 ? 'groupRequestFailed'
                 : undefined;
         const interactNotice: keyof Language | undefined =
-            ctx.req.query('interactNotice') === 'groupRequestSent'
-                ? 'groupRequestSent'
-                : undefined;
+            ctx.req.query('interactNotice') === 'groupRequestSent' ? 'groupRequestSent' : undefined;
 
         return writePage(ctx, 'interact', {
             token,

@@ -43,7 +43,6 @@ export type Language = {
     interactHeading: string;
     interactSelfJoke: string;
     interactSendMoneyTitle: string;
-    interactComingSoon: string;
     interactProfileDetailTitle: string;
     interactDetailEmail: string;
     interactDetailBalance: string;
@@ -280,7 +279,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactHeading: 'Interact with {name}',
         interactSelfJoke: "That's you! Scan someone else's code instead.",
         interactSendMoneyTitle: 'Send money',
-        interactComingSoon: 'Coming soon',
         interactProfileDetailTitle: 'Profile details',
         interactDetailEmail: 'Email',
         interactDetailBalance: 'Balance',
@@ -519,7 +517,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactHeading: 'Sąveika su {name}',
         interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
         interactSendMoneyTitle: 'Siųsti pinigus',
-        interactComingSoon: 'Netrukus',
         interactProfileDetailTitle: 'Profilio detalės',
         interactDetailEmail: 'El. paštas',
         interactDetailBalance: 'Balansas',

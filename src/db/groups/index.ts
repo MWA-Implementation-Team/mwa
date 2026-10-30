@@ -176,12 +176,7 @@ function randomGroupName(): string {
     return `team-${randomBytes(3).toString('hex')}`;
 }
 
-export type AcceptGroupInviteResult =
-    | 'accepted'
-    | 'not_found'
-    | 'forbidden'
-    | 'grouped'
-    | 'full';
+export type AcceptGroupInviteResult = 'accepted' | 'not_found' | 'forbidden' | 'grouped' | 'full';
 
 // The requester wants into the accepter's team: if the accepter already has
 // one the requester joins it; if not, a group is created on the spot —
