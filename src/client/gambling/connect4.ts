@@ -46,7 +46,7 @@ export class Connect4Board {
     static fromString(str: string) {
         const lines = str.trim().split('\n');
         if (lines.length !== c4Height) {
-            throw new Error(`Must be ${c4Width} lines`);
+            throw new Error(`Must be ${c4Height} lines`);
         }
 
         let cells: C4Cell[] = [];
