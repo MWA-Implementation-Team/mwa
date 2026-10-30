@@ -18,6 +18,7 @@ type InteractPageProps = {
     self: boolean;
     target: { username: string };
     detail: InteractProfileDetail | null;
+    targetInGroup: boolean;
     interactError?: keyof Language;
     interactNotice?: keyof Language;
 };
@@ -32,6 +33,7 @@ function InteractPage({
     self,
     target,
     detail,
+    targetInGroup,
     interactError,
     interactNotice,
 }: InteractPageProps) {
@@ -78,6 +80,7 @@ function InteractPage({
                             <button type="submit">{t('groupRequestJoin')}</button>
                         </form>
                     </div>
+                    {!targetInGroup && <p class="mwa-muted">{t('groupRequestCreates')}</p>}
                     <p class="mwa-muted">{t('interactComingSoon')}</p>
                 </div>
             </section>
