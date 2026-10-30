@@ -1370,7 +1370,10 @@
         max-height: 85vh;
         margin: auto;
         padding: 0;
-        background-color: var(--card);
+        /* mwa: --card is translucent; compositing --muted over --background
+           keeps the surface opaque but brighter than the page */
+        background-color: var(--background);
+        background-image: linear-gradient(var(--muted), var(--muted));
         border: 3px solid var(--border);
         border-radius: var(--radius-large);
         box-shadow: var(--shadow-large);

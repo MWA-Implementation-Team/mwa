@@ -1,0 +1,28 @@
+/* Oat pads each dialog region with --space-6; app modals stay compact. */
+dialog > header,
+dialog > footer,
+dialog > form > footer,
+dialog > form > :is(p, div, section) {
+    padding: var(--space-4);
+}
+
+dialog > header {
+    padding-block-end: 0;
+}
+
+dialog > footer,
+dialog > form > footer {
+    padding-block-start: 0;
+}
+
+/* Compact fields — Oat inputs are sized for page forms. */
+dialog .mwa-field :is(input, select) {
+    padding-block: var(--space-1);
+    font-size: var(--text-7);
+}
+
+/* Dialog actions reuse the flat .mwa-button geometry at natural width —
+   the class itself stretches to 100% for menu rows. */
+dialog .mwa-button {
+    width: auto;
+}

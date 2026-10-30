@@ -61,9 +61,12 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                 </div>
             </section>
 
-            <Dialog isOpen={openDialog === 'coin_flip'} onClose={() => setOpenDialog(null)}>
+            <Dialog
+                isOpen={openDialog === 'coin_flip'}
+                onClose={() => setOpenDialog(null)}
+                title={t('gamblingCoinFlip')}
+            >
                 <form method="POST" class="mwa-form">
-                    <h2>{t('gamblingCoinFlip')}</h2>
                     <input type="hidden" name="game_type" value="coin_flip" />
                     <div class="mwa-field">
                         <label for="mwa-cf-bet-amount">{t('gamblingBetAmount')}</label>
@@ -82,20 +85,32 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             <option value="tails">{t('gamblingTails')}</option>
                         </select>
                     </div>
-                    <div class="mwa-actions">
-                        <button type="submit">{t('gamblingSendInvite')}</button>
-                    </div>
                     {error?.message && (
                         <p class="mwa-note mwa-note--error" role="alert">
                             {t(error.message)}
                         </p>
                     )}
+                    <footer>
+                        <button
+                            type="button"
+                            class="mwa-button"
+                            onClick={() => setOpenDialog(null)}
+                        >
+                            {t('dialogClose')}
+                        </button>
+                        <button type="submit" class="mwa-button">
+                            {t('gamblingSendInvite')}
+                        </button>
+                    </footer>
                 </form>
             </Dialog>
 
-            <Dialog isOpen={openDialog === 'connect_4'} onClose={() => setOpenDialog(null)}>
+            <Dialog
+                isOpen={openDialog === 'connect_4'}
+                onClose={() => setOpenDialog(null)}
+                title={t('gamblingConnect4')}
+            >
                 <form method="POST" class="mwa-form">
-                    <h2>{t('gamblingConnect4')}</h2>
                     <input type="hidden" name="game_type" value="connect_4" />
                     <div class="mwa-field">
                         <label for="mwa-c4-bet-amount">{t('gamblingBetAmount')}</label>
@@ -107,14 +122,23 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             required
                         />
                     </div>
-                    <div class="mwa-actions">
-                        <button type="submit">{t('gamblingSendInvite')}</button>
-                    </div>
                     {error?.message && (
                         <p class="mwa-note mwa-note--error" role="alert">
                             {t(error.message)}
                         </p>
                     )}
+                    <footer>
+                        <button
+                            type="button"
+                            class="mwa-button"
+                            onClick={() => setOpenDialog(null)}
+                        >
+                            {t('dialogClose')}
+                        </button>
+                        <button type="submit" class="mwa-button">
+                            {t('gamblingSendInvite')}
+                        </button>
+                    </footer>
                 </form>
             </Dialog>
         </PageShell>
