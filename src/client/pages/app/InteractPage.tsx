@@ -63,6 +63,40 @@ function InteractPage({ token, self, target, detail }: InteractPageProps) {
             {detail && (
                 <section class="mwa-panel">
                     <div class="mwa-panel-head">
+                        <h2>{t('interactAwardTitle')}</h2>
+                    </div>
+                    <div class="mwa-panel-body">
+                        <form
+                            method="POST"
+                            action={`/app/interact/${encodeURIComponent(token)}/award`}
+                            class="mwa-form"
+                        >
+                            <div class="mwa-field">
+                                <label for="mwa-award-amount">{t('interactAwardAmount')}</label>
+                                <input
+                                    id="mwa-award-amount"
+                                    type="number"
+                                    name="amount"
+                                    min="1"
+                                    step="1"
+                                    required
+                                />
+                            </div>
+                            <div class="mwa-field">
+                                <label for="mwa-award-note">{t('interactAwardNote')}</label>
+                                <input id="mwa-award-note" name="note" maxLength={200} />
+                            </div>
+                            <div class="mwa-actions">
+                                <button type="submit">{t('interactAwardSubmit')}</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            )}
+
+            {detail && (
+                <section class="mwa-panel">
+                    <div class="mwa-panel-head">
                         <h2>{t('interactProfileDetailTitle')}</h2>
                     </div>
                     <div class="mwa-panel-body">

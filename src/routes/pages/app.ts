@@ -1,5 +1,5 @@
 import { requireRole, requireUser } from '#src/auth.js';
-import { listUserTransactions } from '#src/db/transactions/index.js';
+import { listUserTransactions, insertTransaction } from '#src/db/transactions/index.js';
 import {
     LeaderboardBoard,
     listGroupLeaderboard,
@@ -27,7 +27,8 @@ import {
 import { serialize } from '#src/client/serialize.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
-import { findUserByInteractToken } from '#src/db/interactions/index.js';
+import { findUserByInteractToken, rotateInteractToken } from '#src/db/interactions/index.js';
+import { claimSystemQrCode } from '#src/db/systemqr/index.js';
 import { deleteSession } from '#src/db/sessions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { MwaHono } from '#src/state.js';
@@ -67,6 +68,15 @@ export function registerAppRoutes(app: MwaHono) {
             groupError = undefined;
         }
 
+        // Reward qr scan outcome: claimed amount or a failure message
+        const qrClaimed = Number(ctx.req.query('claimed'));
+        const qrClaimedAmount = Number.isSafeInteger(qrClaimed) && qrClaimed > 0 ? qrClaimed : null;
+        let qrError = ctx.req.query('qrError') as
+            'expired' | 'used_up' | 'already_claimed' | undefined;
+        if (qrError !== 'expired' && qrError !== 'used_up' && qrError !== 'already_claimed') {
+            qrError = undefined;
+        }
+
         // owner first, then join order — the member table reads top-down
         const groupMembers = group ? listGroupMemberInfos(ctx.var, group.id) : [];
         if (group) {
@@ -84,6 +94,8 @@ export function registerAppRoutes(app: MwaHono) {
             groupMembers,
             groupError,
             queueError,
+            qrClaimedAmount,
+            qrError,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
             standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
         });
@@ -327,5 +339,54 @@ export function registerAppRoutes(app: MwaHono) {
             target: { username: target.username },
             detail,
         });
+    });
+
+    // Host (admin) award form: give the scanned user coins plus write an optional note
+    app.post('/app/interact/:token/award', async (ctx) => {
+        const user = requireRole(ctx, 'host', 'admin');
+        if (user instanceof Response) return user;
+
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) return writeErrorPage(ctx, 400);
+
+        const amount = Number(form.get('amount'));
+        if (!Number.isSafeInteger(amount) || amount <= 0) {
+            return ctx.redirect(
+                `/app/interact/${encodeURIComponent(token)}?awardError=invalid`,
+                303,
+            );
+        }
+
+        const note = form.get('note');
+        const noteText = typeof note === 'string' && note.trim() ? note.trim().slice(0, 200) : null;
+
+        insertTransaction(ctx.var, 'system', target.id, amount, undefined, noteText);
+        return ctx.redirect(`/app/interact/${encodeURIComponent(token)}?awarded=1`, 303);
+    });
+
+    // Reward qr scan (the secret in the QR is the route param)
+    // Any signed-in user can claim (server side guard against double scans)
+    app.get('/app/qr/:secret', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const secret = ctx.req.param('secret');
+        const result = claimSystemQrCode(ctx.var, secret, user.id);
+        const outcome =
+            result.type === 'claimed' ? `claimed=${result.balanceDelta}` : `qrError=${result.type}`;
+        return ctx.redirect(`/app?${outcome}`, 303);
+    });
+
+    // Reset the personal qr token (the old code stops working immediately))
+    app.post('/app/account/reset-qr', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        rotateInteractToken(ctx.var, user.id);
+        return ctx.redirect('/app/account?qrReset=1', 303);
     });
 }

@@ -18,6 +18,8 @@ type HomePageProps = {
     groupError?: keyof Language;
     queuePosition: number | null;
     queueError?: keyof Language;
+    qrClaimedAmount?: number | null;
+    qrError?: 'expired' | 'used_up' | 'already_claimed';
     standings: ViewerStanding[];
 };
 
@@ -47,6 +49,12 @@ const boardHintKey = {
     combined: 'leaderboardCombinedHint',
 } as const satisfies Record<LeaderboardBoard, keyof Language>;
 
+const qrErrorKey = {
+    expired: 'qrErrorExpired',
+    used_up: 'qrErrorUsedUp',
+    already_claimed: 'qrErrorAlreadyClaimed',
+} as const satisfies Record<NonNullable<HomePageProps['qrError']>, keyof Language>;
+
 function HomePage({
     transactions,
     groupName,
@@ -57,6 +65,8 @@ function HomePage({
     groupError,
     queuePosition,
     queueError,
+    qrClaimedAmount,
+    qrError,
     standings,
 }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
@@ -64,6 +74,16 @@ function HomePage({
 
     return (
         <PageShell section="home">
+            {qrClaimedAmount !== null && qrClaimedAmount !== undefined && (
+                <p class="mwa-note mwa-note--success" role="status">
+                    {t('qrClaimed', { amount: String(qrClaimedAmount) })}
+                </p>
+            )}
+            {qrError && (
+                <p class="mwa-note mwa-note--error" role="alert">
+                    {t(qrErrorKey[qrError])}
+                </p>
+            )}
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
                     <h2>{t('dashGame')}</h2>
@@ -188,7 +208,10 @@ function HomePage({
                                                     hour12: false,
                                                 })}
                                             </td>
-                                            <td>{t(transactionKindKey[tx.kind])}</td>
+                                            <td>
+                                                {t(transactionKindKey[tx.kind])}
+                                                {tx.note && <div class="mwa-muted">{tx.note}</div>}
+                                            </td>
                                             <td class="mwa-tx-amount">
                                                 {tx.balanceDelta > 0 ? '+' : ''}
                                                 {tx.balanceDelta.toFixed(2)}

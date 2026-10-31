@@ -47,6 +47,18 @@ function AccountPage({}: AccountPageProps) {
 
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
+                    <h2>{t('accountQrTitle')}</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    <p class="mwa-muted">{t('accountQrHint')}</p>
+                    <form method="POST" action="/app/account/reset-qr" class="mwa-actions">
+                        <button type="submit">{t('accountQrReset')}</button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
                     <h2>{t('dashFinances')}</h2>
                 </div>
                 <div class="mwa-panel-body">
