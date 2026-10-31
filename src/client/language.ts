@@ -51,6 +51,17 @@ export type Language = {
     interactDetailEmail: string;
     interactDetailBalance: string;
     interactDetailJoined: string;
+    interactAwardTitle: string;
+    interactAwardAmount: string;
+    interactAwardNote: string;
+    interactAwardSubmit: string;
+    accountQrTitle: string;
+    accountQrHint: string;
+    accountQrReset: string;
+    qrClaimed: string;
+    qrErrorExpired: string;
+    qrErrorUsedUp: string;
+    qrErrorAlreadyClaimed: string;
 
     landingLangTitle: string;
     landingLoginTitle: string;
@@ -300,6 +311,18 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailEmail: 'Email',
         interactDetailBalance: 'Balance',
         interactDetailJoined: 'Joined',
+        interactAwardTitle: 'Award coins',
+        interactAwardAmount: 'Amount',
+        interactAwardNote: 'Note (optional)',
+        interactAwardSubmit: 'Award',
+        accountQrTitle: 'Personal QR code',
+        accountQrHint:
+            'Your personal QR is shown in the sidebar. Reset it to invalidate the old code.',
+        accountQrReset: 'Reset QR code',
+        qrClaimed: 'You found {amount} coins!',
+        qrErrorExpired: 'This QR code has expired.',
+        qrErrorUsedUp: 'This QR code has already been fully used.',
+        qrErrorAlreadyClaimed: 'You have already claimed this QR code.',
 
         landingLangTitle: 'Language',
         landingLoginTitle: 'System',
@@ -550,6 +573,18 @@ export const languages: Record<LanguageCode, Language> = {
         interactDetailEmail: 'El. paštas',
         interactDetailBalance: 'Balansas',
         interactDetailJoined: 'Prisijungė',
+        interactAwardTitle: 'Suteikti miciaus koinų',
+        interactAwardAmount: 'Suma',
+        interactAwardNote: 'Žinutė (neprivaloma)',
+        interactAwardSubmit: 'Suteikti',
+        accountQrTitle: 'Asmeninis QR kodas',
+        accountQrHint:
+            'Jūsų asmeninis QR rodomas šone. Čia galite jį sukurti iš naujo (senasis nustos veikti).',
+        accountQrReset: 'Iš naujo sukurti QR kodą',
+        qrClaimed: 'Radote {amount} miciaus koinų!',
+        qrErrorExpired: 'Šis QR kodas nebegalioja.',
+        qrErrorUsedUp: 'Šis QR kodas jau panaudotas.',
+        qrErrorAlreadyClaimed: 'Jūs jau panaudojote šį QR kodą.',
 
         landingLangTitle: 'Kalba',
         landingLoginTitle: 'Sistema',
