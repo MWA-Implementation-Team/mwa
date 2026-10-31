@@ -112,7 +112,7 @@ export function registerAppRoutes(app: MwaHono) {
         if (!group || !deleteGroup(ctx.var, group.id, user.id)) {
             return ctx.redirect('/app?groupError=groupDeleteFailed', 303);
         }
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app#panel-group', 303);
     });
 
     // Kicking is owner-only; removeGroupMember still refuses below-minimum.
@@ -143,7 +143,7 @@ export function registerAppRoutes(app: MwaHono) {
             return ctx.redirect('/app?queueError=queueJoinFailed', 303);
         }
 
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app#panel-game', 303);
     });
 
     app.post('/app/queue/leave', (ctx) => {
@@ -155,7 +155,7 @@ export function registerAppRoutes(app: MwaHono) {
             return ctx.redirect('/app?queueError=queueLeaveFailed', 303);
         }
 
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app#panel-game', 303);
     });
 
     app.post('/app', async (ctx) => {

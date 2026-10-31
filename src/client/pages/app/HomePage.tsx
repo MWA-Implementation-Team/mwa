@@ -64,7 +64,7 @@ function HomePage({
 
     return (
         <PageShell section="home">
-            <section class="mwa-panel">
+            <section class="mwa-panel" id="panel-game">
                 <div class="mwa-panel-head">
                     <h2>{t('dashGame')}</h2>
                 </div>
@@ -202,7 +202,7 @@ function HomePage({
                 </div>
             </section>
 
-            <section class="mwa-panel">
+            <section class="mwa-panel" id="panel-group">
                 <div class="mwa-panel-head">
                     <h2>{t('dashGroup')}</h2>
                 </div>
