@@ -116,6 +116,25 @@ it identifies the target but grants no permissions. Any signed-in scanner can
 challenge another user; hosts/admins also see their email, balance, and join date.
 Self-scans show no actions, and money transfers remain a placeholder.
 
+A host/admin scanner gets an
+award form (`POST /app/interact/:token/award`) to credit the scanned user coins
+plus an optional note; the note is stored on the child transaction and shown on
+the recipient's home page. Regular scanners just see the profile. The personal
+token can be rotated from `/app/account` (`POST /app/account/reset-qr`), which
+invalidates the old code immediately.
+
+Reward QRs are the `system_qr_codes` table that has existed since migration 01.
+Admins mint them from `/admin` (`POST /admin/create-qr`) with a positive prize,
+a max-uses cap, and an optional message (migration 12 — `system_qr_codes.message`);
+the admin page lists every QR with its SVG and link. The message is attached to
+the scanner's credit as its transaction note when the QR is claimed. Scanning
+`/app/qr/:secret` claims it for the signed-in user: the claim, the
+use-count check, and the credit all run in one transaction, and a
+`UNIQUE(qr_id, user_id)` row in `system_qr_claims` (migration 11) makes a
+double-scan impossible — the second claim is rejected server-side, not just by
+a disabled button. Each user can claim a given reward QR once, and the QR stops
+paying once `max_uses` claims are reached.
+
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
 invitations. `/app/interact/:token/gamble` creates a challenge; re-challenging the
 same player while an invite is still open redirects to that session instead of
