@@ -5,6 +5,8 @@
 }
 
 .mwa-rows > li {
+    /* Oat gives every li a margin-block-end; row padding spaces these. */
+    margin-block-end: 0;
     padding: var(--space-3) 0;
 
     /* --border is a near-invisible black in this theme — row separators

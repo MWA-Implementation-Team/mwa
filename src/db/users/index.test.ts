@@ -7,6 +7,7 @@ import {
     findUserById,
     findUserByUsername,
     markEmailVerified,
+    updateUsername,
 } from './index.js';
 import { createTestMwaState } from '#src/state.js';
 
@@ -68,5 +69,22 @@ describe('db/users', () => {
         createUser(state, 'dd1@example.com', 'same');
         createUser(state, 'dd2@example.com', 'same2');
         assert.equal(deriveUsername(state, 'same@x.com'), 'same3');
+    });
+
+    it('updateUsername trims, lowercases, and renames', () => {
+        const user = createUser(state, 'rename@example.com', 'rename_me');
+        assert.equal(updateUsername(state, user.id, '  NewName  '), 'updated');
+        assert.equal(findUserById(state, user.id)!.username, 'newname');
+    });
+
+    it('updateUsername rejects bad input and taken names, keeps its own', () => {
+        const a = createUser(state, 'una@example.com', 'rename_a');
+        const b = createUser(state, 'unb@example.com', 'rename_b');
+        assert.equal(updateUsername(state, a.id, 'bad name!'), 'invalid');
+        assert.equal(updateUsername(state, a.id, 'x'.repeat(17)), 'invalid');
+        assert.equal(updateUsername(state, a.id, ''), 'invalid');
+        assert.equal(updateUsername(state, a.id, 'RENAME_B'), 'taken');
+        assert.equal(updateUsername(state, a.id, 'rename_a'), 'updated');
+        assert.equal(findUserById(state, b.id)!.username, 'rename_b');
     });
 });

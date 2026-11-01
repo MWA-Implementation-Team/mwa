@@ -1,0 +1,54 @@
+/* Oat pads each dialog region with --space-6; app modals stay compact. */
+dialog > footer,
+dialog > form > :is(p, div, section) {
+    padding: var(--space-4);
+}
+
+/* Title strip matches the sidebar tab headers (.landing-section > h2). */
+dialog > header {
+    padding: var(--space-1) var(--space-3);
+    border-bottom: 1px solid var(--border);
+    background: var(--section-head-bg);
+}
+
+dialog > header > h2 {
+    margin: 0;
+    color: var(--foreground);
+    font-size: var(--text-8);
+    letter-spacing: 0.06em;
+}
+
+dialog > footer {
+    padding-block-start: 0;
+}
+
+/* Compact fields — Oat inputs are sized for page forms. */
+dialog .mwa-field :is(input, select) {
+    padding-block: var(--space-1);
+    font-size: var(--text-7);
+}
+
+/* Dialog actions reuse the flat .mwa-button geometry at natural width —
+   the class itself stretches to 100% for menu rows. */
+dialog .mwa-button {
+    width: auto;
+}
+
+/* A footer holding a stacked .mwa-actions turns into a column too — every
+   button (Close included, at the top) joins the pile at full width. The top
+   padding the blanket rule strips is restored here — the interact dialog's
+   body can be empty, leaving the pile flush against the header. */
+dialog > footer:has(.mwa-actions--col) {
+    flex-direction: column;
+    padding-block-start: var(--space-4);
+}
+
+dialog > footer:has(.mwa-actions--col) > .mwa-button {
+    width: 100%;
+}
+
+/* Half of Oat's 32rem default — the shared compact modal for short dialogs
+   (single-field forms, the interact actions). */
+.mwa-dialog--half {
+    width: min(16rem, 100% - 2rem);
+}

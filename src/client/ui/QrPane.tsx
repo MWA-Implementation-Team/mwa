@@ -1,6 +1,24 @@
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 
+// navigator.clipboard only exists in secure contexts (https / localhost); over
+// plain http (e.g. opening the dev server by LAN IP) fall back to a selected
+// textarea + execCommand.
+async function copyText(text: string) {
+    if (navigator.clipboard) return navigator.clipboard.writeText(text);
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+        if (!document.execCommand('copy')) throw new Error('copy failed');
+    } finally {
+        ta.remove();
+    }
+}
+
 // Personal QR sidebar pane — the code plus a quiet copy-link control.
 export default function QrPane() {
     const { t, qr } = useContext(ClientContext);
@@ -9,7 +27,7 @@ export default function QrPane() {
 
     const handleCopy = async () => {
         try {
-            await navigator.clipboard.writeText(qr.url);
+            await copyText(qr.url);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch {
@@ -25,6 +43,11 @@ export default function QrPane() {
                 <button type="button" class="lang-link" onClick={handleCopy}>
                     {copied ? t('qrCopied') : t('qrCopyLink')}
                 </button>
+                <form method="POST" action="/app/you/reset-qr">
+                    <button type="submit" class="lang-link" title={t('accountQrHint')}>
+                        {t('accountQrReset')}
+                    </button>
+                </form>
             </div>
         </section>
     );
