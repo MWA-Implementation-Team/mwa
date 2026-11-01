@@ -429,7 +429,7 @@ function HomePage({
             <Dialog
                 isOpen={usernameDialogOpen}
                 onClose={() => setUsernameDialogOpen(false)}
-                title={t('dashYou')}
+                title={t('youSettingsEdit')}
                 class="mwa-dialog--half"
                 submit={{ form: 'mwa-you-form', label: t('youSave') }}
             >
@@ -456,7 +456,7 @@ function HomePage({
             <Dialog
                 isOpen={groupNameEditOpen}
                 onClose={() => setGroupNameEditOpen(false)}
-                title={t('groupName')}
+                title={t('groupSettingsEdit')}
                 class="mwa-dialog--half"
                 submit={{ form: 'mwa-group-name-form', label: t('youSave') }}
             >
@@ -484,7 +484,7 @@ function HomePage({
             <Dialog
                 isOpen={groupPhoneEditOpen}
                 onClose={() => setGroupPhoneEditOpen(false)}
-                title={t('groupPhone')}
+                title={t('groupSettingsEdit')}
                 class="mwa-dialog--half"
                 submit={{ form: 'mwa-group-phone-form', label: t('youSave') }}
             >

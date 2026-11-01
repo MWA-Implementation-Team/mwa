@@ -141,6 +141,7 @@ export type Language = {
     dashYou: string;
     youUsername: string;
     youEdit: string;
+    youSettingsEdit: string;
     youEmail: string;
     youRole: string;
     youSave: string;
@@ -162,6 +163,7 @@ export type Language = {
     groupName: string;
     groupPhone: string;
     groupSettings: string;
+    groupSettingsEdit: string;
     groupDelete: string;
     groupDeleteConfirm: string;
     groupDeleteFailed: string;
@@ -392,6 +394,7 @@ export const languages: Record<LanguageCode, Language> = {
         dashYou: 'You',
         youUsername: 'Username',
         youEdit: 'Edit',
+        youSettingsEdit: 'Edit user settings',
         youEmail: 'Email',
         youRole: 'Role',
         youSave: 'Save',
@@ -413,6 +416,7 @@ export const languages: Record<LanguageCode, Language> = {
         groupName: 'Name',
         groupPhone: 'Emergency phone',
         groupSettings: 'Group settings',
+        groupSettingsEdit: 'Edit group settings',
         groupDelete: 'Delete group',
         groupDeleteConfirm: 'Delete group?',
         groupDeleteFailed: 'failed to delete group',
@@ -644,6 +648,7 @@ export const languages: Record<LanguageCode, Language> = {
         dashYou: 'Tu',
         youUsername: 'Vartotojo vardas',
         youEdit: 'Redaguoti',
+        youSettingsEdit: 'Keičiami vartotojo nustatymai',
         youEmail: 'El. paštas',
         youRole: 'Rolė',
         youSave: 'Išsaugoti',
@@ -666,6 +671,7 @@ export const languages: Record<LanguageCode, Language> = {
         groupName: 'Pavadinimas',
         groupPhone: 'Skubios pagalbos numeris',
         groupSettings: 'Grupės nustatymai',
+        groupSettingsEdit: 'Keičiami grupės nustatymai',
         groupDelete: 'Ištrinti grupę',
         groupDeleteConfirm: 'Ištrinti grupę?',
         groupDeleteFailed: 'nepavyko ištrinti grupės',
