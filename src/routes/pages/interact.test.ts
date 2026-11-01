@@ -57,10 +57,9 @@ describe('GET /app/interact/:token — legacy redirect', () => {
         const owner = createUser(state, 'carry@example.com', 'carry');
         const scanner = createUser(state, 'scan4@example.com', 'scan4');
         const token = getOrCreateInteractToken(state, owner.id);
-        const res = await app.request(
-            `/app/interact/${token}?interactNotice=groupRequestSent`,
-            { headers: authCookie(scanner.id) },
-        );
+        const res = await app.request(`/app/interact/${token}?interactNotice=groupRequestSent`, {
+            headers: authCookie(scanner.id),
+        });
         assert.equal(res.status, 303);
         assert.equal(
             res.headers.get('location'),
