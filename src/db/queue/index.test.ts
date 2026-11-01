@@ -25,10 +25,7 @@ function queuedGroup(memberNames: string[]): number {
     const group = createGroup(state, `queue group ${seq}`, owner.id, '555');
     // the queue needs QUEUE_MIN_GROUP_SIZE members — pad with a filler
     // member when the test doesn't name enough of its own
-    const names =
-        memberNames.length + 1 >= QUEUE_MIN_GROUP_SIZE
-            ? memberNames
-            : [`q${seq}_filler`];
+    const names = memberNames.length + 1 >= QUEUE_MIN_GROUP_SIZE ? memberNames : [`q${seq}_filler`];
     for (const name of names) {
         const member = createUser(state, `${name}@example.com`, name);
         addGroupMember(state, group.id, member.id);

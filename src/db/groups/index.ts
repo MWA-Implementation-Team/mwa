@@ -298,11 +298,7 @@ export function addGroupMember(
     }
 }
 
-export type RemoveGroupMemberResult =
-    | 'removed'
-    | 'group_not_found'
-    | 'is_owner'
-    | 'not_a_member';
+export type RemoveGroupMemberResult = 'removed' | 'group_not_found' | 'is_owner' | 'not_a_member';
 
 export function removeGroupMember(
     state: MwaState,
