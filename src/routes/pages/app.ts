@@ -40,7 +40,7 @@ import { updateUsername } from '#src/db/users/index.js';
 import { deleteSession } from '#src/db/sessions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { notificationsChannel, publish } from '#src/pubsub.js';
-import { MwaHono } from '#src/state.js';
+import { MwaContext, MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';
 import { Language } from '#src/client/language.js';
 import { safeGoto } from './login.js';
@@ -49,6 +49,18 @@ import { safeGoto } from './login.js';
 // group — a mascot, not a slot machine — keyed off the group's id.
 const GROUP_ART_PLACEHOLDERS = ['🦊', '🐸', '🐼', '🐨', '🐯', '🦁', '🐙', '🦄'];
 const NO_GROUP_ART = '😔';
+
+// Feedback query params are allowlist-guarded: an unknown value falls back to
+// undefined so a stray ?xError=whatever can't smuggle a lang key or enum into
+// the page.
+function queryFlag<T extends string>(
+    ctx: MwaContext,
+    name: string,
+    allowed: readonly T[],
+): T | undefined {
+    const value = ctx.req.query(name);
+    return allowed.includes(value as T) ? (value as T) : undefined;
+}
 
 export function registerAppRoutes(app: MwaHono) {
     app.get('/app', async (ctx) => {
@@ -64,40 +76,32 @@ export function registerAppRoutes(app: MwaHono) {
                 ? GROUP_ART_PLACEHOLDERS[group.id % GROUP_ART_PLACEHOLDERS.length]
                 : NO_GROUP_ART;
 
-        let queueError: keyof Language | undefined = ctx.req.query('queueError') as keyof Language;
-        if (
-            queueError !== 'queueJoinFailed' &&
-            queueError !== 'queueLeaveFailed' &&
-            queueError !== 'queueTooSmall'
-        ) {
-            queueError = undefined;
-        }
-
-        let groupError: keyof Language | undefined = ctx.req.query('groupError') as keyof Language;
-        if (
-            groupError !== 'groupKickFailed' &&
-            groupError !== 'groupLeaveFailed' &&
-            groupError !== 'groupDeleteFailed' &&
-            groupError !== 'groupEditFailed' &&
-            groupError !== 'groupNameTaken' &&
-            groupError !== 'groupAcceptFailed'
-        ) {
-            groupError = undefined;
-        }
+        const queueError = queryFlag(ctx, 'queueError', [
+            'queueJoinFailed',
+            'queueLeaveFailed',
+            'queueTooSmall',
+        ] as const);
+        const groupError = queryFlag(ctx, 'groupError', [
+            'groupKickFailed',
+            'groupLeaveFailed',
+            'groupDeleteFailed',
+            'groupEditFailed',
+            'groupNameTaken',
+            'groupAcceptFailed',
+        ] as const);
 
         // Reward qr scan outcome: claimed amount or a failure message
         const qrClaimed = Number(ctx.req.query('claimed'));
         const qrClaimedAmount = Number.isSafeInteger(qrClaimed) && qrClaimed > 0 ? qrClaimed : null;
-        let qrError = ctx.req.query('qrError') as
-            'expired' | 'used_up' | 'already_claimed' | undefined;
-        if (qrError !== 'expired' && qrError !== 'used_up' && qrError !== 'already_claimed') {
-            qrError = undefined;
-        }
-
-        let youError: keyof Language | undefined = ctx.req.query('youError') as keyof Language;
-        if (youError !== 'youUsernameTaken' && youError !== 'youUsernameInvalid') {
-            youError = undefined;
-        }
+        const qrError = queryFlag(ctx, 'qrError', [
+            'expired',
+            'used_up',
+            'already_claimed',
+        ] as const);
+        const youError = queryFlag(ctx, 'youError', [
+            'youUsernameTaken',
+            'youUsernameInvalid',
+        ] as const);
 
         // ?interact=<token> opens the scanned user's dialog over home. A bad
         // token 404s like the old page did. Group-request feedback comes back
@@ -127,18 +131,8 @@ export function registerAppRoutes(app: MwaHono) {
             };
         }
 
-        let interactError: keyof Language | undefined = ctx.req.query(
-            'interactError',
-        ) as keyof Language;
-        if (interactError !== 'groupRequestFailed') {
-            interactError = undefined;
-        }
-        let interactNotice: keyof Language | undefined = ctx.req.query(
-            'interactNotice',
-        ) as keyof Language;
-        if (interactNotice !== 'groupRequestSent') {
-            interactNotice = undefined;
-        }
+        const interactError = queryFlag(ctx, 'interactError', ['groupRequestFailed'] as const);
+        const interactNotice = queryFlag(ctx, 'interactNotice', ['groupRequestSent'] as const);
 
         // owner first, then join order — the member table reads top-down
         const groupMembers = group ? listGroupMemberInfos(ctx.var, group.id) : [];
