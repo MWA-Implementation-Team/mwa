@@ -6,7 +6,6 @@ import { registerAppRoutes } from '#src/routes/pages/app.js';
 import { registerAdminRoutes } from '#src/routes/pages/admin.js';
 import { registerLandingRoutes } from '#src/routes/pages/landing.js';
 import { registerUsersRoutes } from '#src/routes/api/users.js';
-import { registerGroupsRoutes } from '#src/routes/api/groups.js';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
@@ -44,7 +43,6 @@ registerAuthRoutes(app);
 registerAppRoutes(app);
 registerAdminRoutes(app);
 registerUsersRoutes(app);
-registerGroupsRoutes(app);
 registerGamblingRoutes(app);
 
 registerNodeModulesRoutes(app);

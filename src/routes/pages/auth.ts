@@ -60,7 +60,6 @@ export function registerAuthRoutes(app: MwaHono) {
 
 async function logIn(ctx: MwaContext, email: string, goto?: string): Promise<Response> {
     let user = findUserByEmail(ctx.var, email);
-    const isNewAccount = !user;
     if (!user) {
         user = createUser(ctx.var, email, deriveUsername(ctx.var, email));
     }
@@ -73,8 +72,7 @@ async function logIn(ctx: MwaContext, email: string, goto?: string): Promise<Res
         path: '/',
     });
 
-    // New accounts default to the profile page so the derived username can be
-    // fixed; a valid goto still wins either way.
-    const fallback = isNewAccount ? '/app/account' : '/app';
-    return ctx.redirect(safeGoto(ctx, goto) ?? fallback);
+    // A valid goto always wins; everyone else lands on /app, where the you
+    // tab holds the derived username.
+    return ctx.redirect(safeGoto(ctx, goto) ?? '/app');
 }

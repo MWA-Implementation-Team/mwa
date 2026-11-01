@@ -12,6 +12,7 @@ import {
     listStationGroups,
     listWaitingQueue,
     markEntryDone,
+    QUEUE_MIN_GROUP_SIZE,
 } from './index.js';
 import { createTestMwaState } from '#src/state.js';
 
@@ -19,9 +20,13 @@ const state = createTestMwaState({});
 
 let groupSeq = 0;
 function queuedGroup(memberNames: string[]): number {
-    const owner = createUser(state, `q${groupSeq}@example.com`, `q${groupSeq}_owner`);
-    const group = createGroup(state, `queue group ${groupSeq++}`, owner.id, '555');
-    for (const name of memberNames) {
+    const seq = groupSeq++;
+    const owner = createUser(state, `q${seq}@example.com`, `q${seq}_owner`);
+    const group = createGroup(state, `queue group ${seq}`, owner.id, '555');
+    // the queue needs QUEUE_MIN_GROUP_SIZE members — pad with a filler
+    // member when the test doesn't name enough of its own
+    const names = memberNames.length + 1 >= QUEUE_MIN_GROUP_SIZE ? memberNames : [`q${seq}_filler`];
+    for (const name of names) {
         const member = createUser(state, `${name}@example.com`, name);
         addGroupMember(state, group.id, member.id);
     }
@@ -45,6 +50,17 @@ describe('db/queue', () => {
         assert.equal(entry.status, 'waiting');
         assert.equal(entry.closedAt, null);
         assert.equal(entry.activitySlug, null);
+    });
+
+    it('rejects a group below the queue minimum size', () => {
+        // createGroup leaves the owner alone — a 1-member group can't queue
+        const owner = createUser(state, 'qsolo@example.com', 'qsolo');
+        const group = createGroup(state, 'queue solo', owner.id, '555');
+        assert.equal(joinQueue(state, group.id).type, 'too_small');
+
+        const plus = createUser(state, 'qplus@example.com', 'qplus');
+        addGroupMember(state, group.id, plus.id);
+        assert.equal(joinQueue(state, group.id).type, 'joined');
     });
 
     it('rejects a second join while the group is waiting', () => {
@@ -109,6 +125,8 @@ describe('db/queue', () => {
         assert.equal(getUserWaitingEntry(state, user.id), null);
 
         const group = createGroup(state, `member group ${groupSeq++}`, user.id, '555');
+        const second = createUser(state, 'queued2@example.com', 'queued_user2');
+        addGroupMember(state, group.id, second.id);
         const entry = mustJoin(group.id);
         assert.equal(getUserWaitingEntry(state, user.id)?.id, entry.id);
     });

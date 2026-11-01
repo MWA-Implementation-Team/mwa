@@ -10,11 +10,8 @@ export type Language = {
     titleHome: string;
     titleActivities: string;
     titleActivity: string;
-    titleAccount: string;
     titleLeaderboard: string;
-    titleGroup: string;
     titleGambling: string;
-    titleInteract: string;
     titleHost: string;
     titleAdmin: string;
     titleError: string;
@@ -29,7 +26,6 @@ export type Language = {
     headerActivities: string;
     headerLeaderboard: string;
     headerGambling: string;
-    headerAccount: string;
     headerHost: string;
     headerAdmin: string;
 
@@ -46,7 +42,6 @@ export type Language = {
     interactHeading: string;
     interactSelfJoke: string;
     interactSendMoneyTitle: string;
-    interactComingSoon: string;
     interactProfileDetailTitle: string;
     interactDetailEmail: string;
     interactDetailBalance: string;
@@ -89,7 +84,7 @@ export type Language = {
     queueLeave: string;
     queueGroupSize: string;
     queueNeedGroup: string;
-    queueGoGroup: string;
+    queueTooSmall: string;
     queueJoinFailed: string;
     queueLeaveFailed: string;
     dashStandings: string;
@@ -116,6 +111,8 @@ export type Language = {
     shellLogoAlt: string;
     shellNavLabel: string;
     navTitle: string;
+    shellAlert: string;
+    dialogClose: string;
 
     activitiesDirectory: string;
     activitiesEmpty: string;
@@ -142,13 +139,15 @@ export type Language = {
     leaderboardGroupTag: string;
     leaderboardYou: string;
 
-    accountProfile: string;
-    accountUsername: string;
-    accountEdit: string;
-    accountEmail: string;
-    accountRole: string;
-    accountJoined: string;
-    accountLifetimeEarned: string;
+    dashYou: string;
+    youUsername: string;
+    youEdit: string;
+    youSettingsEdit: string;
+    youEmail: string;
+    youRole: string;
+    youSave: string;
+    youUsernameTaken: string;
+    youUsernameInvalid: string;
     adminPanelHead: string;
     adminPanelTodo: string;
 
@@ -164,15 +163,21 @@ export type Language = {
     groupLeaveFailed: string;
     groupName: string;
     groupPhone: string;
-    groupCreate: string;
-    groupYourGroups: string;
-    groupEmpty: string;
+    groupSettings: string;
+    groupSettingsEdit: string;
     groupDelete: string;
     groupDeleteConfirm: string;
-    groupCreated: string;
-    groupDeleted: string;
-    groupCreateFailed: string;
     groupDeleteFailed: string;
+    groupRequestJoin: string;
+    groupInviteCreates: string;
+    groupRequestSent: string;
+    groupRequestFailed: string;
+    groupInviteNotice: string;
+    groupInviteAccept: string;
+    groupAcceptFailed: string;
+    groupEdit: string;
+    groupEditFailed: string;
+    groupNameTaken: string;
 
     loginInvalidEmail: string;
     loginSendFailed: string;
@@ -259,11 +264,8 @@ export const languages: Record<LanguageCode, Language> = {
         titleHome: 'first years | App',
         titleActivities: 'first years | Activities',
         titleActivity: 'first years | {name}',
-        titleAccount: 'first years | Account',
         titleLeaderboard: 'first years | Leaderboard',
-        titleGroup: 'first years | Group',
         titleGambling: 'first years | Gambling',
-        titleInteract: 'first years | Interact',
         titleHost: 'first years | Host',
         titleAdmin: 'first years | Admin',
         titleError: 'first years | {status}',
@@ -278,7 +280,6 @@ export const languages: Record<LanguageCode, Language> = {
         headerActivities: 'Activities',
         headerLeaderboard: 'Leaderboard',
         headerGambling: 'Gambling',
-        headerAccount: 'Account',
         headerHost: 'Host tools',
         headerAdmin: 'Admin',
 
@@ -295,7 +296,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactHeading: 'Interact with {name}',
         interactSelfJoke: "That's you! Scan someone else's code instead.",
         interactSendMoneyTitle: 'Send money',
-        interactComingSoon: 'Coming soon',
         interactProfileDetailTitle: 'Profile details',
         interactDetailEmail: 'Email',
         interactDetailBalance: 'Balance',
@@ -338,7 +338,7 @@ export const languages: Record<LanguageCode, Language> = {
         queueLeave: 'Leave the queue',
         queueGroupSize: '{n} people in the group',
         queueNeedGroup: 'You need a group to join the queue.',
-        queueGoGroup: 'Go to your group',
+        queueTooSmall: 'Your group needs at least 2 people to join the queue.',
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
         dashStandings: 'Your standings',
@@ -365,6 +365,8 @@ export const languages: Record<LanguageCode, Language> = {
         shellLogoAlt: 'first years Event home',
         shellNavLabel: 'Main navigation',
         navTitle: 'Menu',
+        shellAlert: 'Alert',
+        dialogClose: 'Close',
 
         activitiesDirectory: 'Activity directory',
         activitiesEmpty: 'No activities listed yet.',
@@ -391,13 +393,15 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardGroupTag: '*group',
         leaderboardYou: 'You',
 
-        accountProfile: 'Profile',
-        accountUsername: 'Username',
-        accountEdit: 'Edit',
-        accountEmail: 'Email',
-        accountRole: 'Role',
-        accountJoined: 'Joined',
-        accountLifetimeEarned: 'Lifetime earned',
+        dashYou: 'You',
+        youUsername: 'Username',
+        youEdit: 'Edit',
+        youSettingsEdit: 'Edit user settings',
+        youEmail: 'Email',
+        youRole: 'Role',
+        youSave: 'Save',
+        youUsernameTaken: 'That username is taken',
+        youUsernameInvalid: 'Usernames are 1–16 lowercase letters, numbers, _ or -',
         adminPanelHead: 'administration',
         adminPanelTodo: 'TODO: admin panel.',
 
@@ -411,17 +415,23 @@ export const languages: Record<LanguageCode, Language> = {
         groupDeleteHint: 'Delete this group and all its members',
         groupKickFailed: 'Could not remove the member',
         groupLeaveFailed: 'Could not leave the group',
-        groupName: 'Group Name',
-        groupPhone: 'Enter emergency phone Number',
-        groupCreate: 'Create Group',
-        groupYourGroups: 'your Groups',
-        groupEmpty: 'no groups found',
+        groupName: 'Name',
+        groupPhone: 'Emergency phone',
+        groupSettings: 'Group settings',
+        groupSettingsEdit: 'Edit group settings',
         groupDelete: 'Delete group',
         groupDeleteConfirm: 'Delete group?',
-        groupCreated: 'Group created successfully!',
-        groupDeleted: 'Group deleted successfully!',
-        groupCreateFailed: 'failed to create group',
         groupDeleteFailed: 'failed to delete group',
+        groupRequestJoin: 'Join their team',
+        groupInviteCreates: 'Accepting creates a new team with you as the owner.',
+        groupRequestSent: 'Join request sent.',
+        groupRequestFailed: 'Could not send the join request.',
+        groupInviteNotice: '{player} wants to join your team!',
+        groupInviteAccept: 'Accept',
+        groupAcceptFailed: 'Could not form the group.',
+        groupEdit: 'Edit',
+        groupEditFailed: 'Could not update the group.',
+        groupNameTaken: 'That group name is already taken.',
 
         loginInvalidEmail: 'Enter a valid email',
         loginSendFailed: 'Could not send the email — try again in a moment',
@@ -508,11 +518,8 @@ export const languages: Record<LanguageCode, Language> = {
         titleHome: 'pirmakursiu | Programa',
         titleActivities: 'pirmakursiu | Veiklos',
         titleActivity: 'pirmakursiu | {name}',
-        titleAccount: 'pirmakursiu | Paskyra',
         titleLeaderboard: 'pirmakursiu | Lyderių lentelė',
-        titleGroup: 'pirmakursiu | Grupė',
         titleGambling: 'pirmakursiu | Lošimai',
-        titleInteract: 'pirmakursiu | Sąveika',
         titleHost: 'pirmakursiu | Vedėjas',
         titleAdmin: 'pirmakursiu | Administravimas',
         titleError: 'pirmakursiu | {status}',
@@ -527,7 +534,6 @@ export const languages: Record<LanguageCode, Language> = {
         headerActivities: 'Veiklos',
         headerLeaderboard: 'Lyderių lentelė',
         headerGambling: 'Lošimai',
-        headerAccount: 'Paskyra',
         headerHost: 'Vedėjo įrankiai',
         headerAdmin: 'Administravimas',
 
@@ -545,7 +551,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactHeading: 'Sąveika su {name}',
         interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
         interactSendMoneyTitle: 'Siųsti pinigus',
-        interactComingSoon: 'Netrukus',
         interactProfileDetailTitle: 'Profilio detalės',
         interactDetailEmail: 'El. paštas',
         interactDetailBalance: 'Balansas',
@@ -588,7 +593,7 @@ export const languages: Record<LanguageCode, Language> = {
         queueLeave: 'Palikti eilę',
         queueGroupSize: '{n} nariai grupėje',
         queueNeedGroup: 'Norint stoti į eilę, reikia grupės.',
-        queueGoGroup: 'Eiti į grupę',
+        queueTooSmall: 'Norint stoti į eilę, grupėje turi būti bent 2 nariai.',
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
         dashStandings: 'Tavo pozicijos',
@@ -615,6 +620,8 @@ export const languages: Record<LanguageCode, Language> = {
         shellLogoAlt: 'pirmakursiu renginio pradžia',
         shellNavLabel: 'Pagrindinė navigacija',
         navTitle: 'Meniu',
+        shellAlert: 'Pranešimas',
+        dialogClose: 'Uždaryti',
 
         activitiesDirectory: 'Veiklų katalogas',
         activitiesEmpty: 'Veiklų dar nėra.',
@@ -641,13 +648,15 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardGroupTag: '*grupė',
         leaderboardYou: 'Jūs',
 
-        accountProfile: 'Profilis',
-        accountUsername: 'Vartotojo vardas',
-        accountEdit: 'Redaguoti',
-        accountEmail: 'El. paštas',
-        accountRole: 'Rolė',
-        accountJoined: 'Prisijungė',
-        accountLifetimeEarned: 'Viso uždirbta',
+        dashYou: 'Tu',
+        youUsername: 'Vartotojo vardas',
+        youEdit: 'Redaguoti',
+        youSettingsEdit: 'Keičiami vartotojo nustatymai',
+        youEmail: 'El. paštas',
+        youRole: 'Rolė',
+        youSave: 'Išsaugoti',
+        youUsernameTaken: 'Šis vartotojo vardas užimtas',
+        youUsernameInvalid: 'Varde gali būti 1–16 mažųjų raidžių, skaičių, _ arba -',
 
         adminPanelHead: 'administravimas',
         adminPanelTodo: 'TODO: administravimo skydelis.',
@@ -662,17 +671,23 @@ export const languages: Record<LanguageCode, Language> = {
         groupDeleteHint: 'Ištrinti grupę ir visus narius',
         groupKickFailed: 'Nepavyko pašalinti nario',
         groupLeaveFailed: 'Nepavyko išeiti iš grupės',
-        groupName: 'Grupės pavadinimas',
-        groupPhone: 'Įveskite skubios pagalbos telefono numerį',
-        groupCreate: 'Sukurti grupę',
-        groupYourGroups: 'tavo grupės',
-        groupEmpty: 'grupių nerasta',
+        groupName: 'Pavadinimas',
+        groupPhone: 'Skubios pagalbos telefonas',
+        groupSettings: 'Grupės nustatymai',
+        groupSettingsEdit: 'Keičiami grupės nustatymai',
         groupDelete: 'Ištrinti grupę',
         groupDeleteConfirm: 'Ištrinti grupę?',
-        groupCreated: 'Grupė sėkmingai sukurta!',
-        groupDeleted: 'Grupė sėkmingai ištrinta!',
-        groupCreateFailed: 'nepavyko sukurti grupės',
         groupDeleteFailed: 'nepavyko ištrinti grupės',
+        groupRequestJoin: 'Prisijungti prie komandos',
+        groupInviteCreates: 'Priėmus bus sukurta nauja komanda, kurios savininkas būsi tu.',
+        groupRequestSent: 'Prašymas išsiųstas.',
+        groupRequestFailed: 'Nepavyko išsiųsti prašymo.',
+        groupInviteNotice: '{player} nori prisijungti prie tavo komandos!',
+        groupInviteAccept: 'Priimti',
+        groupAcceptFailed: 'Nepavyko suformuoti komandos.',
+        groupEdit: 'Redaguoti',
+        groupEditFailed: 'Nepavyko atnaujinti grupės.',
+        groupNameTaken: 'Grupės pavadinimas jau užimtas.',
 
         loginInvalidEmail: 'Įveskite galiojantį el. pašto adresą',
         loginSendFailed: 'Nepavyko išsiųsti el. laiško — netrukus bandykite dar kartą',

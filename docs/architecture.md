@@ -110,11 +110,23 @@ start so queue/badge rows can foreign-key them.
 ## Interactions and gambling
 
 The `PageShell` sidebar renders a personal QR using `uqr` on every page, linking
-to `/app/interact/:token`.
+to `/app?interact=<token>` — the home route resolves the token and opens the
+scanned user's dialog (`InteractDialog`); the old `/app/interact/:token` path
+redirects there so earlier links and QR payloads keep working.
 Migration `05_interact_tokens.sql` stores one permanent random token per user;
 it identifies the target but grants no permissions. Any signed-in scanner can
 challenge another user; hosts/admins also see their email, balance, and join date.
 Self-scans show no actions, and money transfers remain a placeholder.
+
+Teaming up works through invites (`11_group_invites.sql`): `POST
+/app/interact/:token/group-request` creates a pending `group_invites` row
+asking to join the target's team (the requester must be groupless), and the
+target sees it as a `group_invite` notification. Accepting
+(`/app/groups/invites/:id/accept`) adds the requester to the accepter's team;
+if the accepter has none, a group is created in one transaction — the accepter
+owns it, the name is a random `team-…` placeholder and the phone empty until
+the owner edits them from the home table's per-field dialogs (`POST
+/app/group/edit`).
 
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
 invitations. `/app/interact/:token/gamble` creates a challenge; re-challenging the
@@ -168,7 +180,7 @@ counts toward the active clock.
 `src/pubsub.ts` provides in-process channels for SSE: `/api/notifications` sends
 the user's current notification, and `/app/gambling/sessions/:id/watch` sends session
 snapshots. Both send initial state on connection and updates after changes. The
-client uses `EventSource`; the notification banner in `PageShell` prioritizes a
+client uses `EventSource`; the notification modal in `PageShell` prioritizes a
 running game over the oldest invitation. Multiple games per player are allowed, but only one notification is
 shown. Timers and pubsub assume a single server process.
 

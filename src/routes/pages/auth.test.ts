@@ -51,11 +51,11 @@ describe('GET /auth/verify — link path', () => {
         assert.ok(findUserByEmail(state, 'verify@example.com')!.emailVerifiedAt instanceof Date);
     });
 
-    it('creates an account for a new email and lands on /app/account', async () => {
+    it('creates an account for a new email and lands on /app', async () => {
         const { token } = createLoginToken(state, 'fresh.face@example.com');
         const res = await app.request(`/auth/verify?token=${token}`);
         assert.equal(res.status, 302);
-        assert.equal(res.headers.get('location'), '/app/account');
+        assert.equal(res.headers.get('location'), '/app');
 
         const user = findUserByEmail(state, 'fresh.face@example.com');
         assert.ok(user, 'account should exist after verify');
@@ -138,7 +138,7 @@ describe('POST /auth/verify — code path', () => {
     it('a code also creates accounts for new emails', async () => {
         const { code } = createLoginToken(state, 'signup-code@example.com');
         const res = await postVerify('signup-code@example.com', code);
-        assert.equal(res.headers.get('location'), '/app/account');
+        assert.equal(res.headers.get('location'), '/app');
         assert.ok(findUserByEmail(state, 'signup-code@example.com'));
     });
 });

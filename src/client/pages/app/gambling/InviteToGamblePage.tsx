@@ -78,9 +78,14 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                 </div>
             </section>
 
-            <Dialog isOpen={openDialog === 'coin_flip'} onClose={() => setOpenDialog(null)}>
-                <form method="POST" class="mwa-form">
-                    <h2>{t('gamblingCoinFlip')}</h2>
+            <Dialog
+                isOpen={openDialog === 'coin_flip'}
+                onClose={() => setOpenDialog(null)}
+                title={t('gamblingCoinFlip')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-cf-form', label: t('gamblingSendInvite') }}
+            >
+                <form id="mwa-cf-form" method="POST" class="mwa-form">
                     <input type="hidden" name="game_type" value="coin_flip" />
                     <div class="mwa-field">
                         <label for="mwa-cf-bet-amount">{t('gamblingBetAmount')}</label>
@@ -99,9 +104,6 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             <option value="tails">{t('gamblingTails')}</option>
                         </select>
                     </div>
-                    <div class="mwa-actions">
-                        <button type="submit">{t('gamblingSendInvite')}</button>
-                    </div>
                     {error?.message && (
                         <p class="mwa-note mwa-note--error" role="alert">
                             {t(error.message)}
@@ -110,9 +112,14 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                 </form>
             </Dialog>
 
-            <Dialog isOpen={openDialog === 'connect_4'} onClose={() => setOpenDialog(null)}>
-                <form method="POST" class="mwa-form">
-                    <h2>{t('gamblingConnect4')}</h2>
+            <Dialog
+                isOpen={openDialog === 'connect_4'}
+                onClose={() => setOpenDialog(null)}
+                title={t('gamblingConnect4')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-c4-form', label: t('gamblingSendInvite') }}
+            >
+                <form id="mwa-c4-form" method="POST" class="mwa-form">
                     <input type="hidden" name="game_type" value="connect_4" />
                     <div class="mwa-field">
                         <label for="mwa-c4-bet-amount">{t('gamblingBetAmount')}</label>
@@ -124,9 +131,6 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             required
                         />
                     </div>
-                    <div class="mwa-actions">
-                        <button type="submit">{t('gamblingSendInvite')}</button>
-                    </div>
                     {error?.message && (
                         <p class="mwa-note mwa-note--error" role="alert">
                             {t(error.message)}
@@ -134,9 +138,14 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                     )}
                 </form>
             </Dialog>
-            <Dialog isOpen={openDialog === 'chess'} onClose={() => setOpenDialog(null)}>
-                <form method="POST" class="mwa-form">
-                    <h2>{t('gamblingChess')}</h2>
+            <Dialog
+                isOpen={openDialog === 'chess'}
+                onClose={() => setOpenDialog(null)}
+                title={t('gamblingChess')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-chess-form', label: t('gamblingSendInvite') }}
+            >
+                <form id="mwa-chess-form" method="POST" class="mwa-form">
                     <input type="hidden" name="game_type" value="chess" />
                     <div class="mwa-field">
                         <label for="mwa-chess-bet-amount">{t('gamblingBetAmount')}</label>
@@ -147,9 +156,6 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             name="bet_amount"
                             required
                         />
-                    </div>
-                    <div class="mwa-actions">
-                        <button type="submit">{t('gamblingSendInvite')}</button>
                     </div>
                     {error?.message && (
                         <p class="mwa-note mwa-note--error" role="alert">

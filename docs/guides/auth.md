@@ -49,8 +49,8 @@ There is no global transport setter.
   name (local part sanitized to `[a-z0-9_-]`, deduped). A `sessions` row (30 days,
   sha256 at rest) becomes the `mwa-session` cookie (`HttpOnly`, `SameSite=Lax`,
   `Secure` in prod). Redirect: `safeGoto` accepts normalized same-origin paths and
-  queries (no route allowlist), else `/app` — **new accounts
-  default to `/app/account`** so the derived username can be fixed immediately.
+  queries (no route allowlist), else `/app`, where the you tab shows the
+  derived username.
 - **`currentUser(ctx)`** (`src/auth.ts`) resolves `mwa-session` → `sessions` →
   `User | null`. It's the only place "who is logged in" is decided.
 - **Route guards** (`src/auth.ts`) are how routes consume it:
@@ -103,7 +103,7 @@ only accept moves on that player's turn in a running game.
    `App (alice)`.
 4. Or instead: submit again, then type the **code** into the field — same result.
 5. A fresh email → "signup link" copy; the link creates the
-   account and lands on `/app/account` with a derived username.
+   account and lands on `/app` with a derived username.
 6. The same link/code a second time → "expired or already used".
 7. **Logout** → back at `/login`; the old cookie value is dead.
 8. For curl tests you need a real session cookie — mint one through the flow:

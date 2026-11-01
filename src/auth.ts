@@ -48,6 +48,10 @@ export function redirectIfAuthed(ctx: MwaContext): Response | null {
     return currentUser(ctx) ? ctx.redirect('/app') : null;
 }
 
+// Query survives the login round-trip — deep links like /app?interact=<token>
+// or a filtered leaderboard reopen in the state the visitor asked for.
 function goLogin(ctx: MwaContext): Response {
-    return ctx.redirect(`/login?goto=${encodeURIComponent(ctx.req.path)}`, 303);
+    const url = new URL(ctx.req.url);
+    const goto = url.pathname + url.search;
+    return ctx.redirect(`/login?goto=${encodeURIComponent(goto)}`, 303);
 }

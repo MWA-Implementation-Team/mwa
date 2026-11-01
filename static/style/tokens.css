@@ -14,9 +14,6 @@
     --note-error-fg: #ffe2e8;
     --note-error-bg: rgb(111 24 54 / 0.35);
     --note-error-border: #ff869f;
-    --note-success-fg: #d7ffe8;
-    --note-success-bg: rgb(20 93 76 / 0.3);
-    --note-success-border: #76dfb5;
     --text-danger: #ffd2de;
     --divider: rgb(from var(--muted-foreground) r g b / 0.32);
     --highlight-self: rgb(from var(--muted-foreground) r g b / 0.12);
