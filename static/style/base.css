@@ -76,16 +76,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 65px;
-    max-width: min(100%, 350px);
+    max-width: 100%;
     text-decoration: none;
 }
 
+/* The img itself is sized by .landing-welcome img, same as the landing page. */
 .mwa-logo img {
     display: block;
-    width: auto;
-    max-width: min(100%, 320px);
-    max-height: 112px;
+    max-width: 100%;
+    max-height: 140px;
     height: auto;
     object-fit: contain;
 }

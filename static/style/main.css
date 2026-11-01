@@ -4,7 +4,7 @@
 @import './components/note.css';
 @import './components/form.css';
 @import './components/landing.css';
-@import './components/navbar-menu.css';
+@import './components/button.css';
 @import './components/lang-links.css';
 @import './components/rows.css';
 @import './components/tx.css';
@@ -14,4 +14,5 @@
 @import './components/activity-card.css';
 @import './components/qr-code.css';
 @import './components/connect4.css';
+@import './components/dialog.css';
 @import './components/chess.css';

@@ -4,20 +4,32 @@ import { ClientContext } from '#src/client/context.js';
 import { Transaction, TransactionKind } from '#src/client/api/transactions.js';
 import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
 import PageShell from './PageShell.js';
+import Dialog from '#src/client/ui/Dialog.js';
 import { Language } from '#src/client/language.js';
 import type { LeaderboardBoard, ViewerStanding } from '#src/db/leaderboard/index.js';
 import { displayActor, displayUsername } from '#src/client/display.js';
+import InteractDialog, { InteractProfile } from './InteractDialog.js';
 
 type HomePageProps = {
     transactions: Transaction[];
+    interact: InteractProfile | null;
     groupName: string | null;
+    groupPhone: string | null;
     groupEmoji: string;
     groupMemberCount: number | null;
     groupOwnerId: number | null;
     groupMembers: { userId: number; username: string }[];
     groupError?: keyof Language;
+    // team-up request feedback — lands here because sending it closes the
+    // interact dialog
+    interactError?: keyof Language;
+    interactNotice?: keyof Language;
+    youError?: keyof Language;
     queuePosition: number | null;
+    queueCanJoin: boolean;
     queueError?: keyof Language;
+    qrClaimedAmount?: number | null;
+    qrError?: 'expired' | 'used_up' | 'already_claimed';
     standings: ViewerStanding[];
 };
 
@@ -47,23 +59,50 @@ const boardHintKey = {
     combined: 'leaderboardCombinedHint',
 } as const satisfies Record<LeaderboardBoard, keyof Language>;
 
+const qrErrorKey = {
+    expired: 'qrErrorExpired',
+    used_up: 'qrErrorUsedUp',
+    already_claimed: 'qrErrorAlreadyClaimed',
+} as const satisfies Record<NonNullable<HomePageProps['qrError']>, keyof Language>;
+
 function HomePage({
     transactions,
     groupName,
+    groupPhone,
     groupEmoji,
     groupMemberCount,
     groupOwnerId,
     groupMembers,
     groupError,
+    interactError,
+    interactNotice,
+    youError,
     queuePosition,
+    queueCanJoin,
     queueError,
+    qrClaimedAmount,
+    qrError,
     standings,
+    interact,
 }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
+    const [usernameDialogOpen, setUsernameDialogOpen] = useState(youError !== undefined);
+    const [groupNameEditOpen, setGroupNameEditOpen] = useState(false);
+    const [groupPhoneEditOpen, setGroupPhoneEditOpen] = useState(false);
 
     return (
         <PageShell section="home">
+            {qrClaimedAmount !== null && qrClaimedAmount !== undefined && (
+                <p class="mwa-note mwa-note--success" role="status">
+                    {t('qrClaimed', { amount: String(qrClaimedAmount) })}
+                </p>
+            )}
+            {qrError && (
+                <p class="mwa-note mwa-note--error" role="alert">
+                    {t(qrErrorKey[qrError])}
+                </p>
+            )}
             <section class="mwa-panel" id="panel-game">
                 <div class="mwa-panel-head">
                     <h2>{t('dashGame')}</h2>
@@ -96,15 +135,17 @@ function HomePage({
                                 </form>
                             </div>
                         ) : groupName ? (
-                            <form method="post" action="/app/queue/join" class="mwa-queue-cta">
-                                <button type="submit" class="lang-link">
-                                    {t('queueJoin')}
-                                </button>
-                            </form>
+                            !queueCanJoin ? (
+                                <p class="mwa-muted mwa-queue-cta">{t('queueTooSmall')}</p>
+                            ) : (
+                                <form method="post" action="/app/queue/join" class="mwa-queue-cta">
+                                    <button type="submit" class="lang-link">
+                                        {t('queueJoin')}
+                                    </button>
+                                </form>
+                            )
                         ) : (
-                            <p class="mwa-muted mwa-queue-cta">
-                                {t('queueNeedGroup')} <a href="/app/group">{t('queueGoGroup')}</a>
-                            </p>
+                            <p class="mwa-muted mwa-queue-cta">{t('queueNeedGroup')}</p>
                         )}
                     </div>
 
@@ -188,7 +229,10 @@ function HomePage({
                                                     hour12: false,
                                                 })}
                                             </td>
-                                            <td>{t(transactionKindKey[tx.kind])}</td>
+                                            <td>
+                                                {t(transactionKindKey[tx.kind])}
+                                                {tx.note && <div class="mwa-muted">{tx.note}</div>}
+                                            </td>
                                             <td class="mwa-tx-amount">
                                                 {tx.balanceDelta > 0 ? '+' : ''}
                                                 {tx.balanceDelta.toFixed(2)}
@@ -212,94 +256,181 @@ function HomePage({
                             {t(groupError)}
                         </p>
                     )}
-                    {groupMembers.length === 0 ? (
-                        <p class="mwa-muted">
-                            {t('groupNone')} <a href="/app/group">{t('queueGoGroup')}</a>
+                    {interactError && (
+                        <p class="mwa-note mwa-note--error" role="alert">
+                            {t(interactError)}
                         </p>
+                    )}
+                    {interactNotice && <p class="mwa-muted">{t(interactNotice)}</p>}
+                    {groupMembers.length === 0 ? (
+                        <p class="mwa-muted">{t('groupNone')}</p>
                     ) : (
-                        <div class="table mwa-tx">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th colSpan={2}>{groupName}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {groupMembers.map((member) => (
-                                        <tr key={member.userId}>
-                                            <td>
-                                                {displayActor(member.username, user, t)}
-                                                {member.userId === groupOwnerId && (
-                                                    <span class="mwa-row-tag">
-                                                        {t('groupOwner')}
-                                                    </span>
+                        <>
+                            <div class="table mwa-tx">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colSpan={3}>{t('groupSettings')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{t('groupName')}</td>
+                                            <td>{groupName}</td>
+                                            <td class="mwa-tx-amount">
+                                                {groupOwnerId === user!.id && (
+                                                    <button
+                                                        type="button"
+                                                        class="lang-link"
+                                                        onClick={() => setGroupNameEditOpen(true)}
+                                                    >
+                                                        {t('groupEdit')}
+                                                    </button>
                                                 )}
                                             </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{t('groupPhone')}</td>
+                                            <td>{groupPhone ?? '—'}</td>
                                             <td class="mwa-tx-amount">
-                                                {groupOwnerId === user!.id ? (
-                                                    member.userId === user!.id ? (
-                                                        <form
-                                                            method="post"
-                                                            action="/app/group/delete"
-                                                            onSubmit={(e) => {
-                                                                if (
-                                                                    !window.confirm(
-                                                                        t('groupDeleteConfirm'),
-                                                                    )
-                                                                ) {
-                                                                    e.preventDefault();
-                                                                }
-                                                            }}
-                                                        >
-                                                            <button
-                                                                type="submit"
-                                                                class="lang-link lang-link--danger"
-                                                                title={t('groupDeleteHint')}
-                                                            >
-                                                                {t('groupDelete')}
-                                                            </button>
-                                                        </form>
-                                                    ) : (
-                                                        <form
-                                                            method="post"
-                                                            action="/app/group/kick"
-                                                        >
-                                                            <input
-                                                                type="hidden"
-                                                                name="member_id"
-                                                                value={member.userId}
-                                                            />
-                                                            <button
-                                                                type="submit"
-                                                                class="lang-link lang-link--danger"
-                                                                title={t('groupKickHint', {
-                                                                    name: displayUsername(
-                                                                        member.username,
-                                                                    ),
-                                                                })}
-                                                            >
-                                                                {t('groupKick')}
-                                                            </button>
-                                                        </form>
-                                                    )
-                                                ) : member.userId === user!.id ? (
-                                                    <form method="post" action="/app/group/leave">
-                                                        <button
-                                                            type="submit"
-                                                            class="lang-link"
-                                                            title={t('groupLeaveHint')}
-                                                        >
-                                                            {t('groupLeave')}
-                                                        </button>
-                                                    </form>
-                                                ) : null}
+                                                {groupOwnerId === user!.id && (
+                                                    <button
+                                                        type="button"
+                                                        class="lang-link"
+                                                        onClick={() => setGroupPhoneEditOpen(true)}
+                                                    >
+                                                        {t('groupEdit')}
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="table mwa-tx">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colSpan={2}>{t('leaderboardColMembers')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {groupMembers.map((member) => (
+                                            <tr key={member.userId}>
+                                                <td>
+                                                    {displayActor(member.username, user, t)}
+                                                    {member.userId === groupOwnerId && (
+                                                        <span class="mwa-row-tag">
+                                                            {t('groupOwner')}
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td class="mwa-tx-amount">
+                                                    {groupOwnerId === user!.id ? (
+                                                        member.userId === user!.id ? (
+                                                            <form
+                                                                method="post"
+                                                                action="/app/group/delete"
+                                                                onSubmit={(e) => {
+                                                                    if (
+                                                                        !window.confirm(
+                                                                            t('groupDeleteConfirm'),
+                                                                        )
+                                                                    ) {
+                                                                        e.preventDefault();
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <button
+                                                                    type="submit"
+                                                                    class="lang-link lang-link--danger"
+                                                                    title={t('groupDeleteHint')}
+                                                                >
+                                                                    {t('groupDelete')}
+                                                                </button>
+                                                            </form>
+                                                        ) : (
+                                                            <form
+                                                                method="post"
+                                                                action="/app/group/kick"
+                                                            >
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="member_id"
+                                                                    value={member.userId}
+                                                                />
+                                                                <button
+                                                                    type="submit"
+                                                                    class="lang-link lang-link--danger"
+                                                                    title={t('groupKickHint', {
+                                                                        name: displayUsername(
+                                                                            member.username,
+                                                                        ),
+                                                                    })}
+                                                                >
+                                                                    {t('groupKick')}
+                                                                </button>
+                                                            </form>
+                                                        )
+                                                    ) : member.userId === user!.id ? (
+                                                        <form
+                                                            method="post"
+                                                            action="/app/group/leave"
+                                                        >
+                                                            <button
+                                                                type="submit"
+                                                                class="lang-link"
+                                                                title={t('groupLeaveHint')}
+                                                            >
+                                                                {t('groupLeave')}
+                                                            </button>
+                                                        </form>
+                                                    ) : null}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
                     )}
+                </div>
+            </section>
+
+            <section class="mwa-panel">
+                <div class="mwa-panel-head">
+                    <h2>{t('dashYou')}</h2>
+                </div>
+                <div class="mwa-panel-body">
+                    <div class="table mwa-tx">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>{t('youUsername')}</td>
+                                    <td>{displayUsername(user!.username)}</td>
+                                    <td class="mwa-tx-amount">
+                                        <button
+                                            type="button"
+                                            class="lang-link"
+                                            onClick={() => setUsernameDialogOpen(true)}
+                                        >
+                                            {t('youEdit')}
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{t('youEmail')}</td>
+                                    <td colSpan={2}>{user!.email}</td>
+                                </tr>
+                                <tr>
+                                    <td>{t('youRole')}</td>
+                                    <td colSpan={2}>
+                                        {user!.role.charAt(0).toUpperCase() + user!.role.slice(1)}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -323,6 +454,90 @@ function HomePage({
                     {guideOpen && <p class="mwa-muted">{t('dashGuideBody')}</p>}
                 </div>
             </section>
+
+            <Dialog
+                isOpen={usernameDialogOpen}
+                onClose={() => setUsernameDialogOpen(false)}
+                title={t('youSettingsEdit')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-you-form', label: t('youSave') }}
+            >
+                <form id="mwa-you-form" method="POST" action="/app/you/username" class="mwa-form">
+                    <div class="mwa-field">
+                        <label for="mwa-you-username">{t('youUsername')}</label>
+                        <input
+                            id="mwa-you-username"
+                            name="username"
+                            type="text"
+                            defaultValue={user!.username}
+                            maxLength={16}
+                            required
+                        />
+                    </div>
+                    {youError && (
+                        <p class="mwa-note mwa-note--error" role="alert">
+                            {t(youError)}
+                        </p>
+                    )}
+                </form>
+            </Dialog>
+
+            <Dialog
+                isOpen={groupNameEditOpen}
+                onClose={() => setGroupNameEditOpen(false)}
+                title={t('groupSettingsEdit')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-group-name-form', label: t('youSave') }}
+            >
+                <form
+                    id="mwa-group-name-form"
+                    method="POST"
+                    action="/app/group/edit"
+                    class="mwa-form"
+                >
+                    {/* The route rewrites both columns — carry the phone through. */}
+                    <input type="hidden" name="phone_number" value={groupPhone ?? ''} />
+                    <div class="mwa-field">
+                        <label for="mwa-group-edit-name">{t('groupName')}</label>
+                        <input
+                            id="mwa-group-edit-name"
+                            name="name"
+                            type="text"
+                            defaultValue={groupName ?? ''}
+                            required
+                        />
+                    </div>
+                </form>
+            </Dialog>
+
+            <Dialog
+                isOpen={groupPhoneEditOpen}
+                onClose={() => setGroupPhoneEditOpen(false)}
+                title={t('groupSettingsEdit')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-group-phone-form', label: t('youSave') }}
+            >
+                <form
+                    id="mwa-group-phone-form"
+                    method="POST"
+                    action="/app/group/edit"
+                    class="mwa-form"
+                >
+                    {/* The route rewrites both columns — carry the name through. */}
+                    <input type="hidden" name="name" value={groupName ?? ''} />
+                    <div class="mwa-field">
+                        <label for="mwa-group-edit-phone">{t('groupPhone')}</label>
+                        <input
+                            id="mwa-group-edit-phone"
+                            name="phone_number"
+                            type="tel"
+                            defaultValue={groupPhone ?? ''}
+                        />
+                    </div>
+                </form>
+            </Dialog>
+
+            {interact && <InteractDialog interact={interact} />}
         </PageShell>
     );
 }

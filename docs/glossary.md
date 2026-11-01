@@ -88,7 +88,8 @@ them into a table at startup (`syncActivities` → `activities`).
 ## Interact token
 
 A permanent, unguessable string identifying a user for the personal-QR flow — the
-`<token>` in `/app/interact/<token>`. Minted lazily by `getOrCreateInteractToken`
+`<token>` in `/app?interact=<token>` (the legacy path form `/app/interact/<token>`
+redirects there). Minted lazily by `getOrCreateInteractToken`
 (`src/db/interactions/index.ts`) on the owner's first `/app` render and stored raw in
 `interact_tokens` (like `system_qr_codes.secret`), because the QR needs the real
 value every render. It identifies the target but authorizes nothing — the
@@ -96,8 +97,8 @@ scanner's session and role decide what they can do.
 
 ## Interaction
 
-Something a scanner can do with the owner of an interact token — today just a
-conditional section on `InteractPage` (`src/client/pages/app/InteractPage.tsx`).
+Something a scanner can do with the owner of an interact token — today just the
+conditional content of `InteractDialog` (`src/client/pages/app/InteractDialog.tsx`).
 Role gating is data-driven, not renderer-driven: the route only serializes
 elevated fields (the `detail` prop) for host/admin scanners, so a section can
 never receive data its role shouldn't see. If interactions multiply, this can
@@ -109,7 +110,11 @@ One row in `queue_entries` — a group's spot in the single event-wide queue
 (`src/db/queue/index.ts`). The dashboard uses forms to join via
 `POST /app/queue/join` and leave via `POST /app/queue/leave`, redirecting
 back to `/app` with the updated position or a localized error.
-Both actions use the caller's own group; any member may act.
+Both actions use the caller's own group; any member may act. Joining needs
+at least `QUEUE_MIN_GROUP_SIZE` (2) members — groups may drop below that
+(members can always leave; only the owner can't), but an undersized group
+can't queue and loses a held spot when the removal drops it below the
+minimum.
 Status is `waiting` while in line and stays on the row afterwards — `left` for
 a bail, `called` when a host pulls the group to a station (`activity_slug`
 records which one). A called group finishing its station is marked by

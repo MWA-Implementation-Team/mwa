@@ -35,6 +35,11 @@
     border-color: var(--divider);
 }
 
+/* Stacked tables in one panel (group settings above members). */
+.mwa-tx + .mwa-tx {
+    margin-top: var(--space-3);
+}
+
 .mwa-tx-date {
     color: var(--muted-foreground);
     white-space: nowrap;

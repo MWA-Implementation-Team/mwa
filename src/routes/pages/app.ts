@@ -1,5 +1,5 @@
 import { requireRole, requireUser } from '#src/auth.js';
-import { listUserTransactions } from '#src/db/transactions/index.js';
+import { listUserTransactions, insertTransaction } from '#src/db/transactions/index.js';
 import {
     LeaderboardBoard,
     listGroupLeaderboard,
@@ -7,37 +7,60 @@ import {
     listViewerStandings,
 } from '#src/db/leaderboard/index.js';
 import {
+    acceptGroupInvite,
+    createGroupInvite,
     deleteGroup,
+    deleteGroupInvite,
+    findGroupInviteById,
     findUserGroup,
     listGroupMemberInfos,
     listGroupMembers,
-    listUserGroups,
+    MAX_GROUP_NAME_LENGTH,
+    MAX_PHONE_NUMBER_LENGTH,
     removeGroupMember,
+    updateGroup,
 } from '#src/db/groups/index.js';
 import {
     callNextGroups,
     markEntryDone,
     joinQueue,
     leaveQueue,
+    QUEUE_MIN_GROUP_SIZE,
     getQueuePosition,
     getUserWaitingEntry,
     listWaitingQueue,
     listStationGroups,
 } from '#src/db/queue/index.js';
-import { serialize } from '#src/client/serialize.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
+import type { InteractProfile } from '#src/client/pages/app/InteractDialog.js';
 import { cookieSession } from '#src/client/constants.js';
-import { findUserByInteractToken } from '#src/db/interactions/index.js';
+import { findUserByInteractToken, rotateInteractToken } from '#src/db/interactions/index.js';
+import { claimSystemQrCode } from '#src/db/systemqr/index.js';
+import { updateUsername } from '#src/db/users/index.js';
 import { deleteSession } from '#src/db/sessions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
-import { MwaHono } from '#src/state.js';
+import { notificationsChannel, publish } from '#src/pubsub.js';
+import { MwaContext, MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';
 import { Language } from '#src/client/language.js';
+import { safeGoto } from './login.js';
 
 // Emoji stand-ins until real per-group art ships. The pick is stable per
 // group — a mascot, not a slot machine — keyed off the group's id.
 const GROUP_ART_PLACEHOLDERS = ['🦊', '🐸', '🐼', '🐨', '🐯', '🦁', '🐙', '🦄'];
 const NO_GROUP_ART = '😔';
+
+// Feedback query params are allowlist-guarded: an unknown value falls back to
+// undefined so a stray ?xError=whatever can't smuggle a lang key or enum into
+// the page.
+function queryFlag<T extends string>(
+    ctx: MwaContext,
+    name: string,
+    allowed: readonly T[],
+): T | undefined {
+    const value = ctx.req.query(name);
+    return allowed.includes(value as T) ? (value as T) : undefined;
+}
 
 export function registerAppRoutes(app: MwaHono) {
     app.get('/app', async (ctx) => {
@@ -53,19 +76,63 @@ export function registerAppRoutes(app: MwaHono) {
                 ? GROUP_ART_PLACEHOLDERS[group.id % GROUP_ART_PLACEHOLDERS.length]
                 : NO_GROUP_ART;
 
-        let queueError: keyof Language | undefined = ctx.req.query('queueError') as keyof Language;
-        if (queueError !== 'queueJoinFailed' && queueError !== 'queueLeaveFailed') {
-            queueError = undefined;
+        const queueError = queryFlag(ctx, 'queueError', [
+            'queueJoinFailed',
+            'queueLeaveFailed',
+            'queueTooSmall',
+        ] as const);
+        const groupError = queryFlag(ctx, 'groupError', [
+            'groupKickFailed',
+            'groupLeaveFailed',
+            'groupDeleteFailed',
+            'groupEditFailed',
+            'groupNameTaken',
+            'groupAcceptFailed',
+        ] as const);
+
+        // Reward qr scan outcome: claimed amount or a failure message
+        const qrClaimed = Number(ctx.req.query('claimed'));
+        const qrClaimedAmount = Number.isSafeInteger(qrClaimed) && qrClaimed > 0 ? qrClaimed : null;
+        const qrError = queryFlag(ctx, 'qrError', [
+            'expired',
+            'used_up',
+            'already_claimed',
+        ] as const);
+        const youError = queryFlag(ctx, 'youError', [
+            'youUsernameTaken',
+            'youUsernameInvalid',
+        ] as const);
+
+        // ?interact=<token> opens the scanned user's dialog over home. A bad
+        // token 404s like the old page did. Group-request feedback comes back
+        // without the token — the dialog stays closed and the message shows in
+        // the team panel.
+        let interact: InteractProfile | null = null;
+        const interactToken = ctx.req.query('interact');
+        if (interactToken !== undefined) {
+            const target = findUserByInteractToken(ctx.var, interactToken);
+            if (!target) return writeErrorPage(ctx, 404);
+
+            const self = target.id === user.id;
+            // Profile detail is serialized into #ssr-data — populate it only
+            // for roles whose view includes it, never for regular users.
+            interact = {
+                token: interactToken,
+                self,
+                username: target.username,
+                detail:
+                    !self && (user.role === 'host' || user.role === 'admin')
+                        ? {
+                              email: target.email,
+                              currentBalance: target.currentBalance,
+                              joinedAt: target.createdAt.toISOString(),
+                          }
+                        : null,
+            };
         }
 
-        let groupError: keyof Language | undefined = ctx.req.query('groupError') as keyof Language;
-        if (
-            groupError !== 'groupKickFailed' &&
-            groupError !== 'groupLeaveFailed' &&
-            groupError !== 'groupDeleteFailed'
-        ) {
-            groupError = undefined;
-        }
+        const interactError = queryFlag(ctx, 'interactError', ['groupRequestFailed'] as const);
+        const interactNotice = queryFlag(ctx, 'interactNotice', ['groupRequestSent'] as const);
 
         // owner first, then join order — the member table reads top-down
         const groupMembers = group ? listGroupMemberInfos(ctx.var, group.id) : [];
@@ -78,19 +145,27 @@ export function registerAppRoutes(app: MwaHono) {
         return writePage(ctx, 'home', {
             transactions: listUserTransactions(ctx.var, user.id),
             groupName: group?.name ?? null,
+            groupPhone: group?.phoneNumber ?? null,
             groupEmoji,
             groupMemberCount: group ? memberCount : null,
             groupOwnerId: group?.ownerId ?? null,
             groupMembers,
             groupError,
+            youError,
             queueError,
+            qrClaimedAmount,
+            qrError,
+            queueCanJoin: memberCount >= QUEUE_MIN_GROUP_SIZE,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
             standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
+            interact,
+            interactError,
+            interactNotice,
         });
     });
 
     // Members can only remove themselves; the owner can't leave — deleting
-    // the group (on /app/group) is the only way out for them.
+    // the group is the only way out for them.
     app.post('/app/group/leave', (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
@@ -115,7 +190,8 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect('/app#panel-group', 303);
     });
 
-    // Kicking is owner-only; removeGroupMember still refuses below-minimum.
+    // Kicking is owner-only; removeGroupMember refuses non-members and
+    // evicts the group from the queue when it drops below the queue minimum.
     app.post('/app/group/kick', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
@@ -134,12 +210,124 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect('/app#panel-group', 303);
     });
 
+    // The group's name/phone are edited from the home table's per-field
+    // dialogs — owner only. Each dialog posts both columns (the untouched
+    // field rides along as a hidden input).
+    app.post('/app/group/edit', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const form = await ctx.req.formData().catch(() => null);
+        const name = String(form?.get('name') ?? '').trim();
+        const phoneNumber = String(form?.get('phone_number') ?? '').trim();
+        const group = findUserGroup(ctx.var, user.id);
+
+        if (
+            !group ||
+            name === '' ||
+            name.length > MAX_GROUP_NAME_LENGTH ||
+            phoneNumber.length > MAX_PHONE_NUMBER_LENGTH
+        ) {
+            return ctx.redirect('/app?groupError=groupEditFailed', 303);
+        }
+
+        const result = updateGroup(ctx.var, group.id, user.id, name, phoneNumber);
+        if (result === 'taken') return ctx.redirect('/app?groupError=groupNameTaken', 303);
+        if (result !== 'updated') return ctx.redirect('/app?groupError=groupEditFailed', 303);
+        return ctx.redirect('/app', 303);
+    });
+
+    // Join request from the interact page — the requester asks into the
+    // target's team (must be groupless themselves); the target sees it as a
+    // notification.
+    app.post('/app/interact/:token/group-request', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+
+        // Landing without the token keeps the interact dialog closed — the
+        // feedback note shows in the home page's team panel instead.
+        if (findUserGroup(ctx.var, user.id)) {
+            return ctx.redirect('/app?interactError=groupRequestFailed', 303);
+        }
+
+        createGroupInvite(ctx.var, user.id, target.id);
+        publish(notificationsChannel(target.id), '');
+        return ctx.redirect('/app?interactNotice=groupRequestSent', 303);
+    });
+
+    // Accepting a team-up invite forms the group immediately — the accepter
+    // owns it and can rename it from the home table.
+    app.post('/app/groups/invites/:id/accept', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const inviteId = Number(ctx.req.param('id'));
+        const invite = findGroupInviteById(ctx.var, inviteId);
+        const result = acceptGroupInvite(ctx.var, inviteId, user.id);
+
+        if (invite) {
+            publish(notificationsChannel(invite.fromUserId), '');
+            publish(notificationsChannel(invite.toUserId), '');
+        }
+        return ctx.redirect(
+            result === 'accepted' ? '/app' : '/app?groupError=groupAcceptFailed',
+            303,
+        );
+    });
+
+    app.post('/app/groups/invites/:id/reject', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const inviteId = Number(ctx.req.param('id'));
+        const invite = findGroupInviteById(ctx.var, inviteId);
+        if (!invite || !deleteGroupInvite(ctx.var, inviteId, user.id)) {
+            return writeErrorPage(ctx, 404);
+        }
+
+        publish(notificationsChannel(invite.fromUserId), '');
+        publish(notificationsChannel(invite.toUserId), '');
+
+        let goto: string | undefined;
+        try {
+            goto = new URL(ctx.req.header('Referer') ?? '').pathname;
+        } catch {
+            // fallback below
+        }
+        return ctx.redirect(safeGoto(ctx, goto) ?? '/app', 303);
+    });
+
+    // Username edits come from the you tab's modal on /app; a bad name bounces
+    // back with an error the reopened dialog shows.
+    app.post('/app/you/username', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const form = await ctx.req.formData().catch(() => null);
+        const result = updateUsername(ctx.var, user.id, String(form?.get('username') ?? ''));
+        if (result !== 'updated') {
+            const error = result === 'taken' ? 'youUsernameTaken' : 'youUsernameInvalid';
+            return ctx.redirect(`/app?youError=${error}`, 303);
+        }
+        return ctx.redirect('/app', 303);
+    });
+
     app.post('/app/queue/join', (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
         const group = findUserGroup(ctx.var, user.id);
-        if (!group || joinQueue(ctx.var, group.id).type !== 'joined') {
+        if (!group) return ctx.redirect('/app?queueError=queueJoinFailed#panel-game', 303);
+
+        const result = joinQueue(ctx.var, group.id);
+        if (result.type === 'too_small') {
+            return ctx.redirect('/app?queueError=queueTooSmall#panel-game', 303);
+        }
+        if (result.type !== 'joined') {
             return ctx.redirect('/app?queueError=queueJoinFailed#panel-game', 303);
         }
 
@@ -186,13 +374,6 @@ export function registerAppRoutes(app: MwaHono) {
         return writePage(ctx, 'activity', { slug });
     });
 
-    app.get('/app/account', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        return writePage(ctx, 'account', {});
-    });
-
     app.get('/app/leaderboard', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
@@ -215,15 +396,6 @@ export function registerAppRoutes(app: MwaHono) {
             scope,
             groups: listGroupLeaderboard(ctx.var, board),
             viewerGroupId,
-        });
-    });
-
-    app.get('/app/group', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        return writePage(ctx, 'group', {
-            initialGroups: listUserGroups(ctx.var, user.id).map(serialize),
         });
     });
 
@@ -301,31 +473,65 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect(target, 303);
     });
 
-    app.get('/app/interact/:token', async (ctx) => {
+    // Links minted before the interact page became a dialog on /app — bounce
+    // them onto the query-param form so old shares and QR payloads still land.
+    app.get('/app/interact/:token', (ctx) => {
         const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const url = new URL(ctx.req.url);
+        const target = new URL('/app', url);
+        url.searchParams.forEach((value, key) => target.searchParams.set(key, value));
+        target.searchParams.set('interact', ctx.req.param('token'));
+        return ctx.redirect(target.pathname + target.search, 303);
+    });
+
+    // Host (admin) award form: give the scanned user coins plus write an optional note
+    app.post('/app/interact/:token/award', async (ctx) => {
+        const user = requireRole(ctx, 'host', 'admin');
         if (user instanceof Response) return user;
 
         const token = ctx.req.param('token');
         const target = findUserByInteractToken(ctx.var, token);
-        if (!target) return writeErrorPage(ctx, 404);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
 
-        const self = target.id === user.id;
-        // Profile detail is serialized into #ssr-data — populate it only for
-        // roles whose view includes it, never for regular users.
-        const detail =
-            !self && (user.role === 'host' || user.role === 'admin')
-                ? {
-                      email: target.email,
-                      currentBalance: target.currentBalance,
-                      joinedAt: target.createdAt.toISOString(),
-                  }
-                : null;
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) return writeErrorPage(ctx, 400);
 
-        return writePage(ctx, 'interact', {
-            token,
-            self,
-            target: { username: target.username },
-            detail,
-        });
+        const amount = Number(form.get('amount'));
+        if (!Number.isSafeInteger(amount) || amount <= 0) {
+            return ctx.redirect(
+                `/app/interact/${encodeURIComponent(token)}?awardError=invalid`,
+                303,
+            );
+        }
+
+        const note = form.get('note');
+        const noteText = typeof note === 'string' && note.trim() ? note.trim().slice(0, 200) : null;
+
+        insertTransaction(ctx.var, 'system', target.id, amount, undefined, noteText);
+        return ctx.redirect(`/app/interact/${encodeURIComponent(token)}?awarded=1`, 303);
+    });
+
+    // Reward qr scan (the secret in the QR is the route param)
+    // Any signed-in user can claim (server side guard against double scans)
+    app.get('/app/qr/:secret', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const secret = ctx.req.param('secret');
+        const result = claimSystemQrCode(ctx.var, secret, user.id);
+        const outcome =
+            result.type === 'claimed' ? `claimed=${result.balanceDelta}` : `qrError=${result.type}`;
+        return ctx.redirect(`/app?${outcome}`, 303);
+    });
+
+    // Reset the personal qr token (the old code stops working immediately))
+    app.post('/app/you/reset-qr', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        rotateInteractToken(ctx.var, user.id);
+        return ctx.redirect('/app', 303);
     });
 }

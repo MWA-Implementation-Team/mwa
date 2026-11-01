@@ -36,3 +36,27 @@ export function findUserByInteractToken(state: MwaState, token: string): User | 
     const row = userIdByTokenQuery.get(token);
     return row ? findUserById(state, row.user_id as number) : null;
 }
+
+// Rotate a users personal QR token
+// Updates the row so the sidebar QR code keeps working on the next render
+export function rotateInteractToken(state: MwaState, userId: number): string {
+    const updateTokenQuery = state.prepare(
+        `UPDATE interact_tokens SET token = ? WHERE user_id = ?`,
+    );
+    for (let attempt = 0; attempt < 3; attempt++) {
+        const token = randomBytes(32).toString('base64url');
+        try {
+            const result = updateTokenQuery.run(token, userId);
+            if (result.changes === 0) {
+                // if row doesn't exist yet, mint one like getOrCreateInteractToken
+                return getOrCreateInteractToken(state, userId);
+            }
+            return token;
+        } catch (error) {
+            if (!(error instanceof Error && error.message.includes('UNIQUE'))) {
+                throw error;
+            }
+        }
+    }
+    throw new Error('could not rotate interact token after 3 tries');
+}
