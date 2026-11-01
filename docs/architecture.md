@@ -34,7 +34,8 @@ Follow `GET /` through the code:
       characters are escaped so a prop containing `</script>` can't break out of the
       tag,
     - `<script type="module" src="/client/bootstrap.js">`,
-    - stylesheets (`/oat.css`, `/style/main.css`) and in dev mode `/reload.js`.
+    - stylesheets (`/oat.css`, `/style/main.css`), `/oat.js`, and in dev mode
+      `/reload.js`.
 
     The `<body>` is a `<div id="app">` containing the server-rendered
     `ClientContextWrapper` wrapping the page component — real HTML, not a placeholder.

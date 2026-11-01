@@ -136,6 +136,7 @@ export function Root<P extends RegisteredPageId>({
                 <script type="module" src="/client/bootstrap.js" />
                 <link rel="stylesheet" href="/oat.css" />
                 <link rel="stylesheet" href="/style/main.css" />
+                <script src="/oat.js" defer />
                 {isDevMode && <script src="/reload.js" defer />}
             </head>
             <body style={bodyStyle}>
