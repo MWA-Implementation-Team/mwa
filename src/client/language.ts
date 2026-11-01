@@ -50,7 +50,6 @@ export type Language = {
     interactAwardAmount: string;
     interactAwardNote: string;
     interactAwardSubmit: string;
-    accountQrTitle: string;
     accountQrHint: string;
     accountQrReset: string;
     qrClaimed: string;
@@ -315,7 +314,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardAmount: 'Amount',
         interactAwardNote: 'Note (optional)',
         interactAwardSubmit: 'Award',
-        accountQrTitle: 'Personal QR code',
         accountQrHint:
             'Your personal QR is shown in the sidebar. Reset it to invalidate the old code.',
         accountQrReset: 'Reset QR code',
@@ -582,7 +580,6 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardAmount: 'Suma',
         interactAwardNote: 'Žinutė (neprivaloma)',
         interactAwardSubmit: 'Suteikti',
-        accountQrTitle: 'Asmeninis QR kodas',
         accountQrHint:
             'Jūsų asmeninis QR rodomas šone. Čia galite jį sukurti iš naujo (senasis nustos veikti).',
         accountQrReset: 'Iš naujo sukurti QR kodą',
