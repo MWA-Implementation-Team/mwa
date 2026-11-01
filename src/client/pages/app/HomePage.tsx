@@ -7,6 +7,7 @@ import PageShell from './PageShell.js';
 import Dialog from '#src/client/ui/Dialog.js';
 import { Language } from '#src/client/language.js';
 import type { LeaderboardBoard, ViewerStanding } from '#src/db/leaderboard/index.js';
+import { QUEUE_MIN_GROUP_SIZE } from '#src/db/queue/index.js';
 import { displayActor, displayUsername } from '#src/client/display.js';
 import InteractDialog, { InteractProfile } from './InteractDialog.js';
 
@@ -113,11 +114,15 @@ function HomePage({
                                 </form>
                             </div>
                         ) : groupName ? (
-                            <form method="post" action="/app/queue/join" class="mwa-queue-cta">
-                                <button type="submit" class="lang-link">
-                                    {t('queueJoin')}
-                                </button>
-                            </form>
+                            groupMemberCount !== null && groupMemberCount < QUEUE_MIN_GROUP_SIZE ? (
+                                <p class="mwa-muted mwa-queue-cta">{t('queueTooSmall')}</p>
+                            ) : (
+                                <form method="post" action="/app/queue/join" class="mwa-queue-cta">
+                                    <button type="submit" class="lang-link">
+                                        {t('queueJoin')}
+                                    </button>
+                                </form>
+                            )
                         ) : (
                             <p class="mwa-muted mwa-queue-cta">{t('queueNeedGroup')}</p>
                         )}

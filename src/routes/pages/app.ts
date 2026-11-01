@@ -63,7 +63,11 @@ export function registerAppRoutes(app: MwaHono) {
                 : NO_GROUP_ART;
 
         let queueError: keyof Language | undefined = ctx.req.query('queueError') as keyof Language;
-        if (queueError !== 'queueJoinFailed' && queueError !== 'queueLeaveFailed') {
+        if (
+            queueError !== 'queueJoinFailed' &&
+            queueError !== 'queueLeaveFailed' &&
+            queueError !== 'queueTooSmall'
+        ) {
             queueError = undefined;
         }
 
@@ -178,7 +182,8 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect('/app', 303);
     });
 
-    // Kicking is owner-only; removeGroupMember still refuses below-minimum.
+    // Kicking is owner-only; removeGroupMember refuses non-members and
+    // evicts the group from the queue when it drops below the queue minimum.
     app.post('/app/group/kick', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
@@ -308,7 +313,13 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         const group = findUserGroup(ctx.var, user.id);
-        if (!group || joinQueue(ctx.var, group.id).type !== 'joined') {
+        if (!group) return ctx.redirect('/app?queueError=queueJoinFailed', 303);
+
+        const result = joinQueue(ctx.var, group.id);
+        if (result.type === 'too_small') {
+            return ctx.redirect('/app?queueError=queueTooSmall', 303);
+        }
+        if (result.type !== 'joined') {
             return ctx.redirect('/app?queueError=queueJoinFailed', 303);
         }
 

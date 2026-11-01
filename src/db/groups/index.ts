@@ -2,8 +2,8 @@ import { MwaState } from '#src/state.js';
 import { SQLOutputValue } from 'node:sqlite';
 import { randomBytes } from 'node:crypto';
 import { runTransaction } from '../transaction.js';
+import { leaveQueue, QUEUE_MIN_GROUP_SIZE } from '../queue/index.js';
 
-export const MIN_GROUP_MEMBERS = 2;
 export const MAX_GROUP_MEMBERS = 6;
 export const MAX_GROUP_NAME_LENGTH = 64;
 export const MAX_PHONE_NUMBER_LENGTH = 32;
@@ -298,7 +298,11 @@ export function addGroupMember(
     }
 }
 
-export type RemoveGroupMemberResult = 'removed' | 'group_not_found' | 'is_owner' | 'below_minimum';
+export type RemoveGroupMemberResult =
+    | 'removed'
+    | 'group_not_found'
+    | 'is_owner'
+    | 'not_a_member';
 
 export function removeGroupMember(
     state: MwaState,
@@ -310,6 +314,11 @@ export function removeGroupMember(
         FROM groups
         WHERE id = ?
     `);
+    const getMemberQuery = state.prepare(`
+        SELECT user_id
+        FROM group_members
+        WHERE group_id = ? AND user_id = ?
+    `);
     const getGroupMemberCountQuery = state.prepare(`
         SELECT COUNT(*) as count
         FROM group_members
@@ -320,25 +329,33 @@ export function removeGroupMember(
        WHERE group_id = ? AND user_id = ?
     `);
 
-    const group = getGroupByIdQuery.get(groupId);
-    if (!group) {
-        return 'group_not_found';
-    }
+    return runTransaction(state.db, () => {
+        const group = getGroupByIdQuery.get(groupId);
+        if (!group) {
+            return 'group_not_found';
+        }
 
-    // The owner is a member like any other but can never be removed —
-    // deleting the group is the only way out for them.
-    if (group.owner_id === userId) {
-        return 'is_owner';
-    }
+        // The owner is a member like any other but can never be removed —
+        // deleting the group is the only way out for them.
+        if (group.owner_id === userId) {
+            return 'is_owner';
+        }
 
-    const count = getGroupMemberCountQuery.get(groupId)!.count as number;
+        if (!getMemberQuery.get(groupId, userId)) {
+            return 'not_a_member';
+        }
 
-    if (count <= MIN_GROUP_MEMBERS) {
-        return 'below_minimum';
-    }
+        removeMemberQuery.run(groupId, userId);
 
-    removeMemberQuery.run(groupId, userId);
-    return 'removed';
+        // A group below the queue minimum can't hold a spot — evict it so
+        // the owner has to invite someone back or delete the group.
+        const remaining = getGroupMemberCountQuery.get(groupId)!.count as number;
+        if (remaining < QUEUE_MIN_GROUP_SIZE) {
+            leaveQueue(state, groupId);
+        }
+
+        return 'removed';
+    });
 }
 
 export type GroupMemberInfo = { userId: number; username: string };

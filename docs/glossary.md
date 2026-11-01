@@ -110,7 +110,11 @@ One row in `queue_entries` — a group's spot in the single event-wide queue
 (`src/db/queue/index.ts`). The dashboard uses forms to join via
 `POST /app/queue/join` and leave via `POST /app/queue/leave`, redirecting
 back to `/app` with the updated position or a localized error.
-Both actions use the caller's own group; any member may act.
+Both actions use the caller's own group; any member may act. Joining needs
+at least `QUEUE_MIN_GROUP_SIZE` (2) members — groups may drop below that
+(members can always leave; only the owner can't), but an undersized group
+can't queue and loses a held spot when the removal drops it below the
+minimum.
 Status is `waiting` while in line and stays on the row afterwards — `left` for
 a bail, `called` when a host pulls the group to a station (`activity_slug`
 records which one). A called group finishing its station is marked by
