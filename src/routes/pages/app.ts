@@ -197,8 +197,9 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect('/app', 303);
     });
 
-    // The group's name/phone are edited from the home table's dialog —
-    // owner only.
+    // The group's name/phone are edited from the home table's per-field
+    // dialogs — owner only. Each dialog posts both columns (the untouched
+    // field rides along as a hidden input).
     app.post('/app/group/edit', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;

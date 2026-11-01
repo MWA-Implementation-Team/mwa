@@ -125,7 +125,8 @@ target sees it as a `group_invite` notification. Accepting
 (`/app/groups/invites/:id/accept`) adds the requester to the accepter's team;
 if the accepter has none, a group is created in one transaction — the accepter
 owns it, the name is a random `team-…` placeholder and the phone empty until
-the owner edits them from the home table's dialog (`POST /app/group/edit`).
+the owner edits them from the home table's per-field dialogs (`POST
+/app/group/edit`).
 
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
 invitations. `/app/interact/:token/gamble` creates a challenge; re-challenging the
