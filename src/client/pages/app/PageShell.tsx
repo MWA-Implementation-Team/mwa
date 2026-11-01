@@ -120,11 +120,8 @@ export default function PageShell({
                     isOpen
                     closable={false}
                     title={t('shellAlert')}
-                    actions={
-                        <div class="mwa-actions mwa-actions--col">
-                            <NotificationActions notification={notification} />
-                        </div>
-                    }
+                    class="mwa-dialog--half"
+                    actions={<NotificationActions notification={notification} />}
                 >
                     <div>
                         <NotificationBody notification={notification} />
@@ -171,14 +168,14 @@ function NotificationActions({ notification }: { notification: Notification }) {
         const inviteHref = `/app/groups/invites/${encodeURIComponent(notification.inviteId)}`;
         return (
             <>
-                <form method="POST" action={`${inviteHref}/accept`}>
-                    <button type="submit" class="mwa-button">
-                        {t('groupInviteAccept')}
-                    </button>
-                </form>
                 <form method="POST" action={`${inviteHref}/reject`}>
                     <button type="submit" class="mwa-button">
                         {t('gamblingReject')}
+                    </button>
+                </form>
+                <form method="POST" action={`${inviteHref}/accept`}>
+                    <button type="submit" class="mwa-button">
+                        {t('groupInviteAccept')}
                     </button>
                 </form>
             </>
@@ -188,14 +185,14 @@ function NotificationActions({ notification }: { notification: Notification }) {
     const sessionHref = `/app/gambling/sessions/${encodeURIComponent(notification.sessionId)}`;
     return notification.type === 'gambling_invite' ? (
         <>
-            <a class="mwa-button" href={sessionHref}>
-                {t('gamblingOpen')}
-            </a>
             <form method="POST" action={`${sessionHref}/reject`}>
                 <button type="submit" class="mwa-button">
                     {t('gamblingReject')}
                 </button>
             </form>
+            <a class="mwa-button" href={sessionHref}>
+                {t('gamblingOpen')}
+            </a>
         </>
     ) : (
         <a class="mwa-button" href={sessionHref}>
