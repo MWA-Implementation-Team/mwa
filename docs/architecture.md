@@ -126,7 +126,7 @@ the profile. The personal token can be rotated from the QR sidebar pane
 (`POST /app/you/reset-qr`), which invalidates the old code immediately.
 
 Reward QRs are the `system_qr_codes` table that has existed since migration 01.
-Admins mint them from `/admin` (`POST /admin/create-qr`) with a positive prize,
+Admins mint them from `/app/admin` (`POST /app/admin/create-qr`) with a positive prize,
 a max-uses cap, and an optional message (migration 13 — `system_qr_codes.message`);
 the admin page lists every QR with its SVG and link. The message is attached to
 the scanner's credit as its transaction note when the QR is claimed. Scanning

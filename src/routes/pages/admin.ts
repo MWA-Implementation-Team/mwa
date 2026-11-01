@@ -14,7 +14,7 @@ function requireAdmin(ctx: MwaContext): User | Response {
 }
 
 export function registerAdminRoutes(app: MwaHono) {
-    app.get('/admin', async (ctx) => {
+    app.get('/app/admin', async (ctx) => {
         const user = requireAdmin(ctx);
         if (user instanceof Response) return user;
 
@@ -29,7 +29,7 @@ export function registerAdminRoutes(app: MwaHono) {
         });
     });
 
-    app.post('/admin/mint-coins', async (ctx) => {
+    app.post('/app/admin/mint-coins', async (ctx) => {
         const user = requireAdmin(ctx);
         if (user instanceof Response) return user;
 
@@ -60,10 +60,10 @@ export function registerAdminRoutes(app: MwaHono) {
         }
 
         giveCoins(ctx.var, target.id, amount);
-        return ctx.redirect('/admin?minted=1');
+        return ctx.redirect('/app/admin?minted=1');
     });
 
-    app.post('/admin/create-qr', async (ctx) => {
+    app.post('/app/admin/create-qr', async (ctx) => {
         const user = requireAdmin(ctx);
         if (user instanceof Response) return user;
 
@@ -71,10 +71,10 @@ export function registerAdminRoutes(app: MwaHono) {
         const amount = Number(form?.get('amount'));
         const maxUses = Number(form?.get('max_uses'));
         if (!Number.isSafeInteger(amount) || amount <= 0) {
-            return ctx.redirect('/admin?qrError=1', 303);
+            return ctx.redirect('/app/admin?qrError=1', 303);
         }
         if (!Number.isSafeInteger(maxUses) || maxUses <= 0) {
-            return ctx.redirect('/admin?qrError=1', 303);
+            return ctx.redirect('/app/admin?qrError=1', 303);
         }
 
         const message = form?.get('message');
@@ -82,6 +82,6 @@ export function registerAdminRoutes(app: MwaHono) {
             typeof message === 'string' && message.trim() ? message.trim().slice(0, 200) : null;
 
         createSystemQrCode(ctx.var, amount, maxUses, messageText);
-        return ctx.redirect('/admin?qrCreated=1', 303);
+        return ctx.redirect('/app/admin?qrCreated=1', 303);
     });
 }

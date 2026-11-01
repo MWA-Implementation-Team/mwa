@@ -292,7 +292,7 @@ export const languages: Record<LanguageCode, Language> = {
         headerLeaderboard: 'Leaderboard',
         headerGambling: 'Gambling',
         headerHost: 'Host tools',
-        headerAdmin: 'Admin',
+        headerAdmin: 'Admin tools',
 
         logOut: 'Log out',
         logInSignUp: 'Log in / sign up',

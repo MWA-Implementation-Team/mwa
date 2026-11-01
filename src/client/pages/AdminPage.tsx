@@ -50,7 +50,7 @@ function AdminPage({ message, qrCreated, qrError, qrCodes }: AdminPageProps) {
                     <h2>Mint coins</h2>
                 </div>
                 <div class="mwa-panel-body">
-                    <form method="POST" action="/admin/mint-coins" class="mwa-form">
+                    <form method="POST" action="/app/admin/mint-coins" class="mwa-form">
                         <div class="mwa-field">
                             <label for="mwa-mint-username">Username</label>
                             <input id="mwa-mint-username" name="username" required />
@@ -77,7 +77,7 @@ function AdminPage({ message, qrCreated, qrError, qrCodes }: AdminPageProps) {
                     <h2>Create reward QR</h2>
                 </div>
                 <div class="mwa-panel-body">
-                    <form method="POST" action="/admin/create-qr" class="mwa-form">
+                    <form method="POST" action="/app/admin/create-qr" class="mwa-form">
                         <div class="mwa-field">
                             <label for="mwa-qr-amount">Prize amount</label>
                             <input
