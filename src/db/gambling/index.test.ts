@@ -24,6 +24,14 @@ const state = createTestMwaState({});
 
 const balance = (userId: number) => findUserById(state, userId)!.currentBalance;
 
+// TurnTime fields tick with the wall clock — exclude them from whole-object
+// equality or a millisecond between the two reads flakes the comparison.
+const withoutTurnTime = (game: ReturnType<typeof findGamblingSessionById>) => {
+    if (!game || !('p1TurnTime' in game)) return game;
+    const { p1TurnTime: _p1, p2TurnTime: _p2, ...rest } = game;
+    return rest;
+};
+
 function fundedUser(email: string, username: string, coins: number) {
     const user = createUser(state, email, username);
     if (coins > 0) giveCoins(state, user.id, coins);
@@ -117,7 +125,10 @@ describe('db/gambling', () => {
         board.place(0, first === 'p1' ? 'x' : 'o');
 
         assert.equal(connect4TakeTurn(state, id, second === 'p1' ? p1.id : p2.id, 0), false);
-        assert.deepEqual(findGamblingSessionById(state, id), game);
+        assert.deepEqual(
+            withoutTurnTime(findGamblingSessionById(state, id)),
+            withoutTurnTime(game),
+        );
         assert.equal(connect4TakeTurn(state, id, first === 'p1' ? p1.id : p2.id, 0), true);
         const updated = findGamblingSessionById(state, id);
         assert.equal(updated?.gameType, 'connect_4');
@@ -126,7 +137,10 @@ describe('db/gambling', () => {
 
         board.place(1, first === 'p1' ? 'x' : 'o');
         assert.equal(connect4TakeTurn(state, id, first === 'p1' ? p1.id : p2.id, 0), false);
-        assert.deepEqual(findGamblingSessionById(state, id), updated);
+        assert.deepEqual(
+            withoutTurnTime(findGamblingSessionById(state, id)),
+            withoutTurnTime(updated),
+        );
     });
 
     it('refunds both Connect 4 stakes on a draw', () => {
