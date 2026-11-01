@@ -430,8 +430,10 @@ function HomePage({
                 isOpen={usernameDialogOpen}
                 onClose={() => setUsernameDialogOpen(false)}
                 title={t('dashYou')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-you-form', label: t('youSave') }}
             >
-                <form method="POST" action="/app/you/username" class="mwa-form">
+                <form id="mwa-you-form" method="POST" action="/app/you/username" class="mwa-form">
                     <div class="mwa-field">
                         <label for="mwa-you-username">{t('youUsername')}</label>
                         <input
@@ -448,18 +450,6 @@ function HomePage({
                             {t(youError)}
                         </p>
                     )}
-                    <footer>
-                        <button
-                            type="button"
-                            class="mwa-button"
-                            onClick={() => setUsernameDialogOpen(false)}
-                        >
-                            {t('dialogClose')}
-                        </button>
-                        <button type="submit" class="mwa-button">
-                            {t('youSave')}
-                        </button>
-                    </footer>
                 </form>
             </Dialog>
 
@@ -467,8 +457,15 @@ function HomePage({
                 isOpen={groupNameEditOpen}
                 onClose={() => setGroupNameEditOpen(false)}
                 title={t('groupName')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-group-name-form', label: t('youSave') }}
             >
-                <form method="POST" action="/app/group/edit" class="mwa-form">
+                <form
+                    id="mwa-group-name-form"
+                    method="POST"
+                    action="/app/group/edit"
+                    class="mwa-form"
+                >
                     {/* The route rewrites both columns — carry the phone through. */}
                     <input type="hidden" name="phone_number" value={groupPhone ?? ''} />
                     <div class="mwa-field">
@@ -481,18 +478,6 @@ function HomePage({
                             required
                         />
                     </div>
-                    <footer>
-                        <button
-                            type="button"
-                            class="mwa-button"
-                            onClick={() => setGroupNameEditOpen(false)}
-                        >
-                            {t('dialogClose')}
-                        </button>
-                        <button type="submit" class="mwa-button">
-                            {t('youSave')}
-                        </button>
-                    </footer>
                 </form>
             </Dialog>
 
@@ -500,8 +485,15 @@ function HomePage({
                 isOpen={groupPhoneEditOpen}
                 onClose={() => setGroupPhoneEditOpen(false)}
                 title={t('groupPhone')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-group-phone-form', label: t('youSave') }}
             >
-                <form method="POST" action="/app/group/edit" class="mwa-form">
+                <form
+                    id="mwa-group-phone-form"
+                    method="POST"
+                    action="/app/group/edit"
+                    class="mwa-form"
+                >
                     {/* The route rewrites both columns — carry the name through. */}
                     <input type="hidden" name="name" value={groupName ?? ''} />
                     <div class="mwa-field">
@@ -513,18 +505,6 @@ function HomePage({
                             defaultValue={groupPhone ?? ''}
                         />
                     </div>
-                    <footer>
-                        <button
-                            type="button"
-                            class="mwa-button"
-                            onClick={() => setGroupPhoneEditOpen(false)}
-                        >
-                            {t('dialogClose')}
-                        </button>
-                        <button type="submit" class="mwa-button">
-                            {t('youSave')}
-                        </button>
-                    </footer>
                 </form>
             </Dialog>
 

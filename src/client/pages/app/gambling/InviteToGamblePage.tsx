@@ -82,8 +82,10 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                 isOpen={openDialog === 'coin_flip'}
                 onClose={() => setOpenDialog(null)}
                 title={t('gamblingCoinFlip')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-cf-form', label: t('gamblingSendInvite') }}
             >
-                <form method="POST" class="mwa-form">
+                <form id="mwa-cf-form" method="POST" class="mwa-form">
                     <input type="hidden" name="game_type" value="coin_flip" />
                     <div class="mwa-field">
                         <label for="mwa-cf-bet-amount">{t('gamblingBetAmount')}</label>
@@ -107,18 +109,6 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             {t(error.message)}
                         </p>
                     )}
-                    <footer>
-                        <button
-                            type="button"
-                            class="mwa-button"
-                            onClick={() => setOpenDialog(null)}
-                        >
-                            {t('dialogClose')}
-                        </button>
-                        <button type="submit" class="mwa-button">
-                            {t('gamblingSendInvite')}
-                        </button>
-                    </footer>
                 </form>
             </Dialog>
 
@@ -126,8 +116,10 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                 isOpen={openDialog === 'connect_4'}
                 onClose={() => setOpenDialog(null)}
                 title={t('gamblingConnect4')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-c4-form', label: t('gamblingSendInvite') }}
             >
-                <form method="POST" class="mwa-form">
+                <form id="mwa-c4-form" method="POST" class="mwa-form">
                     <input type="hidden" name="game_type" value="connect_4" />
                     <div class="mwa-field">
                         <label for="mwa-c4-bet-amount">{t('gamblingBetAmount')}</label>
@@ -144,26 +136,16 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             {t(error.message)}
                         </p>
                     )}
-                    <footer>
-                        <button
-                            type="button"
-                            class="mwa-button"
-                            onClick={() => setOpenDialog(null)}
-                        >
-                            {t('dialogClose')}
-                        </button>
-                        <button type="submit" class="mwa-button">
-                            {t('gamblingSendInvite')}
-                        </button>
-                    </footer>
                 </form>
             </Dialog>
             <Dialog
                 isOpen={openDialog === 'chess'}
                 onClose={() => setOpenDialog(null)}
                 title={t('gamblingChess')}
+                class="mwa-dialog--half"
+                submit={{ form: 'mwa-chess-form', label: t('gamblingSendInvite') }}
             >
-                <form method="POST" class="mwa-form">
+                <form id="mwa-chess-form" method="POST" class="mwa-form">
                     <input type="hidden" name="game_type" value="chess" />
                     <div class="mwa-field">
                         <label for="mwa-chess-bet-amount">{t('gamblingBetAmount')}</label>
@@ -180,18 +162,6 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             {t(error.message)}
                         </p>
                     )}
-                    <footer>
-                        <button
-                            type="button"
-                            class="mwa-button"
-                            onClick={() => setOpenDialog(null)}
-                        >
-                            {t('dialogClose')}
-                        </button>
-                        <button type="submit" class="mwa-button">
-                            {t('gamblingSendInvite')}
-                        </button>
-                    </footer>
                 </form>
             </Dialog>
         </PageShell>

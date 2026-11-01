@@ -7,8 +7,11 @@ export type DialogProps = {
     onClose?: () => void;
     title?: string;
     class?: string;
-    // extra buttons injected into the footer, before the Close button
+    // extra buttons injected into the footer, between Close and submit
     actions?: ReactNode;
+    // primary action — a submit button wired to the form by id (form=), so
+    // the footer can live outside the <form>
+    submit?: { form: string; label: string };
     // when false: no Close button, and Esc / backdrop clicks can't dismiss —
     // the caller's actions decide how the user gets out
     closable?: boolean;
@@ -23,6 +26,7 @@ export default function Dialog({
     title,
     class: className,
     actions,
+    submit,
     closable = true,
     children,
 }: DialogProps) {
@@ -78,12 +82,17 @@ export default function Dialog({
                 </header>
             )}
             {children}
-            {actions !== undefined && (
+            {(actions !== undefined || submit !== undefined) && (
                 <footer>
-                    {actions}
                     {closable && onClose && (
                         <button type="button" class="mwa-button" onClick={onClose}>
                             {t('dialogClose')}
+                        </button>
+                    )}
+                    {actions}
+                    {submit && (
+                        <button type="submit" class="mwa-button" form={submit.form}>
+                            {submit.label}
                         </button>
                     )}
                 </footer>

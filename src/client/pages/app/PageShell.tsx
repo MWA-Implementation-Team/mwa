@@ -120,7 +120,11 @@ export default function PageShell({
                     isOpen
                     closable={false}
                     title={t('shellAlert')}
-                    actions={<NotificationActions notification={notification} />}
+                    actions={
+                        <div class="mwa-actions mwa-actions--col">
+                            <NotificationActions notification={notification} />
+                        </div>
+                    }
                 >
                     <div>
                         <NotificationBody notification={notification} />
