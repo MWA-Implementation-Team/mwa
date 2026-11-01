@@ -11,6 +11,7 @@ export type Transaction = {
     createdAt: string;
     kind: TransactionKind;
     balanceDelta: number;
+    note: string | null;
 };
 
 export function listUserTransactions(state: MwaState, userId: number, limit = 10): Transaction[] {
@@ -18,7 +19,8 @@ export function listUserTransactions(state: MwaState, userId: number, limit = 10
     SELECT
         parent_transactions.created_at,
         parent_transactions.kind,
-        child_transactions.balance_delta
+        child_transactions.balance_delta,
+        child_transactions.note
     FROM child_transactions
     JOIN parent_transactions ON parent_transactions.id = child_transactions.parent_id
     WHERE child_transactions.user_id = ?
@@ -30,16 +32,21 @@ export function listUserTransactions(state: MwaState, userId: number, limit = 10
         createdAt: row.created_at as string,
         kind: row.kind as TransactionKind,
         balanceDelta: row.balance_delta as number,
+        note: (row.note as string | null) ?? null,
     }));
 }
 
 // Inserts a parent transaction and its single child row, returning the
-// parent id. Expected to run inside a transaction.
+// parent id. Expected to run inside a transaction. `systemQrCodeId` links a
+// system credit to the reward QR that produced it; `note` is an optional
+// human-readable reason shown on the home page.
 export function insertTransaction(
     state: MwaState,
     kind: TransactionKind,
     userId: number,
     balanceDelta: number,
+    systemQrCodeId?: number,
+    note?: string | null,
 ): number {
     const insertParentTx = state.prepare(`
     INSERT INTO parent_transactions (kind) VALUES (?)
@@ -50,9 +57,17 @@ export function insertTransaction(
     // stamp the user's current group so coins are attributed where they were earned
     const group = findUserGroup(state, userId);
     const insertChildTx = state.prepare(`
-    INSERT INTO child_transactions (parent_id, user_id, balance_delta, group_id) VALUES (?, ?, ?, ?)
+    INSERT INTO child_transactions (parent_id, user_id, balance_delta, group_id, system_qr_code_id, note)
+    VALUES (?, ?, ?, ?, ?, ?)
     `);
-    insertChildTx.run(parentId, userId, balanceDelta, group?.id ?? null);
+    insertChildTx.run(
+        parentId,
+        userId,
+        balanceDelta,
+        group?.id ?? null,
+        systemQrCodeId ?? null,
+        note ?? null,
+    );
 
     return parentId as number;
 }

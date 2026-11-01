@@ -53,6 +53,11 @@ export default function PageShell({
     if (user && (user.role === 'host' || user.role === 'admin')) {
         navigation.push({ section: 'host', label: t('headerHost'), href: '/app/host' });
     }
+    // In dev the page lets any signed-in user in; the nav entry stays
+    // admin-only so the real audience is the one that sees it.
+    if (user && user.role === 'admin') {
+        navigation.push({ section: 'admin', label: t('headerAdmin'), href: '/app/admin' });
+    }
 
     const sidebar = side ?? (
         <>

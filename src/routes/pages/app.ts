@@ -1,5 +1,5 @@
 import { requireRole, requireUser } from '#src/auth.js';
-import { listUserTransactions } from '#src/db/transactions/index.js';
+import { listUserTransactions, insertTransaction } from '#src/db/transactions/index.js';
 import {
     LeaderboardBoard,
     listGroupLeaderboard,
@@ -34,12 +34,13 @@ import {
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import type { InteractProfile } from '#src/client/pages/app/InteractDialog.js';
 import { cookieSession } from '#src/client/constants.js';
-import { findUserByInteractToken } from '#src/db/interactions/index.js';
+import { findUserByInteractToken, rotateInteractToken } from '#src/db/interactions/index.js';
+import { claimSystemQrCode } from '#src/db/systemqr/index.js';
 import { updateUsername } from '#src/db/users/index.js';
 import { deleteSession } from '#src/db/sessions/index.js';
 import { writeErrorPage, writePage } from '#src/pages.js';
 import { notificationsChannel, publish } from '#src/pubsub.js';
-import { MwaHono } from '#src/state.js';
+import { MwaContext, MwaHono } from '#src/state.js';
 import { deleteCookie, getCookie } from 'hono/cookie';
 import { Language } from '#src/client/language.js';
 import { safeGoto } from './login.js';
@@ -48,6 +49,18 @@ import { safeGoto } from './login.js';
 // group — a mascot, not a slot machine — keyed off the group's id.
 const GROUP_ART_PLACEHOLDERS = ['🦊', '🐸', '🐼', '🐨', '🐯', '🦁', '🐙', '🦄'];
 const NO_GROUP_ART = '😔';
+
+// Feedback query params are allowlist-guarded: an unknown value falls back to
+// undefined so a stray ?xError=whatever can't smuggle a lang key or enum into
+// the page.
+function queryFlag<T extends string>(
+    ctx: MwaContext,
+    name: string,
+    allowed: readonly T[],
+): T | undefined {
+    const value = ctx.req.query(name);
+    return allowed.includes(value as T) ? (value as T) : undefined;
+}
 
 export function registerAppRoutes(app: MwaHono) {
     app.get('/app', async (ctx) => {
@@ -63,31 +76,32 @@ export function registerAppRoutes(app: MwaHono) {
                 ? GROUP_ART_PLACEHOLDERS[group.id % GROUP_ART_PLACEHOLDERS.length]
                 : NO_GROUP_ART;
 
-        let queueError: keyof Language | undefined = ctx.req.query('queueError') as keyof Language;
-        if (
-            queueError !== 'queueJoinFailed' &&
-            queueError !== 'queueLeaveFailed' &&
-            queueError !== 'queueTooSmall'
-        ) {
-            queueError = undefined;
-        }
+        const queueError = queryFlag(ctx, 'queueError', [
+            'queueJoinFailed',
+            'queueLeaveFailed',
+            'queueTooSmall',
+        ] as const);
+        const groupError = queryFlag(ctx, 'groupError', [
+            'groupKickFailed',
+            'groupLeaveFailed',
+            'groupDeleteFailed',
+            'groupEditFailed',
+            'groupNameTaken',
+            'groupAcceptFailed',
+        ] as const);
 
-        let groupError: keyof Language | undefined = ctx.req.query('groupError') as keyof Language;
-        if (
-            groupError !== 'groupKickFailed' &&
-            groupError !== 'groupLeaveFailed' &&
-            groupError !== 'groupDeleteFailed' &&
-            groupError !== 'groupEditFailed' &&
-            groupError !== 'groupNameTaken' &&
-            groupError !== 'groupAcceptFailed'
-        ) {
-            groupError = undefined;
-        }
-
-        let youError: keyof Language | undefined = ctx.req.query('youError') as keyof Language;
-        if (youError !== 'youUsernameTaken' && youError !== 'youUsernameInvalid') {
-            youError = undefined;
-        }
+        // Reward qr scan outcome: claimed amount or a failure message
+        const qrClaimed = Number(ctx.req.query('claimed'));
+        const qrClaimedAmount = Number.isSafeInteger(qrClaimed) && qrClaimed > 0 ? qrClaimed : null;
+        const qrError = queryFlag(ctx, 'qrError', [
+            'expired',
+            'used_up',
+            'already_claimed',
+        ] as const);
+        const youError = queryFlag(ctx, 'youError', [
+            'youUsernameTaken',
+            'youUsernameInvalid',
+        ] as const);
 
         // ?interact=<token> opens the scanned user's dialog over home. A bad
         // token 404s like the old page did. Group-request feedback comes back
@@ -117,18 +131,8 @@ export function registerAppRoutes(app: MwaHono) {
             };
         }
 
-        let interactError: keyof Language | undefined = ctx.req.query(
-            'interactError',
-        ) as keyof Language;
-        if (interactError !== 'groupRequestFailed') {
-            interactError = undefined;
-        }
-        let interactNotice: keyof Language | undefined = ctx.req.query(
-            'interactNotice',
-        ) as keyof Language;
-        if (interactNotice !== 'groupRequestSent') {
-            interactNotice = undefined;
-        }
+        const interactError = queryFlag(ctx, 'interactError', ['groupRequestFailed'] as const);
+        const interactNotice = queryFlag(ctx, 'interactNotice', ['groupRequestSent'] as const);
 
         // owner first, then join order — the member table reads top-down
         const groupMembers = group ? listGroupMemberInfos(ctx.var, group.id) : [];
@@ -149,6 +153,8 @@ export function registerAppRoutes(app: MwaHono) {
             groupError,
             youError,
             queueError,
+            qrClaimedAmount,
+            qrError,
             queueCanJoin: memberCount >= QUEUE_MIN_GROUP_SIZE,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
             standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
@@ -478,5 +484,54 @@ export function registerAppRoutes(app: MwaHono) {
         url.searchParams.forEach((value, key) => target.searchParams.set(key, value));
         target.searchParams.set('interact', ctx.req.param('token'));
         return ctx.redirect(target.pathname + target.search, 303);
+    });
+
+    // Host (admin) award form: give the scanned user coins plus write an optional note
+    app.post('/app/interact/:token/award', async (ctx) => {
+        const user = requireRole(ctx, 'host', 'admin');
+        if (user instanceof Response) return user;
+
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) return writeErrorPage(ctx, 400);
+
+        const amount = Number(form.get('amount'));
+        if (!Number.isSafeInteger(amount) || amount <= 0) {
+            return ctx.redirect(
+                `/app/interact/${encodeURIComponent(token)}?awardError=invalid`,
+                303,
+            );
+        }
+
+        const note = form.get('note');
+        const noteText = typeof note === 'string' && note.trim() ? note.trim().slice(0, 200) : null;
+
+        insertTransaction(ctx.var, 'system', target.id, amount, undefined, noteText);
+        return ctx.redirect(`/app/interact/${encodeURIComponent(token)}?awarded=1`, 303);
+    });
+
+    // Reward qr scan (the secret in the QR is the route param)
+    // Any signed-in user can claim (server side guard against double scans)
+    app.get('/app/qr/:secret', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const secret = ctx.req.param('secret');
+        const result = claimSystemQrCode(ctx.var, secret, user.id);
+        const outcome =
+            result.type === 'claimed' ? `claimed=${result.balanceDelta}` : `qrError=${result.type}`;
+        return ctx.redirect(`/app?${outcome}`, 303);
+    });
+
+    // Reset the personal qr token (the old code stops working immediately))
+    app.post('/app/you/reset-qr', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        rotateInteractToken(ctx.var, user.id);
+        return ctx.redirect('/app', 303);
     });
 }

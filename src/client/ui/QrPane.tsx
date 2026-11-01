@@ -43,6 +43,11 @@ export default function QrPane() {
                 <button type="button" class="lang-link" onClick={handleCopy}>
                     {copied ? t('qrCopied') : t('qrCopyLink')}
                 </button>
+                <form method="POST" action="/app/you/reset-qr">
+                    <button type="submit" class="lang-link" title={t('accountQrHint')}>
+                        {t('accountQrReset')}
+                    </button>
+                </form>
             </div>
         </section>
     );

@@ -79,14 +79,14 @@ sqlite3 db.sqlite "UPDATE users SET role = 'host' WHERE username = 'alice';"
 | `/`, `/login`, `/auth/verify`                                    | public                                                  |
 | `GET /app`, `GET /app/*`                                         | `requireUser`                                           |
 | `POST /app` (logout)                                             | session cookie                                          |
-| `GET /admin`, `POST /admin/mint-coins`                           | admin in production; any logged-in user in dev          |
+| `GET /app/admin`, `POST /app/admin/*`                            | admin in production; any logged-in user in dev          |
 | `GET /api/users`                                                 | `requireApiUser`                                        |
 | `GET /api/notifications`, `GET /app/gambling/sessions/:id/watch` | `requireApiUser`                                        |
 | Gambling challenge/accept/reject POSTs                           | `requireUser`; accept/reject require the invited player |
 
-`POST /admin/mint-coins` takes `username` and a positive safe-integer `amount`,
+`POST /app/admin/mint-coins` takes `username` and a positive safe-integer `amount`,
 crediting a `system` transaction through `giveCoins`. In dev, any logged-in
-user can visit `/admin` directly; the navigation link remains admin-only.
+user can visit `/app/admin` directly; the navigation link remains admin-only.
 
 Connect 4's `POST /app/gambling/sessions/:id/c4-place` and chess's
 `POST /app/gambling/sessions/:id/chess-move` require a signed-in participant and

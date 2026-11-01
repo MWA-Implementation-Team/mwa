@@ -92,6 +92,31 @@ export default function InteractDialog({ interact }: { interact: InteractProfile
                             <strong>{detail.joinedAt.slice(0, 10)}</strong>
                         </li>
                     </ul>
+                    <h3>{t('interactAwardTitle')}</h3>
+                    <form
+                        method="POST"
+                        action={`/app/interact/${encodeURIComponent(token)}/award`}
+                        class="mwa-form"
+                    >
+                        <div class="mwa-field">
+                            <label for="mwa-award-amount">{t('interactAwardAmount')}</label>
+                            <input
+                                id="mwa-award-amount"
+                                type="number"
+                                name="amount"
+                                min="1"
+                                step="1"
+                                required
+                            />
+                        </div>
+                        <div class="mwa-field">
+                            <label for="mwa-award-note">{t('interactAwardNote')}</label>
+                            <input id="mwa-award-note" name="note" maxLength={200} />
+                        </div>
+                        <div class="mwa-actions">
+                            <button type="submit">{t('interactAwardSubmit')}</button>
+                        </div>
+                    </form>
                 </>
             )}
         </Dialog>
