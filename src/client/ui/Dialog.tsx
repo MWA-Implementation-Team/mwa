@@ -33,7 +33,18 @@ export default function Dialog({
         const dialog = dialogRef.current;
         if (!dialog) return;
 
-        if (isOpen && !dialog.open) dialog.showModal();
+        if (isOpen && !dialog.open) {
+            dialog.showModal();
+            // showModal() focuses the first field with the caret at 0 —
+            // prefilled values read better with the caret at the end.
+            const el = dialog.ownerDocument.activeElement;
+            if (
+                (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) &&
+                el.selectionStart === 0
+            ) {
+                el.setSelectionRange(el.value.length, el.value.length);
+            }
+        }
         if (!isOpen && dialog.open) dialog.close();
     }, [isOpen]);
 
