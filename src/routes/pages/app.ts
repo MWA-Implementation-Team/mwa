@@ -172,9 +172,9 @@ export function registerAppRoutes(app: MwaHono) {
 
         const group = findUserGroup(ctx.var, user.id);
         if (!group || removeGroupMember(ctx.var, group.id, user.id) !== 'removed') {
-            return ctx.redirect('/app?groupError=groupLeaveFailed', 303);
+            return ctx.redirect('/app?groupError=groupLeaveFailed#panel-group', 303);
         }
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app#panel-group', 303);
     });
 
     // Deleting is the owner's only way out — owner check is inside
@@ -185,9 +185,9 @@ export function registerAppRoutes(app: MwaHono) {
 
         const group = findUserGroup(ctx.var, user.id);
         if (!group || !deleteGroup(ctx.var, group.id, user.id)) {
-            return ctx.redirect('/app?groupError=groupDeleteFailed', 303);
+            return ctx.redirect('/app?groupError=groupDeleteFailed#panel-group', 303);
         }
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app#panel-group', 303);
     });
 
     // Kicking is owner-only; removeGroupMember refuses non-members and
@@ -205,9 +205,9 @@ export function registerAppRoutes(app: MwaHono) {
             !Number.isInteger(memberId) ||
             removeGroupMember(ctx.var, group.id, memberId) !== 'removed'
         ) {
-            return ctx.redirect('/app?groupError=groupKickFailed', 303);
+            return ctx.redirect('/app?groupError=groupKickFailed#panel-group', 303);
         }
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app#panel-group', 303);
     });
 
     // The group's name/phone are edited from the home table's per-field
@@ -321,17 +321,17 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         const group = findUserGroup(ctx.var, user.id);
-        if (!group) return ctx.redirect('/app?queueError=queueJoinFailed', 303);
+        if (!group) return ctx.redirect('/app?queueError=queueJoinFailed#panel-game', 303);
 
         const result = joinQueue(ctx.var, group.id);
         if (result.type === 'too_small') {
-            return ctx.redirect('/app?queueError=queueTooSmall', 303);
+            return ctx.redirect('/app?queueError=queueTooSmall#panel-game', 303);
         }
         if (result.type !== 'joined') {
-            return ctx.redirect('/app?queueError=queueJoinFailed', 303);
+            return ctx.redirect('/app?queueError=queueJoinFailed#panel-game', 303);
         }
 
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app#panel-game', 303);
     });
 
     app.post('/app/queue/leave', (ctx) => {
@@ -340,10 +340,10 @@ export function registerAppRoutes(app: MwaHono) {
 
         const group = findUserGroup(ctx.var, user.id);
         if (!group || !leaveQueue(ctx.var, group.id)) {
-            return ctx.redirect('/app?queueError=queueLeaveFailed', 303);
+            return ctx.redirect('/app?queueError=queueLeaveFailed#panel-game', 303);
         }
 
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app#panel-game', 303);
     });
 
     app.post('/app', async (ctx) => {
