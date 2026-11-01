@@ -1,0 +1,15 @@
+/* Top-layer tooltip for title= hints — driven by src/client/ui/tooltip.ts. */
+.mwa-tooltip {
+    position: fixed;
+    inset: auto;
+    max-width: 18rem;
+    margin: 0;
+    padding: var(--space-2) var(--space-3);
+    border: none;
+    border-radius: var(--radius-medium);
+    background: var(--foreground);
+    color: var(--background);
+    font-size: var(--text-7);
+    line-height: 1.3;
+    pointer-events: none;
+}
