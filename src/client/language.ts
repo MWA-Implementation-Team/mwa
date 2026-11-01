@@ -12,7 +12,6 @@ export type Language = {
     titleActivity: string;
     titleLeaderboard: string;
     titleGambling: string;
-    titleInteract: string;
     titleHost: string;
     titleAdmin: string;
     titleError: string;
@@ -263,7 +262,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleActivity: 'first years | {name}',
         titleLeaderboard: 'first years | Leaderboard',
         titleGambling: 'first years | Gambling',
-        titleInteract: 'first years | Interact',
         titleHost: 'first years | Host',
         titleAdmin: 'first years | Admin',
         titleError: 'first years | {status}',
@@ -514,7 +512,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleActivity: 'pirmakursiu | {name}',
         titleLeaderboard: 'pirmakursiu | Lyderių lentelė',
         titleGambling: 'pirmakursiu | Lošimai',
-        titleInteract: 'pirmakursiu | Sąveika',
         titleHost: 'pirmakursiu | Vedėjas',
         titleAdmin: 'pirmakursiu | Administravimas',
         titleError: 'pirmakursiu | {status}',

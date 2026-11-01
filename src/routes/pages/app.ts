@@ -31,6 +31,7 @@ import {
     listStationGroups,
 } from '#src/db/queue/index.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
+import { InteractProfile } from '#src/client/pages/app/InteractDialog.js';
 import { cookieSession } from '#src/client/constants.js';
 import { findUserByInteractToken } from '#src/db/interactions/index.js';
 import { updateUsername } from '#src/db/users/index.js';
@@ -83,6 +84,47 @@ export function registerAppRoutes(app: MwaHono) {
             youError = undefined;
         }
 
+        // ?interact=<token> opens the scanned user's dialog over home. A bad
+        // token 404s like the old page did. Group-request feedback comes back
+        // without the token — the dialog stays closed and the message shows in
+        // the team panel.
+        let interact: InteractProfile | null = null;
+        const interactToken = ctx.req.query('interact');
+        if (interactToken !== undefined) {
+            const target = findUserByInteractToken(ctx.var, interactToken);
+            if (!target) return writeErrorPage(ctx, 404);
+
+            const self = target.id === user.id;
+            // Profile detail is serialized into #ssr-data — populate it only
+            // for roles whose view includes it, never for regular users.
+            interact = {
+                token: interactToken,
+                self,
+                username: target.username,
+                detail:
+                    !self && (user.role === 'host' || user.role === 'admin')
+                        ? {
+                              email: target.email,
+                              currentBalance: target.currentBalance,
+                              joinedAt: target.createdAt.toISOString(),
+                          }
+                        : null,
+            };
+        }
+
+        let interactError: keyof Language | undefined = ctx.req.query(
+            'interactError',
+        ) as keyof Language;
+        if (interactError !== 'groupRequestFailed') {
+            interactError = undefined;
+        }
+        let interactNotice: keyof Language | undefined = ctx.req.query(
+            'interactNotice',
+        ) as keyof Language;
+        if (interactNotice !== 'groupRequestSent') {
+            interactNotice = undefined;
+        }
+
         // owner first, then join order — the member table reads top-down
         const groupMembers = group ? listGroupMemberInfos(ctx.var, group.id) : [];
         if (group) {
@@ -104,6 +146,9 @@ export function registerAppRoutes(app: MwaHono) {
             queueError,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
             standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
+            interact,
+            interactError,
+            interactNotice,
         });
     });
 
@@ -189,14 +234,15 @@ export function registerAppRoutes(app: MwaHono) {
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
 
-        const back = `/app/interact/${encodeURIComponent(token)}`;
+        // Landing without the token keeps the interact dialog closed — the
+        // feedback note shows in the home page's team panel instead.
         if (findUserGroup(ctx.var, user.id)) {
-            return ctx.redirect(`${back}?interactError=groupRequestFailed`, 303);
+            return ctx.redirect('/app?interactError=groupRequestFailed', 303);
         }
 
         createGroupInvite(ctx.var, user.id, target.id);
         publish(notificationsChannel(target.id), '');
-        return ctx.redirect(`${back}?interactNotice=groupRequestSent`, 303);
+        return ctx.redirect('/app?interactNotice=groupRequestSent', 303);
     });
 
     // Accepting a team-up invite forms the group immediately — the accepter
@@ -407,41 +453,11 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect(target, 303);
     });
 
-    app.get('/app/interact/:token', async (ctx) => {
+    // Links minted before the interact page became a dialog on /app — bounce
+    // them onto the query-param form so old shares and QR payloads still land.
+    app.get('/app/interact/:token', (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
-
-        const token = ctx.req.param('token');
-        const target = findUserByInteractToken(ctx.var, token);
-        if (!target) return writeErrorPage(ctx, 404);
-
-        const self = target.id === user.id;
-        // Profile detail is serialized into #ssr-data — populate it only for
-        // roles whose view includes it, never for regular users.
-        const detail =
-            !self && (user.role === 'host' || user.role === 'admin')
-                ? {
-                      email: target.email,
-                      currentBalance: target.currentBalance,
-                      joinedAt: target.createdAt.toISOString(),
-                  }
-                : null;
-
-        // Feedback for the team-up request POST bouncing back here.
-        const interactError: keyof Language | undefined =
-            ctx.req.query('interactError') === 'groupRequestFailed'
-                ? 'groupRequestFailed'
-                : undefined;
-        const interactNotice: keyof Language | undefined =
-            ctx.req.query('interactNotice') === 'groupRequestSent' ? 'groupRequestSent' : undefined;
-
-        return writePage(ctx, 'interact', {
-            token,
-            self,
-            target: { username: target.username },
-            detail,
-            interactError,
-            interactNotice,
-        });
+        return ctx.redirect(`/app?interact=${encodeURIComponent(ctx.req.param('token'))}`, 303);
     });
 }

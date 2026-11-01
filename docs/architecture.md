@@ -110,7 +110,9 @@ start so queue/badge rows can foreign-key them.
 ## Interactions and gambling
 
 The `PageShell` sidebar renders a personal QR using `uqr` on every page, linking
-to `/app/interact/:token`.
+to `/app?interact=<token>` — the home route resolves the token and opens the
+scanned user's dialog (`InteractDialog`); the old `/app/interact/:token` path
+redirects there so earlier links and QR payloads keep working.
 Migration `05_interact_tokens.sql` stores one permanent random token per user;
 it identifies the target but grants no permissions. Any signed-in scanner can
 challenge another user; hosts/admins also see their email, balance, and join date.

@@ -13,7 +13,6 @@ export type Section =
     | 'host'
     | 'admin'
     | 'gambling'
-    | 'interact'
     | 'landing'
     | 'login'
     | 'error';

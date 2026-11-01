@@ -7,7 +7,6 @@ import { activitiesPage } from '#src/client/pages/app/ActivitiesPage.js';
 import { activityPage } from '#src/client/pages/app/ActivityPage.js';
 import { leaderboardPage } from '#src/client/pages/app/LeaderboardPage.js';
 import { gamblingPage } from '#src/client/pages/app/gambling/GamblingHomePage.js';
-import { interactPage } from '#src/client/pages/app/InteractPage.js';
 import { hostPage } from '#src/client/pages/app/HostPage.js';
 import { adminPage } from '#src/client/pages/AdminPage.js';
 import { gamblingSessionPage } from '#src/client/pages/app/gambling/GamblingSessionPage.js';
@@ -24,7 +23,6 @@ export const registeredPages = {
     leaderboard: leaderboardPage,
     gambling: gamblingPage,
     gamblingSession: gamblingSessionPage,
-    interact: interactPage,
     host: hostPage,
     inviteToGamble: inviteToGamblePage,
     admin: adminPage,

@@ -8,9 +8,11 @@ import Dialog from '#src/client/ui/Dialog.js';
 import { Language } from '#src/client/language.js';
 import type { LeaderboardBoard, ViewerStanding } from '#src/db/leaderboard/index.js';
 import { displayActor, displayUsername } from '#src/client/display.js';
+import InteractDialog, { InteractProfile } from './InteractDialog.js';
 
 type HomePageProps = {
     transactions: Transaction[];
+    interact: InteractProfile | null;
     groupName: string | null;
     groupPhone: string | null;
     groupEmoji: string;
@@ -18,6 +20,10 @@ type HomePageProps = {
     groupOwnerId: number | null;
     groupMembers: { userId: number; username: string }[];
     groupError?: keyof Language;
+    // team-up request feedback — lands here because sending it closes the
+    // interact dialog
+    interactError?: keyof Language;
+    interactNotice?: keyof Language;
     youError?: keyof Language;
     queuePosition: number | null;
     queueError?: keyof Language;
@@ -59,10 +65,13 @@ function HomePage({
     groupOwnerId,
     groupMembers,
     groupError,
+    interactError,
+    interactNotice,
     youError,
     queuePosition,
     queueError,
     standings,
+    interact,
 }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
@@ -226,6 +235,12 @@ function HomePage({
                             {t(groupError)}
                         </p>
                     )}
+                    {interactError && (
+                        <p class="mwa-note mwa-note--error" role="alert">
+                            {t(interactError)}
+                        </p>
+                    )}
+                    {interactNotice && <p class="mwa-muted">{t(interactNotice)}</p>}
                     {groupMembers.length === 0 ? (
                         <p class="mwa-muted">{t('groupNone')}</p>
                     ) : (
@@ -445,6 +460,8 @@ function HomePage({
                     </footer>
                 </form>
             </Dialog>
+
+            {interact && <InteractDialog interact={interact} />}
         </PageShell>
     );
 }

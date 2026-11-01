@@ -35,3 +35,17 @@ dialog .mwa-field :is(input, select) {
 dialog .mwa-button {
     width: auto;
 }
+
+/* A footer holding a stacked .mwa-actions turns into a column too, so the
+   Close button drops below the pile instead of sitting beside it. The top
+   padding the blanket rule strips is restored here — the interact dialog's
+   body can be empty, leaving the pile flush against the header. */
+dialog > footer:has(.mwa-actions--col) {
+    flex-direction: column;
+    padding-block-start: var(--space-4);
+}
+
+/* Half of Oat's 32rem default — compact modal for the interact actions. */
+.mwa-dialog--half {
+    width: min(16rem, 100% - 2rem);
+}

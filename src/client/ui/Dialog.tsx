@@ -6,6 +6,7 @@ export type DialogProps = {
     isOpen: boolean;
     onClose?: () => void;
     title?: string;
+    class?: string;
     // extra buttons injected into the footer, before the Close button
     actions?: ReactNode;
     // when false: no Close button, and Esc / backdrop clicks can't dismiss —
@@ -20,6 +21,7 @@ export default function Dialog({
     isOpen,
     onClose,
     title,
+    class: className,
     actions,
     closable = true,
     children,
@@ -54,6 +56,7 @@ export default function Dialog({
     return (
         <dialog
             ref={dialogRef}
+            class={className}
             onClose={onClose}
             onCancel={closable ? undefined : (e) => e.preventDefault()}
             onClick={handleBackdropClick}
