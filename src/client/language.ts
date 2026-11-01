@@ -672,7 +672,7 @@ export const languages: Record<LanguageCode, Language> = {
         groupKickFailed: 'Nepavyko pašalinti nario',
         groupLeaveFailed: 'Nepavyko išeiti iš grupės',
         groupName: 'Pavadinimas',
-        groupPhone: 'Skubios pagalbos numeris',
+        groupPhone: 'Skubios pagalbos telefonas',
         groupSettings: 'Grupės nustatymai',
         groupSettingsEdit: 'Keičiami grupės nustatymai',
         groupDelete: 'Ištrinti grupę',
