@@ -79,6 +79,14 @@ export type ChessGame = BoardGame & {
 
 export type RunningGame = CoinFlipGame | Connect4Game | ChessGame;
 
+// Clocks stop when the game does — re-reading an ended session mustn't decay
+// them, so time left is evaluated at the last turn's timestamp, not Date.now().
+function freezeTurnTime(time: PlayerTurnTime, endTimeMs: number) {
+    if (time.turnStartedTimeMs === undefined) return;
+    time.baseTimeLeftMs = Math.max(0, time.baseTimeLeftMs - (endTimeMs - time.turnStartedTimeMs));
+    delete time.turnStartedTimeMs;
+}
+
 export type Invitation = {
     id: number;
     type: GameType;
@@ -236,15 +244,15 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
 
             const p1TurnTime = calcPlayerTurnTime(turns, 'p1', c4PlayerTurnTime);
             const p2TurnTime = calcPlayerTurnTime(turns, 'p2', c4PlayerTurnTime);
+            const lastTurn = turnRows[turnRows.length - 1];
 
             if (status.type === 'ended') {
-                p1TurnTime.baseTimeLeftMs = calcTurnTimeLeftMs(p1TurnTime);
-                p2TurnTime.baseTimeLeftMs = calcTurnTimeLeftMs(p2TurnTime);
-                delete p1TurnTime.turnStartedTimeMs;
-                delete p2TurnTime.turnStartedTimeMs;
+                const endTimeMs = lastTurn
+                    ? new Date(lastTurn.created_at as string).getTime()
+                    : Date.now();
+                freezeTurnTime(p1TurnTime, endTimeMs);
+                freezeTurnTime(p2TurnTime, endTimeMs);
             }
-
-            const lastTurn = turnRows[turnRows.length - 1];
 
             return {
                 gameType: 'connect_4',
@@ -296,10 +304,12 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
             const p2TurnTime = calcPlayerTurnTime(turns, 'p2', chessPlayerTurnTime);
 
             if (status.type === 'ended') {
-                p1TurnTime.baseTimeLeftMs = calcTurnTimeLeftMs(p1TurnTime);
-                p2TurnTime.baseTimeLeftMs = calcTurnTimeLeftMs(p2TurnTime);
-                delete p1TurnTime.turnStartedTimeMs;
-                delete p2TurnTime.turnStartedTimeMs;
+                const lastTurn = turnRows[turnRows.length - 1];
+                const endTimeMs = lastTurn
+                    ? new Date(lastTurn.created_at as string).getTime()
+                    : Date.now();
+                freezeTurnTime(p1TurnTime, endTimeMs);
+                freezeTurnTime(p2TurnTime, endTimeMs);
             }
 
             return {
