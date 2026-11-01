@@ -118,7 +118,7 @@ it identifies the target but grants no permissions. Any signed-in scanner can
 challenge another user; hosts/admins also see their email, balance, and join date.
 Self-scans show no actions, and money transfers remain a placeholder.
 
-Teaming up works through invites (`10_group_invites.sql`): `POST
+Teaming up works through invites (`11_group_invites.sql`): `POST
 /app/interact/:token/group-request` creates a pending `group_invites` row
 asking to join the target's team (the requester must be groupless), and the
 target sees it as a `group_invite` notification. Accepting
