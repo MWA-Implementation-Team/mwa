@@ -1,10 +1,9 @@
 import type { ComponentChildren } from 'preact';
-import { useContext, useEffect } from 'preact/hooks';
+import { useContext } from 'preact/hooks';
 import { ClientContext, Notification } from '#src/client/context.js';
 import Dialog from '#src/client/ui/Dialog.js';
 import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 import QrPane from '#src/client/ui/QrPane.js';
-import { installTooltips } from '#src/client/ui/tooltip.js';
 import { displayActor } from '#src/client/display.js';
 
 export type Section =
@@ -38,8 +37,6 @@ export default function PageShell({
     children,
 }: PageShellProps) {
     const { t, user, qr, notification } = useContext(ClientContext);
-
-    useEffect(() => installTooltips(), []);
 
     const showAlert = notification !== null && !hideNotification;
 
@@ -123,8 +120,6 @@ export default function PageShell({
                     </main>
                 </div>
             </div>
-            {/* Top-layer tooltip surface — filled by ui/tooltip.ts on hover. */}
-            <div class="mwa-tooltip" popover="auto" />
             {showAlert && (
                 <Dialog
                     isOpen

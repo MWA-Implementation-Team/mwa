@@ -28,7 +28,6 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── static/                    files served as-is
 │   ├── oat.css                forked Oat CSS: theme variables + plain-element styles;
 │   │                          our edits are marked /* mwa: … */
-│   ├── oat.js                 Oat CSS framework JS, minified, don't edit
 │   ├── style/main.css         stylesheet entry point; only @imports
 │   ├── style/tokens.css       app-only design tokens (the only app file with raw colours)
 │   ├── style/base.css         site font + .mwa page frame
