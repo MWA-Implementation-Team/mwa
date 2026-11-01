@@ -31,7 +31,7 @@ import {
     listStationGroups,
 } from '#src/db/queue/index.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
-import { InteractProfile } from '#src/client/pages/app/InteractDialog.js';
+import type { InteractProfile } from '#src/client/pages/app/InteractDialog.js';
 import { cookieSession } from '#src/client/constants.js';
 import { findUserByInteractToken } from '#src/db/interactions/index.js';
 import { updateUsername } from '#src/db/users/index.js';
@@ -459,6 +459,11 @@ export function registerAppRoutes(app: MwaHono) {
     app.get('/app/interact/:token', (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
-        return ctx.redirect(`/app?interact=${encodeURIComponent(ctx.req.param('token'))}`, 303);
+
+        const url = new URL(ctx.req.url);
+        const target = new URL('/app', url);
+        url.searchParams.forEach((value, key) => target.searchParams.set(key, value));
+        target.searchParams.set('interact', ctx.req.param('token'));
+        return ctx.redirect(target.pathname + target.search, 303);
     });
 }
