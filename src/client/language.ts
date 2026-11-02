@@ -104,6 +104,7 @@ export type Language = {
     queueGroupSize: string;
     queueNeedGroup: string;
     queueTooSmall: string;
+    queueAtStation: string;
     queueJoinFailed: string;
     queueLeaveFailed: string;
     dashStandings: string;
@@ -380,6 +381,8 @@ export const languages: Record<LanguageCode, Language> = {
         queueGroupSize: '{n} people in the group',
         queueNeedGroup: 'You need a group to join the queue.',
         queueTooSmall: 'Your group needs at least 2 people to join the queue.',
+        queueAtStation:
+            'Your team is at a station right now — finish it before rejoining the queue.',
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
         dashStandings: 'Your standings',
@@ -658,6 +661,7 @@ export const languages: Record<LanguageCode, Language> = {
         queueGroupSize: '{n} nariai grupėje',
         queueNeedGroup: 'Norint stoti į eilę, reikia grupės.',
         queueTooSmall: 'Norint stoti į eilę, grupėje turi būti bent 2 nariai.',
+        queueAtStation: 'Jūsų komanda dabar prie stotelės — užbaikite ją prieš vėl stodami į eilę.',
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
         dashStandings: 'Tavo pozicijos',

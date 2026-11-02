@@ -35,13 +35,24 @@ function mapQueueEntry(row: Record<string, SQLOutputValue>): QueueEntry {
 export const QUEUE_MIN_GROUP_SIZE = 2;
 
 export type JoinQueueResult =
-    { type: 'joined'; entry: QueueEntry } | { type: 'already_queued' } | { type: 'too_small' };
+    | { type: 'joined'; entry: QueueEntry }
+    | { type: 'already_queued' }
+    | { type: 'at_station' }
+    | { type: 'too_small' };
 
 // A group holds one spot at a time; rejoining after leaving inserts a
 // new row so the old 'left' entry stays in the history.
 export function joinQueue(state: MwaState, groupId: number): JoinQueueResult {
     if (getWaitingEntry(state, groupId)) {
         return { type: 'already_queued' };
+    }
+
+    const atStationQuery = state.prepare(`
+        SELECT 1 FROM queue_entries
+        WHERE group_id = ? AND status = 'called' AND done_at IS NULL
+    `);
+    if (atStationQuery.get(groupId)) {
+        return { type: 'at_station' };
     }
 
     const memberCountQuery = state.prepare(`

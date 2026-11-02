@@ -70,6 +70,14 @@ describe('db/queue', () => {
         assert.equal(listWaitingQueue(state).filter((e) => e.groupId === groupId).length, 1);
     });
 
+    it('rejects a join while the group is called to a station', () => {
+        const groupId = queuedGroup([]);
+        mustJoin(groupId);
+        state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('test-station')`).run();
+        callNextGroups(state, 1, 'test-station');
+        assert.equal(joinQueue(state, groupId).type, 'at_station');
+    });
+
     it('orders positions by join order', () => {
         const a = queuedGroup([]);
         const b = queuedGroup([]);
@@ -139,7 +147,7 @@ describe('db/queue', () => {
         const eb = mustJoin(b);
         const ec = mustJoin(c);
 
-        state.prepare(`INSERT INTO activities (slug) VALUES ('test-station')`).run();
+        state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('test-station')`).run();
         const called = callNextGroups(state, 2, 'test-station');
 
         assert.deepEqual(

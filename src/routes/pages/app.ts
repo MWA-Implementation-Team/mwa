@@ -84,6 +84,7 @@ export function registerAppRoutes(app: MwaHono) {
             'queueJoinFailed',
             'queueLeaveFailed',
             'queueTooSmall',
+            'queueAtStation',
         ] as const);
         const groupError = queryFlag(ctx, 'groupError', [
             'groupKickFailed',
@@ -318,6 +319,9 @@ export function registerAppRoutes(app: MwaHono) {
         const result = joinQueue(ctx.var, group.id);
         if (result.type === 'too_small') {
             return ctx.redirect('/app?queueError=queueTooSmall#panel-game', 303);
+        }
+        if (result.type === 'at_station') {
+            return ctx.redirect('/app?queueError=queueAtStation#panel-game', 303);
         }
         if (result.type !== 'joined') {
             return ctx.redirect('/app?queueError=queueJoinFailed#panel-game', 303);

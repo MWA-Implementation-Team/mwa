@@ -114,7 +114,9 @@ Both actions use the caller's own group; any member may act. Joining needs
 at least `QUEUE_MIN_GROUP_SIZE` (2) members — groups may drop below that
 (members can always leave; only the owner can't), but an undersized group
 can't queue and loses a held spot when the removal drops it below the
-minimum.
+minimum. A group called to a station and not yet done there can't rejoin —
+`joinQueue` reports `at_station` and the dashboard tells the team to finish
+the station first.
 Status is `waiting` while in line and stays on the row afterwards — `left` for
 a bail, `called` when a host pulls the group to a station (`activity_slug`
 records which one). A called group finishing its station is marked by
