@@ -129,6 +129,17 @@
             dest: '{{ deploy_dir }}/Caddyfile'
             mode: '0644'
 
+      # the app container runs as nonroot (uid 65532, distroless) — the
+      # bind-mounted data dir has to be writable by it
+      - name: create the app data dir
+        tags: [app]
+        ansible.builtin.file:
+            path: '{{ deploy_dir }}/data'
+            state: directory
+            owner: '65532'
+            group: '65532'
+            mode: '0755'
+
       - name: build and start the stack
         tags: [app]
         community.docker.docker_compose_v2:

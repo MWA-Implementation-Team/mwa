@@ -3,6 +3,8 @@
 .env
 Caddyfile
 db.sqlite
+# prod bind mount on the VM — deploy_dir/data
+/data/
 bun.lock
 deno.lock
 

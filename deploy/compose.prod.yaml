@@ -10,7 +10,9 @@ services:
             context: ..
         env_file: ../.env
         volumes:
-            - mwa-data:/data
+            # host dir, not a named volume — the db sits at
+            # deploy_dir/data/db.sqlite, readable/scp-able straight off the VM
+            - ../data:/data
         restart: unless-stopped
         # no published ports — caddy reaches the app over this network
         healthcheck:
@@ -39,6 +41,5 @@ services:
                 condition: service_started
 
 volumes:
-    mwa-data:
     caddy-data:
     caddy-config:
