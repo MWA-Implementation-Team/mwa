@@ -2,7 +2,7 @@
 
 One Ansible playbook turns a fresh Ubuntu 24.04 VM into the running app:
 Docker + `app`/`caddy` containers behind Caddy TLS, secrets from an
-encrypted vault, nightly sqlite backups. Spec: [../SPEC-deploy.md](../SPEC-deploy.md).
+encrypted vault. Spec: [../SPEC-deploy.md](../SPEC-deploy.md).
 
 ## Prerequisites
 
@@ -55,7 +55,7 @@ ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --ask-vault-pass
 ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --check --diff --ask-vault-pass
 
 # one layer only
-... --tags app        # base | docker | app | backup
+... --tags app        # base | docker | app
 
 # on the VM
 cd /opt/mwa && docker compose -f deploy/compose.prod.yaml ps
@@ -81,15 +81,3 @@ ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --ask-vault-pass --
 ```
 
 The `.env` re-render changes the container config → compose recreates it.
-
-## Restoring a backup
-
-Nightly snapshots live in `/opt/mwa/backups` (newest 14 kept). Restore:
-
-```shell
-cd /opt/mwa
-docker compose -f deploy/compose.prod.yaml stop app
-docker run --rm -v mwa_mwa-data:/data -v /opt/mwa/backups:/b alpine \
-    cp "/b/<file>.sqlite" /data/db.sqlite
-docker compose -f deploy/compose.prod.yaml start app
-```

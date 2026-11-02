@@ -17,7 +17,7 @@ authenticated SMTP.
 
 Deferred (explicitly out of scope): auto-deploy on `main` changes
 (mechanism TBD — cron pull vs CI-built image vs webhook), staging
-environment, off-site backups, monitoring beyond container healthchecks.
+environment, backups, monitoring beyond container healthchecks.
 
 ## Tech Stack
 
@@ -65,7 +65,6 @@ On the VM:
             env.j2             → MWA_* env vars → /opt/mwa/.env (mode 0600)
             Caddyfile.j2       → "<domain> { reverse_proxy app:3000 }"
         compose.prod.yaml      → app + caddy services (static file, not templated)
-        backup.sh              → nightly sqlite backup; runs from the clone via cron
         README.md              → operator runbook: prereqs, first run, DNS step
 
 App change (lands as its own small commit, prerequisite for real SMTP):
@@ -77,7 +76,6 @@ App change (lands as its own small commit, prerequisite for real SMTP):
 
     /opt/mwa/          → git clone of this repo (ssh auth via agent forwarding)
     /opt/mwa/.env      → rendered from vault, mode 0600, owner root
-    /opt/mwa/backups/  → nightly sqlite dumps, last 14 kept
 
 Compose project `mwa` (deploy/compose.prod.yaml):
 
@@ -113,13 +111,9 @@ Compose project `mwa` (deploy/compose.prod.yaml):
 
 ## Backups
 
-- Nightly cron on the VM runs `deploy/backup.sh` straight from the clone:
-  `docker compose exec` into the app container and `node -e` a
-  `VACUUM INTO '/backups/<ts>.sqlite'` (node:sqlite is in the app image; no
-  sqlite3 CLI needed). The `/backups` bind mount lands files under
-  /opt/mwa/backups; keeps the last 14.
-- Local-only for v1 — the VM is a single point of failure by design, but
-  the DB survives a botched deploy or corrupted container.
+None — the deployment is built for a one-off event (~6 hours). The db lives
+in the `mwa-data` volume; if persistence ever matters, add a snapshot job
+then.
 
 ## Code Style
 
@@ -160,7 +154,6 @@ Compose project `mwa` (deploy/compose.prod.yaml):
 - [ ] Second playbook run reports zero changes (idempotent)
 - [ ] Only ports 22/80/443 reachable externally; app port unpublished
 - [ ] `.env` on the VM is 0600; no plaintext secrets in git
-- [ ] Nightly backup produces a restorable sqlite file
 - [ ] `deploy/README.md` runbook + `docs/` updated in the same PR(s)
 
 ## Open Questions
@@ -172,4 +165,3 @@ Resolved — no blockers:
   in `vault.yml` (encrypted). The only thing outside git is the vault
   password itself.
 - Auto-deploy — deferred; revisit once v1 is live.
-- Off-site backups — out of scope for v1 (local-only).

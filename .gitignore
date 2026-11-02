@@ -2,7 +2,6 @@
 /dist
 .env
 Caddyfile
-/backups/
 db.sqlite
 bun.lock
 deno.lock
