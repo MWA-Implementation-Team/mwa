@@ -177,7 +177,7 @@ export type Language = {
     groupKickHint: string;
     groupLeave: string;
     groupLeaveHint: string;
-    groupDeleteHint: string;
+    groupDisbandHint: string;
     groupKickFailed: string;
     groupLeaveFailed: string;
     groupKicked: string;
@@ -188,9 +188,9 @@ export type Language = {
     groupSettings: string;
     groupSettingsEdit: string;
     groupSaved: string;
-    groupDelete: string;
-    groupDeleteConfirm: string;
-    groupDeleteFailed: string;
+    groupDisband: string;
+    groupDisbandConfirm: string;
+    groupDisbandFailed: string;
     groupRequestJoin: string;
     groupInviteCreates: string;
     groupRequestSent: string;
@@ -455,7 +455,7 @@ export const languages: Record<LanguageCode, Language> = {
         groupKickHint: 'Remove {name} from the group',
         groupLeave: 'Leave',
         groupLeaveHint: 'Leave this group',
-        groupDeleteHint: 'Delete this group and all its members',
+        groupDisbandHint: 'Disband this group and remove all members',
         groupKickFailed: 'Could not remove the member',
         groupLeaveFailed: 'Could not leave the group',
         groupKicked: 'Member kicked.',
@@ -466,9 +466,9 @@ export const languages: Record<LanguageCode, Language> = {
         groupSettings: 'Group settings',
         groupSettingsEdit: 'Edit group settings',
         groupSaved: 'Group settings saved.',
-        groupDelete: 'Delete group',
-        groupDeleteConfirm: 'Delete group?',
-        groupDeleteFailed: 'failed to delete group',
+        groupDisband: 'Disband group',
+        groupDisbandConfirm: 'Disband group?',
+        groupDisbandFailed: 'failed to disband group',
         groupRequestJoin: 'Join their team',
         groupInviteCreates: 'Accepting creates a new team with you as the owner.',
         groupRequestSent: 'Join request sent.',
@@ -735,7 +735,7 @@ export const languages: Record<LanguageCode, Language> = {
         groupKickHint: 'Pašalinti {name} iš grupės',
         groupLeave: 'Išeiti',
         groupLeaveHint: 'Išeiti iš grupės',
-        groupDeleteHint: 'Ištrinti grupę ir visus narius',
+        groupDisbandHint: 'Išformuoti grupę ir pašalinti visus narius',
         groupKickFailed: 'Nepavyko pašalinti nario',
         groupLeaveFailed: 'Nepavyko išeiti iš grupės',
         groupKicked: 'Narys išmestas.',
@@ -746,9 +746,9 @@ export const languages: Record<LanguageCode, Language> = {
         groupSettings: 'Grupės nustatymai',
         groupSettingsEdit: 'Keičiami grupės nustatymai',
         groupSaved: 'Grupės nustatymai išsaugoti.',
-        groupDelete: 'Ištrinti grupę',
-        groupDeleteConfirm: 'Ištrinti grupę?',
-        groupDeleteFailed: 'nepavyko ištrinti grupės',
+        groupDisband: 'Išformuoti grupę',
+        groupDisbandConfirm: 'Išformuoti grupę?',
+        groupDisbandFailed: 'nepavyko išformuoti grupės',
         groupRequestJoin: 'Prisijungti prie komandos',
         groupInviteCreates: 'Priėmus bus sukurta nauja komanda, kurios savininkas būsi tu.',
         groupRequestSent: 'Prašymas išsiųstas.',

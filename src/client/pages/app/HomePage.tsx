@@ -322,11 +322,13 @@ function HomePage({
                                                         member.userId === user!.id ? (
                                                             <form
                                                                 method="post"
-                                                                action="/app/group/delete"
+                                                                action="/app/group/disband"
                                                                 onSubmit={(e) => {
                                                                     if (
                                                                         !window.confirm(
-                                                                            t('groupDeleteConfirm'),
+                                                                            t(
+                                                                                'groupDisbandConfirm',
+                                                                            ),
                                                                         )
                                                                     ) {
                                                                         e.preventDefault();
@@ -336,9 +338,9 @@ function HomePage({
                                                                 <button
                                                                     type="submit"
                                                                     class="lang-link lang-link--danger"
-                                                                    title={t('groupDeleteHint')}
+                                                                    title={t('groupDisbandHint')}
                                                                 >
-                                                                    {t('groupDelete')}
+                                                                    {t('groupDisband')}
                                                                 </button>
                                                             </form>
                                                         ) : (

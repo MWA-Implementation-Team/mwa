@@ -174,7 +174,7 @@ if the accepter has none, a group is created in one transaction — the accepter
 owns it, the name is a random `team-…` placeholder and the phone empty until
 the owner edits them from the home table's per-field dialogs (`POST
 /app/group/edit`). The owner can also disband the team (`POST
-/app/group/delete` → `disbandGroup`): a soft delete that stamps
+/app/group/disband` → `disbandGroup`): a soft delete that stamps
 `disbanded_at` (`14_group_disband.sql`) instead of removing the row, so the
 group keeps its stamped coins and queue history. Members are deleted, a
 waiting queue spot closes as `left`, a group mid-station is marked `left`
