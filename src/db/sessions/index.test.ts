@@ -11,7 +11,6 @@ import {
     findSessionUserId,
     lastLoginTokenSentAt,
     maxCodeAttempts,
-    pruneLoginTokens,
     redeemLoginCode,
     redeemLoginToken,
 } from './index.js';
@@ -57,18 +56,6 @@ describe('db/sessions — login tokens', () => {
         const second = createLoginToken(state, 'tok5@example.com');
         discardLoginToken(state, second.id);
         assert.equal(redeemLoginToken(state, first.token), 'tok5@example.com');
-    });
-
-    it('pruneLoginTokens reclaims used and expired rows', () => {
-        const { token } = createLoginToken(state, 'prune@example.com');
-        redeemLoginToken(state, token);
-        const { token: expired } = createLoginToken(state, 'prune@example.com');
-        expireToken('login_tokens', expired);
-        pruneLoginTokens(state);
-        const row = state.db
-            .prepare('SELECT COUNT(*) AS n FROM login_tokens WHERE email = ?')
-            .get('prune@example.com');
-        assert.equal(row!.n, 0);
     });
 
     it('lastLoginTokenSentAt reports the most recent send for the resend cap', () => {

@@ -134,16 +134,6 @@ export function lastLoginTokenSentAt(state: MwaState, email: string): Date | nul
     return row?.last_sent ? new Date(row.last_sent as string) : null;
 }
 
-// Lazy cleanup — expired/used rows are ignored on read anyway, this reclaims
-// them. Called opportunistically from POST /login.
-export function pruneLoginTokens(state: MwaState) {
-    const pruneLoginTokensQuery = state.prepare(`
-    DELETE FROM login_tokens WHERE used_at IS NOT NULL OR expires_at <= ${now}
-    `);
-
-    pruneLoginTokensQuery.run();
-}
-
 // Returns the raw token for the mwa-session cookie — only its sha256 is stored.
 export function createSession(state: MwaState, userId: number): string {
     const insertSessionQuery = state.prepare(`

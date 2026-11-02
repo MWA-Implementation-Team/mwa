@@ -7,7 +7,6 @@ import {
     deleteExpiredSessions,
     discardLoginToken,
     lastLoginTokenSentAt,
-    pruneLoginTokens,
 } from '#src/db/sessions/index.js';
 import { MwaContext, MwaHono } from '#src/state.js';
 import { writePage } from '#src/pages.js';
@@ -93,7 +92,6 @@ export function registerLoginRoutes(app: MwaHono) {
             confirmLoginTokenSent(ctx.var, email, created.id);
         }
         deleteExpiredSessions(ctx.var);
-        pruneLoginTokens(ctx.var);
 
         return writePage(ctx, 'login', {
             sentTo: email,
