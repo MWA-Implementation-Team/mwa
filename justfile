@@ -1,9 +1,12 @@
 # mwa deploy ops — run `just <recipe>` from the repo root.
 # Prereqs: just, ansible-core, your GitHub key in ssh-agent (ssh-add -l).
 
-vm := "root@188.245.220.47" # keep in sync with deploy/inventory.yml
+# user@host read straight out of the inventory — never drifts
+vm := `awk '/ansible_host:/{h=$2} /ansible_user:/{u=$2} END{print u "@" h}' deploy/inventory.yml`
 compose := "docker compose -f /opt/mwa/deploy/compose.prod.yaml"
-playbook := "ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --ask-vault-pass"
+# deploy/.vault_pass is gitignored + local-only — use it when present, prompt otherwise
+vault_flag := `if [ -f deploy/.vault_pass ]; then echo "--vault-password-file deploy/.vault_pass"; else echo "--ask-vault-pass"; fi`
+playbook := "ansible-playbook -i deploy/inventory.yml deploy/playbook.yml " + vault_flag
 
 default:
     @just --list
@@ -38,7 +41,7 @@ restart:
 
 # edit the encrypted secrets (smtp credentials)
 vault:
-    ansible-vault edit deploy/group_vars/all/vault.yml
+    ansible-vault edit deploy/group_vars/all/vault.yml {{ vault_flag }}
 
 # seed the prod db with sample data — no-op if users already exist
 seed:
