@@ -424,7 +424,7 @@ export function registerAppRoutes(app: MwaHono) {
             return ctx.redirect(`${target}&error=hostRequestFailed`, 303);
         }
 
-        callNextGroups(ctx.var, Math.min(count, 20), station);
+        callNextGroups(ctx.var, Math.min(count, 4), station);
         return ctx.redirect(target, 303);
     });
 
