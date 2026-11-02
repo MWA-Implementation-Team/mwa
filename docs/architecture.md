@@ -22,7 +22,7 @@ Follow `GET /` through the code:
    `mwa-session` cookie and resolves it through the `sessions` table to a `users`
    row — see [auth](guides/auth.md).
 3. **The route loads data.** It calls typed functions from `src/db/<domain>/index.ts` (e.g.
-   `listUsers(ctx.var)`), which wrap prepared statements. The results become _page props_.
+   `listWaitingQueue(ctx.var)`), which wrap prepared statements. The results become _page props_.
 4. **`writePage` renders the page.** `writePage(ctx, 'landing', { users })` in
    `src/pages.tsx` builds `ctxInit = { lang, user, notification }` (lang from the
    `mwa-language` cookie, user from `currentUser`, notification from the database) and renders the `Root` component with

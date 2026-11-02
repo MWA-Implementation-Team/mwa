@@ -80,7 +80,6 @@ sqlite3 db.sqlite "UPDATE users SET role = 'host' WHERE username = 'alice';"
 | `GET /app`, `GET /app/*`                                         | `requireUser`                                           |
 | `POST /app` (logout)                                             | session cookie                                          |
 | `GET /app/admin`, `POST /app/admin/*`                            | admin in production; any logged-in user in dev          |
-| `GET /api/users`                                                 | `requireApiUser`                                        |
 | `GET /api/notifications`, `GET /app/gambling/sessions/:id/watch` | `requireApiUser`                                        |
 | Gambling challenge/accept/reject POSTs                           | `requireUser`; accept/reject require the invited player |
 
@@ -113,7 +112,7 @@ only accept moves on that player's turn in a running game.
         -d 'email=alice@mwa.dev'
     # copy the link from the server console, then:
     curl -s -c cookies.txt 'http://localhost:3000/auth/verify?token=…'
-    curl -s -b cookies.txt localhost:3000/api/users   # → 200 JSON
+    curl -s -b cookies.txt -o /dev/null -w '%{http_code}\n' localhost:3000/app   # → 200
     ```
 
     `mwa-session` is an opaque token — you can't forge it in the browser console
