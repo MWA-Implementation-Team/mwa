@@ -503,16 +503,8 @@ export function registerAppRoutes(app: MwaHono) {
         if (!target) return writeErrorPage(ctx, 404);
 
         const self = target.id === user.id;
-        // Profile detail is serialized into #ssr-data — populate it only for
-        // roles whose view includes it, never for regular users.
-        const detail =
-            !self && (user.role === 'host' || user.role === 'admin')
-                ? {
-                      email: target.email,
-                      currentBalance: target.currentBalance,
-                      joinedAt: target.createdAt.toISOString(),
-                  }
-                : null;
+        // staff get the award-shaped send panel instead of play actions
+        const canAward = !self && (user.role === 'host' || user.role === 'admin');
 
         const interactError = queryFlag(ctx, 'interactError', [
             'groupRequestFailed',
@@ -567,7 +559,7 @@ export function registerAppRoutes(app: MwaHono) {
             // same three boards as the home standings table, for the target
             // and their team
             standings: listViewerStandings(ctx.var, target.id, targetGroup?.id ?? null),
-            detail,
+            canAward,
             interactError,
             interactNotice,
             sendError,

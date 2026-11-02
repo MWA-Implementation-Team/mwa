@@ -42,14 +42,7 @@ export type Language = {
     interactSelfJoke: string;
     interactGeneralTitle: string;
     interactSendMoneyTitle: string;
-    interactProfileDetailTitle: string;
-    interactDetailEmail: string;
-    interactDetailBalance: string;
-    interactDetailJoined: string;
-    interactAwardTitle: string;
-    interactAwardAmount: string;
     interactAwardNote: string;
-    interactAwardSubmit: string;
     interactSendSubmit: string;
     interactSendAvailable: string;
     interactSendAll: string;
@@ -325,14 +318,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactSelfJoke: "That's you! Scan someone else's code instead.",
         interactGeneralTitle: 'General information',
         interactSendMoneyTitle: 'Send money',
-        interactProfileDetailTitle: 'Profile details',
-        interactDetailEmail: 'Email',
-        interactDetailBalance: 'Balance',
-        interactDetailJoined: 'Joined',
-        interactAwardTitle: 'Award coins',
-        interactAwardAmount: 'Amount',
         interactAwardNote: 'Note (optional)',
-        interactAwardSubmit: 'Award',
         interactSendSubmit: 'Send',
         interactSendAvailable: 'Available {amount}',
         interactSendAll: 'All',
@@ -612,14 +598,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
         interactGeneralTitle: 'Bendra informacija',
         interactSendMoneyTitle: 'Siųsti pinigus',
-        interactProfileDetailTitle: 'Profilio detalės',
-        interactDetailEmail: 'El. paštas',
-        interactDetailBalance: 'Balansas',
-        interactDetailJoined: 'Prisijungė',
-        interactAwardTitle: 'Suteikti miciaus koinų',
-        interactAwardAmount: 'Suma',
         interactAwardNote: 'Žinutė (neprivaloma)',
-        interactAwardSubmit: 'Suteikti',
         interactSendSubmit: 'Siųsti',
         interactSendAvailable: 'Galima {amount}',
         interactSendAll: 'Viską',

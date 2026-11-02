@@ -93,7 +93,7 @@ describe('GET /app/interact/:token', () => {
         assert.equal(res.status, 404);
     });
 
-    it('shows the target and send-money to a regular user, but not profile detail', async () => {
+    it('shows the target and send-money to a regular user, and no award form', async () => {
         const owner = createUser(state, 'target@example.com', 'target_user');
         const scanner = createUser(state, 'scan2@example.com', 'scan2');
         const token = getOrCreateInteractToken(state, owner.id);
@@ -105,11 +105,11 @@ describe('GET /app/interact/:token', () => {
         const html = await res.text();
         assert.match(html, /Interact with Target_user/);
         assert.match(html, /send-money/);
-        // detail fields must not leak into props for a regular scanner
+        assert.doesNotMatch(html, /\/award/);
         assert.doesNotMatch(html, /target@example\.com/);
     });
 
-    it('shows profile detail to hosts and admins', async () => {
+    it('shows hosts the award-shaped send panel and no profile detail', async () => {
         const owner = createUser(state, 'target2@example.com', 'target2_user');
         const host = createUser(state, 'host1@example.com', 'host1');
         promote(host.id, 'host');
@@ -119,8 +119,13 @@ describe('GET /app/interact/:token', () => {
             headers: authCookie(host.id),
         });
         const html = await res.text();
-        assert.match(html, /Profile details/);
-        assert.match(html, /target2@example\.com/);
+        // no profile detail leak
+        assert.doesNotMatch(html, /Profile details/);
+        assert.doesNotMatch(html, /target2@example\.com/);
+        // the staff send panel posts to award with a note field, never send-money
+        assert.match(html, /action="\/app\/interact\/[^"]+\/award"/);
+        assert.match(html, /name="note"/);
+        assert.doesNotMatch(html, /send-money/);
     });
 
     it('self-scan gets the easter egg instead of actions', async () => {

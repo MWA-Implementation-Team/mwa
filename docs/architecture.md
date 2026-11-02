@@ -124,17 +124,18 @@ to `/app/interact/<token>` — the standalone interact page
 while the flow lived in a home-page dialog keep working.
 Migration `05_interact_tokens.sql` stores one permanent random token per user;
 it identifies the target but grants no permissions. Any signed-in scanner can
-challenge another user or send them coins; hosts/admins also see their email,
-balance, and join date. Staff don't play: hosts and admins can neither send
-money, gamble, or request a team-up nor be the target of those flows — the
-POSTs answer 403 and the interact page hides the play panels (`canPlay`)
-when either side has a staff role. Self-scans show no actions.
+challenge another user or send them coins. Staff don't play: hosts and admins
+can neither send money, gamble, or request a team-up nor be the target of
+those flows — the POSTs answer 403 and the interact page hides the play
+panels (`canPlay`) when either side has a staff role. Instead they get the
+award-shaped send panel (`canAward`). Self-scans show no actions.
 
 The shared-info panel ("Bendra informacija") mirrors the home queue panel:
 the target's team on the left (group emoji, member count, join button) and
 their personal + group standings across all three boards on the right. The
-send-money panel holds the amount widget — built with −/+ steppers and
-quick-add chips, then posts to `POST /app/interact/:token/send-money`.
+send-money panel (`SendPanel` in `InteractPage.tsx`, shared by both roles)
+holds the amount widget — built with −/+ steppers and quick-add chips, then
+posts to `POST /app/interact/:token/send-money`.
 `transferCoins` (`src/db/transactions/index.ts`) checks the sender's balance
 and writes one parent `transfer` transaction with two child rows (the
 sender's debit and the recipient's credit) in a single database transaction.
@@ -146,11 +147,10 @@ each Challenge link opens a small bet dialog posting to
 `POST /app/interact/:token/gamble`. Joining the target's team is
 `POST /app/interact/:token/group-request`.
 
-A host/admin scanner gets an
-award form on the interact page (`POST /app/interact/:token/award`) to credit
-the scanned user coins (`host_grant` via `grantCoins`) plus an optional note; the note is stored on the child
-transaction and shown on the recipient's home page. Regular scanners just see
-the profile. The personal token can be rotated from the QR sidebar pane
+A host/admin scanner sees the same send panel in its award shape — unclamped,
+with an optional note — posting to `POST /app/interact/:token/award` to credit
+the scanned user coins (`host_grant` via `grantCoins`); the note is stored on the child
+transaction and shown on the recipient's home page. The personal token can be rotated from the QR sidebar pane
 (`POST /app/you/reset-qr`), which invalidates the old code immediately.
 
 Reward QRs are the `system_qr_codes` table that has existed since migration 01.

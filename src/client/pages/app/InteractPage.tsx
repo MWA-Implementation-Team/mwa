@@ -11,14 +11,6 @@ import type { GameType } from '#src/db/gambling/index.js';
 import type { ViewerStanding } from '#src/db/leaderboard/index.js';
 import { boardHintKey, boardLabelKey } from '#src/client/boards.js';
 
-// Extra target fields shown only to elevated roles — the route populates
-// this solely for host/admin scanners, so `detail` being non-null is the gate.
-export type InteractProfileDetail = {
-    email: string;
-    currentBalance: number;
-    joinedAt: string; // ISO timestamp
-};
-
 type InteractPageProps = {
     token: string;
     self: boolean;
@@ -35,7 +27,9 @@ type InteractPageProps = {
     // false when the scanner or the target is staff — staff don't send
     // money, gamble, or team-up, so the play panels stay hidden
     canPlay: boolean;
-    detail: InteractProfileDetail | null;
+    // true for host/admin scanners — they get the award-shaped send panel
+    // (posts to /award, optional note, no balance clamp) instead of play
+    canAward: boolean;
     interactError?: keyof Language;
     interactNotice?: keyof Language;
     // send-money feedback, rendered inside the Send money panel
@@ -59,7 +53,7 @@ function InteractPage({
     groupEmoji,
     standings,
     canPlay,
-    detail,
+    canAward,
     interactError,
     interactNotice,
     sendError,
@@ -67,10 +61,6 @@ function InteractPage({
     gamblingError,
 }: InteractPageProps) {
     const { t, user } = useContext(ClientContext);
-    const [sendAmount, setSendAmount] = useState(0);
-    // hosts/admins can send past their balance — the server allows negative
-    const unlimited = user?.role === 'host' || user?.role === 'admin';
-    const maxSend = unlimited ? Number.MAX_SAFE_INTEGER : (user?.currentBalance ?? 0);
     const [openDialog, setOpenDialog] = useState<GameType | null>(gamblingError?.dialog ?? null);
 
     if (self) {
@@ -132,8 +122,12 @@ function InteractPage({
 
     return (
         <PageShell section="interact">
-            {interactError && <Toast kind="error">{t(interactError)}</Toast>}
-            {interactNotice && <Toast kind="success">{t(interactNotice)}</Toast>}
+            {interactError && interactError !== 'interactAwardInvalid' && (
+                <Toast kind="error">{t(interactError)}</Toast>
+            )}
+            {interactNotice && interactNotice !== 'interactAwarded' && (
+                <Toast kind="success">{t(interactNotice)}</Toast>
+            )}
 
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
@@ -204,76 +198,26 @@ function InteractPage({
             </section>
 
             {canPlay && (
-                <section class="mwa-panel">
-                    <div class="mwa-panel-head">
-                        <h2>{t('interactSendMoneyTitle')}</h2>
-                    </div>
-                    <div class="mwa-panel-body">
-                        {sendError && <Toast kind="error">{t(sendError)}</Toast>}
-                        {sentAmount !== null && sentAmount !== undefined && (
-                            <Toast kind="success">
-                                {t('interactMoneySent', { amount: String(sentAmount) })}
-                            </Toast>
-                        )}
-                        <form method="POST" action={post('send-money')} class="mwa-send">
-                            <input type="hidden" name="amount" value={sendAmount} />
-                            <div class="mwa-send-stepper">
-                                <button
-                                    type="button"
-                                    class="mwa-send-step"
-                                    onClick={() => setSendAmount((a) => Math.max(0, a - 1))}
-                                    disabled={sendAmount <= 0}
-                                >
-                                    −
-                                </button>
-                                <output class="mwa-send-amount">{sendAmount}</output>
-                                <button
-                                    type="button"
-                                    class="mwa-send-step"
-                                    onClick={() => setSendAmount((a) => Math.min(maxSend, a + 1))}
-                                    disabled={sendAmount >= maxSend}
-                                >
-                                    +
-                                </button>
-                            </div>
-                            {!unlimited && (
-                                <p class="mwa-send-available">
-                                    {t('interactSendAvailable', {
-                                        amount: String(user!.currentBalance),
-                                    })}
-                                </p>
-                            )}
-                            <div class="mwa-send-chips">
-                                {[5, 10, 50, 100].map((n) => (
-                                    <button
-                                        key={n}
-                                        type="button"
-                                        class="mwa-send-chip"
-                                        onClick={() =>
-                                            setSendAmount((a) => Math.min(maxSend, a + n))
-                                        }
-                                    >
-                                        +{n}
-                                    </button>
-                                ))}
-                                <button
-                                    type="button"
-                                    class="mwa-send-chip"
-                                    onClick={() => setSendAmount(user!.currentBalance)}
-                                >
-                                    {t('interactSendAll')}
-                                </button>
-                            </div>
-                            <button
-                                type="submit"
-                                class="mwa-button"
-                                disabled={sendAmount < 1 || sendAmount > maxSend}
-                            >
-                                {t('interactSendSubmit')}
-                            </button>
-                        </form>
-                    </div>
-                </section>
+                <SendPanel
+                    action={post('send-money')}
+                    max={user!.currentBalance}
+                    error={sendError}
+                    notice={
+                        sentAmount !== null && sentAmount !== undefined
+                            ? t('interactMoneySent', { amount: String(sentAmount) })
+                            : undefined
+                    }
+                />
+            )}
+
+            {canAward && (
+                <SendPanel
+                    action={post('award')}
+                    max={null}
+                    withNote
+                    error={interactError === 'interactAwardInvalid' ? interactError : undefined}
+                    notice={interactNotice === 'interactAwarded' ? t(interactNotice) : undefined}
+                />
             )}
 
             {canPlay && (
@@ -314,51 +258,6 @@ function InteractPage({
                 </section>
             )}
 
-            {detail && (
-                <section class="mwa-panel">
-                    <div class="mwa-panel-head">
-                        <h2>{t('interactProfileDetailTitle')}</h2>
-                    </div>
-                    <div class="mwa-panel-body">
-                        <ul class="mwa-rows">
-                            <li class="mwa-row">
-                                <span>{t('interactDetailEmail')}</span>
-                                <strong>{detail.email}</strong>
-                            </li>
-                            <li class="mwa-row">
-                                <span>{t('interactDetailBalance')}</span>
-                                <strong>{detail.currentBalance}</strong>
-                            </li>
-                            <li class="mwa-row">
-                                <span>{t('interactDetailJoined')}</span>
-                                <strong>{detail.joinedAt.slice(0, 10)}</strong>
-                            </li>
-                        </ul>
-                        <h3>{t('interactAwardTitle')}</h3>
-                        <form method="POST" action={post('award')} class="mwa-form">
-                            <div class="mwa-field">
-                                <label for="mwa-award-amount">{t('interactAwardAmount')}</label>
-                                <input
-                                    id="mwa-award-amount"
-                                    type="number"
-                                    name="amount"
-                                    min="1"
-                                    step="1"
-                                    required
-                                />
-                            </div>
-                            <div class="mwa-field">
-                                <label for="mwa-award-note">{t('interactAwardNote')}</label>
-                                <input id="mwa-award-note" name="note" maxLength={200} />
-                            </div>
-                            <div class="mwa-actions">
-                                <button type="submit">{t('interactAwardSubmit')}</button>
-                            </div>
-                        </form>
-                    </div>
-                </section>
-            )}
-
             {canPlay &&
                 challengeDialog(
                     'coin_flip',
@@ -390,5 +289,99 @@ function InteractPage({
                     betField('mwa-chess-bet-amount'),
                 )}
         </PageShell>
+    );
+}
+
+// The send-money panel in both its shapes: players pay out of their own
+// balance (clamped stepper, "All" chip); staff get the same widget posting to
+// the award route — unclamped, an optional note, no balance line.
+function SendPanel({
+    action,
+    max,
+    withNote,
+    error,
+    notice,
+}: {
+    action: string;
+    max: number | null;
+    withNote?: boolean;
+    error?: keyof Language;
+    notice?: string;
+}) {
+    const { t } = useContext(ClientContext);
+    const [sendAmount, setSendAmount] = useState(0);
+    const cap = max ?? Number.MAX_SAFE_INTEGER;
+
+    return (
+        <section class="mwa-panel">
+            <div class="mwa-panel-head">
+                <h2>{t('interactSendMoneyTitle')}</h2>
+            </div>
+            <div class="mwa-panel-body">
+                {error && <Toast kind="error">{t(error)}</Toast>}
+                {notice && <Toast kind="success">{notice}</Toast>}
+                <form method="POST" action={action} class="mwa-send">
+                    <input type="hidden" name="amount" value={sendAmount} />
+                    <div class="mwa-send-stepper">
+                        <button
+                            type="button"
+                            class="mwa-send-step"
+                            onClick={() => setSendAmount((a) => Math.max(0, a - 1))}
+                            disabled={sendAmount <= 0}
+                        >
+                            −
+                        </button>
+                        <output class="mwa-send-amount">{sendAmount}</output>
+                        <button
+                            type="button"
+                            class="mwa-send-step"
+                            onClick={() => setSendAmount((a) => Math.min(cap, a + 1))}
+                            disabled={sendAmount >= cap}
+                        >
+                            +
+                        </button>
+                    </div>
+                    {max !== null && (
+                        <p class="mwa-send-available">
+                            {t('interactSendAvailable', { amount: String(max) })}
+                        </p>
+                    )}
+                    <div class="mwa-send-chips">
+                        {[5, 10, 50, 100].map((n) => (
+                            <button
+                                key={n}
+                                type="button"
+                                class="mwa-send-chip"
+                                onClick={() => setSendAmount((a) => Math.min(cap, a + n))}
+                            >
+                                +{n}
+                            </button>
+                        ))}
+                        {max !== null && (
+                            <button
+                                type="button"
+                                class="mwa-send-chip"
+                                onClick={() => setSendAmount(max)}
+                            >
+                                {t('interactSendAll')}
+                            </button>
+                        )}
+                    </div>
+                    {withNote && (
+                        <div class="mwa-field">
+                            <label for="mwa-send-note">{t('interactAwardNote')}</label>
+                            <input id="mwa-send-note" name="note" maxLength={200} />
+                        </div>
+                    )}
+                    <button
+                        type="submit"
+                        class="mwa-button"
+                        disabled={sendAmount < 1 || sendAmount > cap}
+                    >
+                        {t('interactSendSubmit')}
+                    </button>
+                </form>
+            </div>
+        </section>
     );
 }

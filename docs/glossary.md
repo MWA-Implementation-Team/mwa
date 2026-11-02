@@ -102,9 +102,10 @@ scanner's session and role decide what they can do.
 
 Something a scanner can do with the owner of an interact token — today just the
 conditional content of `InteractPage` (`src/client/pages/app/InteractPage.tsx`).
-Role gating is data-driven, not renderer-driven: the route only serializes
-elevated fields (the `detail` prop) for host/admin scanners, so a section can
-never receive data its role shouldn't see. If interactions multiply, this can
+Two route-computed flags split the audience: `canPlay` (both sides are plain
+users) shows the play panels — send-money, gambling, join-team — and
+`canAward` (host/admin scanner) shows the award-shaped send panel instead.
+If interactions multiply, this can
 graduate to a registry like `registeredActivities`.
 
 ## Queue entry
