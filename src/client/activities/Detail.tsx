@@ -1,6 +1,7 @@
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { ActivityProps, registeredActivities } from '#src/client/activities.js';
+import { Toast } from '#src/client/ui/Toast.js';
 
 // The universal station page: every activity gets its card art on top
 // and its text below. `completed` adds a banner for signed-in teams.
@@ -17,11 +18,7 @@ export function ActivityDetail({
                 <h2>{activity.name}</h2>
             </div>
             <div class="mwa-panel-body">
-                {completed && (
-                    <p class="mwa-note mwa-note--success" role="status">
-                        {t('activityCompleted')}
-                    </p>
-                )}
+                {completed && <Toast kind="success">{t('activityCompleted')}</Toast>}
                 <Card slug={slug} />
                 {activity.text && (
                     <div
