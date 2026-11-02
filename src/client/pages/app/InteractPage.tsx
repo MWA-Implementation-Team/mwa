@@ -64,6 +64,9 @@ function InteractPage({
 }: InteractPageProps) {
     const { t, user } = useContext(ClientContext);
     const [sendAmount, setSendAmount] = useState(0);
+    // hosts/admins can send past their balance — the server allows negative
+    const unlimited = user?.role === 'host' || user?.role === 'admin';
+    const maxSend = unlimited ? Number.MAX_SAFE_INTEGER : (user?.currentBalance ?? 0);
     const [openDialog, setOpenDialog] = useState<GameType | null>(gamblingError?.dialog ?? null);
 
     if (self) {
@@ -216,10 +219,8 @@ function InteractPage({
                             <button
                                 type="button"
                                 class="mwa-send-step"
-                                onClick={() =>
-                                    setSendAmount((a) => Math.min(user!.currentBalance, a + 1))
-                                }
-                                disabled={sendAmount >= user!.currentBalance}
+                                onClick={() => setSendAmount((a) => Math.min(maxSend, a + 1))}
+                                disabled={sendAmount >= maxSend}
                             >
                                 +
                             </button>
@@ -235,9 +236,7 @@ function InteractPage({
                                     key={n}
                                     type="button"
                                     class="mwa-send-chip"
-                                    onClick={() =>
-                                        setSendAmount((a) => Math.min(user!.currentBalance, a + n))
-                                    }
+                                    onClick={() => setSendAmount((a) => Math.min(maxSend, a + n))}
                                 >
                                     +{n}
                                 </button>
@@ -253,7 +252,7 @@ function InteractPage({
                         <button
                             type="submit"
                             class="mwa-button"
-                            disabled={sendAmount < 1 || sendAmount > user!.currentBalance}
+                            disabled={sendAmount < 1 || sendAmount > maxSend}
                         >
                             {t('interactSendSubmit')}
                         </button>
