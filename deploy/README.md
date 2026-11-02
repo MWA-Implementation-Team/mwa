@@ -2,7 +2,7 @@
 
 One Ansible playbook turns a fresh Ubuntu 24.04 VM into the running app:
 Docker + `app`/`caddy` containers behind Caddy TLS, secrets from an
-encrypted vault. Spec: [../SPEC-deploy.md](../SPEC-deploy.md).
+encrypted vault.
 
 ## Prerequisites
 
@@ -71,7 +71,7 @@ ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --ask-vault-pass --
 ```
 
 This pulls the clone, rebuilds the image, and recreates the container.
-Auto-deploy on push is deliberately not built yet (see SPEC-deploy.md).
+Auto-deploy on push is deliberately not built yet.
 
 ## Rotating secrets
 
