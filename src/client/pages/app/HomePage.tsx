@@ -26,7 +26,7 @@ type HomePageProps = {
     queueCanJoin: boolean;
     queueError?: keyof Language;
     qrClaimedAmount?: number | null;
-    qrError?: 'expired' | 'used_up' | 'already_claimed';
+    qrError?: 'not_found' | 'expired' | 'used_up' | 'already_claimed';
     standings: ViewerStanding[];
 };
 
@@ -47,6 +47,7 @@ const transactionKindKey = {
 import { boardHintKey, boardLabelKey } from '#src/client/boards.js';
 
 const qrErrorKey = {
+    not_found: 'qrErrorNotFound',
     expired: 'qrErrorExpired',
     used_up: 'qrErrorUsedUp',
     already_claimed: 'qrErrorAlreadyClaimed',

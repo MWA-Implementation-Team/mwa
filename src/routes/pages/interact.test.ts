@@ -332,6 +332,16 @@ describe('GET /app/qr/:secret', () => {
         assert.match(second.headers.get('location') ?? '', /qrError=already_claimed/);
         assert.equal(findUserById(state, user.id)!.currentBalance, 40);
     });
+
+    it('reports an unknown secret as not found', async () => {
+        const user = createUser(state, 'qrbogus@example.com', 'qrbogus_user');
+        const res = await app.request('/app/qr/nope-no-such-secret', {
+            headers: authCookie(user.id),
+        });
+        assert.equal(res.status, 303);
+        assert.match(res.headers.get('location') ?? '', /qrError=not_found/);
+        assert.equal(findUserById(state, user.id)!.currentBalance, 0);
+    });
 });
 
 describe('POST /app/you/reset-qr', () => {

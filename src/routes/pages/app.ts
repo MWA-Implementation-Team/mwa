@@ -98,6 +98,7 @@ export function registerAppRoutes(app: MwaHono) {
         const qrClaimed = Number(ctx.req.query('claimed'));
         const qrClaimedAmount = Number.isSafeInteger(qrClaimed) && qrClaimed > 0 ? qrClaimed : null;
         const qrError = queryFlag(ctx, 'qrError', [
+            'not_found',
             'expired',
             'used_up',
             'already_claimed',

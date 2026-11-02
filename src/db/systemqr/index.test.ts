@@ -55,9 +55,9 @@ describe('db/systemqr', () => {
         assert.equal(findUserById(state, b.id)!.currentBalance, 0);
     });
 
-    it('returns used_up for an unknown secret', () => {
+    it('returns not_found for an unknown secret', () => {
         const user = createUser(state, 'unknown@example.com', 'unknown_user');
-        assert.equal(claimSystemQrCode(state, 'nope', user.id).type, 'used_up');
+        assert.equal(claimSystemQrCode(state, 'nope', user.id).type, 'not_found');
     });
 
     it('stores an optional message as the credit note', () => {

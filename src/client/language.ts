@@ -60,6 +60,7 @@ export type Language = {
     accountQrHint: string;
     accountQrReset: string;
     qrClaimed: string;
+    qrErrorNotFound: string;
     qrErrorExpired: string;
     qrErrorUsedUp: string;
     qrErrorAlreadyClaimed: string;
@@ -335,6 +336,7 @@ export const languages: Record<LanguageCode, Language> = {
             'Your personal QR is shown in the sidebar. Reset it to invalidate the old code.',
         accountQrReset: 'Reset QR code',
         qrClaimed: 'You found {amount} coins!',
+        qrErrorNotFound: "This QR code doesn't exist.",
         qrErrorExpired: 'This QR code has expired.',
         qrErrorUsedUp: 'This QR code has already been fully used.',
         qrErrorAlreadyClaimed: 'You have already claimed this QR code.',
@@ -612,6 +614,7 @@ export const languages: Record<LanguageCode, Language> = {
             'Jūsų asmeninis QR rodomas šone. Čia galite jį sukurti iš naujo (senasis nustos veikti).',
         accountQrReset: 'Iš naujo sukurti QR kodą',
         qrClaimed: 'Radote {amount} miciaus koinų!',
+        qrErrorNotFound: 'Šis QR kodas neegzistuoja.',
         qrErrorExpired: 'Šis QR kodas nebegalioja.',
         qrErrorUsedUp: 'Šis QR kodas jau panaudotas.',
         qrErrorAlreadyClaimed: 'Jūs jau panaudojote šį QR kodą.',
