@@ -18,8 +18,10 @@ export type DialogProps = {
     children: ReactNode;
 };
 
-// Oat styles plain <dialog> and pads its header / div / footer children, so the
-// markup below is all the layout this needs.
+// Oat styles plain <dialog> and pads its header / div / footer children. The
+// body wrapper is the scroll region — Oat caps the box at 85vh but leaves
+// scrolling to a direct div/section child, so bare h3/ul/form children would
+// overflow the cap instead of scrolling.
 export default function Dialog({
     isOpen,
     onClose,
@@ -81,7 +83,7 @@ export default function Dialog({
                     <h2>{title}</h2>
                 </header>
             )}
-            {children}
+            <div class="mwa-dialog-body">{children}</div>
             {(actions !== undefined || submit !== undefined) && (
                 <footer>
                     {closable && onClose && (

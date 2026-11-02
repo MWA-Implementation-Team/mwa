@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'preact/hooks';
 import { defaultLanguage, LanguageCode, translate, TranslateFn } from './language.js';
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
 import { reviveUser, User, UserJson } from '#src/client/api/users.js';
+import { subscribeSharedSse } from './sse.js';
 import { Toasts } from './ui/Toast.js';
 
 import type { Notification } from '#src/db/users/index.js';
@@ -75,11 +76,9 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
 
     useEffect(() => {
         if (!init.user) return; // /api/notifications requires a session
-        const updates = new EventSource('/api/notifications');
-        updates.onmessage = (msg) => {
-            setNotification(JSON.parse(msg.data as string));
-        };
-        return () => updates.close();
+        return subscribeSharedSse('/api/notifications', 'mwa-notifications', {
+            onmessage: (data) => setNotification(JSON.parse(data)),
+        });
     }, [init.user?.id]);
 
     return (

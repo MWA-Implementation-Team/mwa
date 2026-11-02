@@ -8,10 +8,10 @@ export type Language = {
     titleLanding: string;
     titleLogin: string;
     titleHome: string;
-    titleActivities: string;
     titleActivity: string;
     titleLeaderboard: string;
     titleGambling: string;
+    titleInteract: string;
     titleHost: string;
     titleAdmin: string;
     titleError: string;
@@ -20,10 +20,8 @@ export type Language = {
     titleGamblingRejected: string;
     titleGamblingCoinFlip: string;
     titleGamblingConnect4: string;
-    titleGamblingInvite: string;
 
     headerHome: string;
-    headerActivities: string;
     headerLeaderboard: string;
     headerGambling: string;
     headerHost: string;
@@ -39,8 +37,8 @@ export type Language = {
     loginCode: string;
     loginVerify: string;
 
-    interactHeading: string;
     interactSelfJoke: string;
+    interactGeneralTitle: string;
     interactSendMoneyTitle: string;
     interactProfileDetailTitle: string;
     interactDetailEmail: string;
@@ -50,6 +48,15 @@ export type Language = {
     interactAwardAmount: string;
     interactAwardNote: string;
     interactAwardSubmit: string;
+    interactSendSubmit: string;
+    interactSendAvailable: string;
+    interactSendAll: string;
+    interactSendInvalid: string;
+    interactSendInsufficient: string;
+    interactMoneySent: string;
+    interactAwardInvalid: string;
+    interactAwarded: string;
+    interactGroupNone: string;
     accountQrHint: string;
     accountQrReset: string;
     qrClaimed: string;
@@ -61,6 +68,7 @@ export type Language = {
     landingLoginTitle: string;
     landingCountdownTitle: string;
     landingSocialTitle: string;
+    landingSocialEvent: string;
     landingFeedTitle: string;
     landingGoApp: string;
     landingLogin: string;
@@ -99,13 +107,13 @@ export type Language = {
     queueLeaveFailed: string;
     dashStandings: string;
 
-    hostCallTitle: string;
-    hostStation: string;
+    hostAssign: string;
     hostCount: string;
     hostRequest: string;
-    hostWaiting: string;
     hostAtStation: string;
     hostStationEmpty: string;
+    hostPrevStation: string;
+    hostNextStation: string;
     hostDone: string;
     hostNextUp: string;
     hostQueueEmpty: string;
@@ -124,9 +132,6 @@ export type Language = {
     shellAlert: string;
     dialogClose: string;
 
-    activitiesDirectory: string;
-    activitiesEmpty: string;
-    activityInfoTitle: string;
     activityBack: string;
 
     leaderboardTypeLabel: string;
@@ -208,7 +213,6 @@ export type Language = {
     gamblingNoInvitations: string;
     gamblingNoActiveGames: string;
     gamblingVersus: string;
-    gamblingWith: string;
     gamblingChallenge: string;
     gamblingBetAmount: string;
     gamblingSendInvite: string;
@@ -234,7 +238,6 @@ export type Language = {
     gamblingOpen: string;
     gamblingInProgress: string;
     gamblingReturn: string;
-    gamblingAction: string;
 
     gamblingCoinFlip: string;
     gamblingHeads: string;
@@ -272,10 +275,10 @@ export const languages: Record<LanguageCode, Language> = {
         titleLanding: 'first years | Home',
         titleLogin: 'first years | Login',
         titleHome: 'first years | App',
-        titleActivities: 'first years | Activities',
         titleActivity: 'first years | {name}',
         titleLeaderboard: 'first years | Leaderboard',
         titleGambling: 'first years | Gambling',
+        titleInteract: 'first years | Interact with {name}',
         titleHost: 'first years | Host',
         titleAdmin: 'first years | Admin',
         titleError: 'first years | {status}',
@@ -284,10 +287,9 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingRejected: 'first years | Rejected',
         titleGamblingCoinFlip: 'first years | Coin flip',
         titleGamblingConnect4: 'first years | Connect 4',
-        titleGamblingInvite: 'first years | Gamble with {name}',
 
         headerHome: 'App',
-        headerActivities: 'Activities',
+
         headerLeaderboard: 'Leaderboard',
         headerGambling: 'Gambling',
         headerHost: 'Host tools',
@@ -303,8 +305,8 @@ export const languages: Record<LanguageCode, Language> = {
         loginCode: 'Code from the email',
         loginVerify: 'Verify code',
 
-        interactHeading: 'Interact with {name}',
         interactSelfJoke: "That's you! Scan someone else's code instead.",
+        interactGeneralTitle: 'General information',
         interactSendMoneyTitle: 'Send money',
         interactProfileDetailTitle: 'Profile details',
         interactDetailEmail: 'Email',
@@ -314,6 +316,15 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardAmount: 'Amount',
         interactAwardNote: 'Note (optional)',
         interactAwardSubmit: 'Award',
+        interactSendSubmit: 'Send',
+        interactSendAvailable: 'Available {amount}',
+        interactSendAll: 'All',
+        interactSendInvalid: 'Enter a valid whole-number amount.',
+        interactSendInsufficient: 'You do not have enough coins.',
+        interactMoneySent: 'Sent {amount} coins.',
+        interactAwardInvalid: 'Enter a valid whole-number amount.',
+        interactAwarded: 'Coins awarded.',
+        interactGroupNone: 'Not in a group.',
         accountQrHint:
             'Your personal QR is shown in the sidebar. Reset it to invalidate the old code.',
         accountQrReset: 'Reset QR code',
@@ -326,6 +337,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingLoginTitle: 'System',
         landingCountdownTitle: 'Until the event',
         landingSocialTitle: 'Follow us here!',
+        landingSocialEvent: 'Event',
         landingFeedTitle: 'Activities',
         landingGoApp: 'Go',
         landingLogin: 'Login',
@@ -364,13 +376,13 @@ export const languages: Record<LanguageCode, Language> = {
         queueLeaveFailed: 'Could not leave the queue',
         dashStandings: 'Your standings',
 
-        hostCallTitle: 'Send groups to a station',
-        hostStation: 'Station',
+        hostAssign: 'Assign groups',
         hostCount: 'Groups to call',
         hostRequest: 'Request from queue',
-        hostWaiting: '{n} group(s) waiting in the queue',
-        hostAtStation: 'At the station',
+        hostAtStation: 'Teams assigned to the activity',
         hostStationEmpty: 'No groups at this station',
+        hostPrevStation: 'Previous station',
+        hostNextStation: 'Next station',
         hostDone: 'Done',
         hostNextUp: 'Next in line',
         hostQueueEmpty: 'The queue is empty',
@@ -389,9 +401,6 @@ export const languages: Record<LanguageCode, Language> = {
         shellAlert: 'Alert',
         dialogClose: 'Close',
 
-        activitiesDirectory: 'Activity directory',
-        activitiesEmpty: 'No activities listed yet.',
-        activityInfoTitle: 'activity information',
         activityBack: '← back to activities',
 
         leaderboardTypeLabel: 'Leaderboard board',
@@ -473,7 +482,6 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingNoInvitations: 'No invitations yet.',
         gamblingNoActiveGames: 'No games running.',
         gamblingVersus: '{p1} vs {p2}',
-        gamblingWith: 'Gamble with {name}',
         gamblingChallenge: 'Challenge',
         gamblingBetAmount: 'Bet amount',
         gamblingSendInvite: 'Send invite',
@@ -500,7 +508,6 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingOpen: 'Open',
         gamblingInProgress: 'You are currently gambling.',
         gamblingReturn: 'Return',
-        gamblingAction: 'Gamble',
 
         gamblingCoinFlip: 'Coin flip',
         gamblingHeads: 'Heads',
@@ -537,10 +544,11 @@ export const languages: Record<LanguageCode, Language> = {
         titleLanding: 'pirmakursiu | Pradžia',
         titleLogin: 'pirmakursiu | Prisijungimas',
         titleHome: 'pirmakursiu | Programa',
-        titleActivities: 'pirmakursiu | Veiklos',
+
         titleActivity: 'pirmakursiu | {name}',
         titleLeaderboard: 'pirmakursiu | Lyderių lentelė',
         titleGambling: 'pirmakursiu | Lošimai',
+        titleInteract: 'pirmakursiu | Sąveika su {name}',
         titleHost: 'pirmakursiu | Vedėjas',
         titleAdmin: 'pirmakursiu | Administravimas',
         titleError: 'pirmakursiu | {status}',
@@ -549,10 +557,9 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingRejected: 'pirmakursiu | Kvietimas atmestas',
         titleGamblingCoinFlip: 'pirmakursiu | Monetos metimas',
         titleGamblingConnect4: 'pirmakursiu | Keturi iš eilės',
-        titleGamblingInvite: 'pirmakursiu | Lošk su {name}',
 
         headerHome: 'Programa',
-        headerActivities: 'Veiklos',
+
         headerLeaderboard: 'Lyderių lentelė',
         headerGambling: 'Lošimai',
         headerHost: 'Vedėjo įrankiai',
@@ -569,8 +576,8 @@ export const languages: Record<LanguageCode, Language> = {
         loginCode: 'Kodas iš laiško',
         loginVerify: 'Patvirtinti kodą',
 
-        interactHeading: 'Sąveika su {name}',
         interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
+        interactGeneralTitle: 'Bendra informacija',
         interactSendMoneyTitle: 'Siųsti pinigus',
         interactProfileDetailTitle: 'Profilio detalės',
         interactDetailEmail: 'El. paštas',
@@ -580,6 +587,15 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardAmount: 'Suma',
         interactAwardNote: 'Žinutė (neprivaloma)',
         interactAwardSubmit: 'Suteikti',
+        interactSendSubmit: 'Siųsti',
+        interactSendAvailable: 'Galima {amount}',
+        interactSendAll: 'Viską',
+        interactSendInvalid: 'Neteisinga suma.',
+        interactSendInsufficient: 'Nepakanka monetų.',
+        interactMoneySent: 'Išsiųsta {amount} monetų.',
+        interactAwardInvalid: 'Neteisinga suma.',
+        interactAwarded: 'Koinai suteikti.',
+        interactGroupNone: 'Nėra grupėje.',
         accountQrHint:
             'Jūsų asmeninis QR rodomas šone. Čia galite jį sukurti iš naujo (senasis nustos veikti).',
         accountQrReset: 'Iš naujo sukurti QR kodą',
@@ -592,6 +608,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingLoginTitle: 'Sistema',
         landingCountdownTitle: 'Iki renginio',
         landingSocialTitle: 'Sekite mus čia!',
+        landingSocialEvent: 'Renginys',
         landingFeedTitle: 'Veiklos',
         landingGoApp: 'Eiti',
         landingLogin: 'Prisijungti',
@@ -630,13 +647,13 @@ export const languages: Record<LanguageCode, Language> = {
         queueLeaveFailed: 'Nepavyko palikti eilės',
         dashStandings: 'Tavo pozicijos',
 
-        hostCallTitle: 'Siųsti grupes į stotį',
-        hostStation: 'Stotis',
         hostCount: 'Kiek grupių kviesti',
         hostRequest: 'Paimti iš eilės',
-        hostWaiting: 'Eilėje laukia grupių: {n}',
-        hostAtStation: 'Prie stoties',
-        hostStationEmpty: 'Prie šios stoties grupių nėra',
+        hostAssign: 'Grupių priskirimas',
+        hostAtStation: 'Veiklai priskirtos komandos',
+        hostStationEmpty: 'Prie šios veiklos grupių nėra',
+        hostPrevStation: 'Ankstesnė veikla',
+        hostNextStation: 'Kita veikla',
         hostDone: 'Atlikta',
         hostNextUp: 'Eilėje toliau',
         hostQueueEmpty: 'Eilė tuščia',
@@ -655,9 +672,6 @@ export const languages: Record<LanguageCode, Language> = {
         shellAlert: 'Pranešimas',
         dialogClose: 'Uždaryti',
 
-        activitiesDirectory: 'Veiklų katalogas',
-        activitiesEmpty: 'Veiklų dar nėra.',
-        activityInfoTitle: 'veiklos informacija',
         activityBack: '← atgal į veiklas',
 
         leaderboardTypeLabel: 'Lentelės tipas',
@@ -742,7 +756,6 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingNoInvitations: 'Kvietimų kol kas nėra.',
         gamblingNoActiveGames: 'Šiuo metu vykstančių žaidimų nėra.',
         gamblingVersus: '{p1} prieš {p2}',
-        gamblingWith: 'Lošk su {name}',
         gamblingChallenge: 'Siųsti iššūkį',
         gamblingBetAmount: 'Statymo suma',
         gamblingSendInvite: 'Pakviesti',
@@ -769,7 +782,6 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingOpen: 'Atidaryti',
         gamblingInProgress: 'Šiuo metu dalyvauji lošime.',
         gamblingReturn: 'Grįžti',
-        gamblingAction: 'Lošti',
 
         gamblingCoinFlip: 'Monetos metimas',
         gamblingHeads: 'Herbas',

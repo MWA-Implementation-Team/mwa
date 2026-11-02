@@ -1,9 +1,9 @@
 import type { Activity } from '#src/client/activities.js';
 import { EgyptCard } from './Card.js';
-import { EgyptDetail } from './Detail.js';
+import { text } from './text.js';
 
 export const egyptActivity: Activity = {
     name: 'Miauripto piramidės',
     Card: EgyptCard,
-    Detail: EgyptDetail,
+    text,
 };

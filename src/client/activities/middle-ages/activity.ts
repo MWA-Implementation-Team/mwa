@@ -1,9 +1,9 @@
 import type { Activity } from '#src/client/activities.js';
 import { MiddleAgesCard } from './Card.js';
-import { MiddleAgesDetail } from './Detail.js';
+import { text } from './text.js';
 
 export const middleAgesActivity: Activity = {
     name: 'Micius viduramžiuose',
     Card: MiddleAgesCard,
-    Detail: MiddleAgesDetail,
+    text,
 };

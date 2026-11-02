@@ -11,6 +11,7 @@ import {
     RunningGame,
 } from '#src/db/gambling/index.js';
 import { Language, TranslateFn } from '#src/client/language.js';
+import { subscribeSharedSse } from '#src/client/sse.js';
 import { c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
 import { ComponentChildren } from 'preact';
 import { TurnTimeLeftDisplay } from '#src/client/ui/TurnTimeLeftDisplay.js';
@@ -62,13 +63,15 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
     if (user?.id === currentGame.p2) side = 'p2';
 
     useEffect(() => {
-        const updates = new EventSource(`/app/gambling/sessions/${sessionId}/watch`);
-        updates.onmessage = (msg) => {
-            setCurrentGame(JSON.parse(msg.data as string));
-        };
-        updates.onopen = () => setIsDisconnected(false);
-        updates.onerror = () => setIsDisconnected(true);
-        return () => updates.close();
+        return subscribeSharedSse(
+            `/app/gambling/sessions/${sessionId}/watch`,
+            `mwa-gambling-watch-${sessionId}`,
+            {
+                onmessage: (data) => setCurrentGame(JSON.parse(data)),
+                onopen: () => setIsDisconnected(false),
+                onerror: () => setIsDisconnected(true),
+            },
+        );
     }, [sessionId]);
 
     useEffect(() => {

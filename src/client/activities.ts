@@ -10,7 +10,7 @@ import { year2028Activity } from '#src/client/activities/year-2028/activity.js';
 import { miciausParadiseActivity } from '#src/client/activities/miciaus-paradise/activity.js';
 
 // Each activity is an irl station. Its key here — the slug — is its
-// identity everywhere: the /app/activities/<slug> url, the activities
+// identity everywhere: the /activities/<slug> url, the activities
 // table, and any queue/badge rows that reference it later.
 // Keys also set the display order on the list page — avoid integer-like
 // slugs ('2028'), which would sort to the front regardless of order here.
@@ -40,15 +40,17 @@ export type Activity = {
     // Display name — used for the <title> and anywhere the app refers
     // to the station generically. Proper noun, not translated.
     name: string;
-    // Rendered inside a link on the activities list page.
+    // Rendered inside a link on the activities list page and again at
+    // the top of the station's own page.
     Card: ComponentType<ActivityProps>;
-    // Rendered below the header on /app/activities/<slug>. This is where
-    // the station's unique decorations live.
-    Detail: ComponentType<ActivityProps>;
+    // The station's description, shown under the card on
+    // /activities/<slug>. An HTML string (p, ul, strong, em) —
+    // author-controlled, rendered as-is. Optional until the copy lands.
+    text?: { en: string; lt: string };
 };
 
 export function isActivitySlug(value: string): value is ActivitySlug {
     // hasOwn, not `in`: `in` walks the prototype chain, so
-    // /app/activities/toString would pass a plain-membership check
+    // /activities/toString would pass a plain-membership check
     return Object.hasOwn(registeredActivities, value);
 }

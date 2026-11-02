@@ -8,11 +8,11 @@ import { displayActor } from '#src/client/display.js';
 
 export type Section =
     | 'home'
-    | 'activities'
     | 'leaderboard'
     | 'host'
     | 'admin'
     | 'gambling'
+    | 'interact'
     | 'landing'
     | 'login'
     | 'error';
@@ -42,7 +42,6 @@ export default function PageShell({
 
     const navigation = [
         { section: 'home', label: t('headerHome'), href: '/app' },
-        { section: 'activities', label: t('headerActivities'), href: '/app/activities' },
         {
             section: 'leaderboard',
             label: t('headerLeaderboard'),
@@ -64,7 +63,7 @@ export default function PageShell({
             <section class="landing-section landing-pane-brand">
                 <div class="landing-welcome">
                     <a href="/" class="mwa-logo" aria-label={t('shellLogoAlt')}>
-                        <img src="/logo.png" alt={t('shellLogoAlt')} />
+                        <img src="/logo.webp" alt={t('shellLogoAlt')} />
                     </a>
                 </div>
             </section>

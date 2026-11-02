@@ -6,14 +6,12 @@ import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
 import PageShell from './PageShell.js';
 import Dialog from '#src/client/ui/Dialog.js';
 import { Language } from '#src/client/language.js';
-import type { LeaderboardBoard, ViewerStanding } from '#src/db/leaderboard/index.js';
+import type { ViewerStanding } from '#src/db/leaderboard/index.js';
 import { displayActor, displayUsername } from '#src/client/display.js';
-import InteractDialog, { InteractProfile } from './InteractDialog.js';
 import { Toast } from '#src/client/ui/Toast.js';
 
 type HomePageProps = {
     transactions: Transaction[];
-    interact: InteractProfile | null;
     groupName: string | null;
     groupPhone: string | null;
     groupEmoji: string;
@@ -21,10 +19,6 @@ type HomePageProps = {
     groupOwnerId: number | null;
     groupMembers: { userId: number; username: string }[];
     groupError?: keyof Language;
-    // team-up request feedback — lands here because sending it closes the
-    // interact dialog
-    interactError?: keyof Language;
-    interactNotice?: keyof Language;
     youError?: keyof Language;
     queuePosition: number | null;
     queueCanJoin: boolean;
@@ -48,17 +42,7 @@ const transactionKindKey = {
     host_grant: 'txHostGrant',
 } as const satisfies Record<TransactionKind, keyof Language>;
 
-const boardLabelKey = {
-    activity: 'leaderboardActivity',
-    gambling: 'leaderboardGambling',
-    combined: 'leaderboardCombined',
-} as const satisfies Record<LeaderboardBoard, keyof Language>;
-
-const boardHintKey = {
-    activity: 'leaderboardActivityHint',
-    gambling: 'leaderboardGamblingHint',
-    combined: 'leaderboardCombinedHint',
-} as const satisfies Record<LeaderboardBoard, keyof Language>;
+import { boardHintKey, boardLabelKey } from '#src/client/boards.js';
 
 const qrErrorKey = {
     expired: 'qrErrorExpired',
@@ -75,8 +59,6 @@ function HomePage({
     groupOwnerId,
     groupMembers,
     groupError,
-    interactError,
-    interactNotice,
     youError,
     queuePosition,
     queueCanJoin,
@@ -84,7 +66,6 @@ function HomePage({
     qrClaimedAmount,
     qrError,
     standings,
-    interact,
 }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
     const [guideOpen, setGuideOpen] = useState(false);
@@ -104,6 +85,7 @@ function HomePage({
                 </div>
                 <div class="mwa-panel-body mwa-queue-grid">
                     <div>
+                        <p class="mwa-queue-name">{displayUsername(user!.username)}</p>
                         <div class="mwa-queue-art" aria-hidden="true">
                             {groupEmoji}
                         </div>
@@ -243,8 +225,6 @@ function HomePage({
                 </div>
                 <div class="mwa-panel-body">
                     {groupError && <Toast kind="error">{t(groupError)}</Toast>}
-                    {interactError && <Toast kind="error">{t(interactError)}</Toast>}
-                    {interactNotice && <Toast kind="success">{t(interactNotice)}</Toast>}
                     {groupMembers.length === 0 ? (
                         <p class="mwa-muted">{t('groupNone')}</p>
                     ) : (
@@ -515,8 +495,6 @@ function HomePage({
                     </div>
                 </form>
             </Dialog>
-
-            {interact && <InteractDialog interact={interact} />}
         </PageShell>
     );
 }
