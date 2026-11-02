@@ -1,0 +1,100 @@
+/* Host tools (/app/host): the station card sits in a left column with
+   prev/next cycle buttons under it; the right column holds the at-station
+   table and the request form. Stacks on phones. */
+.mwa-host {
+    display: grid;
+    gap: var(--space-4);
+}
+
+@media (min-width: 700px) {
+    .mwa-host {
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+}
+
+/* Cards are hand-drawn <article>s with different inner content heights —
+   pin a shape so cycling doesn't make the column jump. aspect-ratio, not a
+   fixed height: on a phone the full-width card would otherwise crop to a
+   pixel value sized for the desktop column. */
+.mwa-host-picker > article {
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+}
+
+/* The host cycles stations on a phone mid-event — the arrows get a big
+   tap target. Menu buttons (.mwa-button) left-align text and stretch
+   full-width; the cycle arrows recenter and share the row evenly. */
+.mwa-host-cycle {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+
+.mwa-host-cycle .mwa-button {
+    flex: 1;
+    justify-content: center;
+    padding: var(--space-3);
+    font-size: var(--text-3);
+    line-height: 1;
+}
+
+/* Right column items hug the right edge. */
+.mwa-host-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-4);
+}
+
+.mwa-host-controls {
+    width: 100%;
+    text-align: right;
+}
+
+/* Controls span the column in two rows: the four count buttons share the
+   first row, the request button takes the second. */
+.mwa-host-request {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: stretch;
+    margin-top: var(--space-4);
+}
+
+.mwa-host-request > .mwa-button {
+    justify-content: center;
+}
+
+/* The 1–4 count pickers are radio inputs dressed as menu buttons — no
+   JS needed, the picked value posts with the form. */
+.mwa-host-count {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.mwa-host-count-option {
+    position: relative;
+    flex: 1;
+    width: auto;
+    padding: var(--space-2) var(--space-4);
+    justify-content: center;
+    cursor: pointer;
+}
+
+.mwa-host-count-option input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: inherit;
+}
+
+/* Selected count — same cue the menu's current page gets (text only). */
+.mwa-host-count-option:has(input:checked) {
+    color: var(--foreground);
+}
+
+.mwa-host-count-option:has(input:focus-visible) {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+}

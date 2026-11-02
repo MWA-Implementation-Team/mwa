@@ -16,3 +16,6 @@
 @import './components/connect4.css';
 @import './components/dialog.css';
 @import './components/chess.css';
+@import './components/activity.css';
+@import './components/host.css';
+@import './components/send.css';

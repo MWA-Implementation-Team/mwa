@@ -11,7 +11,7 @@ export default function ThemeToggle() {
         }
 
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.cookie = `${cookieThemeOverride}=${newTheme}`;
+        document.cookie = `${cookieThemeOverride}=${newTheme}; path=/; SameSite=Lax`;
         document.body.style.colorScheme = newTheme;
     }
 

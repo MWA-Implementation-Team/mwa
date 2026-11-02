@@ -5,7 +5,9 @@ import { createUser, findUserById } from '#src/db/users/index.js';
 import { createSession } from '#src/db/sessions/index.js';
 import { getOrCreateInteractToken } from '#src/db/interactions/index.js';
 import { createSystemQrCode } from '#src/db/systemqr/index.js';
+import { giveCoins } from '#src/db/transactions/index.js';
 import { registerAppRoutes } from './app.js';
+import { registerGamblingRoutes } from './gambling.js';
 import { createTestMwaState, MwaHono, setupHonoState } from '#src/state.js';
 
 const state = createTestMwaState({});
@@ -13,6 +15,7 @@ const state = createTestMwaState({});
 const app: MwaHono = new Hono();
 setupHonoState(app, state);
 registerAppRoutes(app);
+registerGamblingRoutes(app);
 
 function authCookie(userId: number) {
     return { cookie: `mwa-session=${createSession(state, userId)}` };
@@ -29,48 +32,13 @@ describe('GET /app — personal QR', () => {
         assert.equal(res.status, 200);
         const html = await res.text();
         const token = getOrCreateInteractToken(state, user.id);
-        assert.match(html, new RegExp(`/app\\?interact=${token}`));
+        assert.match(html, new RegExp(`/app/interact/${token}`));
         assert.match(html, /<svg/);
     });
 });
 
-describe('GET /app/interact/:token — legacy redirect', () => {
+describe('GET /app?interact=<token> — legacy redirect', () => {
     it('redirects logged-out scanners to login', async () => {
-        const owner = createUser(state, 'owner1@example.com', 'owner1');
-        const token = getOrCreateInteractToken(state, owner.id);
-        const res = await app.request(`/app/interact/${token}`);
-        assert.equal(res.status, 303);
-        assert.match(res.headers.get('location') ?? '', /\/login\?goto=%2Fapp%2Finteract%2F/);
-    });
-
-    it('bounces signed-in visitors onto the query-param form', async () => {
-        const owner = createUser(state, 'legacy@example.com', 'legacy');
-        const scanner = createUser(state, 'scan0@example.com', 'scan0');
-        const token = getOrCreateInteractToken(state, owner.id);
-        const res = await app.request(`/app/interact/${token}`, {
-            headers: authCookie(scanner.id),
-        });
-        assert.equal(res.status, 303);
-        assert.equal(res.headers.get('location'), `/app?interact=${token}`);
-    });
-
-    it('carries query params through the redirect', async () => {
-        const owner = createUser(state, 'carry@example.com', 'carry');
-        const scanner = createUser(state, 'scan4@example.com', 'scan4');
-        const token = getOrCreateInteractToken(state, owner.id);
-        const res = await app.request(`/app/interact/${token}?interactNotice=groupRequestSent`, {
-            headers: authCookie(scanner.id),
-        });
-        assert.equal(res.status, 303);
-        assert.equal(
-            res.headers.get('location'),
-            `/app?interactNotice=groupRequestSent&interact=${token}`,
-        );
-    });
-});
-
-describe('GET /app?interact=<token>', () => {
-    it('keeps the token in the login goto for logged-out scanners', async () => {
         const owner = createUser(state, 'out@example.com', 'out_user');
         const token = getOrCreateInteractToken(state, owner.id);
         const res = await app.request(`/app?interact=${token}`);
@@ -81,9 +49,44 @@ describe('GET /app?interact=<token>', () => {
         );
     });
 
+    it('bounces signed-in visitors onto the path form', async () => {
+        const owner = createUser(state, 'legacy@example.com', 'legacy');
+        const scanner = createUser(state, 'scan0@example.com', 'scan0');
+        const token = getOrCreateInteractToken(state, owner.id);
+        const res = await app.request(`/app?interact=${token}`, {
+            headers: authCookie(scanner.id),
+        });
+        assert.equal(res.status, 303);
+        assert.equal(res.headers.get('location'), `/app/interact/${token}`);
+    });
+
+    it('carries query params through the redirect', async () => {
+        const owner = createUser(state, 'carry@example.com', 'carry');
+        const scanner = createUser(state, 'scan4@example.com', 'scan4');
+        const token = getOrCreateInteractToken(state, owner.id);
+        const res = await app.request(`/app?interact=${token}&interactNotice=groupRequestSent`, {
+            headers: authCookie(scanner.id),
+        });
+        assert.equal(res.status, 303);
+        assert.equal(
+            res.headers.get('location'),
+            `/app/interact/${token}?interactNotice=groupRequestSent`,
+        );
+    });
+});
+
+describe('GET /app/interact/:token', () => {
+    it('redirects logged-out scanners to login', async () => {
+        const owner = createUser(state, 'owner1@example.com', 'owner1');
+        const token = getOrCreateInteractToken(state, owner.id);
+        const res = await app.request(`/app/interact/${token}`);
+        assert.equal(res.status, 303);
+        assert.match(res.headers.get('location') ?? '', /\/login\?goto=%2Fapp%2Finteract%2F/);
+    });
+
     it('404s on a bad token', async () => {
         const scanner = createUser(state, 'scan1@example.com', 'scan1');
-        const res = await app.request('/app?interact=forged', {
+        const res = await app.request('/app/interact/forged', {
             headers: authCookie(scanner.id),
         });
         assert.equal(res.status, 404);
@@ -94,13 +97,13 @@ describe('GET /app?interact=<token>', () => {
         const scanner = createUser(state, 'scan2@example.com', 'scan2');
         const token = getOrCreateInteractToken(state, owner.id);
 
-        const res = await app.request(`/app?interact=${token}`, {
+        const res = await app.request(`/app/interact/${token}`, {
             headers: authCookie(scanner.id),
         });
         assert.equal(res.status, 200);
         const html = await res.text();
         assert.match(html, /Interact with Target_user/);
-        assert.match(html, /Send money/);
+        assert.match(html, /send-money/);
         // detail fields must not leak into props for a regular scanner
         assert.doesNotMatch(html, /target@example\.com/);
     });
@@ -111,7 +114,7 @@ describe('GET /app?interact=<token>', () => {
         promote(host.id, 'host');
         const token = getOrCreateInteractToken(state, owner.id);
 
-        const res = await app.request(`/app?interact=${token}`, {
+        const res = await app.request(`/app/interact/${token}`, {
             headers: authCookie(host.id),
         });
         const html = await res.text();
@@ -122,29 +125,29 @@ describe('GET /app?interact=<token>', () => {
     it('self-scan gets the easter egg instead of actions', async () => {
         const user = createUser(state, 'ego@example.com', 'ego_user');
         const token = getOrCreateInteractToken(state, user.id);
-        const res = await app.request(`/app?interact=${token}`, {
+        const res = await app.request(`/app/interact/${token}`, {
             headers: authCookie(user.id),
         });
         const html = await res.text();
         assert.match(html, /That's you!/);
-        assert.doesNotMatch(html, /Send money/);
+        assert.doesNotMatch(html, /send-money/);
     });
 
-    it('shows the sent notice in the team panel without reopening the dialog', async () => {
+    it('shows the sent notice on the interact page', async () => {
+        const owner = createUser(state, 'notice2@example.com', 'notice2_user');
         const requester = createUser(state, 'notice@example.com', 'notice_user');
-        const res = await app.request('/app?interactNotice=groupRequestSent', {
+        const token = getOrCreateInteractToken(state, owner.id);
+        const res = await app.request(`/app/interact/${token}?interactNotice=groupRequestSent`, {
             headers: authCookie(requester.id),
         });
         assert.equal(res.status, 200);
         const html = await res.text();
         assert.match(html, /Join request sent\./);
-        assert.match(html, /"interact":null/);
-        assert.doesNotMatch(html, /Interact with/);
     });
 });
 
 describe('POST /app/interact/:token/group-request', () => {
-    it('lands on /app with the notice — the dialog stays closed', async () => {
+    it('lands back on the interact page with the notice', async () => {
         const owner = createUser(state, 'owner2@example.com', 'owner2');
         const requester = createUser(state, 'asker@example.com', 'asker');
         const token = getOrCreateInteractToken(state, owner.id);
@@ -153,7 +156,10 @@ describe('POST /app/interact/:token/group-request', () => {
             headers: authCookie(requester.id),
         });
         assert.equal(res.status, 303);
-        assert.equal(res.headers.get('location'), '/app?interactNotice=groupRequestSent');
+        assert.equal(
+            res.headers.get('location'),
+            `/app/interact/${token}?interactNotice=groupRequestSent`,
+        );
     });
 });
 
@@ -191,7 +197,7 @@ describe('POST /app/interact/:token/award', () => {
             body: 'amount=0',
         });
         assert.equal(res.status, 303);
-        assert.match(res.headers.get('location') ?? '', /awardError=invalid/);
+        assert.match(res.headers.get('location') ?? '', /interactError=interactAwardInvalid/);
         assert.equal(findUserById(state, owner.id)!.currentBalance, 0);
     });
 
@@ -210,6 +216,98 @@ describe('POST /app/interact/:token/award', () => {
         });
         assert.equal(res.status, 403);
         assert.equal(findUserById(state, owner.id)!.currentBalance, 0);
+    });
+});
+
+describe('POST /app/interact/:token/send-money', () => {
+    function post(token: string, userId: number, body: string) {
+        return app.request(`/app/interact/${token}/send-money`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(userId),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body,
+        });
+    }
+
+    it('moves coins between the two balances', async () => {
+        const owner = createUser(state, 'payee@example.com', 'payee_user');
+        const sender = createUser(state, 'payer@example.com', 'payer_user');
+        giveCoins(state, sender.id, 50);
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await post(token, sender.id, 'amount=20');
+        assert.equal(res.status, 303);
+        assert.equal(res.headers.get('location'), `/app/interact/${token}?sent=20`);
+        assert.equal(findUserById(state, sender.id)!.currentBalance, 30);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 20);
+    });
+
+    it('bounces back to the page on a bad amount', async () => {
+        const owner = createUser(state, 'payee2@example.com', 'payee2_user');
+        const sender = createUser(state, 'payer2@example.com', 'payer2_user');
+        giveCoins(state, sender.id, 50);
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await post(token, sender.id, 'amount=-5');
+        assert.equal(res.status, 303);
+        assert.equal(
+            res.headers.get('location'),
+            `/app/interact/${token}?sendError=interactSendInvalid`,
+        );
+        assert.equal(findUserById(state, sender.id)!.currentBalance, 50);
+    });
+
+    it('bounces back when the sender cannot cover it', async () => {
+        const owner = createUser(state, 'payee3@example.com', 'payee3_user');
+        const sender = createUser(state, 'payer3@example.com', 'payer3_user');
+        giveCoins(state, sender.id, 10);
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await post(token, sender.id, 'amount=11');
+        assert.equal(res.status, 303);
+        assert.equal(
+            res.headers.get('location'),
+            `/app/interact/${token}?sendError=interactSendInsufficient`,
+        );
+        assert.equal(findUserById(state, sender.id)!.currentBalance, 10);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 0);
+    });
+
+    it('404s on self-send and on a bad token', async () => {
+        const user = createUser(state, 'selfpay@example.com', 'selfpay_user');
+        giveCoins(state, user.id, 50);
+        const token = getOrCreateInteractToken(state, user.id);
+
+        const self = await post(token, user.id, 'amount=5');
+        assert.equal(self.status, 404);
+        const forged = await post('forged', user.id, 'amount=5');
+        assert.equal(forged.status, 404);
+        assert.equal(findUserById(state, user.id)!.currentBalance, 50);
+    });
+});
+
+describe('POST /app/interact/:token/gamble', () => {
+    it('bounces a bad bet back onto the interact page with the game flag', async () => {
+        const owner = createUser(state, 'gtarget@example.com', 'gtarget_user');
+        const challenger = createUser(state, 'gchall@example.com', 'gchall_user');
+        giveCoins(state, challenger.id, 50);
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await app.request(`/app/interact/${token}/gamble`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(challenger.id),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'game_type=connect_4&bet_amount=0',
+        });
+        assert.equal(res.status, 302);
+        assert.equal(
+            res.headers.get('location'),
+            `/app/interact/${token}?error_game=connect_4&error_type=invalid`,
+        );
     });
 });
 

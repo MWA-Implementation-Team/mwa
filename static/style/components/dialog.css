@@ -1,7 +1,27 @@
 /* Oat pads each dialog region with --space-6; app modals stay compact. */
-dialog > footer,
-dialog > form > :is(p, div, section) {
+dialog > .mwa-dialog-body,
+dialog > footer {
     padding: var(--space-4);
+}
+
+/* Oat caps the dialog at 85vh but leaves scrolling to a direct div/section
+   child — .mwa-dialog-body is that region. The column flex lets it shrink
+   inside the cap so tall content scrolls instead of painting past the box.
+   [open] only: a blanket display would override the UA rule that keeps closed
+   dialogs hidden. */
+dialog[open] {
+    display: flex;
+    flex-direction: column;
+}
+
+dialog > .mwa-dialog-body {
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* Empty bodies leave no gap between the header and the footer. */
+dialog > .mwa-dialog-body:empty {
+    display: none;
 }
 
 /* Title strip matches the sidebar tab headers (.landing-section > h2). */
@@ -34,21 +54,8 @@ dialog .mwa-button {
     width: auto;
 }
 
-/* A footer holding a stacked .mwa-actions turns into a column too — every
-   button (Close included, at the top) joins the pile at full width. The top
-   padding the blanket rule strips is restored here — the interact dialog's
-   body can be empty, leaving the pile flush against the header. */
-dialog > footer:has(.mwa-actions--col) {
-    flex-direction: column;
-    padding-block-start: var(--space-4);
-}
-
-dialog > footer:has(.mwa-actions--col) > .mwa-button {
-    width: 100%;
-}
-
 /* Half of Oat's 32rem default — the shared compact modal for short dialogs
-   (single-field forms, the interact actions). */
+   (single-field forms, the invite games). */
 .mwa-dialog--half {
     width: min(16rem, 100% - 2rem);
 }

@@ -5,6 +5,7 @@ import { registerAuthRoutes } from '#src/routes/pages/auth.js';
 import { registerAppRoutes } from '#src/routes/pages/app.js';
 import { registerAdminRoutes } from '#src/routes/pages/admin.js';
 import { registerLandingRoutes } from '#src/routes/pages/landing.js';
+import { registerActivitiesRoutes } from '#src/routes/pages/activities.js';
 import { registerUsersRoutes } from '#src/routes/api/users.js';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
@@ -37,7 +38,15 @@ setupHonoState(app, state);
 // 'Origin: http://localhost:3000' (or send JSON, which browsers can't cross-post).
 app.use('*', csrf());
 
+// serve-static already sends Last-Modified — no-cache forces revalidation,
+// so edits land instantly while unchanged assets come back as cheap 304s.
+app.use('*', async (ctx, next) => {
+    ctx.header('Cache-Control', 'no-cache');
+    await next();
+});
+
 registerLandingRoutes(app);
+registerActivitiesRoutes(app);
 registerLoginRoutes(app);
 registerAuthRoutes(app);
 registerAppRoutes(app);

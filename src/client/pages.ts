@@ -3,14 +3,13 @@ import { homePage } from '#src/client/pages/app/HomePage.js';
 import { errorPage } from '#src/client/pages/ErrorPage.js';
 import { landingPage } from '#src/client/pages/LandingPage.js';
 import { loginPage } from '#src/client/pages/LoginPage.js';
-import { activitiesPage } from '#src/client/pages/app/ActivitiesPage.js';
-import { activityPage } from '#src/client/pages/app/ActivityPage.js';
+import { activityPage } from '#src/client/pages/ActivityPage.js';
 import { leaderboardPage } from '#src/client/pages/app/LeaderboardPage.js';
 import { gamblingPage } from '#src/client/pages/app/gambling/GamblingHomePage.js';
+import { interactPage } from '#src/client/pages/app/InteractPage.js';
 import { hostPage } from '#src/client/pages/app/HostPage.js';
 import { adminPage } from '#src/client/pages/AdminPage.js';
 import { gamblingSessionPage } from '#src/client/pages/app/gambling/GamblingSessionPage.js';
-import { inviteToGamblePage } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
 import { LanguageCode, TranslateFn } from './language.js';
 
 export const registeredPages = {
@@ -18,13 +17,12 @@ export const registeredPages = {
     landing: landingPage,
     login: loginPage,
     home: homePage,
-    activities: activitiesPage,
     activity: activityPage,
     leaderboard: leaderboardPage,
     gambling: gamblingPage,
     gamblingSession: gamblingSessionPage,
+    interact: interactPage,
     host: hostPage,
-    inviteToGamble: inviteToGamblePage,
     admin: adminPage,
     error: errorPage,
 } satisfies Record<string, Page<any>>;

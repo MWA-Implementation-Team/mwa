@@ -60,13 +60,14 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
     └── client/                code that also runs in the browser
         ├── bootstrap.tsx      browser entry: reads #ssr-data, hydrates #app
         ├── pages.ts           registeredPages: page id → { Component, title }
-        ├── activities.ts      registeredActivities: activity slug → { name, Card, Detail }
+        ├── activities.ts      registeredActivities: activity slug → { name, Card, text }
         ├── context.tsx        ClientContext: lang, updateLang, t(), user, live notification
         ├── language.ts        translations (en, lt) + translate() / t()
         ├── constants.ts       cookie names (mwa-session, mwa-language, mwa-theme-override)
         ├── serialize.ts       Serialized<T> wire types + serialize()/revive() for Date fields
         ├── api/               fetch wrappers + Serialized<T> wire types + db type re-exports
-        ├── activities/        one slug-named folder per station (Card + Detail + activity.ts)
+        ├── activities/        one slug-named folder per station (Card + activity.ts + text.ts),
+        │                      plus the shared Detail.tsx every station page renders
         ├── pages/             one component per page, each a Page<P> object;
         │                      app/PageShell.tsx wraps them in the shell layout
         └── ui/                shared components (toggles, icons, Trans, controlled Dialog)

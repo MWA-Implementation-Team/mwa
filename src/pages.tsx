@@ -26,7 +26,7 @@ export function writePage<P extends RegisteredPageId>(
     const qr = user
         ? (() => {
               const url = new URL(
-                  `/app?interact=${encodeURIComponent(getOrCreateInteractToken(ctx.var, user.id))}`,
+                  `/app/interact/${encodeURIComponent(getOrCreateInteractToken(ctx.var, user.id))}`,
                   ctx.req.url,
               ).toString();
               return { svg: renderSVG(url), url };
@@ -134,6 +134,7 @@ export function Root<P extends RegisteredPageId>({
                     dangerouslySetInnerHTML={{ __html: ssrData }}
                 />
                 <script type="module" src="/client/bootstrap.js" />
+                <link rel="icon" type="image/png" href="/favicon.webp" />
                 <link rel="stylesheet" href="/oat.css" />
                 <link rel="stylesheet" href="/style/main.css" />
                 <script src="/oat.js" defer />

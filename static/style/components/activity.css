@@ -1,0 +1,30 @@
+/* The universal /activities/<slug> page: card art + text in a panel. */
+.mwa-activity-text {
+    margin-top: var(--space-3);
+    line-height: 1.75;
+}
+
+.mwa-activity-text > * + * {
+    margin-top: var(--space-6);
+}
+
+/* Lists stick to their lead-in ("Eiga:") — sibling margins collapse to
+   the larger value, so both the paragraph's bottom and the list's top
+   must shrink for the gap to actually close. */
+.mwa-activity-text > * + ul,
+.mwa-activity-text > * + ol {
+    margin-top: var(--space-1);
+}
+
+.mwa-activity-text > p:has(+ ul),
+.mwa-activity-text > p:has(+ ol) {
+    margin-bottom: var(--space-1);
+}
+
+.mwa-activity-text > :first-child {
+    margin-top: 0;
+}
+
+.mwa-activity-text > :last-child {
+    margin-bottom: 0;
+}
