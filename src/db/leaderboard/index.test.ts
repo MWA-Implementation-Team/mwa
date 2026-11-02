@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { listGroupLeaderboard, listPlayerLeaderboard, type LeaderboardBoard } from './index.js';
-import { addGroupMember, createGroup, deleteGroup, removeGroupMember } from '../groups/index.js';
+import { addGroupMember, createGroup, disbandGroup, removeGroupMember } from '../groups/index.js';
 import { createUser } from '../users/index.js';
 import { grantCoins, insertTransaction } from '../transactions/index.js';
 import { createTestMwaState } from '#src/state.js';
@@ -161,15 +161,34 @@ describe('db/leaderboard listGroupLeaderboard', () => {
         assert.equal(row.memberCount, 2);
     });
 
-    it('clears stamps when the group is deleted', () => {
-        const { user: u, group } = grouped('lb_gs_del', 'lb gs deleted');
+    it('keeps a disbanded group on the board, marked', () => {
+        const { user: u, group } = grouped('lb_gs_del', 'lb gs disbanded');
         grantCoins(state, u.id, 10);
 
-        assert.ok(deleteGroup(state, group.id, u.id));
+        assert.ok(disbandGroup(state, group.id, u.id));
+        const row = listGroupLeaderboard(state, 'activity').find((g) => g.id === group.id)!;
+        assert.equal(row.score, 10);
+        assert.equal(row.disbanded, true);
+        assert.equal(row.memberCount, 0);
+
+        // past coins stay stamped to the disbanded group
         const stamp = state
             .prepare(`SELECT group_id FROM child_transactions WHERE user_id = ?`)
             .get(u.id);
-        assert.equal(stamp?.group_id, null);
+        assert.equal(stamp?.group_id, group.id);
+    });
+
+    it('a new group can reuse a disbanded name', () => {
+        const { user: u, group } = grouped('lb_gs_re', 'lb gs reused');
+        assert.ok(disbandGroup(state, group.id, u.id));
+        const fresh = createGroup(state, 'lb gs reused', user('lb_gs_re2').id, '555');
+        assert.notEqual(fresh.id, group.id);
+        // …while a live name still clashes
+        grouped('lb_gs_tk', 'lb gs taken');
+        assert.throws(
+            () => createGroup(state, 'lb gs taken', user('lb_gs_tk2').id, '555'),
+            /UNIQUE/,
+        );
     });
 
     it('ranks groups by score desc, name asc', () => {

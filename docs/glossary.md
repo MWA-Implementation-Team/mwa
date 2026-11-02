@@ -121,7 +121,9 @@ Status is `waiting` while in line and stays on the row afterwards — `left` for
 a bail, `called` when a host pulls the group to a station (`activity_slug`
 records which one). A called group finishing its station is marked by
 `done_at` rather than a new status — it drops out of `listStationGroups`, which
-is what `/app/host` shows. Order is by row id, so a rejoined group lands at the
+is what `/app/host` shows. Disbanding a group closes its queue entries the
+same way — a waiting spot becomes `left`, and a called-not-done visit counts
+as `left` too, never as a completion. Order is by row id, so a rejoined group lands at the
 back and a partial unique index guarantees at most one waiting spot per group.
 The dashboard shows the caller's 1-based position; hosts read `listWaitingQueue`
 and call `callNextGroups` when a station frees up. Host actions use

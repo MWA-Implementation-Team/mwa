@@ -153,6 +153,7 @@ export type Language = {
     leaderboardColGames: string;
     leaderboardNoGroups: string;
     leaderboardNoPlayers: string;
+    lbDisbanded: string;
     leaderboardMemberCount: string;
     leaderboardGames: string;
     leaderboardGroupTag: string;
@@ -433,6 +434,7 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardColGames: 'games',
         leaderboardNoGroups: 'No groups yet.',
         leaderboardNoPlayers: 'No players yet.',
+        lbDisbanded: 'disbanded',
         leaderboardMemberCount: '{n} member(s)',
         leaderboardGames: '{n} game(s)',
         leaderboardGroupTag: '*group',
@@ -714,6 +716,7 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardColGames: 'žaidimai',
         leaderboardNoGroups: 'Grupių kol kas nėra.',
         leaderboardNoPlayers: 'Žaidėjų kol kas nėra.',
+        lbDisbanded: 'išformuota',
         leaderboardMemberCount: 'Nariai: {n}',
         leaderboardGames: 'Žaidimai: {n}',
         leaderboardGroupTag: '*grupė',

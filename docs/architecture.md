@@ -164,7 +164,12 @@ target sees it as a `group_invite` notification. Accepting
 if the accepter has none, a group is created in one transaction — the accepter
 owns it, the name is a random `team-…` placeholder and the phone empty until
 the owner edits them from the home table's per-field dialogs (`POST
-/app/group/edit`).
+/app/group/edit`). The owner can also disband the team (`POST
+/app/group/delete` → `disbandGroup`): a soft delete that stamps
+`disbanded_at` (`14_group_disband.sql`) instead of removing the row, so the
+group keeps its stamped coins and queue history. Members are deleted, a
+waiting queue spot closes as `left`, a group mid-station is marked `left`
+rather than done, and a partial unique index frees the name for reuse.
 
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
 invitations. `POST /app/interact/:token/gamble` creates a challenge; re-challenging
@@ -247,7 +252,8 @@ Board definitions (`src/db/leaderboard/index.ts`):
   stamped net for groups.
 
 Player boards only rank `role = 'user'` accounts — admins and hosts never appear.
-Group boards rank every group by stamped score with member count. The page renders
+Group boards rank every group by stamped score with member count — disbanded
+groups stay listed, marked with a muted `disbanded` tag. The page renders
 a dense table: when a board lists more than 20 rows, the viewer's own standing is
 pinned in a bold `mwa-lb-you` header row, their in-list row gets `mwa-lb--self`,
 and their groupmates get a dimmed `*group` tag (`mwa-standing-hint`) after the

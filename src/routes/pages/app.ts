@@ -9,7 +9,7 @@ import {
 import {
     acceptGroupInvite,
     createGroupInvite,
-    deleteGroup,
+    disbandGroup,
     deleteGroupInvite,
     findGroupInviteById,
     findUserGroup,
@@ -167,14 +167,15 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect('/app?groupNotice=groupLeft#panel-group', 303);
     });
 
-    // Deleting is the owner's only way out — owner check is inside
-    // deleteGroup, members/queue rows cascade away with the group.
+    // Disbanding is the owner's only way out — owner check is inside
+    // disbandGroup. It's a soft delete: the row stays (scores and queue
+    // history survive), members leave and queue spots close.
     app.post('/app/group/delete', (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
         const group = findUserGroup(ctx.var, user.id);
-        if (!group || !deleteGroup(ctx.var, group.id, user.id)) {
+        if (!group || !disbandGroup(ctx.var, group.id, user.id)) {
             return ctx.redirect('/app?groupError=groupDeleteFailed#panel-group', 303);
         }
         return ctx.redirect('/app?groupNotice=groupDeleted#panel-group', 303);

@@ -190,7 +190,12 @@ function GroupsTable({
                             class={group.id === viewerGroupId ? 'mwa-lb--self' : undefined}
                         >
                             <td class="mwa-lb-rank">{index + 1}</td>
-                            <td>{group.name}</td>
+                            <td>
+                                {group.name}
+                                {group.disbanded && (
+                                    <span class="mwa-standing-hint"> {t('lbDisbanded')}</span>
+                                )}
+                            </td>
                             <td class="mwa-tx-amount">{group.memberCount}</td>
                             <td class="mwa-tx-amount">{group.score.toFixed(2)}</td>
                         </tr>
