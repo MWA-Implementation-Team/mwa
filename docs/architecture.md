@@ -190,8 +190,8 @@ participation, running status, time remaining, column capacity, and turn order.
 server and UI. `connect_4_turns` stores timestamped board snapshots, starting with
 an empty board attributed to the second player. `src/client/gambling/turns.ts`
 derives each player's remaining clock from those timestamps. Each player currently
-has **30 seconds total**, counting only their own turns (`c4PlayerTurnTime`,
-temporarily reduced for testing); running out awards the opponent the win.
+has **2 minutes total**, counting only their own turns (`c4PlayerTurnTime`);
+running out awards the opponent the win.
 Game labels, invitations, and results use English/Lithuanian translations.
 
 Chess randomly assigns colours on acceptance and gives each player **five minutes
