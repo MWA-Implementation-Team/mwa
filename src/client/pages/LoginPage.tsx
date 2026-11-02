@@ -15,6 +15,9 @@ type LoginPageProps = {
     errorKey?: LoginErrorKey;
     sentTo?: string;
     sentKind?: 'login' | 'signup';
+    // set by GET /auth/verify — the emailed link lands here and only the
+    // posted form spends the one-shot token
+    confirmToken?: string;
     goto?: string;
 };
 
@@ -23,13 +26,22 @@ export const loginPage: Page<LoginPageProps> = {
     title: (t) => t('titleLogin'),
 };
 
-function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
+function LoginPage({ errorKey, sentTo, sentKind, confirmToken, goto }: LoginPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="login" nav={false}>
             <section class="mwa-panel">
                 <div class="mwa-panel-body">
-                    {sentTo ? (
+                    {confirmToken ? (
+                        <>
+                            <p class="mwa-muted">{t('loginConfirmPrompt')}</p>
+                            <form method="POST" action="/auth/verify" class="mwa-form">
+                                <input type="hidden" name="token" value={confirmToken} />
+                                {goto && <input type="hidden" name="goto" value={goto} />}
+                                <button type="submit">{t('loginConfirmSubmit')}</button>
+                            </form>
+                        </>
+                    ) : sentTo ? (
                         <>
                             <p class="mwa-muted">
                                 {sentKind === 'signup'

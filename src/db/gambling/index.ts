@@ -616,8 +616,7 @@ export function queryPendingCoinFlips(state: MwaState): PendingCoinFlip[] {
 
 // --- CONNECT 4 GAME ---
 
-//export const c4PlayerTurnTime = 2 * 60 * 1000;
-export const c4PlayerTurnTime = 30 * 1000; // lower for testing for now
+export const c4PlayerTurnTime = 2 * 60 * 1000;
 
 export function initConnect4(state: MwaState, opts: CommonGameOpts): number | null {
     return runTransaction(state.db, () => {

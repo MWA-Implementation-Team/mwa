@@ -32,12 +32,30 @@ function postVerify(email: string, code: string, extra: Record<string, string> =
     });
 }
 
+function postTokenVerify(token: string, extra: Record<string, string> = {}) {
+    return app.request('/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ token, ...extra }).toString(),
+    });
+}
+
 describe('GET /auth/verify — link path', () => {
-    it('logs in an existing user and redirects to /app', async () => {
+    it('shows a confirm form without spending the token', async () => {
         const user = createUser(state, 'verify@example.com', 'verify_u');
         const { token } = createLoginToken(state, user.email);
 
-        const res = await app.request(`/auth/verify?token=${token}`);
+        // prefetches only render the form — no cookie, token unconsumed
+        for (let i = 0; i < 2; i++) {
+            const res = await app.request(`/auth/verify?token=${token}`);
+            assert.equal(res.status, 200);
+            assert.equal(res.headers.get('set-cookie'), null);
+            const html = await res.text();
+            assert.match(html, /name="token"/);
+            assert.match(html, /Continue/);
+        }
+
+        const res = await postTokenVerify(token);
         assert.equal(res.status, 302);
         assert.equal(res.headers.get('location'), '/app');
 
@@ -53,7 +71,7 @@ describe('GET /auth/verify — link path', () => {
 
     it('creates an account for a new email and lands on /app', async () => {
         const { token } = createLoginToken(state, 'fresh.face@example.com');
-        const res = await app.request(`/auth/verify?token=${token}`);
+        const res = await postTokenVerify(token);
         assert.equal(res.status, 302);
         assert.equal(res.headers.get('location'), '/app');
 
@@ -70,18 +88,22 @@ describe('GET /auth/verify — link path', () => {
 
     it('rejects replayed, forged, and missing tokens', async () => {
         const { token } = createLoginToken(state, 'replay@example.com');
-        await app.request(`/auth/verify?token=${token}`);
+        await postTokenVerify(token);
 
-        for (const url of [
-            `/auth/verify?token=${token}`, // replay
-            '/auth/verify?token=forged',
-            '/auth/verify',
+        for (const res of [
+            await postTokenVerify(token), // replay
+            await postTokenVerify('forged'),
+            await app.request('/auth/verify'), // no token at all
         ]) {
-            const res = await app.request(url);
             assert.equal(res.status, 200);
             assert.match(await res.text(), /expired or already used/);
             assert.equal(res.headers.get('set-cookie'), null);
         }
+
+        // a forged GET still renders the confirm form — the POST decides
+        const get = await app.request('/auth/verify?token=forged');
+        assert.equal(get.status, 200);
+        assert.match(await get.text(), /name="token"/);
     });
 
     it('honours an allowlisted goto and rejects foreign ones', async () => {
@@ -92,11 +114,20 @@ describe('GET /auth/verify — link path', () => {
             ['/app/../admin/../..', '/'],
         ]) {
             const { token } = createLoginToken(state, 'goto2@example.com');
-            const res = await app.request(
-                `/auth/verify?token=${token}&goto=${encodeURIComponent(goto)}`,
-            );
+            const res = await postTokenVerify(token, { goto });
             assert.equal(res.headers.get('location'), expected);
         }
+    });
+
+    it('carries the goto through the confirm form', async () => {
+        createUser(state, 'goto4@example.com', 'goto4_u');
+        const { token } = createLoginToken(state, 'goto4@example.com');
+        const res = await app.request(
+            `/auth/verify?token=${token}&goto=${encodeURIComponent('/app/gambling')}`,
+        );
+        assert.equal(res.status, 200);
+        const html = await res.text();
+        assert.match(html, /name="goto" value="\/app\/gambling"/);
     });
 });
 
@@ -147,7 +178,7 @@ describe('logout', () => {
     it('deletes the session server-side', async () => {
         const user = createUser(state, 'out@example.com', 'out_u');
         const { token } = createLoginToken(state, user.email);
-        const verify = await app.request(`/auth/verify?token=${token}`);
+        const verify = await postTokenVerify(token);
         const cookie = sessionCookie(verify);
 
         const logout = await app.request('/app', {

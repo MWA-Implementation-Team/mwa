@@ -5,7 +5,8 @@ import { createUser, findUserById } from '#src/db/users/index.js';
 import { createSession } from '#src/db/sessions/index.js';
 import { getOrCreateInteractToken } from '#src/db/interactions/index.js';
 import { createSystemQrCode } from '#src/db/systemqr/index.js';
-import { giveCoins } from '#src/db/transactions/index.js';
+import { grantCoins, listUserTransactions } from '#src/db/transactions/index.js';
+import { listPlayerLeaderboard } from '#src/db/leaderboard/index.js';
 import { registerAppRoutes } from './app.js';
 import { registerGamblingRoutes } from './gambling.js';
 import { createTestMwaState, MwaHono, setupHonoState } from '#src/state.js';
@@ -92,7 +93,7 @@ describe('GET /app/interact/:token', () => {
         assert.equal(res.status, 404);
     });
 
-    it('shows the target and send-money to a regular user, but not profile detail', async () => {
+    it('shows the target and send-money to a regular user, and no award form', async () => {
         const owner = createUser(state, 'target@example.com', 'target_user');
         const scanner = createUser(state, 'scan2@example.com', 'scan2');
         const token = getOrCreateInteractToken(state, owner.id);
@@ -104,11 +105,11 @@ describe('GET /app/interact/:token', () => {
         const html = await res.text();
         assert.match(html, /Interact with Target_user/);
         assert.match(html, /send-money/);
-        // detail fields must not leak into props for a regular scanner
+        assert.doesNotMatch(html, /\/award/);
         assert.doesNotMatch(html, /target@example\.com/);
     });
 
-    it('shows profile detail to hosts and admins', async () => {
+    it('shows hosts the award-shaped send panel and no profile detail', async () => {
         const owner = createUser(state, 'target2@example.com', 'target2_user');
         const host = createUser(state, 'host1@example.com', 'host1');
         promote(host.id, 'host');
@@ -118,8 +119,13 @@ describe('GET /app/interact/:token', () => {
             headers: authCookie(host.id),
         });
         const html = await res.text();
-        assert.match(html, /Profile details/);
-        assert.match(html, /target2@example\.com/);
+        // no profile detail leak
+        assert.doesNotMatch(html, /Profile details/);
+        assert.doesNotMatch(html, /target2@example\.com/);
+        // the staff send panel posts to award with a note field, never send-money
+        assert.match(html, /action="\/app\/interact\/[^"]+\/award"/);
+        assert.match(html, /name="note"/);
+        assert.doesNotMatch(html, /send-money/);
     });
 
     it('self-scan gets the easter egg instead of actions', async () => {
@@ -161,6 +167,18 @@ describe('POST /app/interact/:token/group-request', () => {
             `/app/interact/${token}?interactNotice=groupRequestSent`,
         );
     });
+
+    it('forbids staff from team-up requests', async () => {
+        const owner = createUser(state, 'owner3@example.com', 'owner3');
+        const host = createUser(state, 'hostask@example.com', 'hostask');
+        promote(host.id, 'host');
+        const token = getOrCreateInteractToken(state, owner.id);
+        const res = await app.request(`/app/interact/${token}/group-request`, {
+            method: 'POST',
+            headers: authCookie(host.id),
+        });
+        assert.equal(res.status, 403);
+    });
 });
 
 describe('POST /app/interact/:token/award', () => {
@@ -180,6 +198,10 @@ describe('POST /app/interact/:token/award', () => {
         });
         assert.equal(res.status, 303);
         assert.equal(findUserById(state, owner.id)!.currentBalance, 100);
+        const kinds = listUserTransactions(state, owner.id).map((tx) => tx.kind);
+        assert.deepEqual(kinds, ['host_grant']);
+        const board = listPlayerLeaderboard(state, 'activity');
+        assert.equal(board.find((row) => row.userId === owner.id)?.score, 100);
     });
 
     it('rejects a non-positive amount', async () => {
@@ -234,7 +256,7 @@ describe('POST /app/interact/:token/send-money', () => {
     it('moves coins between the two balances', async () => {
         const owner = createUser(state, 'payee@example.com', 'payee_user');
         const sender = createUser(state, 'payer@example.com', 'payer_user');
-        giveCoins(state, sender.id, 50);
+        grantCoins(state, sender.id, 50);
         const token = getOrCreateInteractToken(state, owner.id);
 
         const res = await post(token, sender.id, 'amount=20');
@@ -247,7 +269,7 @@ describe('POST /app/interact/:token/send-money', () => {
     it('bounces back to the page on a bad amount', async () => {
         const owner = createUser(state, 'payee2@example.com', 'payee2_user');
         const sender = createUser(state, 'payer2@example.com', 'payer2_user');
-        giveCoins(state, sender.id, 50);
+        grantCoins(state, sender.id, 50);
         const token = getOrCreateInteractToken(state, owner.id);
 
         const res = await post(token, sender.id, 'amount=-5');
@@ -262,7 +284,7 @@ describe('POST /app/interact/:token/send-money', () => {
     it('bounces back when the sender cannot cover it', async () => {
         const owner = createUser(state, 'payee3@example.com', 'payee3_user');
         const sender = createUser(state, 'payer3@example.com', 'payer3_user');
-        giveCoins(state, sender.id, 10);
+        grantCoins(state, sender.id, 10);
         const token = getOrCreateInteractToken(state, owner.id);
 
         const res = await post(token, sender.id, 'amount=11');
@@ -277,7 +299,7 @@ describe('POST /app/interact/:token/send-money', () => {
 
     it('404s on self-send and on a bad token', async () => {
         const user = createUser(state, 'selfpay@example.com', 'selfpay_user');
-        giveCoins(state, user.id, 50);
+        grantCoins(state, user.id, 50);
         const token = getOrCreateInteractToken(state, user.id);
 
         const self = await post(token, user.id, 'amount=5');
@@ -286,13 +308,28 @@ describe('POST /app/interact/:token/send-money', () => {
         assert.equal(forged.status, 404);
         assert.equal(findUserById(state, user.id)!.currentBalance, 50);
     });
+
+    it('forbids staff senders and staff targets', async () => {
+        const owner = createUser(state, 'payee4@example.com', 'payee4_user');
+        const host = createUser(state, 'hostpay@example.com', 'hostpay');
+        promote(host.id, 'host');
+        grantCoins(state, host.id, 50);
+        grantCoins(state, owner.id, 50);
+
+        const fromHost = await post(getOrCreateInteractToken(state, owner.id), host.id, 'amount=5');
+        assert.equal(fromHost.status, 403);
+        const toHost = await post(getOrCreateInteractToken(state, host.id), owner.id, 'amount=5');
+        assert.equal(toHost.status, 403);
+        assert.equal(findUserById(state, host.id)!.currentBalance, 50);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 50);
+    });
 });
 
 describe('POST /app/interact/:token/gamble', () => {
     it('bounces a bad bet back onto the interact page with the game flag', async () => {
         const owner = createUser(state, 'gtarget@example.com', 'gtarget_user');
         const challenger = createUser(state, 'gchall@example.com', 'gchall_user');
-        giveCoins(state, challenger.id, 50);
+        grantCoins(state, challenger.id, 50);
         const token = getOrCreateInteractToken(state, owner.id);
 
         const res = await app.request(`/app/interact/${token}/gamble`, {
@@ -308,6 +345,24 @@ describe('POST /app/interact/:token/gamble', () => {
             res.headers.get('location'),
             `/app/interact/${token}?error_game=connect_4&error_type=invalid`,
         );
+    });
+
+    it('forbids staff from challenging', async () => {
+        const owner = createUser(state, 'gtarget2@example.com', 'gtarget2_user');
+        const host = createUser(state, 'ghost@example.com', 'ghost');
+        promote(host.id, 'host');
+        grantCoins(state, host.id, 50);
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await app.request(`/app/interact/${token}/gamble`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(host.id),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'game_type=connect_4&bet_amount=5',
+        });
+        assert.equal(res.status, 403);
     });
 });
 
@@ -331,6 +386,16 @@ describe('GET /app/qr/:secret', () => {
         const second = await app.request(`/app/qr/${qr.secret}`, { headers });
         assert.match(second.headers.get('location') ?? '', /qrError=already_claimed/);
         assert.equal(findUserById(state, user.id)!.currentBalance, 40);
+    });
+
+    it('reports an unknown secret as not found', async () => {
+        const user = createUser(state, 'qrbogus@example.com', 'qrbogus_user');
+        const res = await app.request('/app/qr/nope-no-such-secret', {
+            headers: authCookie(user.id),
+        });
+        assert.equal(res.status, 303);
+        assert.match(res.headers.get('location') ?? '', /qrError=not_found/);
+        assert.equal(findUserById(state, user.id)!.currentBalance, 0);
     });
 });
 

@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
 import { createUser } from '../users/index.js';
-import { addGroupMember, createGroup } from '../groups/index.js';
+import { addGroupMember, createGroup, disbandGroup } from '../groups/index.js';
+import { registeredActivities } from '#src/client/activities.js';
 import {
     callNextGroups,
     getQueuePosition,
@@ -9,6 +10,7 @@ import {
     getWaitingEntry,
     joinQueue,
     leaveQueue,
+    listGroupCompletions,
     listStationGroups,
     listWaitingQueue,
     markEntryDone,
@@ -31,6 +33,18 @@ function queuedGroup(memberNames: string[]): number {
         addGroupMember(state, group.id, member.id);
     }
     return group.id;
+}
+
+// write a finished visit directly — the completion definition: a 'called'
+// row with done_at set
+function completeStation(groupId: number, slug: string) {
+    state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES (?)`).run(slug);
+    state
+        .prepare(
+            `INSERT INTO queue_entries (group_id, status, closed_at, done_at, activity_slug)
+             VALUES (?, 'called', '2024-01-01', '2024-01-02', ?)`,
+        )
+        .run(groupId, slug);
 }
 
 function mustJoin(groupId: number) {
@@ -68,6 +82,14 @@ describe('db/queue', () => {
         assert.equal(joinQueue(state, groupId).type, 'joined');
         assert.equal(joinQueue(state, groupId).type, 'already_queued');
         assert.equal(listWaitingQueue(state).filter((e) => e.groupId === groupId).length, 1);
+    });
+
+    it('rejects a join while the group is called to a station', () => {
+        const groupId = queuedGroup([]);
+        mustJoin(groupId);
+        state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('test-station')`).run();
+        callNextGroups(state, 1, 'test-station');
+        assert.equal(joinQueue(state, groupId).type, 'at_station');
     });
 
     it('orders positions by join order', () => {
@@ -139,7 +161,7 @@ describe('db/queue', () => {
         const eb = mustJoin(b);
         const ec = mustJoin(c);
 
-        state.prepare(`INSERT INTO activities (slug) VALUES ('test-station')`).run();
+        state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('test-station')`).run();
         const called = callNextGroups(state, 2, 'test-station');
 
         assert.deepEqual(
@@ -224,5 +246,59 @@ describe('db/queue', () => {
             [b, a],
         );
         assert.match(rows[0].groupName, /queue group/);
+    });
+
+    it('listGroupCompletions returns distinct finished slugs only', () => {
+        const groupId = queuedGroup([]);
+        completeStation(groupId, 'cells');
+        completeStation(groupId, 'cells'); // a second visit doesn't duplicate
+        completeStation(groupId, 'egypt');
+        mustJoin(groupId); // still waiting somewhere — not a completion
+
+        const done = listGroupCompletions(state, groupId).sort();
+        assert.deepEqual(done, ['cells', 'egypt']);
+    });
+
+    it('callNextGroups skips groups that already did that station but keeps them waiting', () => {
+        const done = queuedGroup([]);
+        const fresh = queuedGroup([]);
+        completeStation(done, 'cells');
+        const dEntry = mustJoin(done);
+        const fEntry = mustJoin(fresh);
+
+        const picked = callNextGroups(state, 2, 'cells');
+        assert.deepEqual(
+            picked.map((e) => e.id),
+            [fEntry.id],
+        );
+        // skipped, not dropped — still first in line
+        assert.equal(getQueuePosition(state, dEntry.id), 1);
+
+        // the same group can still be called to a station it hasn't done
+        const again = callNextGroups(state, 1, 'egypt');
+        assert.deepEqual(
+            again.map((e) => e.id),
+            [dEntry.id],
+        );
+    });
+
+    it('joinQueue reports all_done once every registered station is complete', () => {
+        const groupId = queuedGroup([]);
+        for (const slug of Object.keys(registeredActivities)) {
+            completeStation(groupId, slug);
+        }
+        assert.equal(joinQueue(state, groupId).type, 'all_done');
+    });
+
+    it('completions survive the group disbanding', () => {
+        const groupId = queuedGroup([]);
+        completeStation(groupId, 'cells');
+        const owner = state.prepare(`SELECT owner_id FROM groups WHERE id = ?`).get(groupId)!
+            .owner_id as number;
+        assert.ok(disbandGroup(state, groupId, owner));
+        assert.deepEqual(listGroupCompletions(state, groupId), ['cells']);
+        // …and another group's completions don't affect a fresh group's join
+        const fresh = queuedGroup([]);
+        assert.equal(joinQueue(state, fresh).type, 'joined');
     });
 });

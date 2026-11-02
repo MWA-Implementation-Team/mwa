@@ -4,7 +4,7 @@ Worked example: `GET /api/badges`, returning the badges list as JSON. This guide
 the four pieces: the db function, the route, its registration, and a client-side
 fetcher.
 
-The pattern (from `src/routes/api/users.ts`): the SQL lives in `db/<domain>/index.ts` as a
+The pattern: the SQL lives in `db/<domain>/index.ts` as a
 prepared statement + typed function; the route handler only checks auth and serializes.
 
 ## 1. The db function

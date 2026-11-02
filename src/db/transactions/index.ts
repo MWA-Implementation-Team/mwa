@@ -114,8 +114,10 @@ export function transferCoins(
     });
 }
 
-export function giveCoins(state: MwaState, userId: number, amount: number) {
+// Staff-side coin grant: a 'host_grant' credit in one transaction.
+// `note` is the optional reason shown on the recipient's home page.
+export function grantCoins(state: MwaState, userId: number, amount: number, note?: string | null) {
     return runTransaction(state.db, () => {
-        insertTransaction(state, 'system', userId, amount);
+        insertTransaction(state, 'host_grant', userId, amount, undefined, note);
     });
 }

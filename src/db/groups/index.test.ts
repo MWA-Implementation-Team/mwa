@@ -1,8 +1,16 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { createUser } from '../users/index.js';
-import { addGroupMember, createGroup, listGroupMembers, removeGroupMember } from './index.js';
-import { joinQueue, getWaitingEntry } from '../queue/index.js';
+import {
+    addGroupMember,
+    createGroup,
+    disbandGroup,
+    findUserGroup,
+    listGroupMembers,
+    removeGroupMember,
+    updateGroup,
+} from './index.js';
+import { callNextGroups, joinQueue, getWaitingEntry, listStationGroups } from '../queue/index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});
@@ -64,5 +72,56 @@ describe('db/groups removeGroupMember', () => {
 
         assert.equal(removeGroupMember(state, group.id, members[2].id), 'removed');
         assert.ok(getWaitingEntry(state, group.id));
+    });
+});
+
+describe('db/groups disbandGroup', () => {
+    it('disbands: members leave, the group stops resolving, and it cannot disband twice', () => {
+        const { group, owner, members } = groupOf(2);
+        assert.ok(disbandGroup(state, group.id, owner.id));
+        assert.equal(listGroupMembers(state, group.id).length, 0);
+        assert.equal(findUserGroup(state, members[0].id), null);
+        assert.equal(disbandGroup(state, group.id, owner.id), false);
+    });
+
+    it('refuses a non-owner', () => {
+        const { group, members } = groupOf(2);
+        assert.equal(disbandGroup(state, group.id, members[1].id), false);
+        assert.ok(findUserGroup(state, members[0].id));
+    });
+
+    it('drops a waiting spot and marks a called entry left', () => {
+        // clear leftovers from earlier tests so only these groups can be called
+        state.db.exec(`DELETE FROM queue_entries`);
+        const { group, owner } = groupOf(2);
+        const waiting = groupOf(2);
+        joinQueue(state, group.id);
+        joinQueue(state, waiting.group.id);
+        state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('test-station')`).run();
+        callNextGroups(state, 2, 'test-station');
+
+        assert.ok(disbandGroup(state, group.id, owner.id));
+        const row = state
+            .prepare(`SELECT status, done_at FROM queue_entries WHERE group_id = ?`)
+            .get(group.id);
+        assert.equal(row?.status, 'left');
+        assert.equal(row?.done_at, null);
+        assert.equal(listStationGroups(state, 'test-station').length, 1);
+
+        // a group still waiting loses its spot outright
+        const inLine = groupOf(2);
+        joinQueue(state, inLine.group.id);
+        assert.ok(getWaitingEntry(state, inLine.group.id));
+        assert.ok(disbandGroup(state, inLine.group.id, inLine.owner.id));
+        assert.equal(getWaitingEntry(state, inLine.group.id), null);
+
+        assert.ok(disbandGroup(state, waiting.group.id, waiting.owner.id));
+        assert.equal(listStationGroups(state, 'test-station').length, 0);
+    });
+
+    it("still reports 'taken' against a live name under the partial index", () => {
+        const { group, owner } = groupOf(1);
+        createGroup(state, 'db taken name', createUser(state, 'tk@example.com', 'tk').id, '555');
+        assert.equal(updateGroup(state, group.id, owner.id, 'db taken name', '555'), 'taken');
     });
 });

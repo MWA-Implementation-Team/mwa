@@ -75,7 +75,10 @@ An irl station at the event — something visitors queue for and complete. In co
 a `registeredActivities` entry (`src/client/activities.ts`): a slug mapped to
 `{ name, Card, text }`. The slug is its identity in the url
 (`/activities/<slug>`) and as a row in the `activities` table, so queue/badge
-records can reference it.
+records can reference it. A group completes an activity when a host marks
+its queue visit done (see Queue entry); the public page then shows the
+signed-in team a "completed" banner, and the home queue panel lists every
+station with its ✓/— status.
 
 ## Registry
 
@@ -99,9 +102,10 @@ scanner's session and role decide what they can do.
 
 Something a scanner can do with the owner of an interact token — today just the
 conditional content of `InteractPage` (`src/client/pages/app/InteractPage.tsx`).
-Role gating is data-driven, not renderer-driven: the route only serializes
-elevated fields (the `detail` prop) for host/admin scanners, so a section can
-never receive data its role shouldn't see. If interactions multiply, this can
+Two route-computed flags split the audience: `canPlay` (both sides are plain
+users) shows the play panels — send-money, gambling, join-team — and
+`canAward` (host/admin scanner) shows the award-shaped send panel instead.
+If interactions multiply, this can
 graduate to a registry like `registeredActivities`.
 
 ## Queue entry
@@ -114,13 +118,22 @@ Both actions use the caller's own group; any member may act. Joining needs
 at least `QUEUE_MIN_GROUP_SIZE` (2) members — groups may drop below that
 (members can always leave; only the owner can't), but an undersized group
 can't queue and loses a held spot when the removal drops it below the
-minimum.
+minimum. A group called to a station and not yet done there can't rejoin —
+`joinQueue` reports `at_station` and the dashboard tells the team to finish
+the station first.
 Status is `waiting` while in line and stays on the row afterwards — `left` for
 a bail, `called` when a host pulls the group to a station (`activity_slug`
 records which one). A called group finishing its station is marked by
 `done_at` rather than a new status — it drops out of `listStationGroups`, which
-is what `/app/host` shows. Order is by row id, so a rejoined group lands at the
+is what `/app/host` shows. Disbanding a group closes its queue entries the
+same way — a waiting spot becomes `left`, and a called-not-done visit counts
+as `left` too, never as a completion. Order is by row id, so a rejoined group lands at the
 back and a partial unique index guarantees at most one waiting spot per group.
+A `called` row with `done_at` set is the group's **completion** of that
+station — `listGroupCompletions` reads those slugs, `callNextGroups` skips
+waiting groups that already did the station they're being called to, and
+`joinQueue` reports `all_done` once the group finished every registered
+station. Marking done pays nothing; hosts award players by scan.
 The dashboard shows the caller's 1-based position; hosts read `listWaitingQueue`
 and call `callNextGroups` when a station frees up. Host actions use
 POST forms at `/app/host/call` and `/app/host/done`, restricted to hosts and

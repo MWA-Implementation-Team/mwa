@@ -24,9 +24,11 @@ type HomePageProps = {
     youNotice?: keyof Language;
     queuePosition: number | null;
     queueCanJoin: boolean;
+    // per-station ✓/— for the viewer's group; null when groupless
+    stationProgress: { slug: string; name: string; done: boolean }[] | null;
     queueError?: keyof Language;
     qrClaimedAmount?: number | null;
-    qrError?: 'expired' | 'used_up' | 'already_claimed';
+    qrError?: 'not_found' | 'expired' | 'used_up' | 'already_claimed';
     standings: ViewerStanding[];
 };
 
@@ -47,6 +49,7 @@ const transactionKindKey = {
 import { boardHintKey, boardLabelKey } from '#src/client/boards.js';
 
 const qrErrorKey = {
+    not_found: 'qrErrorNotFound',
     expired: 'qrErrorExpired',
     used_up: 'qrErrorUsedUp',
     already_claimed: 'qrErrorAlreadyClaimed',
@@ -66,6 +69,7 @@ function HomePage({
     youNotice,
     queuePosition,
     queueCanJoin,
+    stationProgress,
     queueError,
     qrClaimedAmount,
     qrError,
@@ -160,6 +164,26 @@ function HomePage({
                                 </tbody>
                             </table>
                         </div>
+
+                        {stationProgress && (
+                            <div class="table mwa-tx">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colSpan={2}>{t('homeStationProgress')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {stationProgress.map((s) => (
+                                            <tr key={s.slug}>
+                                                <td>{s.name}</td>
+                                                <td class="mwa-tx-amount">{s.done ? '✓' : '—'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -298,11 +322,13 @@ function HomePage({
                                                         member.userId === user!.id ? (
                                                             <form
                                                                 method="post"
-                                                                action="/app/group/delete"
+                                                                action="/app/group/disband"
                                                                 onSubmit={(e) => {
                                                                     if (
                                                                         !window.confirm(
-                                                                            t('groupDeleteConfirm'),
+                                                                            t(
+                                                                                'groupDisbandConfirm',
+                                                                            ),
                                                                         )
                                                                     ) {
                                                                         e.preventDefault();
@@ -312,9 +338,9 @@ function HomePage({
                                                                 <button
                                                                     type="submit"
                                                                     class="lang-link lang-link--danger"
-                                                                    title={t('groupDeleteHint')}
+                                                                    title={t('groupDisbandHint')}
                                                                 >
-                                                                    {t('groupDelete')}
+                                                                    {t('groupDisband')}
                                                                 </button>
                                                             </form>
                                                         ) : (

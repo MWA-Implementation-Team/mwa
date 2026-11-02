@@ -69,7 +69,7 @@ export function findGroupById(state: MwaState, groupId: number): Group | null {
     const getGroupByIdQuery = state.prepare(`
         SELECT id, name, owner_id, phone_number, created_at
         FROM groups
-        WHERE id = ?
+        WHERE id = ? AND disbanded_at IS NULL
     `);
 
     const row = getGroupByIdQuery.get(groupId);
@@ -77,14 +77,35 @@ export function findGroupById(state: MwaState, groupId: number): Group | null {
     return mapGroup(row);
 }
 
-export function deleteGroup(state: MwaState, groupId: number, ownerId: number): boolean {
-    const deleteGroupQuery = state.prepare(`
-        DELETE FROM groups
-        WHERE id = ? AND owner_id = ?
-    `);
+// Soft delete: the row stays so the group's leaderboard score and queue
+// history survive — members leave, queue spots close, and the partial unique
+// index frees the name for a new group. A group mid-station is marked `left`
+// so the visit doesn't count as a completion.
+export function disbandGroup(state: MwaState, groupId: number, ownerId: number): boolean {
+    return runTransaction(state.db, () => {
+        const owned = state
+            .prepare(`SELECT 1 FROM groups WHERE id = ? AND owner_id = ? AND disbanded_at IS NULL`)
+            .get(groupId, ownerId);
+        if (!owned) return false;
 
-    const result = deleteGroupQuery.run(groupId, ownerId);
-    return result.changes > 0;
+        leaveQueue(state, groupId);
+        state
+            .prepare(
+                `UPDATE queue_entries
+                 SET status = 'left', closed_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+                 WHERE group_id = ? AND status = 'called' AND done_at IS NULL`,
+            )
+            .run(groupId);
+        state.prepare(`DELETE FROM group_members WHERE group_id = ?`).run(groupId);
+        const result = state
+            .prepare(
+                `UPDATE groups
+                 SET disbanded_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+                 WHERE id = ? AND disbanded_at IS NULL`,
+            )
+            .run(groupId);
+        return result.changes > 0;
+    });
 }
 
 // A user belongs to at most one group — group_members.user_id is UNIQUE.
@@ -252,7 +273,9 @@ export function updateGroup(
 ): 'updated' | 'taken' | 'forbidden' {
     try {
         const result = state
-            .prepare(`UPDATE groups SET name = ?, phone_number = ? WHERE id = ? AND owner_id = ?`)
+            .prepare(
+                `UPDATE groups SET name = ?, phone_number = ? WHERE id = ? AND owner_id = ? AND disbanded_at IS NULL`,
+            )
             .run(name, phoneNumber, groupId, ownerId);
         return result.changes > 0 ? 'updated' : 'forbidden';
     } catch (error) {

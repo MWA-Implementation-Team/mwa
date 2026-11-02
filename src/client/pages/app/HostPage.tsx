@@ -39,6 +39,9 @@ function HostPage({
     const station = activities[index]?.slug ?? initialStation;
     const { Card } = registeredActivities[station];
     const onStation = atStation.filter((entry) => entry.activitySlug === station);
+    // groups that already completed this station keep their spot but can't
+    // be called to it again
+    const eligible = waiting.filter((entry) => !entry.completedSlugs.includes(station)).length;
     const [count, setCount] = useState(1);
 
     const cycle = (step: 1 | -1) =>
@@ -137,7 +140,7 @@ function HostPage({
                                 <button
                                     type="submit"
                                     class="mwa-button"
-                                    disabled={count > waiting.length}
+                                    disabled={count > eligible}
                                 >
                                     {t('hostRequest')}
                                 </button>
@@ -160,7 +163,15 @@ function HostPage({
                                         waiting.map((entry, i) => (
                                             <tr key={entry.id}>
                                                 <td>{i + 1}.</td>
-                                                <td>{entry.groupName}</td>
+                                                <td>
+                                                    {entry.groupName}
+                                                    {entry.completedSlugs.includes(station) && (
+                                                        <span class="mwa-standing-hint">
+                                                            {' '}
+                                                            {t('hostAlreadyDone')}
+                                                        </span>
+                                                    )}
+                                                </td>
                                             </tr>
                                         ))
                                     )}
