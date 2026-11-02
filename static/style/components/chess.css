@@ -1,5 +1,6 @@
 .mwa-chess-board {
-    width: min(100%, 32rem);
+		margin:0px auto;
+    width: min(100%, 36rem);
     table-layout: fixed;
 }
 
