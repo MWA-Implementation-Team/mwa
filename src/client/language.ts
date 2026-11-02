@@ -36,6 +36,8 @@ export type Language = {
     loginSentSignup: string;
     loginCode: string;
     loginVerify: string;
+    loginConfirmPrompt: string;
+    loginConfirmSubmit: string;
 
     interactSelfJoke: string;
     interactGeneralTitle: string;
@@ -312,6 +314,8 @@ export const languages: Record<LanguageCode, Language> = {
         loginSentSignup: 'We sent a signup link to {email} — click it to create your account.',
         loginCode: 'Code from the email',
         loginVerify: 'Verify code',
+        loginConfirmPrompt: 'Continue to sign in.',
+        loginConfirmSubmit: 'Continue',
 
         interactSelfJoke: "That's you! Scan someone else's code instead.",
         interactGeneralTitle: 'General information',
@@ -592,6 +596,8 @@ export const languages: Record<LanguageCode, Language> = {
             'Išsiuntėme registracijos nuorodą į {email} — paspausk ją, kad sukurtum paskyrą.',
         loginCode: 'Kodas iš laiško',
         loginVerify: 'Patvirtinti kodą',
+        loginConfirmPrompt: 'Tęskite, kad prisijungtumėte.',
+        loginConfirmSubmit: 'Tęsti',
 
         interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
         interactGeneralTitle: 'Bendra informacija',
