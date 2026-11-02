@@ -1,0 +1,19 @@
+# Non-secret config — real values, committed plaintext.
+
+domain: example.com
+deploy_dir: /opt/mwa
+
+# Repo the VM clones + builds from. Private repo → the VM needs a
+# read-only GitHub deploy key (see deploy/README.md).
+repo_url: git@github.com:MWA-Implementation-Team/mwa-template.git
+repo_ref: main
+
+# Operators manage their own ssh keys by hand. Flip ssh_lockdown only
+# after confirming everyone can still log in — it disables password auth.
+ssh_lockdown: false
+
+# SMTP — credentials live in vault.yml
+smtp_host: micius@mif.vusa.lt
+smtp_port: 587
+smtp_secure: false # false = STARTTLS on 587; true = implicit TLS on 465
+mail_from: micius@mif.vusa.lt
