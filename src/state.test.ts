@@ -41,4 +41,23 @@ describe('smtpConfigFromEnv', () => {
         });
         assert.deepEqual(config?.auth, { user: 'mwa', pass: '' });
     });
+
+    it('sets requireTLS when MWA_SMTP_STARTTLS is true', () => {
+        const config = smtpConfigFromEnv({
+            MWA_SMTP_HOST: 'smtp.gmail.com',
+            MWA_SMTP_STARTTLS: 'true',
+        });
+        assert.equal(config?.requireTLS, true);
+    });
+
+    it('throws on a non-integer port instead of passing NaN to nodemailer', () => {
+        assert.throws(
+            () =>
+                smtpConfigFromEnv({
+                    MWA_SMTP_HOST: 'smtp.example.com',
+                    MWA_SMTP_PORT: '587x',
+                }),
+            /MWA_SMTP_PORT must be an integer/,
+        );
+    });
 });

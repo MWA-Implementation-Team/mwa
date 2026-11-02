@@ -30,11 +30,18 @@ export function smtpConfigFromEnv(env: NodeJS.ProcessEnv) {
     if (!host) {
         return null;
     }
+    const port = Number(env.MWA_SMTP_PORT ?? 25);
+    if (!Number.isInteger(port)) {
+        throw new Error(`MWA_SMTP_PORT must be an integer, got '${env.MWA_SMTP_PORT}'`);
+    }
     const user = env.MWA_SMTP_USER;
     return {
         host,
-        port: Number(env.MWA_SMTP_PORT ?? 25),
+        port,
         secure: env.MWA_SMTP_SECURE === 'true',
+        // requireTLS: fail instead of sending credentials over plaintext when
+        // the server won't upgrade via STARTTLS
+        ...(env.MWA_SMTP_STARTTLS === 'true' ? { requireTLS: true } : {}),
         // auth only when a user is configured — plain `auth: undefined` would
         // still create the key and change nodemailer's greeting
         ...(user ? { auth: { user, pass: env.MWA_SMTP_PASS ?? '' } } : {}),
