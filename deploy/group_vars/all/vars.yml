@@ -5,7 +5,7 @@ deploy_dir: /opt/mwa
 
 # Repo the VM clones + builds from. Private repo → the clone authenticates
 # through the operator's forwarded ssh agent (see deploy/README.md).
-repo_url: git@github.com:MWA-Implementation-Team/mwa-template.git
+repo_url: git@github.com:MWA-Implementation-Team/mwa.git
 repo_ref: main
 
 # Operators manage their own ssh keys by hand. Flip ssh_lockdown only

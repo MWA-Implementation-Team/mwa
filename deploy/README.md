@@ -19,7 +19,9 @@ encrypted vault.
 - A GitHub ssh key **in your local agent** — `ssh -T git@github.com`
   works, `ssh-add -l` lists it. The VM clones the private repo through
   agent forwarding (`ansible_ssh_extra_args` in inventory.yml).
-- The vault password (ask the other operator)
+- The vault password (ask the other operator) — either keep it in
+  `deploy/.vault_pass` (gitignored, picked up automatically by the justfile)
+  or enter it when `--ask-vault-pass` prompts
 
 ## Fill in the real values
 
