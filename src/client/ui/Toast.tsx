@@ -1,5 +1,6 @@
 import { ComponentChildren } from 'preact';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { createPortal } from 'preact/compat';
+import { useEffect, useState } from 'preact/hooks';
 
 export type ToastKind = 'info' | 'success' | 'error';
 
@@ -77,11 +78,12 @@ export function Toast({
     );
 }
 
-// Rendered once by ClientContextWrapper. The container is a manual popover:
-// top-layer placement keeps toasts visible above modal <dialog>s, and it
-// mounts outside .mwa so position: fixed isn't trapped by its filter.
+// Rendered once by ClientContextWrapper. While a modal <dialog> is open the
+// rest of the document is inert — even top-layer elements can't be clicked —
+// so the stack portals into the dialog itself (fixed inside it, above the
+// backdrop). With no dialog it renders in place, outside .mwa so position:
+// fixed isn't trapped by its filter.
 export function Toasts() {
-    const ref = useRef<HTMLDivElement>(null);
     const [, bump] = useState(0);
 
     useEffect(() => {
@@ -93,26 +95,24 @@ export function Toasts() {
         return () => listeners.delete(listener);
     }, []);
 
+    // a dialog opening or closing moves the stack's portal host
     useEffect(() => {
-        const el = ref.current;
-        if (!el || typeof el.showPopover !== 'function') return;
-        const isOpen = el.matches(':popover-open');
-        if (items.length === 0) {
-            if (isOpen) el.hidePopover();
-            return;
-        }
-        if (!isOpen) {
-            el.showPopover();
-        } else if (document.querySelector('dialog[open]')) {
-            // A modal dialog that opened after the popover sits higher in the
-            // top layer — re-show to leapfrog it.
-            el.hidePopover();
-            el.showPopover();
-        }
-    });
+        const observer = new MutationObserver(() => bump((n) => n + 1));
+        observer.observe(document.body, {
+            attributes: true,
+            subtree: true,
+            attributeFilter: ['open'],
+        });
+        return () => observer.disconnect();
+    }, []);
 
-    return (
-        <div ref={ref} class="mwa-toasts" popover="manual">
+    // the most recently opened dialog is the topmost — last in DOM order
+    const host =
+        typeof document !== 'undefined' && [...document.querySelectorAll('dialog[open]')].pop();
+    const inDialog = host ? ' mwa-toasts--in-dialog' : '';
+
+    const stack = (
+        <div class={`mwa-toasts${inDialog}`}>
             {items.map((item) => {
                 // built outside the class= attribute — the css-usage check
                 // reads bare string literals in there as class names
@@ -131,4 +131,6 @@ export function Toasts() {
             })}
         </div>
     );
+
+    return host ? createPortal(stack, host) : stack;
 }
