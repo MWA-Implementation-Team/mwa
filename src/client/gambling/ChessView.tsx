@@ -136,7 +136,7 @@ export function ChessView({
                         </div>
                     </div>
 
-                    <p role="mwa-chess-status">{status}</p>
+                    <p class="mwa-chess-status">{status}</p>
 
                     {canPromote && (
                         <>
