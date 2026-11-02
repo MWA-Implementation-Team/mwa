@@ -40,6 +40,22 @@ services:
             app:
                 condition: service_started
 
+    # opt-in db admin UI — `just dbgate` brings it up and ssh-tunnels it.
+    # bound to localhost only; reach it via ssh -L, never publish it.
+    dbgate:
+        image: dbgate/dbgate:7.3.3-alpine
+        profiles: [tools]
+        ports:
+            - '127.0.0.1:5050:3000'
+        volumes:
+            - ../data:/db:ro
+        environment:
+            CONNECTIONS: mwa
+            ENGINE_mwa: sqlite@dbgate-plugin-sqlite
+            FILE_mwa: /db/db.sqlite
+            LABEL_mwa: mwa
+        restart: unless-stopped
+
 volumes:
     caddy-data:
     caddy-config:

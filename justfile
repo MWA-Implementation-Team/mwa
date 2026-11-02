@@ -58,3 +58,14 @@ db-pull file="dump.sqlite":
 db-query sql:
     echo "const { DatabaseSync } = require('node:sqlite'); console.table(new DatabaseSync('/data/db.sqlite').prepare('{{ sql }}').all())" \
         | ssh {{ vm }} "{{ compose }} exec -T app /nodejs/bin/node"
+
+# dbgate web UI on the live db (read-only) — open http://localhost:5050,
+# Ctrl-C closes the tunnel. drop :ro in compose to allow edits.
+dbgate:
+    ssh {{ vm }} "{{ compose }} --profile tools up -d dbgate"
+    @echo "dbgate on http://localhost:5050 — Ctrl-C to close the tunnel"
+    ssh -N -L 5050:localhost:5050 {{ vm }}
+
+# stop the dbgate container on the VM
+dbgate-down:
+    ssh {{ vm }} "{{ compose }} --profile tools stop dbgate"
