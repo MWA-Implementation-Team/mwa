@@ -3,9 +3,12 @@ import { ClientContext } from '#src/client/context.js';
 import { ActivityProps, registeredActivities } from '#src/client/activities.js';
 
 // The universal station page: every activity gets its card art on top
-// and its text below.
-export function ActivityDetail({ slug }: ActivityProps) {
-    const { lang } = useContext(ClientContext);
+// and its text below. `completed` adds a banner for signed-in teams.
+export function ActivityDetail({
+    slug,
+    completed,
+}: ActivityProps & { completed?: boolean | null }) {
+    const { lang, t } = useContext(ClientContext);
     const activity = registeredActivities[slug];
     const { Card } = activity;
     return (
@@ -14,6 +17,11 @@ export function ActivityDetail({ slug }: ActivityProps) {
                 <h2>{activity.name}</h2>
             </div>
             <div class="mwa-panel-body">
+                {completed && (
+                    <p class="mwa-note mwa-note--success" role="status">
+                        {t('activityCompleted')}
+                    </p>
+                )}
                 <Card slug={slug} />
                 {activity.text && (
                     <div

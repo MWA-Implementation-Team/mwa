@@ -105,7 +105,16 @@ missing props are a compile error caught by `npm run lint`, not a runtime surpri
 stations: `ActivitySlug` is derived from its keys, the `/activities/:slug` route
 validates the param against it (unknown slug → 404), and `syncActivities(state)`
 (`src/db/activities/index.ts`) inserts every slug into the `activities` table on server
-start so queue/badge rows can foreign-key them.
+start so queue/badge rows can foreign-key them. A group **completes** a station
+when a host marks its `called` queue entry `done_at` — no separate table; the
+definition lives in `listGroupCompletions` (`src/db/queue/index.ts`), which reads
+distinct `activity_slug`s from called-and-done rows. Completions belong to the
+group (they survive disbanding, like its score), pay nothing themselves — hosts
+award players via scan — and gate the queue: `callNextGroups` skips groups that
+already did that station, `joinQueue` reports `all_done` once every registered
+slug is finished. The home queue panel renders a per-station ✓/— table, the
+activity page shows a completion banner, and the host page marks already-done
+rows so they can't be called twice.
 
 ## Interactions and gambling
 

@@ -24,6 +24,8 @@ type HomePageProps = {
     youNotice?: keyof Language;
     queuePosition: number | null;
     queueCanJoin: boolean;
+    // per-station ✓/— for the viewer's group; null when groupless
+    stationProgress: { slug: string; name: string; done: boolean }[] | null;
     queueError?: keyof Language;
     qrClaimedAmount?: number | null;
     qrError?: 'not_found' | 'expired' | 'used_up' | 'already_claimed';
@@ -67,6 +69,7 @@ function HomePage({
     youNotice,
     queuePosition,
     queueCanJoin,
+    stationProgress,
     queueError,
     qrClaimedAmount,
     qrError,
@@ -124,6 +127,26 @@ function HomePage({
                             )
                         ) : (
                             <p class="mwa-muted mwa-queue-cta">{t('queueNeedGroup')}</p>
+                        )}
+
+                        {stationProgress && (
+                            <div class="table mwa-tx">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colSpan={2}>{t('homeStationProgress')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {stationProgress.map((s) => (
+                                            <tr key={s.slug}>
+                                                <td>{s.name}</td>
+                                                <td class="mwa-tx-amount">{s.done ? '✓' : '—'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
 

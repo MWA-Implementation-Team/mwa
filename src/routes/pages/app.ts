@@ -28,6 +28,7 @@ import {
     QUEUE_MIN_GROUP_SIZE,
     getQueuePosition,
     getUserWaitingEntry,
+    listGroupCompletions,
     listWaitingQueue,
     listStationGroups,
 } from '#src/db/queue/index.js';
@@ -81,6 +82,7 @@ export function registerAppRoutes(app: MwaHono) {
             'queueLeaveFailed',
             'queueTooSmall',
             'queueAtStation',
+            'queueAllDone',
         ] as const);
         const groupError = queryFlag(ctx, 'groupError', [
             'groupKickFailed',
@@ -148,6 +150,13 @@ export function registerAppRoutes(app: MwaHono) {
             queueError,
             qrClaimedAmount,
             qrError,
+            stationProgress: group
+                ? (Object.keys(registeredActivities) as ActivitySlug[]).map((slug) => ({
+                      slug,
+                      name: registeredActivities[slug].name,
+                      done: listGroupCompletions(ctx.var, group.id).includes(slug),
+                  }))
+                : null,
             queueCanJoin: memberCount >= QUEUE_MIN_GROUP_SIZE,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
             standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
@@ -320,6 +329,9 @@ export function registerAppRoutes(app: MwaHono) {
         }
         if (result.type === 'at_station') {
             return ctx.redirect('/app?queueError=queueAtStation#panel-game', 303);
+        }
+        if (result.type === 'all_done') {
+            return ctx.redirect('/app?queueError=queueAllDone#panel-game', 303);
         }
         if (result.type !== 'joined') {
             return ctx.redirect('/app?queueError=queueJoinFailed#panel-game', 303);

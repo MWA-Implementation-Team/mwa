@@ -6,18 +6,18 @@ import { ActivityDetail } from '#src/client/activities/Detail.js';
 import PageShell from './app/PageShell.js';
 import { LandingSide } from './LandingSide.js';
 
-type ActivityPageProps = { slug: ActivitySlug };
+type ActivityPageProps = { slug: ActivitySlug; completed: boolean | null };
 
 export const activityPage: Page<ActivityPageProps> = {
     Component: ActivityPage,
     title: (t, { slug }) => t('titleActivity', { name: registeredActivities[slug].name }),
 };
 
-function ActivityPage({ slug }: ActivityPageProps) {
+function ActivityPage({ slug, completed }: ActivityPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="landing" side={<LandingSide />}>
-            <ActivityDetail slug={slug} />
+            <ActivityDetail slug={slug} completed={completed} />
             <div>
                 <a href="/">{t('activityBack')}</a>
             </div>

@@ -1,4 +1,5 @@
 import { MwaState } from '#src/state.js';
+import { registeredActivities } from '#src/client/activities.js';
 import { SQLOutputValue } from 'node:sqlite';
 import { runTransaction } from '../transaction.js';
 
@@ -16,7 +17,7 @@ export type QueueEntry = {
     activitySlug: string | null;
 };
 
-export type WaitingQueueRow = QueueEntry & { groupName: string };
+export type WaitingQueueRow = QueueEntry & { groupName: string; completedSlugs: string[] };
 
 function mapQueueEntry(row: Record<string, SQLOutputValue>): QueueEntry {
     return {
@@ -38,6 +39,7 @@ export type JoinQueueResult =
     | { type: 'joined'; entry: QueueEntry }
     | { type: 'already_queued' }
     | { type: 'at_station' }
+    | { type: 'all_done' }
     | { type: 'too_small' };
 
 // A group holds one spot at a time; rejoining after leaving inserts a
@@ -62,6 +64,13 @@ export function joinQueue(state: MwaState, groupId: number): JoinQueueResult {
     `);
     if ((memberCountQuery.get(groupId)!.count as number) < QUEUE_MIN_GROUP_SIZE) {
         return { type: 'too_small' };
+    }
+
+    // a group that finished every registered station is done playing
+    const completed = listGroupCompletions(state, groupId);
+    const slugs = Object.keys(registeredActivities);
+    if (slugs.length > 0 && slugs.every((slug) => completed.includes(slug))) {
+        return { type: 'all_done' };
     }
 
     const joinQuery = state.prepare(`
@@ -121,6 +130,37 @@ export function getQueuePosition(state: MwaState, entryId: number): number | nul
     return countQuery.get(entryId)!.position as number;
 }
 
+// The stations a group finished — distinct slugs from its called-and-done
+// queue rows. A completion belongs to the group; disbanding doesn't erase it.
+export function listGroupCompletions(state: MwaState, groupId: number): string[] {
+    const query = state.prepare(`
+        SELECT DISTINCT activity_slug
+        FROM queue_entries
+        WHERE group_id = ? AND status = 'called' AND done_at IS NOT NULL
+          AND activity_slug IS NOT NULL
+    `);
+    return query.all(groupId).map((row) => row.activity_slug as string);
+}
+
+// group_id → completed slugs for every group that finished anything — one
+// query so list pages can decorate rows without an N+1.
+function listCompletionsByGroup(state: MwaState): Map<number, string[]> {
+    const rows = state
+        .prepare(
+            `SELECT DISTINCT group_id, activity_slug
+             FROM queue_entries
+             WHERE status = 'called' AND done_at IS NOT NULL AND activity_slug IS NOT NULL`,
+        )
+        .all();
+    const byGroup = new Map<number, string[]>();
+    for (const row of rows) {
+        const groupId = row.group_id as number;
+        if (!byGroup.has(groupId)) byGroup.set(groupId, []);
+        byGroup.get(groupId)!.push(row.activity_slug as string);
+    }
+    return byGroup;
+}
+
 // The line from front to back — what a host reads before calling groups.
 export function listWaitingQueue(state: MwaState): WaitingQueueRow[] {
     const query = state.prepare(`
@@ -132,19 +172,30 @@ export function listWaitingQueue(state: MwaState): WaitingQueueRow[] {
         WHERE queue_entries.status = 'waiting'
         ORDER BY queue_entries.id
     `);
+    const completions = listCompletionsByGroup(state);
     return query.all().map((row) => ({
         ...mapQueueEntry(row),
         groupName: row.group_name as string,
+        completedSlugs: completions.get(row.group_id as number) ?? [],
     }));
 }
 
 // A station freed up: take the next `count` groups in line and mark them
 // called to `activitySlug`. They stop counting toward queue positions.
 export function callNextGroups(state: MwaState, count: number, activitySlug: string): QueueEntry[] {
+    // a group that already completed this station keeps its place but is
+    // skipped — the station can't credit it twice
     const pickQuery = state.prepare(`
         SELECT id, group_id, joined_at, status, closed_at, done_at, activity_slug
         FROM queue_entries
         WHERE status = 'waiting'
+          AND NOT EXISTS (
+              SELECT 1 FROM queue_entries d
+              WHERE d.group_id = queue_entries.group_id
+                AND d.activity_slug = ?
+                AND d.status = 'called'
+                AND d.done_at IS NOT NULL
+          )
         ORDER BY id
         LIMIT ?
     `);
@@ -156,7 +207,7 @@ export function callNextGroups(state: MwaState, count: number, activitySlug: str
     `);
 
     return runTransaction(state.db, () => {
-        const picked = pickQuery.all(count).map(mapQueueEntry);
+        const picked = pickQuery.all(activitySlug, count).map(mapQueueEntry);
         for (const entry of picked) {
             markCalledQuery.run(activitySlug, entry.id);
             entry.status = 'called';
@@ -180,9 +231,11 @@ export function listStationGroups(state: MwaState, activitySlug: string): Waitin
           AND queue_entries.activity_slug = ?
         ORDER BY queue_entries.closed_at
     `);
+    const completions = listCompletionsByGroup(state);
     return query.all(activitySlug).map((row) => ({
         ...mapQueueEntry(row),
         groupName: row.group_name as string,
+        completedSlugs: completions.get(row.group_id as number) ?? [],
     }));
 }
 

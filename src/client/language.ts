@@ -107,6 +107,8 @@ export type Language = {
     queueNeedGroup: string;
     queueTooSmall: string;
     queueAtStation: string;
+    queueAllDone: string;
+    homeStationProgress: string;
     queueJoinFailed: string;
     queueLeaveFailed: string;
     dashStandings: string;
@@ -119,6 +121,7 @@ export type Language = {
     hostPrevStation: string;
     hostNextStation: string;
     hostDone: string;
+    hostAlreadyDone: string;
     hostNextUp: string;
     hostQueueEmpty: string;
     hostRequestFailed: string;
@@ -137,6 +140,7 @@ export type Language = {
     dialogClose: string;
 
     activityBack: string;
+    activityCompleted: string;
 
     leaderboardTypeLabel: string;
     leaderboardScopeLabel: string;
@@ -388,6 +392,8 @@ export const languages: Record<LanguageCode, Language> = {
         queueTooSmall: 'Your group needs at least 2 people to join the queue.',
         queueAtStation:
             'Your team is at a station right now — finish it before rejoining the queue.',
+        queueAllDone: 'Your team has completed every station!',
+        homeStationProgress: 'Stations',
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
         dashStandings: 'Your standings',
@@ -400,6 +406,7 @@ export const languages: Record<LanguageCode, Language> = {
         hostPrevStation: 'Previous station',
         hostNextStation: 'Next station',
         hostDone: 'Done',
+        hostAlreadyDone: 'done here',
         hostNextUp: 'Next in line',
         hostQueueEmpty: 'The queue is empty',
         hostRequestFailed: 'Could not request groups',
@@ -418,6 +425,7 @@ export const languages: Record<LanguageCode, Language> = {
         dialogClose: 'Close',
 
         activityBack: '← back to activities',
+        activityCompleted: '✓ Your team completed this station',
 
         leaderboardTypeLabel: 'Leaderboard board',
         leaderboardScopeLabel: 'Leaderboard scope',
@@ -670,6 +678,8 @@ export const languages: Record<LanguageCode, Language> = {
         queueNeedGroup: 'Norint stoti į eilę, reikia grupės.',
         queueTooSmall: 'Norint stoti į eilę, grupėje turi būti bent 2 nariai.',
         queueAtStation: 'Jūsų komanda dabar prie stotelės — užbaikite ją prieš vėl stodami į eilę.',
+        queueAllDone: 'Jūsų komanda įveikė visas stoteles!',
+        homeStationProgress: 'Stotelės',
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
         dashStandings: 'Tavo pozicijos',
@@ -682,6 +692,7 @@ export const languages: Record<LanguageCode, Language> = {
         hostPrevStation: 'Ankstesnė veikla',
         hostNextStation: 'Kita veikla',
         hostDone: 'Atlikta',
+        hostAlreadyDone: 'jau atlikta',
         hostNextUp: 'Eilėje toliau',
         hostQueueEmpty: 'Eilė tuščia',
         hostRequestFailed: 'Nepavyko pakviesti grupių',
@@ -700,6 +711,7 @@ export const languages: Record<LanguageCode, Language> = {
         dialogClose: 'Uždaryti',
 
         activityBack: '← atgal į veiklas',
+        activityCompleted: '✓ Jūsų komanda įveikė šią stotelę',
 
         leaderboardTypeLabel: 'Lentelės tipas',
         leaderboardScopeLabel: 'Lentelės apimtis',
