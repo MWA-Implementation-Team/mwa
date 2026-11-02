@@ -547,7 +547,9 @@ function deductCoinsForGambling(
         throw new Error(`User ${userId} doesn't exist`);
     }
 
-    if (user.currentBalance < betAmount) {
+    // hosts/admins can go negative — they stake games as organizers
+    const unlimited = user.role === 'host' || user.role === 'admin';
+    if (!unlimited && user.currentBalance < betAmount) {
         return { type: 'too_broke' };
     }
 

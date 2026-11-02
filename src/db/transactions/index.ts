@@ -103,7 +103,9 @@ export function transferCoins(
     }
     return runTransaction(state.db, () => {
         const sender = findUserById(state, fromUserId);
-        if (!sender || sender.currentBalance < amount) return 'too_broke';
+        // hosts/admins can go negative — they fund prizes and refunds
+        const unlimited = sender?.role === 'host' || sender?.role === 'admin';
+        if (!sender || (!unlimited && sender.currentBalance < amount)) return 'too_broke';
 
         const parentId = insertParentTx(state, 'transfer');
         insertChildTx(state, parentId, fromUserId, -amount);
