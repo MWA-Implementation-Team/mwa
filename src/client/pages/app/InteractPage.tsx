@@ -4,6 +4,7 @@ import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import PageShell from './PageShell.js';
 import Dialog from '#src/client/ui/Dialog.js';
+import { Toast } from '#src/client/ui/Toast.js';
 import { displayUsername } from '#src/client/display.js';
 import { Language } from '#src/client/language.js';
 import type { GameType } from '#src/db/gambling/index.js';
@@ -63,6 +64,9 @@ function InteractPage({
 }: InteractPageProps) {
     const { t, user } = useContext(ClientContext);
     const [sendAmount, setSendAmount] = useState(0);
+    // hosts/admins can send past their balance — the server allows negative
+    const unlimited = user?.role === 'host' || user?.role === 'admin';
+    const maxSend = unlimited ? Number.MAX_SAFE_INTEGER : (user?.currentBalance ?? 0);
     const [openDialog, setOpenDialog] = useState<GameType | null>(gamblingError?.dialog ?? null);
 
     if (self) {
@@ -95,9 +99,7 @@ function InteractPage({
                 <input type="hidden" name="game_type" value={game} />
                 {children}
                 {gamblingError?.dialog === game && gamblingError.message && (
-                    <p class="mwa-note mwa-note--error" role="alert">
-                        {t(gamblingError.message)}
-                    </p>
+                    <Toast kind="error">{t(gamblingError.message)}</Toast>
                 )}
             </form>
         </Dialog>
@@ -126,12 +128,8 @@ function InteractPage({
 
     return (
         <PageShell section="interact">
-            {interactError && (
-                <p class="mwa-note mwa-note--error" role="alert">
-                    {t(interactError)}
-                </p>
-            )}
-            {interactNotice && <p class="mwa-muted">{t(interactNotice)}</p>}
+            {interactError && <Toast kind="error">{t(interactError)}</Toast>}
+            {interactNotice && <Toast kind="success">{t(interactNotice)}</Toast>}
 
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
@@ -200,15 +198,11 @@ function InteractPage({
                     <h2>{t('interactSendMoneyTitle')}</h2>
                 </div>
                 <div class="mwa-panel-body">
-                    {sendError && (
-                        <p class="mwa-note mwa-note--error" role="alert">
-                            {t(sendError)}
-                        </p>
-                    )}
+                    {sendError && <Toast kind="error">{t(sendError)}</Toast>}
                     {sentAmount !== null && sentAmount !== undefined && (
-                        <p class="mwa-note mwa-note--success" role="status">
+                        <Toast kind="success">
                             {t('interactMoneySent', { amount: String(sentAmount) })}
-                        </p>
+                        </Toast>
                     )}
                     <form method="POST" action={post('send-money')} class="mwa-send">
                         <input type="hidden" name="amount" value={sendAmount} />
@@ -225,28 +219,26 @@ function InteractPage({
                             <button
                                 type="button"
                                 class="mwa-send-step"
-                                onClick={() =>
-                                    setSendAmount((a) => Math.min(user!.currentBalance, a + 1))
-                                }
-                                disabled={sendAmount >= user!.currentBalance}
+                                onClick={() => setSendAmount((a) => Math.min(maxSend, a + 1))}
+                                disabled={sendAmount >= maxSend}
                             >
                                 +
                             </button>
                         </div>
-                        <p class="mwa-send-available">
-                            {t('interactSendAvailable', {
-                                amount: String(user!.currentBalance),
-                            })}
-                        </p>
+                        {!unlimited && (
+                            <p class="mwa-send-available">
+                                {t('interactSendAvailable', {
+                                    amount: String(user!.currentBalance),
+                                })}
+                            </p>
+                        )}
                         <div class="mwa-send-chips">
                             {[5, 10, 50, 100].map((n) => (
                                 <button
                                     key={n}
                                     type="button"
                                     class="mwa-send-chip"
-                                    onClick={() =>
-                                        setSendAmount((a) => Math.min(user!.currentBalance, a + n))
-                                    }
+                                    onClick={() => setSendAmount((a) => Math.min(maxSend, a + n))}
                                 >
                                     +{n}
                                 </button>
@@ -262,7 +254,7 @@ function InteractPage({
                         <button
                             type="submit"
                             class="mwa-button"
-                            disabled={sendAmount < 1 || sendAmount > user!.currentBalance}
+                            disabled={sendAmount < 1 || sendAmount > maxSend}
                         >
                             {t('interactSendSubmit')}
                         </button>

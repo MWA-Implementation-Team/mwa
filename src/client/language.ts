@@ -161,6 +161,8 @@ export type Language = {
     youEmail: string;
     youRole: string;
     youSave: string;
+    youSaved: string;
+    youQrReset: string;
     youUsernameTaken: string;
     youUsernameInvalid: string;
     adminPanelHead: string;
@@ -176,10 +178,14 @@ export type Language = {
     groupDeleteHint: string;
     groupKickFailed: string;
     groupLeaveFailed: string;
+    groupKicked: string;
+    groupDeleted: string;
+    groupLeft: string;
     groupName: string;
     groupPhone: string;
     groupSettings: string;
     groupSettingsEdit: string;
+    groupSaved: string;
     groupDelete: string;
     groupDeleteConfirm: string;
     groupDeleteFailed: string;
@@ -430,6 +436,8 @@ export const languages: Record<LanguageCode, Language> = {
         youEmail: 'Email',
         youRole: 'Role',
         youSave: 'Save',
+        youSaved: 'Settings saved.',
+        youQrReset: 'QR code reset.',
         youUsernameTaken: 'That username is taken',
         youUsernameInvalid: 'Usernames are 1–16 lowercase letters, numbers, _ or -',
         adminPanelHead: 'administration',
@@ -445,10 +453,14 @@ export const languages: Record<LanguageCode, Language> = {
         groupDeleteHint: 'Delete this group and all its members',
         groupKickFailed: 'Could not remove the member',
         groupLeaveFailed: 'Could not leave the group',
+        groupKicked: 'Member kicked.',
+        groupDeleted: 'Group deleted.',
+        groupLeft: 'Left the group.',
         groupName: 'Name',
         groupPhone: 'Emergency phone',
         groupSettings: 'Group settings',
         groupSettingsEdit: 'Edit group settings',
+        groupSaved: 'Group settings saved.',
         groupDelete: 'Delete group',
         groupDeleteConfirm: 'Delete group?',
         groupDeleteFailed: 'failed to delete group',
@@ -701,6 +713,8 @@ export const languages: Record<LanguageCode, Language> = {
         youEmail: 'El. paštas',
         youRole: 'Rolė',
         youSave: 'Išsaugoti',
+        youSaved: 'Nustatymai išsaugoti.',
+        youQrReset: 'QR kodas atstatytas.',
         youUsernameTaken: 'Šis vartotojo vardas užimtas',
         youUsernameInvalid: 'Varde gali būti 1–16 mažųjų raidžių, skaičių, _ arba -',
 
@@ -717,10 +731,14 @@ export const languages: Record<LanguageCode, Language> = {
         groupDeleteHint: 'Ištrinti grupę ir visus narius',
         groupKickFailed: 'Nepavyko pašalinti nario',
         groupLeaveFailed: 'Nepavyko išeiti iš grupės',
+        groupKicked: 'Narys išmestas.',
+        groupDeleted: 'Grupė ištrinta.',
+        groupLeft: 'Išėjote iš grupės.',
         groupName: 'Pavadinimas',
         groupPhone: 'Skubios pagalbos telefonas',
         groupSettings: 'Grupės nustatymai',
         groupSettingsEdit: 'Keičiami grupės nustatymai',
+        groupSaved: 'Grupės nustatymai išsaugoti.',
         groupDelete: 'Ištrinti grupę',
         groupDeleteConfirm: 'Ištrinti grupę?',
         groupDeleteFailed: 'nepavyko ištrinti grupės',

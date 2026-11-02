@@ -8,6 +8,8 @@ import Dialog from '#src/client/ui/Dialog.js';
 import { Language } from '#src/client/language.js';
 import type { ViewerStanding } from '#src/db/leaderboard/index.js';
 import { displayActor, displayUsername } from '#src/client/display.js';
+import { Toast } from '#src/client/ui/Toast.js';
+
 type HomePageProps = {
     transactions: Transaction[];
     groupName: string | null;
@@ -17,7 +19,9 @@ type HomePageProps = {
     groupOwnerId: number | null;
     groupMembers: { userId: number; username: string }[];
     groupError?: keyof Language;
+    groupNotice?: keyof Language;
     youError?: keyof Language;
+    youNotice?: keyof Language;
     queuePosition: number | null;
     queueCanJoin: boolean;
     queueError?: keyof Language;
@@ -57,7 +61,9 @@ function HomePage({
     groupOwnerId,
     groupMembers,
     groupError,
+    groupNotice,
     youError,
+    youNotice,
     queuePosition,
     queueCanJoin,
     queueError,
@@ -74,15 +80,9 @@ function HomePage({
     return (
         <PageShell section="home">
             {qrClaimedAmount !== null && qrClaimedAmount !== undefined && (
-                <p class="mwa-note mwa-note--success" role="status">
-                    {t('qrClaimed', { amount: String(qrClaimedAmount) })}
-                </p>
+                <Toast kind="success">{t('qrClaimed', { amount: String(qrClaimedAmount) })}</Toast>
             )}
-            {qrError && (
-                <p class="mwa-note mwa-note--error" role="alert">
-                    {t(qrErrorKey[qrError])}
-                </p>
-            )}
+            {qrError && <Toast kind="error">{t(qrErrorKey[qrError])}</Toast>}
             <section class="mwa-panel" id="panel-game">
                 <div class="mwa-panel-head">
                     <h2>{t('dashGame')}</h2>
@@ -93,11 +93,7 @@ function HomePage({
                         <div class="mwa-queue-art" aria-hidden="true">
                             {groupEmoji}
                         </div>
-                        {queueError && (
-                            <p class="mwa-note mwa-note--error" role="alert">
-                                {t(queueError)}
-                            </p>
-                        )}
+                        {queueError && <Toast kind="error">{t(queueError)}</Toast>}
 
                         {groupMemberCount !== null && (
                             <p class="mwa-queue-members">
@@ -232,11 +228,8 @@ function HomePage({
                     <h2>{t('dashGroup')}</h2>
                 </div>
                 <div class="mwa-panel-body">
-                    {groupError && (
-                        <p class="mwa-note mwa-note--error" role="alert">
-                            {t(groupError)}
-                        </p>
-                    )}
+                    {groupError && <Toast kind="error">{t(groupError)}</Toast>}
+                    {groupNotice && <Toast kind="success">{t(groupNotice)}</Toast>}
                     {groupMembers.length === 0 ? (
                         <p class="mwa-muted">{t('groupNone')}</p>
                     ) : (
@@ -449,11 +442,8 @@ function HomePage({
                             required
                         />
                     </div>
-                    {youError && (
-                        <p class="mwa-note mwa-note--error" role="alert">
-                            {t(youError)}
-                        </p>
-                    )}
+                    {youError && <Toast kind="error">{t(youError)}</Toast>}
+                    {youNotice && <Toast kind="success">{t(youNotice)}</Toast>}
                 </form>
             </Dialog>
 

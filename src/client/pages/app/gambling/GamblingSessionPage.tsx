@@ -17,6 +17,7 @@ import { ComponentChildren } from 'preact';
 import { TurnTimeLeftDisplay } from '#src/client/ui/TurnTimeLeftDisplay.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import PageShell from '#src/client/pages/app/PageShell.js';
+import { Toast } from '#src/client/ui/Toast.js';
 import { displayActor } from '#src/client/display.js';
 
 type GamblingSessionPageProps = {
@@ -78,9 +79,9 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
     }, [currentGame, t]);
 
     const disconnected = isDisconnected ? (
-        <p class="mwa-note mwa-note--error" role="alert">
+        <Toast kind="error">
             {t('gamblingDisconnected')}. <a href="">{t('gamblingRefreshQuestion')}</a>
-        </p>
+        </Toast>
     ) : null;
 
     switch (currentGame.status.type) {
@@ -109,11 +110,7 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                         {t('gamblingReject')}
                                     </button>
                                 </form>
-                                {message && (
-                                    <p class="mwa-note mwa-note--error" role="alert">
-                                        {t(message)}
-                                    </p>
-                                )}
+                                {message && <Toast kind="error">{t(message)}</Toast>}
                             </div>
                         </section>
                     </PageShell>

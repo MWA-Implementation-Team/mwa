@@ -5,6 +5,7 @@ import { defaultLanguage, LanguageCode, translate, TranslateFn } from './languag
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
 import { reviveUser, User, UserJson } from '#src/client/api/users.js';
 import { subscribeSharedSse } from './sse.js';
+import { Toasts } from './ui/Toast.js';
 
 import type { Notification } from '#src/db/users/index.js';
 export type { Notification };
@@ -80,5 +81,10 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
         });
     }, [init.user?.id]);
 
-    return <ClientContext value={value}>{content}</ClientContext>;
+    return (
+        <ClientContext value={value}>
+            {content}
+            <Toasts />
+        </ClientContext>
+    );
 }

@@ -4,6 +4,7 @@ import { ClientContext } from '#src/client/context.js';
 import type { WaitingQueueRow } from '#src/db/queue/index.js';
 import { ActivitySlug, registeredActivities } from '#src/client/activities.js';
 import PageShell from './PageShell.js';
+import { Toast } from '#src/client/ui/Toast.js';
 import { Language } from '#src/client/language.js';
 
 type HostPageProps = {
@@ -141,11 +142,7 @@ function HostPage({
                                     {t('hostRequest')}
                                 </button>
                             </form>
-                            {error && (
-                                <p class="mwa-note mwa-note--error" role="alert">
-                                    {t(error)}
-                                </p>
-                            )}
+                            {error && <Toast kind="error">{t(error)}</Toast>}
                         </div>
                         <div class="table mwa-tx">
                             <table>

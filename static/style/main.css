@@ -1,7 +1,6 @@
 @import './tokens.css';
 @import './base.css';
 @import './components/panel.css';
-@import './components/note.css';
 @import './components/form.css';
 @import './components/landing.css';
 @import './components/button.css';
@@ -19,3 +18,4 @@
 @import './components/activity.css';
 @import './components/host.css';
 @import './components/send.css';
+@import './components/toast.css';

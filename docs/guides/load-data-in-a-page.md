@@ -7,7 +7,7 @@ Server data reaches a page through:
 - **Client fetch** — the page calls an `/api/*` endpoint from the browser (see
   [add-an-api-endpoint](add-an-api-endpoint.md)).
 - **SSE** — `EventSource` receives snapshots after the initial render; gambling
-  sessions and the `PageShell` notification banner use this (see [architecture](../architecture.md#interactions-and-gambling)).
+  sessions and the `PageShell` notification modal use this (see [architecture](../architecture.md#interactions-and-gambling)).
 
 These populate Preact props or state. The difference is _when_ the data arrives and
 _who pays_ the loading state.

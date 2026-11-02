@@ -2,6 +2,7 @@ import { useContext } from 'preact/hooks';
 import { Page } from '#src/client/pages.js';
 import { ClientContext } from '#src/client/context.js';
 import PageShell from './app/PageShell.js';
+import { Toast } from '#src/client/ui/Toast.js';
 
 type AdminQrCode = {
     id: number;
@@ -30,21 +31,9 @@ function AdminPage({ message, qrCreated, qrError, qrCodes }: AdminPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="admin">
-            {message && (
-                <p class="mwa-note" role="status">
-                    {message}
-                </p>
-            )}
-            {qrCreated && (
-                <p class="mwa-note mwa-note--success" role="status">
-                    QR code created
-                </p>
-            )}
-            {qrError && (
-                <p class="mwa-note mwa-note--error" role="status">
-                    Enter a valid amount and max amount of uses
-                </p>
-            )}
+            {message && <Toast>{message}</Toast>}
+            {qrCreated && <Toast kind="success">QR code created</Toast>}
+            {qrError && <Toast kind="error">Enter a valid amount and max amount of uses</Toast>}
             <section class="mwa-panel">
                 <div class="mwa-panel-head">
                     <h2>Mint coins</h2>
