@@ -13,6 +13,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── package.json               npm scripts + "#src/*" → "./dist/*" import alias for Node
 ├── tsconfig.json              strict TS, JSX → preact, "#src/*" → "./src/*" for tsc
 ├── Dockerfile                 two-stage build: compile TS, run dist/main.js
+├── justfile                   deploy shortcuts: just deploy, logs, db-pull, db-query
 ├── AGENTS.md                  project conventions — read before contributing
 ├── .github/workflows/         ci.yml — npm ci + npm run lint + npm run test;
 │                              migrations.yml — runs scripts/check-migrations.sh on migration PRs

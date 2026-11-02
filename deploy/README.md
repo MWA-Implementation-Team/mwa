@@ -7,6 +7,8 @@ encrypted vault.
 ## Prerequisites
 
 - ansible-core ≥ 2.17 on your machine (`ansible --version`)
+- `just` on your machine (`brew install just`) — the justfile wraps the
+  commands below: `just deploy`, `just logs`, `just db-pull`, `just --list`
 - `ansible-galaxy collection install -r deploy/requirements.yml`
 - A VM: Ubuntu 24.04, reachable over ssh **with key auth** —
   `ssh root@<ip>` must work non-interactively. Operators install their
