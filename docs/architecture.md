@@ -102,7 +102,7 @@ component, so `writePage(ctx, 'badges', { badges })` is fully typechecked — wr
 missing props are a compile error caught by `npm run lint`, not a runtime surprise.
 
 `registeredActivities` in `src/client/activities.ts` plays the same role for activity
-stations: `ActivitySlug` is derived from its keys, the `/app/activities/:slug` route
+stations: `ActivitySlug` is derived from its keys, the `/activities/:slug` route
 validates the param against it (unknown slug → 404), and `syncActivities(state)`
 (`src/db/activities/index.ts`) inserts every slug into the `activities` table on server
 start so queue/badge rows can foreign-key them.

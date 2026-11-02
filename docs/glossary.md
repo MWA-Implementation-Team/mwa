@@ -73,8 +73,8 @@ is separate from the Preact context passed to page components.
 
 An irl station at the event — something visitors queue for and complete. In code it's
 a `registeredActivities` entry (`src/client/activities.ts`): a slug mapped to
-`{ name, Card, Detail }`. The slug is its identity in the url
-(`/app/activities/<slug>`) and as a row in the `activities` table, so queue/badge
+`{ name, Card, text }`. The slug is its identity in the url
+(`/activities/<slug>`) and as a row in the `activities` table, so queue/badge
 records can reference it.
 
 ## Registry

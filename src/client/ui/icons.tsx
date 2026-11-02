@@ -117,6 +117,14 @@ export function LinkedinIcon(props: IconProps) {
     );
 }
 
+export function TiktokIcon(props: IconProps) {
+    // https://tabler.io/icons/icon/brand-tiktok
+    return strokeIcon(
+        props,
+        <path d="M21 7.917v4.034a9.948 9.948 0 0 1 -5 -1.951v4.5a6.5 6.5 0 1 1 -8 -6.326v4.326a2.5 2.5 0 1 0 4 2v-11.5h4.083a6.005 6.005 0 0 0 4.917 4.917z" />,
+    );
+}
+
 export function InstagramIcon(props: IconProps) {
     // https://lucide.dev/icons/instagram
     return strokeIcon(

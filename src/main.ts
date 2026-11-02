@@ -5,6 +5,7 @@ import { registerAuthRoutes } from '#src/routes/pages/auth.js';
 import { registerAppRoutes } from '#src/routes/pages/app.js';
 import { registerAdminRoutes } from '#src/routes/pages/admin.js';
 import { registerLandingRoutes } from '#src/routes/pages/landing.js';
+import { registerActivitiesRoutes } from '#src/routes/pages/activities.js';
 import { registerUsersRoutes } from '#src/routes/api/users.js';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
@@ -38,6 +39,7 @@ setupHonoState(app, state);
 app.use('*', csrf());
 
 registerLandingRoutes(app);
+registerActivitiesRoutes(app);
 registerLoginRoutes(app);
 registerAuthRoutes(app);
 registerAppRoutes(app);

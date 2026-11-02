@@ -8,7 +8,6 @@ export type Language = {
     titleLanding: string;
     titleLogin: string;
     titleHome: string;
-    titleActivities: string;
     titleActivity: string;
     titleLeaderboard: string;
     titleGambling: string;
@@ -23,7 +22,6 @@ export type Language = {
     titleGamblingInvite: string;
 
     headerHome: string;
-    headerActivities: string;
     headerLeaderboard: string;
     headerGambling: string;
     headerHost: string;
@@ -61,6 +59,7 @@ export type Language = {
     landingLoginTitle: string;
     landingCountdownTitle: string;
     landingSocialTitle: string;
+    landingSocialEvent: string;
     landingFeedTitle: string;
     landingGoApp: string;
     landingLogin: string;
@@ -124,9 +123,6 @@ export type Language = {
     shellAlert: string;
     dialogClose: string;
 
-    activitiesDirectory: string;
-    activitiesEmpty: string;
-    activityInfoTitle: string;
     activityBack: string;
 
     leaderboardTypeLabel: string;
@@ -272,7 +268,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleLanding: 'first years | Home',
         titleLogin: 'first years | Login',
         titleHome: 'first years | App',
-        titleActivities: 'first years | Activities',
         titleActivity: 'first years | {name}',
         titleLeaderboard: 'first years | Leaderboard',
         titleGambling: 'first years | Gambling',
@@ -287,7 +282,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingInvite: 'first years | Gamble with {name}',
 
         headerHome: 'App',
-        headerActivities: 'Activities',
+
         headerLeaderboard: 'Leaderboard',
         headerGambling: 'Gambling',
         headerHost: 'Host tools',
@@ -326,6 +321,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingLoginTitle: 'System',
         landingCountdownTitle: 'Until the event',
         landingSocialTitle: 'Follow us here!',
+        landingSocialEvent: 'Event',
         landingFeedTitle: 'Activities',
         landingGoApp: 'Go',
         landingLogin: 'Login',
@@ -389,9 +385,6 @@ export const languages: Record<LanguageCode, Language> = {
         shellAlert: 'Alert',
         dialogClose: 'Close',
 
-        activitiesDirectory: 'Activity directory',
-        activitiesEmpty: 'No activities listed yet.',
-        activityInfoTitle: 'activity information',
         activityBack: '← back to activities',
 
         leaderboardTypeLabel: 'Leaderboard board',
@@ -537,7 +530,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleLanding: 'pirmakursiu | Pradžia',
         titleLogin: 'pirmakursiu | Prisijungimas',
         titleHome: 'pirmakursiu | Programa',
-        titleActivities: 'pirmakursiu | Veiklos',
+
         titleActivity: 'pirmakursiu | {name}',
         titleLeaderboard: 'pirmakursiu | Lyderių lentelė',
         titleGambling: 'pirmakursiu | Lošimai',
@@ -552,7 +545,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingInvite: 'pirmakursiu | Lošk su {name}',
 
         headerHome: 'Programa',
-        headerActivities: 'Veiklos',
+
         headerLeaderboard: 'Lyderių lentelė',
         headerGambling: 'Lošimai',
         headerHost: 'Vedėjo įrankiai',
@@ -592,6 +585,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingLoginTitle: 'Sistema',
         landingCountdownTitle: 'Iki renginio',
         landingSocialTitle: 'Sekite mus čia!',
+        landingSocialEvent: 'Renginys',
         landingFeedTitle: 'Veiklos',
         landingGoApp: 'Eiti',
         landingLogin: 'Prisijungti',
@@ -655,9 +649,6 @@ export const languages: Record<LanguageCode, Language> = {
         shellAlert: 'Pranešimas',
         dialogClose: 'Uždaryti',
 
-        activitiesDirectory: 'Veiklų katalogas',
-        activitiesEmpty: 'Veiklų dar nėra.',
-        activityInfoTitle: 'veiklos informacija',
         activityBack: '← atgal į veiklas',
 
         leaderboardTypeLabel: 'Lentelės tipas',

@@ -357,23 +357,6 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect('/login', 303);
     });
 
-    app.get('/app/activities', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        return writePage(ctx, 'activities', {});
-    });
-
-    app.get('/app/activities/:slug', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        const slug = ctx.req.param('slug');
-        if (!isActivitySlug(slug)) return writeErrorPage(ctx, 404);
-
-        return writePage(ctx, 'activity', { slug });
-    });
-
     app.get('/app/leaderboard', async (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
