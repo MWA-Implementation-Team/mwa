@@ -135,6 +135,8 @@ export function registerAppRoutes(app: MwaHono) {
             );
         }
 
+        const completed = group ? listGroupCompletions(ctx.var, group.id) : [];
+
         return writePage(ctx, 'home', {
             transactions: listUserTransactions(ctx.var, user.id),
             groupName: group?.name ?? null,
@@ -154,7 +156,7 @@ export function registerAppRoutes(app: MwaHono) {
                 ? (Object.keys(registeredActivities) as ActivitySlug[]).map((slug) => ({
                       slug,
                       name: registeredActivities[slug].name,
-                      done: listGroupCompletions(ctx.var, group.id).includes(slug),
+                      done: completed.includes(slug),
                   }))
                 : null,
             queueCanJoin: memberCount >= QUEUE_MIN_GROUP_SIZE,

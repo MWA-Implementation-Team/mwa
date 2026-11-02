@@ -297,7 +297,7 @@ describe('db/queue', () => {
             .owner_id as number;
         assert.ok(disbandGroup(state, groupId, owner));
         assert.deepEqual(listGroupCompletions(state, groupId), ['cells']);
-        // …and a stale completion still bars the station's waitlist spot
+        // …and another group's completions don't affect a fresh group's join
         const fresh = queuedGroup([]);
         assert.equal(joinQueue(state, fresh).type, 'joined');
     });
