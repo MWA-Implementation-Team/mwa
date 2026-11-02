@@ -57,7 +57,7 @@ works in three different environments:
 - **TypeScript** resolves `#src/*` via `tsconfig.json` `paths` → `./src/*`.
 - **Node** resolves `#src/*` via `package.json` `imports` → `./dist/*` (the compiled
   output — `tsc` leaves the specifier untouched).
-- **The browser** resolves `#src/` via the importmap to `/`, and `main.ts` serves
+- **The browser** resolves `#src/` via the importmap to `/`, and the app serves
   `dist/` — so `#src/client/pages.js` becomes `/client/pages.js`, i.e.
   `dist/client/pages.js`.
 
@@ -82,7 +82,7 @@ Two consequences:
    `http://localhost:3001/watch` and reloads the tab;
 4. changes in `static/` broadcast a reload without restarting the server.
 
-In dev mode, `main.ts` also serves the whole repo root as static files (so sourcemaps
+In dev mode, the app also serves the whole repo root as static files (so sourcemaps
 and sources resolve). In production it only serves `static/` and `dist/`, and refuses
 `.js.map` requests.
 

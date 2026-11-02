@@ -1,6 +1,12 @@
 /node_modules
 /dist
 .env
+Caddyfile
 db.sqlite
+# prod bind mount on the VM — deploy_dir/data
+/data/
 bun.lock
 deno.lock
+
+# never commit the vault password
+*.vault_pass

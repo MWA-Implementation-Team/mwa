@@ -13,9 +13,17 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
 ├── package.json               npm scripts + "#src/*" → "./dist/*" import alias for Node
 ├── tsconfig.json              strict TS, JSX → preact, "#src/*" → "./src/*" for tsc
 ├── Dockerfile                 two-stage build: compile TS, run dist/main.js
+├── justfile                   deploy shortcuts: just deploy, logs, db-pull, db-query
 ├── AGENTS.md                  project conventions — read before contributing
 ├── .github/workflows/         ci.yml — npm ci + npm run lint + npm run test;
 │                              migrations.yml — runs scripts/check-migrations.sh on migration PRs
+│
+├── deploy/                    ansible + prod compose — one playbook provisions the whole VM
+│   ├── playbook.yml           base OS → docker → app stack (tags per layer)
+│   ├── inventory.yml          the one production VM
+│   ├── group_vars/all/        vars.yml (plaintext config) + vault.yml (encrypted secrets)
+│   ├── compose.prod.yaml      prod stack: app + caddy; runbook in deploy/README.md
+│   └── templates/             env.j2 + Caddyfile.j2 — rendered onto the VM
 │
 ├── migrations/                numbered SQL files, applied in order on every server start
 │                              (run by src/db/migrate.ts, progress tracked in migration_status database table)

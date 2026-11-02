@@ -15,8 +15,10 @@ alongside mailpit; the web inbox is at http://localhost:8025. Bare-metal
 to load `.env`; production startup uses the process environment.
 
 The factory selects SMTP when `MWA_SMTP_HOST` is set. It also reads `MWA_SMTP_PORT`
-(default `25`), `MWA_SMTP_SECURE` (`true` enables TLS), and `MWA_MAIL_FROM` (default
-`mwa@localhost`). The login route calls
+(default `25`), `MWA_SMTP_SECURE` (`true` enables implicit TLS), `MWA_SMTP_STARTTLS`
+(`true` requires a STARTTLS upgrade — the send fails rather than going plaintext),
+`MWA_SMTP_USER`/`MWA_SMTP_PASS` (SMTP auth — set only when the relay needs it), and
+`MWA_MAIL_FROM` (default `mwa@localhost`). The login route calls
 `ctx.var.mailer.sendLoginEmail(to, { lang, url, code })`. `getRequestLanguage(ctx)`
 reads the language cookie, defaulting to English. The email subject, HTML body,
 and plain-text fallback use that language through the shared translation system.
