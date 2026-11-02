@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { Hono } from 'hono';
-import { maxCodeAttempts, redeemLoginCode, redeemLoginToken } from '#src/db/sessions/index.js';
+import { redeemLoginToken } from '#src/db/sessions/index.js';
 import { createUser } from '#src/db/users/index.js';
 import { registerLoginRoutes } from './login.js';
 import { LoginEmailProps, Mailer } from '#src/emails/mailer.js';
