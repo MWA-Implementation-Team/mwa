@@ -84,7 +84,7 @@ sqlite3 db.sqlite "UPDATE users SET role = 'host' WHERE username = 'alice';"
 | Gambling challenge/accept/reject POSTs                           | `requireUser`; accept/reject require the invited player |
 
 `POST /app/admin/mint-coins` takes `username` and a positive safe-integer `amount`,
-crediting a `system` transaction through `giveCoins`. In dev, any logged-in
+crediting a `host_grant` transaction through `grantCoins`. In dev, any logged-in
 user can visit `/app/admin` directly; the navigation link remains admin-only.
 
 Connect 4's `POST /app/gambling/sessions/:id/c4-place` and chess's

@@ -56,6 +56,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         const token = ctx.req.param('token');
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+        if (user.role !== 'user' || target.role !== 'user') return writeErrorPage(ctx, 403);
 
         const form = await ctx.req.formData().catch(() => null);
         if (!form) return writeErrorPage(ctx, 400);

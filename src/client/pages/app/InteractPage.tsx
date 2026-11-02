@@ -32,6 +32,9 @@ type InteractPageProps = {
     // the target's personal + team position on each board — the same three
     // rows the home standings table shows
     standings: ViewerStanding[];
+    // false when the scanner or the target is staff — staff don't send
+    // money, gamble, or team-up, so the play panels stay hidden
+    canPlay: boolean;
     detail: InteractProfileDetail | null;
     interactError?: keyof Language;
     interactNotice?: keyof Language;
@@ -55,6 +58,7 @@ function InteractPage({
     group,
     groupEmoji,
     standings,
+    canPlay,
     detail,
     interactError,
     interactNotice,
@@ -148,11 +152,17 @@ function InteractPage({
                         ) : (
                             <p class="mwa-muted mwa-queue-cta">{t('interactGroupNone')}</p>
                         )}
-                        <form method="POST" action={post('group-request')} class="mwa-queue-cta">
-                            <button type="submit" class="lang-link">
-                                {t('groupRequestJoin')}
-                            </button>
-                        </form>
+                        {canPlay && (
+                            <form
+                                method="POST"
+                                action={post('group-request')}
+                                class="mwa-queue-cta"
+                            >
+                                <button type="submit" class="lang-link">
+                                    {t('groupRequestJoin')}
+                                </button>
+                            </form>
+                        )}
                     </div>
 
                     <div>
@@ -193,110 +203,116 @@ function InteractPage({
                 </div>
             </section>
 
-            <section class="mwa-panel">
-                <div class="mwa-panel-head">
-                    <h2>{t('interactSendMoneyTitle')}</h2>
-                </div>
-                <div class="mwa-panel-body">
-                    {sendError && <Toast kind="error">{t(sendError)}</Toast>}
-                    {sentAmount !== null && sentAmount !== undefined && (
-                        <Toast kind="success">
-                            {t('interactMoneySent', { amount: String(sentAmount) })}
-                        </Toast>
-                    )}
-                    <form method="POST" action={post('send-money')} class="mwa-send">
-                        <input type="hidden" name="amount" value={sendAmount} />
-                        <div class="mwa-send-stepper">
-                            <button
-                                type="button"
-                                class="mwa-send-step"
-                                onClick={() => setSendAmount((a) => Math.max(0, a - 1))}
-                                disabled={sendAmount <= 0}
-                            >
-                                −
-                            </button>
-                            <output class="mwa-send-amount">{sendAmount}</output>
-                            <button
-                                type="button"
-                                class="mwa-send-step"
-                                onClick={() => setSendAmount((a) => Math.min(maxSend, a + 1))}
-                                disabled={sendAmount >= maxSend}
-                            >
-                                +
-                            </button>
-                        </div>
-                        {!unlimited && (
-                            <p class="mwa-send-available">
-                                {t('interactSendAvailable', {
-                                    amount: String(user!.currentBalance),
-                                })}
-                            </p>
+            {canPlay && (
+                <section class="mwa-panel">
+                    <div class="mwa-panel-head">
+                        <h2>{t('interactSendMoneyTitle')}</h2>
+                    </div>
+                    <div class="mwa-panel-body">
+                        {sendError && <Toast kind="error">{t(sendError)}</Toast>}
+                        {sentAmount !== null && sentAmount !== undefined && (
+                            <Toast kind="success">
+                                {t('interactMoneySent', { amount: String(sentAmount) })}
+                            </Toast>
                         )}
-                        <div class="mwa-send-chips">
-                            {[5, 10, 50, 100].map((n) => (
+                        <form method="POST" action={post('send-money')} class="mwa-send">
+                            <input type="hidden" name="amount" value={sendAmount} />
+                            <div class="mwa-send-stepper">
                                 <button
-                                    key={n}
+                                    type="button"
+                                    class="mwa-send-step"
+                                    onClick={() => setSendAmount((a) => Math.max(0, a - 1))}
+                                    disabled={sendAmount <= 0}
+                                >
+                                    −
+                                </button>
+                                <output class="mwa-send-amount">{sendAmount}</output>
+                                <button
+                                    type="button"
+                                    class="mwa-send-step"
+                                    onClick={() => setSendAmount((a) => Math.min(maxSend, a + 1))}
+                                    disabled={sendAmount >= maxSend}
+                                >
+                                    +
+                                </button>
+                            </div>
+                            {!unlimited && (
+                                <p class="mwa-send-available">
+                                    {t('interactSendAvailable', {
+                                        amount: String(user!.currentBalance),
+                                    })}
+                                </p>
+                            )}
+                            <div class="mwa-send-chips">
+                                {[5, 10, 50, 100].map((n) => (
+                                    <button
+                                        key={n}
+                                        type="button"
+                                        class="mwa-send-chip"
+                                        onClick={() =>
+                                            setSendAmount((a) => Math.min(maxSend, a + n))
+                                        }
+                                    >
+                                        +{n}
+                                    </button>
+                                ))}
+                                <button
                                     type="button"
                                     class="mwa-send-chip"
-                                    onClick={() => setSendAmount((a) => Math.min(maxSend, a + n))}
+                                    onClick={() => setSendAmount(user!.currentBalance)}
                                 >
-                                    +{n}
+                                    {t('interactSendAll')}
                                 </button>
-                            ))}
+                            </div>
                             <button
-                                type="button"
-                                class="mwa-send-chip"
-                                onClick={() => setSendAmount(user!.currentBalance)}
+                                type="submit"
+                                class="mwa-button"
+                                disabled={sendAmount < 1 || sendAmount > maxSend}
                             >
-                                {t('interactSendAll')}
+                                {t('interactSendSubmit')}
                             </button>
-                        </div>
-                        <button
-                            type="submit"
-                            class="mwa-button"
-                            disabled={sendAmount < 1 || sendAmount > maxSend}
-                        >
-                            {t('interactSendSubmit')}
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            <section class="mwa-panel">
-                <div class="mwa-panel-head">
-                    <h2>{t('headerGambling')}</h2>
-                </div>
-                <div class="mwa-panel-body">
-                    <div class="table mwa-tx">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th colSpan={2}>{t('headerGambling')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {games.map((game) => (
-                                    <tr key={game.type}>
-                                        <td>
-                                            {t(game.name)}
-                                            <div class="mwa-muted">{t(game.desc)}</div>
-                                        </td>
-                                        <td class="mwa-tx-amount">
-                                            <button
-                                                type="button"
-                                                class="lang-link"
-                                                onClick={() => setOpenDialog(game.type)}
-                                            >
-                                                {t('gamblingChallenge')}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        </form>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
+
+            {canPlay && (
+                <section class="mwa-panel">
+                    <div class="mwa-panel-head">
+                        <h2>{t('headerGambling')}</h2>
+                    </div>
+                    <div class="mwa-panel-body">
+                        <div class="table mwa-tx">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th colSpan={2}>{t('headerGambling')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {games.map((game) => (
+                                        <tr key={game.type}>
+                                            <td>
+                                                {t(game.name)}
+                                                <div class="mwa-muted">{t(game.desc)}</div>
+                                            </td>
+                                            <td class="mwa-tx-amount">
+                                                <button
+                                                    type="button"
+                                                    class="lang-link"
+                                                    onClick={() => setOpenDialog(game.type)}
+                                                >
+                                                    {t('gamblingChallenge')}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {detail && (
                 <section class="mwa-panel">
@@ -343,33 +359,36 @@ function InteractPage({
                 </section>
             )}
 
-            {challengeDialog(
-                'coin_flip',
-                'gamblingCoinFlip',
-                'mwa-cf-form',
-                <>
-                    {betField('mwa-cf-bet-amount')}
-                    <div class="mwa-field">
-                        <label for="mwa-cf-bet">{t('gamblingCoinFlip')}</label>
-                        <select id="mwa-cf-bet" name="cf_bet">
-                            <option value="heads">{t('gamblingHeads')}</option>
-                            <option value="tails">{t('gamblingTails')}</option>
-                        </select>
-                    </div>
-                </>,
-            )}
-            {challengeDialog(
-                'connect_4',
-                'gamblingConnect4',
-                'mwa-c4-form',
-                betField('mwa-c4-bet-amount'),
-            )}
-            {challengeDialog(
-                'chess',
-                'gamblingChess',
-                'mwa-chess-form',
-                betField('mwa-chess-bet-amount'),
-            )}
+            {canPlay &&
+                challengeDialog(
+                    'coin_flip',
+                    'gamblingCoinFlip',
+                    'mwa-cf-form',
+                    <>
+                        {betField('mwa-cf-bet-amount')}
+                        <div class="mwa-field">
+                            <label for="mwa-cf-bet">{t('gamblingCoinFlip')}</label>
+                            <select id="mwa-cf-bet" name="cf_bet">
+                                <option value="heads">{t('gamblingHeads')}</option>
+                                <option value="tails">{t('gamblingTails')}</option>
+                            </select>
+                        </div>
+                    </>,
+                )}
+            {canPlay &&
+                challengeDialog(
+                    'connect_4',
+                    'gamblingConnect4',
+                    'mwa-c4-form',
+                    betField('mwa-c4-bet-amount'),
+                )}
+            {canPlay &&
+                challengeDialog(
+                    'chess',
+                    'gamblingChess',
+                    'mwa-chess-form',
+                    betField('mwa-chess-bet-amount'),
+                )}
         </PageShell>
     );
 }

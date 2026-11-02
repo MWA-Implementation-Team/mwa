@@ -162,6 +162,18 @@ describe('POST /app/interact/:token/group-request', () => {
             `/app/interact/${token}?interactNotice=groupRequestSent`,
         );
     });
+
+    it('forbids staff from team-up requests', async () => {
+        const owner = createUser(state, 'owner3@example.com', 'owner3');
+        const host = createUser(state, 'hostask@example.com', 'hostask');
+        promote(host.id, 'host');
+        const token = getOrCreateInteractToken(state, owner.id);
+        const res = await app.request(`/app/interact/${token}/group-request`, {
+            method: 'POST',
+            headers: authCookie(host.id),
+        });
+        assert.equal(res.status, 403);
+    });
 });
 
 describe('POST /app/interact/:token/award', () => {
@@ -291,6 +303,21 @@ describe('POST /app/interact/:token/send-money', () => {
         assert.equal(forged.status, 404);
         assert.equal(findUserById(state, user.id)!.currentBalance, 50);
     });
+
+    it('forbids staff senders and staff targets', async () => {
+        const owner = createUser(state, 'payee4@example.com', 'payee4_user');
+        const host = createUser(state, 'hostpay@example.com', 'hostpay');
+        promote(host.id, 'host');
+        grantCoins(state, host.id, 50);
+        grantCoins(state, owner.id, 50);
+
+        const fromHost = await post(getOrCreateInteractToken(state, owner.id), host.id, 'amount=5');
+        assert.equal(fromHost.status, 403);
+        const toHost = await post(getOrCreateInteractToken(state, host.id), owner.id, 'amount=5');
+        assert.equal(toHost.status, 403);
+        assert.equal(findUserById(state, host.id)!.currentBalance, 50);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 50);
+    });
 });
 
 describe('POST /app/interact/:token/gamble', () => {
@@ -313,6 +340,24 @@ describe('POST /app/interact/:token/gamble', () => {
             res.headers.get('location'),
             `/app/interact/${token}?error_game=connect_4&error_type=invalid`,
         );
+    });
+
+    it('forbids staff from challenging', async () => {
+        const owner = createUser(state, 'gtarget2@example.com', 'gtarget2_user');
+        const host = createUser(state, 'ghost@example.com', 'ghost');
+        promote(host.id, 'host');
+        grantCoins(state, host.id, 50);
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await app.request(`/app/interact/${token}/gamble`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(host.id),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'game_type=connect_4&bet_amount=5',
+        });
+        assert.equal(res.status, 403);
     });
 });
 
