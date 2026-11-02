@@ -36,7 +36,7 @@ setupHonoState(app, state);
 // Intercepts form-encoded unsafe requests and 403s unless Sec-Fetch-Site or
 // Origin proves same-origin — browsers always send one, curl users add -H
 // 'Origin: http://localhost:3000' (or send JSON, which browsers can't cross-post).
-app.use('*', csrf());
+app.use('*', csrf({ origin: state.origin }));
 
 // serve-static already sends Last-Modified — no-cache forces revalidation,
 // so edits land instantly while unchanged assets come back as cheap 304s.

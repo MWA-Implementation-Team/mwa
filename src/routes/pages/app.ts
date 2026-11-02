@@ -113,7 +113,10 @@ export function registerAppRoutes(app: MwaHono) {
         const interactToken = ctx.req.query('interact');
         if (interactToken !== undefined) {
             const url = new URL(ctx.req.url);
-            const target = new URL(`/app/interact/${encodeURIComponent(interactToken)}`, url);
+            const target = new URL(
+                `/app/interact/${encodeURIComponent(interactToken)}`,
+                ctx.var.origin,
+            );
             url.searchParams.forEach((value, key) => {
                 if (key !== 'interact') target.searchParams.set(key, value);
             });

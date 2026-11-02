@@ -27,7 +27,7 @@ export function writePage<P extends RegisteredPageId>(
         ? (() => {
               const url = new URL(
                   `/app/interact/${encodeURIComponent(getOrCreateInteractToken(ctx.var, user.id))}`,
-                  ctx.req.url,
+                  ctx.var.origin,
               ).toString();
               return { svg: renderSVG(url), url };
           })()

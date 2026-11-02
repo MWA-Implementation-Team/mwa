@@ -23,9 +23,9 @@ export function safeGoto(ctx: MwaContext, raw: string | undefined): string | nul
         return null;
     }
     try {
-        const origin = new URL(ctx.req.url).origin;
+        const origin = ctx.var.origin;
         const url = new URL(raw, origin);
-        if (url.origin !== origin) {
+        if (url.origin !== origin || url.pathname.startsWith('//')) {
             return null;
         }
         return url.pathname + url.search;
@@ -47,12 +47,12 @@ export function registerLoginRoutes(app: MwaHono) {
     });
 
     app.post('/login', async (ctx) => {
+        const lang = getRequestLanguage(ctx);
+
         const form = await ctx.req.formData().catch(() => null);
         if (!form) {
-            return ctx.text(translate(getRequestLanguage(ctx))('badRequest'), 400);
+            return ctx.text(translate(lang)('badRequest'), 400);
         }
-
-        const lang = getRequestLanguage(ctx);
 
         const email = String(form.get('email') ?? '')
             .trim()
@@ -66,7 +66,7 @@ export function registerLoginRoutes(app: MwaHono) {
         const lastSent = lastLoginTokenSentAt(ctx.var, email);
         if (!lastSent || Date.now() - lastSent.getTime() > resendCooldownMs) {
             const created = createLoginToken(ctx.var, email);
-            const url = new URL('/auth/verify', ctx.req.url);
+            const url = new URL('/auth/verify', ctx.var.origin);
             url.searchParams.set('token', created.token);
             // goto passes through unvalidated — safeGoto re-checks it on
             // the verify request, so nothing here can smuggle a bad redirect.
