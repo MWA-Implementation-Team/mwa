@@ -75,7 +75,7 @@ App change (lands as its own small commit, prerequisite for real SMTP):
 
 ## Layout on the VM
 
-    /opt/mwa/          → git clone of this repo (read-only deploy key or https)
+    /opt/mwa/          → git clone of this repo (ssh auth via agent forwarding)
     /opt/mwa/.env      → rendered from vault, mode 0600, owner root
     /opt/mwa/backups/  → nightly sqlite dumps, last 14 kept
 

@@ -22,8 +22,8 @@ encrypted vault, nightly sqlite backups. Spec: [../SPEC-deploy.md](../SPEC-deplo
 ## Fill in the real values
 
 - `deploy/inventory.yml` — `ansible_host`, `ansible_user`
-- `deploy/group_vars/all/vars.yml` — `domain`, `ssh_public_keys`,
-  `smtp_host`/`smtp_port`, `mail_from`
+- `deploy/group_vars/all/vars.yml` — `domain`,
+  `smtp_host`/`smtp_port`/`smtp_starttls`, `mail_from`
 - `deploy/group_vars/all/vault.yml` — `smtp_user`, `smtp_pass`, then:
 
     ```shell
