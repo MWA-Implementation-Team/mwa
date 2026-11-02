@@ -38,6 +38,13 @@ setupHonoState(app, state);
 // 'Origin: http://localhost:3000' (or send JSON, which browsers can't cross-post).
 app.use('*', csrf());
 
+// serve-static already sends Last-Modified — no-cache forces revalidation,
+// so edits land instantly while unchanged assets come back as cheap 304s.
+app.use('*', async (ctx, next) => {
+    ctx.header('Cache-Control', 'no-cache');
+    await next();
+});
+
 registerLandingRoutes(app);
 registerActivitiesRoutes(app);
 registerLoginRoutes(app);
