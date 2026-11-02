@@ -1,10 +1,10 @@
 # Non-secret config — real values, committed plaintext.
 
-domain: example.com
+domain: mwa.jetar.lt
 deploy_dir: /opt/mwa
 
-# Repo the VM clones + builds from. Private repo → the VM needs a
-# read-only GitHub deploy key (see deploy/README.md).
+# Repo the VM clones + builds from. Private repo → the clone authenticates
+# through the operator's forwarded ssh agent (see deploy/README.md).
 repo_url: git@github.com:MWA-Implementation-Team/mwa-template.git
 repo_ref: main
 
@@ -13,7 +13,8 @@ repo_ref: main
 ssh_lockdown: false
 
 # SMTP — credentials live in vault.yml
-smtp_host: micius@mif.vusa.lt
+smtp_host: smtp.gmail.com
 smtp_port: 587
-smtp_secure: false # false = STARTTLS on 587; true = implicit TLS on 465
+smtp_secure: false # false = plain/STARTTLS on 587; true = implicit TLS on 465
+smtp_starttls: true # require the STARTTLS upgrade — fail rather than go plaintext
 mail_from: micius@mif.vusa.lt
