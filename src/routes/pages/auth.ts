@@ -39,22 +39,24 @@ export function registerAuthRoutes(app: MwaHono) {
         if (!form) {
             return ctx.text(translate(getRequestLanguage(ctx))('badRequest'), 400);
         }
-        const email = String(form.get('email') ?? '')
-            .trim()
-            .toLowerCase();
+        const challengeId = String(form.get('challenge_id') ?? '');
         const code = String(form.get('code') ?? '').trim();
         const goto = String(form.get('goto') ?? '') || undefined;
 
-        const result = redeemLoginCode(ctx.var, email, code);
-        if (result !== 'redeemed') {
+        const result = redeemLoginCode(ctx.var, challengeId, code);
+        if (result.type === 'invalid') {
+            return writePage(ctx, 'login', { errorKey: 'loginCodeExpired' });
+        }
+        if (result.type === 'wrong') {
             return writePage(ctx, 'login', {
-                errorKey: result === 'wrong' ? 'loginWrongCode' : 'loginCodeExpired',
-                sentTo: email,
-                sentKind: findUserByEmail(ctx.var, email) ? 'login' : 'signup',
+                errorKey: 'loginWrongCode',
+                sentTo: result.email,
+                challengeId,
+                sentKind: findUserByEmail(ctx.var, result.email) ? 'login' : 'signup',
                 goto,
             });
         }
-        return logIn(ctx, email, goto);
+        return logIn(ctx, result.email, goto);
     });
 }
 

@@ -3,10 +3,9 @@ import { redirectIfAuthed } from '#src/auth.js';
 import { findUserByEmail } from '#src/db/users/index.js';
 import {
     confirmLoginTokenSent,
-    createLoginToken,
+    reserveLoginToken,
     deleteExpiredSessions,
     discardLoginToken,
-    lastLoginTokenSentAt,
 } from '#src/db/sessions/index.js';
 import { MwaContext, MwaHono } from '#src/state.js';
 import { writePage } from '#src/pages.js';
@@ -32,8 +31,6 @@ export function safeGoto(ctx: MwaContext, raw: string | undefined): string | nul
         return null;
     }
 }
-
-const resendCooldownMs = 60_000;
 
 export function registerLoginRoutes(app: MwaHono) {
     app.get('/login', async (ctx) => {
@@ -62,39 +59,41 @@ export function registerLoginRoutes(app: MwaHono) {
         }
 
         const isSignup = !findUserByEmail(ctx.var, email);
-        const lastSent = lastLoginTokenSentAt(ctx.var, email);
-        if (!lastSent || Date.now() - lastSent.getTime() > resendCooldownMs) {
-            const created = createLoginToken(ctx.var, email);
-            const url = new URL('/auth/verify', ctx.var.origin);
-            url.searchParams.set('token', created.token);
-            // goto passes through unvalidated — safeGoto re-checks it on
-            // the verify request, so nothing here can smuggle a bad redirect.
-            const goto = ctx.req.query('goto');
-            if (goto) {
-                url.searchParams.set('goto', goto);
-            }
-            try {
-                await ctx.var.mailer.sendLoginEmail(email, {
-                    lang,
-                    url: url.toString(),
-                    code: created.code,
-                });
-            } catch (error) {
-                // SMTP down/unreachable — drop the token so a retry actually
-                // re-sends instead of hitting the resend cap on an email that
-                // never existed, and the previous link stays alive.
-                discardLoginToken(ctx.var, created.id);
-                console.error('Failed to send login email', error);
-                return writePage(ctx, 'login', {
-                    errorKey: 'loginSendFailed',
-                });
-            }
-            confirmLoginTokenSent(ctx.var, email, created.id);
+        const reservation = reserveLoginToken(ctx.var, email);
+        if (reservation.type === 'cooldown') {
+            ctx.status(429);
+            ctx.header('Retry-After', String(reservation.retryAfter));
+            return writePage(ctx, 'login', { errorKey: 'loginRateLimited' });
         }
+
+        const created = reservation.login;
+        const url = new URL('/auth/verify', ctx.var.origin);
+        url.searchParams.set('token', created.token);
+
+        const goto = ctx.req.query('goto');
+        if (goto) {
+            url.searchParams.set('goto', goto);
+        }
+
+        try {
+            await ctx.var.mailer.sendLoginEmail(email, {
+                lang,
+                url: url.toString(),
+                code: created.code,
+            });
+        } catch (error) {
+            discardLoginToken(ctx.var, created.id);
+            console.error('Failed to send login email', error);
+            return writePage(ctx, 'login', {
+                errorKey: 'loginSendFailed',
+            });
+        }
+        confirmLoginTokenSent(ctx.var, email, created.id);
         deleteExpiredSessions(ctx.var);
 
         return writePage(ctx, 'login', {
             sentTo: email,
+            challengeId: created.challengeId,
             sentKind: isSignup ? 'signup' : 'login',
             goto: ctx.req.query('goto'),
         });

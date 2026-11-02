@@ -6,6 +6,7 @@ import PageShell from './app/PageShell.js';
 export type LoginErrorKey =
     | 'loginInvalidEmail'
     | 'loginSendFailed'
+    | 'loginRateLimited'
     | 'loginLinkExpired'
     | 'loginWrongCode'
     | 'loginCodeExpired';
@@ -13,6 +14,7 @@ export type LoginErrorKey =
 type LoginPageProps = {
     errorKey?: LoginErrorKey;
     sentTo?: string;
+    challengeId?: string;
     sentKind?: 'login' | 'signup';
     goto?: string;
 };
@@ -22,13 +24,13 @@ export const loginPage: Page<LoginPageProps> = {
     title: (t) => t('titleLogin'),
 };
 
-function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
+function LoginPage({ errorKey, sentTo, challengeId, sentKind, goto }: LoginPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="login" nav={false}>
             <section class="mwa-panel">
                 <div class="mwa-panel-body">
-                    {sentTo ? (
+                    {sentTo && challengeId ? (
                         <>
                             <p class="mwa-muted">
                                 {sentKind === 'signup'
@@ -36,7 +38,7 @@ function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
                                     : t('loginSentLogin', { email: sentTo })}
                             </p>
                             <form method="POST" action="/auth/verify" class="mwa-form">
-                                <input type="hidden" name="email" value={sentTo} />
+                                <input type="hidden" name="challenge_id" value={challengeId} />
                                 {goto && <input type="hidden" name="goto" value={goto} />}
                                 <div class="mwa-field">
                                     <label for="code">{t('loginCode')}</label>

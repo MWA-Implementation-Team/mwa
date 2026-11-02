@@ -24,11 +24,11 @@ function sessionCookie(res: Response): string {
     return match[1];
 }
 
-function postVerify(email: string, code: string, extra: Record<string, string> = {}) {
+function postVerify(challengeId: string, code: string, extra: Record<string, string> = {}) {
     return app.request('/auth/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ email, code, ...extra }).toString(),
+        body: new URLSearchParams({ challenge_id: challengeId, code, ...extra }).toString(),
     });
 }
 
@@ -103,8 +103,8 @@ describe('GET /auth/verify — link path', () => {
 describe('POST /auth/verify — code path', () => {
     it('redeems a code and logs in', async () => {
         createUser(state, 'coder@example.com', 'coder_u');
-        const { code } = createLoginToken(state, 'coder@example.com');
-        const res = await postVerify('coder@example.com', code);
+        const { code, challengeId } = createLoginToken(state, 'coder@example.com');
+        const res = await postVerify(challengeId, code);
         assert.equal(res.status, 302);
         assert.equal(res.headers.get('location'), '/app');
         sessionCookie(res);
@@ -116,28 +116,31 @@ describe('POST /auth/verify — code path', () => {
             ['/app/gambling', '/app/gambling'],
             ['https://evil.example/', '/app'],
         ]) {
-            const { code } = createLoginToken(state, 'goto3@example.com');
-            const res = await postVerify('goto3@example.com', code, { goto });
+            const { code, challengeId } = createLoginToken(state, 'goto3@example.com');
+            const res = await postVerify(challengeId, code, { goto });
             assert.equal(res.headers.get('location'), expected);
         }
     });
 
     it('rejects a wrong code with a retry message', async () => {
-        createLoginToken(state, 'coder2@example.com');
-        const res = await postVerify('coder2@example.com', 'ZZZZZZZZ');
+        const { challengeId, code } = createLoginToken(state, 'coder2@example.com');
+        const res = await postVerify(challengeId, 'not-a-code');
         assert.equal(res.status, 200);
-        assert.match(await res.text(), /Wrong code/);
+        const html = await res.text();
+        assert.match(html, /Wrong code/);
+        assert.match(html, new RegExp(`name="challenge_id" value="${challengeId}"`));
+        assert.equal((await postVerify(challengeId, code)).status, 302);
         assert.equal(res.headers.get('set-cookie'), null);
     });
 
     it('rejects when no live token exists', async () => {
-        const res = await postVerify('ghost@example.com', 'ABCDEFGH');
+        const res = await postVerify('unknown-challenge', 'ABCDEFGH');
         assert.match(await res.text(), /expired or already used/);
     });
 
     it('a code also creates accounts for new emails', async () => {
-        const { code } = createLoginToken(state, 'signup-code@example.com');
-        const res = await postVerify('signup-code@example.com', code);
+        const { code, challengeId } = createLoginToken(state, 'signup-code@example.com');
+        const res = await postVerify(challengeId, code);
         assert.equal(res.headers.get('location'), '/app');
         assert.ok(findUserByEmail(state, 'signup-code@example.com'));
     });
