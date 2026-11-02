@@ -97,11 +97,11 @@ export function GamblingCoin({ currentGame, side }: Props) {
                     ref={coinRef}
                 >
                     <div class="mwa-coin-side">
-                        <img src="/img/gambling/heads.png" alt="Heads" />
+                        <img src="/img/gambling/heads.webp" alt="Heads" />
                     </div>
 
                     <div class="mwa-coin-side mwa-coin-side--tails">
-                        <img src="/img/gambling/tails.png" alt="Tails" />
+                        <img src="/img/gambling/tails.webp" alt="Tails" />
                     </div>
                 </div>
             </div>
