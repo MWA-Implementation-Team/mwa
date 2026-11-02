@@ -225,11 +225,13 @@ function InteractPage({
                                 +
                             </button>
                         </div>
-                        <p class="mwa-send-available">
-                            {t('interactSendAvailable', {
-                                amount: String(user!.currentBalance),
-                            })}
-                        </p>
+                        {!unlimited && (
+                            <p class="mwa-send-available">
+                                {t('interactSendAvailable', {
+                                    amount: String(user!.currentBalance),
+                                })}
+                            </p>
+                        )}
                         <div class="mwa-send-chips">
                             {[5, 10, 50, 100].map((n) => (
                                 <button
