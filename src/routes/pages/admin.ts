@@ -23,7 +23,7 @@ export function registerAdminRoutes(app: MwaHono) {
             qrCreated: ctx.req.query('qrCreated') === '1',
             qrError: ctx.req.query('qrError') === '1',
             qrCodes: listSystemQrCodes(ctx.var).map((qr) => {
-                const url = new URL(`/app/qr/${qr.secret}`, ctx.req.url).toString();
+                const url = new URL(`/app/qr/${qr.secret}`, ctx.var.origin).toString();
                 return { ...qr, url, svg: renderSVG(url) };
             }),
         });
@@ -41,7 +41,7 @@ export function registerAdminRoutes(app: MwaHono) {
             return writePage(ctx, 'admin', {
                 message: 'enter valid username and amount',
                 qrCodes: listSystemQrCodes(ctx.var).map((qr) => {
-                    const url = new URL(`/app/qr/${qr.secret}`, ctx.req.url).toString();
+                    const url = new URL(`/app/qr/${qr.secret}`, ctx.var.origin).toString();
                     return { ...qr, url, svg: renderSVG(url) };
                 }),
             });
@@ -53,7 +53,7 @@ export function registerAdminRoutes(app: MwaHono) {
             return writePage(ctx, 'admin', {
                 message: 'user not found',
                 qrCodes: listSystemQrCodes(ctx.var).map((qr) => {
-                    const url = new URL(`/app/qr/${qr.secret}`, ctx.req.url).toString();
+                    const url = new URL(`/app/qr/${qr.secret}`, ctx.var.origin).toString();
                     return { ...qr, url, svg: renderSVG(url) };
                 }),
             });

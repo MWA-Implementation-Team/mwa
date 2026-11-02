@@ -18,7 +18,26 @@ function expiresIn(ms: number): string {
 
 const now = `strftime('%Y-%m-%dT%H:%M:%fZ', 'now')`;
 
-export type LoginToken = { id: number; token: string; code: string };
+export type LoginToken = {
+    id: number;
+    token: string;
+    code: string;
+    challengeId: string;
+};
+
+export const resendCooldownMs = 60_000;
+
+type LoginReservation =
+    { type: 'created'; login: LoginToken } | { type: 'cooldown'; retryAfter: number };
+
+export function reserveLoginToken(state: MwaState, email: string): LoginReservation {
+    const lastSent = lastLoginTokenSentAt(state, email);
+    const remaining = lastSent ? resendCooldownMs - (Date.now() - lastSent.getTime()) : 0;
+    if (remaining > 0) {
+        return { type: 'cooldown', retryAfter: Math.ceil(remaining / 1000) };
+    }
+    return { type: 'created', login: createLoginToken(state, email) };
+}
 
 // Returns the raw credentials for the email — the link carries `token`, the
 // paste-field carries `code`. Only sha256 hashes hit the database. Inserts a
@@ -28,12 +47,13 @@ export type LoginToken = { id: number; token: string; code: string };
 // of letting the UNIQUE constraint 500 the request.
 export function createLoginToken(state: MwaState, email: string): LoginToken {
     const insertLoginTokenQuery = state.prepare(`
-    INSERT INTO login_tokens (expires_at, token_hash, code_hash, email) VALUES (?, ?, ?, ?)
+    INSERT INTO login_tokens (expires_at, token_hash, code_hash, email, challenge_hash) VALUES (?, ?, ?, ?, ?)
     RETURNING id
     `);
 
     for (let attempt = 0; attempt < 3; attempt++) {
         const token = randomBytes(32).toString('base64url');
+        const challengeId = randomBytes(32).toString('base64url');
         const code = Array.from(
             { length: 8 },
             () => codeAlphabet[randomInt(codeAlphabet.length)],
@@ -44,8 +64,9 @@ export function createLoginToken(state: MwaState, email: string): LoginToken {
                 hashToken(token),
                 hashToken(code),
                 email,
+                hashToken(challengeId),
             );
-            return { id: Number(row!.id), token, code };
+            return { id: Number(row!.id), token, code, challengeId };
         } catch (error) {
             if (!(error instanceof Error && error.message.includes('UNIQUE'))) {
                 throw error;
@@ -55,15 +76,15 @@ export function createLoginToken(state: MwaState, email: string): LoginToken {
     throw new Error('could not mint a unique login token after 3 tries');
 }
 
-// Call after the email is confirmed sent — kills every other live token for
-// the email (newest link wins).
 export function confirmLoginTokenSent(state: MwaState, email: string, keepId: number) {
-    const invalidateOtherTokensQuery = state.prepare(`
+    state
+        .prepare(
+            `
     UPDATE login_tokens SET used_at = ${now}
-    WHERE email = ? AND used_at IS NULL AND id != ?
-    `);
-
-    invalidateOtherTokensQuery.run(email, keepId);
+    WHERE email = ? AND used_at IS NULL AND id < ?
+    `,
+        )
+        .run(email, keepId);
 }
 
 // Call when the send failed — removes the just-inserted row so the resend cap
@@ -88,41 +109,34 @@ export function redeemLoginToken(state: MwaState, token: string): string | null 
     return (row?.email as string) ?? null;
 }
 
-// Code path — the form carries the email, so wrong guesses land on a specific row
-// we can count. Wrong code: bump attempts; past the cap, the token dies.
-export type CodeResult = 'redeemed' | 'wrong' | 'invalid';
+export type CodeResult =
+    { type: 'redeemed'; email: string } | { type: 'wrong'; email: string } | { type: 'invalid' };
 
-export function redeemLoginCode(state: MwaState, email: string, code: string): CodeResult {
-    const tokenByEmailQuery = state.prepare(`
-    SELECT id, code_hash FROM login_tokens
-    WHERE email = ? AND used_at IS NULL AND expires_at > ${now}
-    ORDER BY created_at DESC
-    `);
+export function redeemLoginCode(state: MwaState, challengeId: string, code: string): CodeResult {
+    const row = state
+        .prepare(
+            `
+            SELECT id, code_hash, email FROM login_tokens
+            WHERE challenge_hash = ? AND used_at IS NULL AND expires_at > ${now}
+        `,
+        )
+        .get(hashToken(challengeId));
+    if (!row) return { type: 'invalid' };
 
-    const markTokenUsedQuery = state.prepare(`
-    UPDATE login_tokens SET used_at = ${now} WHERE id = ? RETURNING email
-    `);
-
-    const bumpAttemptsQuery = state.prepare(`
-    UPDATE login_tokens SET attempts = attempts + 1 WHERE id = ? RETURNING attempts
-    `);
-
-    const killTokenQuery = state.prepare(`
-    UPDATE login_tokens SET used_at = ${now} WHERE id = ?
-    `);
-
-    const row = tokenByEmailQuery.get(email);
-    if (!row) {
-        return 'invalid';
-    }
     if (row.code_hash !== hashToken(code.trim().toUpperCase())) {
-        const attempts = (bumpAttemptsQuery.get(row.id)?.attempts as number) ?? 0;
-        if (attempts >= maxCodeAttempts) {
-            killTokenQuery.run(row.id);
-        }
-        return 'wrong';
+        state
+            .prepare(
+                `
+                UPDATE login_tokens SET attempts = attempts + 1,
+                    used_at = CASE WHEN attempts + 1 >= ? THEN ${now} ELSE used_at END
+                WHERE id = ?
+            `,
+            )
+            .run(maxCodeAttempts, row.id);
+        return { type: 'wrong', email: row.email as string };
     }
-    return (markTokenUsedQuery.get(row.id)?.email as string) ? 'redeemed' : 'invalid';
+    state.prepare(`UPDATE login_tokens SET used_at = ${now} WHERE id = ?`).run(row.id);
+    return { type: 'redeemed', email: row.email as string };
 }
 
 export function lastLoginTokenSentAt(state: MwaState, email: string): Date | null {
@@ -132,16 +146,6 @@ export function lastLoginTokenSentAt(state: MwaState, email: string): Date | nul
 
     const row = lastLoginTokenSentAtQuery.get(email);
     return row?.last_sent ? new Date(row.last_sent as string) : null;
-}
-
-// Lazy cleanup — expired/used rows are ignored on read anyway, this reclaims
-// them. Called opportunistically from POST /login.
-export function pruneLoginTokens(state: MwaState) {
-    const pruneLoginTokensQuery = state.prepare(`
-    DELETE FROM login_tokens WHERE used_at IS NOT NULL OR expires_at <= ${now}
-    `);
-
-    pruneLoginTokensQuery.run();
 }
 
 // Returns the raw token for the mwa-session cookie — only its sha256 is stored.

@@ -5,6 +5,7 @@ import { migrateDatabase } from './db/migrate.js';
 import nodemailer from 'nodemailer';
 
 export type MwaState = {
+    origin: string;
     isDevMode: boolean;
     db: DatabaseSync;
     mailer: Mailer;
@@ -17,6 +18,7 @@ export type MwaHono = Hono<{ Variables: MwaState }>;
 
 export function setupHonoState(app: MwaHono, state: MwaState) {
     app.use('*', async (ctx, next) => {
+        ctx.set('origin', state.origin);
         ctx.set('isDevMode', state.isDevMode);
         ctx.set('db', state.db);
         ctx.set('mailer', state.mailer);
@@ -45,6 +47,7 @@ export function smtpConfigFromEnv(env: NodeJS.ProcessEnv) {
 }
 
 export function createDefaultMwaState(isDevMode: boolean): MwaState {
+    const origin = process.env.ORIGIN ?? 'http://localhost:3000';
     const smtpConfig = smtpConfigFromEnv(process.env);
     const smtpClient = smtpConfig ? nodemailer.createTransport(smtpConfig) : null;
     const smtpFrom = process.env.MWA_MAIL_FROM ?? 'mwa@localhost';
@@ -54,14 +57,16 @@ export function createDefaultMwaState(isDevMode: boolean): MwaState {
     const db = createDatabase(process.env.MWA_DB_PATH ?? 'db.sqlite');
 
     return createMwaState({
+        origin,
         isDevMode,
         db,
         mailer,
     });
 }
 
-export function createTestMwaState(init: { mailer?: Mailer }): MwaState {
+export function createTestMwaState(init: { origin?: string; mailer?: Mailer }): MwaState {
     return createMwaState({
+        origin: init.origin ?? 'http://localhost:3000',
         isDevMode: false,
         db: createDatabase(':memory:'),
         mailer: init.mailer ?? noopMailer,
@@ -74,9 +79,15 @@ function createDatabase(path: string) {
     return db;
 }
 
-function createMwaState(init: { isDevMode: boolean; db: DatabaseSync; mailer: Mailer }): MwaState {
+function createMwaState(init: {
+    origin: string;
+    isDevMode: boolean;
+    db: DatabaseSync;
+    mailer: Mailer;
+}): MwaState {
     const statements: Record<string, StatementSync> = {};
     return {
+        origin: init.origin,
         isDevMode: init.isDevMode,
         db: init.db,
         mailer: init.mailer,

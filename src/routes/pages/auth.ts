@@ -3,6 +3,7 @@ import { translate } from '#src/client/language.js';
 import { cookieSession } from '#src/client/constants.js';
 import {
     createSession,
+    deleteSession,
     redeemLoginCode,
     redeemLoginToken,
     sessionTtlDays,
@@ -16,7 +17,7 @@ import {
 import { writePage } from '#src/pages.js';
 import { safeGoto } from '#src/routes/pages/login.js';
 import { MwaContext, MwaHono } from '#src/state.js';
-import { setCookie } from 'hono/cookie';
+import { getCookie, setCookie } from 'hono/cookie';
 
 export function registerAuthRoutes(app: MwaHono) {
     // The link inside login emails. GET never redeems — mail scanners prefetch
@@ -56,21 +57,23 @@ export function registerAuthRoutes(app: MwaHono) {
             return logIn(ctx, email, goto);
         }
 
-        const email = String(form.get('email') ?? '')
-            .trim()
-            .toLowerCase();
+        const challengeId = String(form.get('challenge_id') ?? '');
         const code = String(form.get('code') ?? '').trim();
 
-        const result = redeemLoginCode(ctx.var, email, code);
-        if (result !== 'redeemed') {
+        const result = redeemLoginCode(ctx.var, challengeId, code);
+        if (result.type === 'invalid') {
+            return writePage(ctx, 'login', { errorKey: 'loginCodeExpired' });
+        }
+        if (result.type === 'wrong') {
             return writePage(ctx, 'login', {
-                errorKey: result === 'wrong' ? 'loginWrongCode' : 'loginCodeExpired',
-                sentTo: email,
-                sentKind: findUserByEmail(ctx.var, email) ? 'login' : 'signup',
+                errorKey: 'loginWrongCode',
+                sentTo: result.email,
+                challengeId,
+                sentKind: findUserByEmail(ctx.var, result.email) ? 'login' : 'signup',
                 goto,
             });
         }
-        return logIn(ctx, email, goto);
+        return logIn(ctx, result.email, goto);
     });
 }
 
@@ -80,6 +83,8 @@ async function logIn(ctx: MwaContext, email: string, goto?: string): Promise<Res
         user = createUser(ctx.var, email, deriveUsername(ctx.var, email));
     }
     markEmailVerified(ctx.var, user.id);
+    const previousToken = getCookie(ctx, cookieSession);
+    if (previousToken) deleteSession(ctx.var, previousToken);
     setCookie(ctx, cookieSession, createSession(ctx.var, user.id), {
         httpOnly: true,
         sameSite: 'Lax',

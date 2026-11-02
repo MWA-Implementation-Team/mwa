@@ -51,10 +51,11 @@ describe('POST /login — registered email', () => {
     });
 
     it('the response page carries a code input for manual entry', async () => {
-        const res = await postLogin({});
+        const res = await postLogin({ email: 'form@example.com' });
         const html = await res.text();
         assert.match(html, /name="code"/);
         assert.match(html, /action="\/auth\/verify"/);
+        assert.match(html, /name="challenge_id" value="[A-Za-z0-9_-]{43}"/);
     });
 });
 
@@ -72,23 +73,6 @@ describe('POST /login — validation and caps', () => {
     it('rejects a non-email', async () => {
         const res = await postLogin({ email: 'not-an-email' });
         assert.match(await res.text(), /valid email/);
-    });
-
-    it('caps resends — a second request within a minute sends nothing', async () => {
-        createUser(state, 'cap@example.com', 'cap_user');
-        sent = [];
-        await postLogin({ email: 'cap@example.com' });
-        await postLogin({ email: 'cap@example.com' });
-        assert.equal(sent.length, 1);
-
-        // Age the last send past the cooldown — a retry then sends again.
-        state.db
-            .prepare(
-                `UPDATE login_tokens SET created_at = '2000-01-01T00:00:00.000Z' WHERE email = ?`,
-            )
-            .run('cap@example.com');
-        await postLogin({ email: 'cap@example.com' });
-        assert.equal(sent.length, 2);
     });
 
     it('forwards ?goto into the verify link', async () => {

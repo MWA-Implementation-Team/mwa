@@ -11,7 +11,6 @@ import {
     findSessionUserId,
     lastLoginTokenSentAt,
     maxCodeAttempts,
-    pruneLoginTokens,
     redeemLoginCode,
     redeemLoginToken,
 } from './index.js';
@@ -59,18 +58,6 @@ describe('db/sessions — login tokens', () => {
         assert.equal(redeemLoginToken(state, first.token), 'tok5@example.com');
     });
 
-    it('pruneLoginTokens reclaims used and expired rows', () => {
-        const { token } = createLoginToken(state, 'prune@example.com');
-        redeemLoginToken(state, token);
-        const { token: expired } = createLoginToken(state, 'prune@example.com');
-        expireToken('login_tokens', expired);
-        pruneLoginTokens(state);
-        const row = state.db
-            .prepare('SELECT COUNT(*) AS n FROM login_tokens WHERE email = ?')
-            .get('prune@example.com');
-        assert.equal(row!.n, 0);
-    });
-
     it('lastLoginTokenSentAt reports the most recent send for the resend cap', () => {
         assert.equal(lastLoginTokenSentAt(state, 'nosend@example.com'), null);
         createLoginToken(state, 'tok4@example.com');
@@ -81,32 +68,58 @@ describe('db/sessions — login tokens', () => {
 });
 
 describe('db/sessions — login codes', () => {
-    it('a correct code redeems the token, case-insensitively', () => {
-        const { code } = createLoginToken(state, 'code1@example.com');
-        assert.equal(redeemLoginCode(state, 'code1@example.com', code.toLowerCase()), 'redeemed');
-        // Single-use applies to the code path too.
-        assert.equal(redeemLoginCode(state, 'code1@example.com', code), 'invalid');
+    it('a correct code redeems the token, case-insensitively and exactly once', () => {
+        const { code, challengeId, token } = createLoginToken(state, 'code1@example.com');
+        assert.deepEqual(redeemLoginCode(state, challengeId, code.toLowerCase()), {
+            type: 'redeemed',
+            email: 'code1@example.com',
+        });
+        assert.deepEqual(redeemLoginCode(state, challengeId, code), { type: 'invalid' });
+        assert.equal(redeemLoginToken(state, token), null);
     });
 
     it('wrong codes count attempts and the token dies at the cap', () => {
-        const { code } = createLoginToken(state, 'code2@example.com');
-        for (let i = 0; i < maxCodeAttempts - 1; i++) {
-            assert.equal(redeemLoginCode(state, 'code2@example.com', 'ZZZZZZZZ'), 'wrong');
+        const { code, challengeId, token } = createLoginToken(state, 'code2@example.com');
+        for (let i = 0; i < maxCodeAttempts; i++) {
+            assert.equal(redeemLoginCode(state, challengeId, 'not-a-code').type, 'wrong');
         }
-        // The cap kills the token — even the right code is now dead.
-        assert.equal(redeemLoginCode(state, 'code2@example.com', 'ZZZZZZZZ'), 'wrong');
-        assert.equal(redeemLoginCode(state, 'code2@example.com', code), 'invalid');
+        assert.equal(redeemLoginCode(state, challengeId, code).type, 'invalid');
+        assert.equal(redeemLoginToken(state, token), null);
     });
 
-    it('codes with no live token report invalid', () => {
-        assert.equal(redeemLoginCode(state, 'nobody@example.com', 'ABCDEFGH'), 'invalid');
+    it('codes with no live challenge report invalid', () => {
+        assert.deepEqual(redeemLoginCode(state, 'unknown-challenge', 'ABCDEFGH'), {
+            type: 'invalid',
+        });
     });
 
-    it('a code for a different email does not redeem', () => {
-        const { code } = createLoginToken(state, 'code3@example.com');
-        assert.equal(redeemLoginCode(state, 'other@example.com', code), 'invalid');
-        // and the real owner's token is untouched.
-        assert.equal(redeemLoginCode(state, 'code3@example.com', code), 'redeemed');
+    it('creates an independent random challenge and stores only its hash', () => {
+        const { challengeId, token, id } = createLoginToken(state, 'challenge@example.com');
+        assert.notEqual(challengeId, token);
+        assert.match(challengeId, /^[A-Za-z0-9_-]{43}$/);
+        const row = state.db
+            .prepare('SELECT challenge_hash FROM login_tokens WHERE id = ?')
+            .get(id)!;
+        assert.equal(row.challenge_hash, createHash('sha256').update(challengeId).digest('hex'));
+    });
+
+    it('a wrong guess affects only the selected challenge, even for the same email', () => {
+        const email = 'isolated@example.com';
+        const first = createLoginToken(state, email);
+        const second = createLoginToken(state, email);
+        for (let i = 0; i < maxCodeAttempts; i++) {
+            redeemLoginCode(state, second.challengeId, 'not-a-code');
+        }
+        assert.equal(redeemLoginCode(state, first.challengeId, first.code).type, 'redeemed');
+    });
+
+    it('expired challenges and challenges consumed by link cannot redeem', () => {
+        const expired = createLoginToken(state, 'code-expired@example.com');
+        expireToken('login_tokens', expired.token);
+        assert.equal(redeemLoginCode(state, expired.challengeId, expired.code).type, 'invalid');
+        const used = createLoginToken(state, 'code-used@example.com');
+        redeemLoginToken(state, used.token);
+        assert.equal(redeemLoginCode(state, used.challengeId, used.code).type, 'invalid');
     });
 });
 

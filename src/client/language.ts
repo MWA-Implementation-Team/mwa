@@ -207,6 +207,7 @@ export type Language = {
     loginLinkExpired: string;
     loginWrongCode: string;
     loginCodeExpired: string;
+    loginRateLimited: string;
     badRequest: string;
     emailLoginSubject: string;
     emailLoginHeading: string;
@@ -485,6 +486,7 @@ export const languages: Record<LanguageCode, Language> = {
         loginLinkExpired: 'That login link is expired or already used — request a new one',
         loginWrongCode: 'Wrong code — check the email and try again',
         loginCodeExpired: 'That code is expired or already used — request a new one',
+        loginRateLimited: 'Please wait a minute before requesting another login email.',
         badRequest: 'Bad Request',
         emailLoginSubject: 'Your first years sign-in link',
         emailLoginHeading: 'Sign in to first years',
@@ -766,6 +768,7 @@ export const languages: Record<LanguageCode, Language> = {
             'Ši prisijungimo nuoroda nebegalioja arba jau panaudota — paprašykite naujos',
         loginWrongCode: 'Neteisingas kodas — patikrinkite el. laišką ir bandykite dar kartą',
         loginCodeExpired: 'Šis kodas nebegalioja arba jau panaudotas — paprašykite naujo',
+        loginRateLimited: 'Prieš prašydami kito prisijungimo laiško, palaukite minutę.',
         badRequest: 'Netinkama užklausa',
         emailLoginSubject: 'Jūsų pirmakursiu prisijungimo nuoroda',
         emailLoginHeading: 'Prisijunkite prie pirmakursiu',

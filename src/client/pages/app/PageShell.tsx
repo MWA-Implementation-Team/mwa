@@ -45,7 +45,7 @@ export default function PageShell({
         {
             section: 'leaderboard',
             label: t('headerLeaderboard'),
-            href: '/app/leaderboard?type=team',
+            href: '/app/leaderboard?scope=groups',
         },
         { section: 'gambling', label: t('headerGambling'), href: '/app/gambling' },
     ];

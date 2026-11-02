@@ -23,7 +23,7 @@ Follow `GET /` through the code:
    row — see [auth](guides/auth.md).
 3. **The route loads data.** It calls typed functions from `src/db/<domain>/index.ts` (e.g.
    `listWaitingQueue(ctx.var)`), which wrap prepared statements. The results become _page props_.
-4. **`writePage` renders the page.** `writePage(ctx, 'landing', { users })` in
+4. **`writePage` renders the page.** `writePage(ctx, 'landing', {})` in
    `src/pages.tsx` builds `ctxInit = { lang, user, notification }` (lang from the
    `mwa-language` cookie, user from `currentUser`, notification from the database) and renders the `Root` component with
    `preact-render-to-string`.
@@ -179,13 +179,17 @@ the owner edits them from the home table's per-field dialogs (`POST
 group keeps its stamped coins and queue history. Members are deleted, a
 waiting queue spot closes as `left`, a group mid-station is marked `left`
 rather than done, and a partial unique index frees the name for reuse.
+Queue IDs are non-reusable (`16_queue_ids.sql`), so stale host Done forms cannot
+target new entries. `17_query_indexes.sql` indexes recipient invites by
+`(to_user_id, id)` and Connect 4 history by `(session, id)`.
 
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
 invitations. `POST /app/interact/:token/gamble` creates a challenge; re-challenging
 the same player while an invite is still open redirects to that session instead of
 stacking invites. Session pages live at `/app/gambling/sessions/:id`, with POST
 `/accept` and `/reject` actions restricted to the invited player. Any signed-in
-user can view a session.
+user can view a session. Rejecting a non-pending invite or another user's invite
+returns 404 without broadcasting an update.
 
 `src/db/gambling/index.ts` owns the shared lifecycle for coin flip, Connect 4, and
 chess, persisted by `06_gambling.sql`, `09_connect_4.sql`, and `10_chess.sql`:
@@ -231,8 +235,14 @@ counts toward the active clock.
 
 `src/pubsub.ts` provides in-process channels for SSE: `/api/notifications` sends
 the user's current notification, and `/app/gambling/sessions/:id/watch` sends session
-snapshots. Both send initial state on connection and updates after changes. The
-client uses `EventSource`; the notification modal in `PageShell` prioritizes a
+snapshots. Both send initial state on connection and updates after changes.
+Each subscriber retains only its latest pending snapshot or notification poke,
+not an unbounded queue; this is not a delta/event log. Each tab opens its own
+`EventSource` and closes it on effect cleanup; there is no cross-tab sharing.
+Notification streams revalidate their original session before each update, then
+emit `session-ended` and close if invalid; the client closes and reloads. Idle
+streams wait for the next update, without session watchers or expiry timers.
+The notification modal in `PageShell` prioritizes a
 running game over the oldest invitation. Multiple games per player are allowed, but only one notification is
 shown. Timers and pubsub assume a single server process.
 
@@ -241,7 +251,7 @@ shown. Timers and pubsub assume a single server process.
 `/app/leaderboard` is server-rendered: `src/routes/pages/app.ts` loads rows as page
 props, so there is no leaderboard API. Two query params pick the view —
 `?board=activity|gambling|combined` (default `activity`) and
-`?scope=players|groups` (default `players`).
+`?scope=players|groups` (default `players`). The sidebar link selects `scope=groups`.
 
 Every `child_transactions` row is stamped with the user's `group_id` at insert time
 (`insertTransaction` looks it up via `findUserGroup`). Group scores therefore
