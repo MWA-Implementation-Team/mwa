@@ -106,7 +106,7 @@ export function registerAppRoutes(app: MwaHono) {
             'youUsernameTaken',
             'youUsernameInvalid',
         ] as const);
-        const youNotice = queryFlag(ctx, 'youNotice', ['youSaved'] as const);
+        const youNotice = queryFlag(ctx, 'youNotice', ['youSaved', 'youQrReset'] as const);
         const groupNotice = queryFlag(ctx, 'groupNotice', [
             'groupSaved',
             'groupKicked',
@@ -601,6 +601,6 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         rotateInteractToken(ctx.var, user.id);
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app?youNotice=youQrReset', 303);
     });
 }

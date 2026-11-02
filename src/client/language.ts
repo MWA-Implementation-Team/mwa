@@ -162,6 +162,7 @@ export type Language = {
     youRole: string;
     youSave: string;
     youSaved: string;
+    youQrReset: string;
     youUsernameTaken: string;
     youUsernameInvalid: string;
     adminPanelHead: string;
@@ -436,6 +437,7 @@ export const languages: Record<LanguageCode, Language> = {
         youRole: 'Role',
         youSave: 'Save',
         youSaved: 'Settings saved.',
+        youQrReset: 'QR code reset.',
         youUsernameTaken: 'That username is taken',
         youUsernameInvalid: 'Usernames are 1–16 lowercase letters, numbers, _ or -',
         adminPanelHead: 'administration',
@@ -712,6 +714,7 @@ export const languages: Record<LanguageCode, Language> = {
         youRole: 'Rolė',
         youSave: 'Išsaugoti',
         youSaved: 'Nustatymai išsaugoti.',
+        youQrReset: 'QR kodas atstatytas.',
         youUsernameTaken: 'Šis vartotojo vardas užimtas',
         youUsernameInvalid: 'Varde gali būti 1–16 mažųjų raidžių, skaičių, _ arba -',
 
