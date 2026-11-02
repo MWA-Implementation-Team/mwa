@@ -18,6 +18,7 @@ import { TurnTimeLeftDisplay } from '#src/client/ui/TurnTimeLeftDisplay.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import PageShell from '#src/client/pages/app/PageShell.js';
 import { displayActor } from '#src/client/display.js';
+import { GamblingCoin } from '#src/client/gambling/coin.js';
 
 type GamblingSessionPageProps = {
     sessionId: number;
@@ -281,6 +282,12 @@ function CoinFlipping({ currentGame, side }: { currentGame: CoinFlipGame; side: 
                         p2: displayActor(currentGame.p2Name, user, t),
                     })}
                 </p>
+                {/*Needs fixing */}
+                <GamblingCoin
+                    outcome={
+                        currentGame.status.type === 'ended' ? currentGame.status.flipResult : true
+                    }
+                />{' '}
                 {currentGame.status.type === 'ended' ? (
                     <>
                         {<h3>{t(coinSideTrans(currentGame.status.flipResult))}</h3>}
@@ -362,32 +369,38 @@ function Connect4View({
 
     return (
         <>
-            <form method="POST" action={`/app/gambling/sessions/${sessionId}/c4-place`}>
-                <table>
-                    <tbody>
-                        {Array.from({ length: c4Height }, (_, y) => (
-                            <tr key={y}>
-                                {Array.from({ length: c4Width }, (_, x) => (
-                                    <td key={x}>
-                                        <button
-                                            type="submit"
-                                            name="x"
-                                            value={x}
-                                            disabled={!isYourTurn}
-                                            class="mwa-connect4-cell"
-                                            data-cell={board.get(x, c4Height - 1 - y)}
-                                        >
-                                            {isWinCell(x, c4Height - 1 - y) && 'x'}
-                                        </button>
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <div class="mwa-panel-head">
+                <h2>{t('gamblingConnect4')}</h2>
+            </div>
 
-                {status}
-            </form>
+            <div class="mwa-panel-body">
+                <form method="POST" action={`/app/gambling/sessions/${sessionId}/c4-place`}>
+                    <table class="mwa-connect4-table">
+                        <tbody>
+                            {Array.from({ length: c4Height }, (_, y) => (
+                                <tr key={y}>
+                                    {Array.from({ length: c4Width }, (_, x) => (
+                                        <td key={x}>
+                                            <button
+                                                type="submit"
+                                                name="x"
+                                                value={x}
+                                                disabled={!isYourTurn}
+                                                class="mwa-connect4-cell"
+                                                data-cell={board.get(x, c4Height - 1 - y)}
+                                            >
+                                                {isWinCell(x, c4Height - 1 - y) && 'x'}
+                                            </button>
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    {status}
+                </form>
+            </div>
         </>
     );
 }

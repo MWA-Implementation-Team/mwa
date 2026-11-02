@@ -43,3 +43,12 @@
     height: 85%;
     pointer-events: none;
 }
+
+.mwa-actions {
+    display: flex;
+    flex-direcion: row;
+    justify-content: space-between;
+}
+.mwa-chess-status {
+    margin-top: var(--space-2);
+}
