@@ -37,3 +37,4 @@ Full guide: `docs/guides/css-architecture.md`. Read it before touching any CSS. 
 - **Run `npm run lint` before every commit that touches CSS or markup.** For visual changes, tell the user which page and element changed so they can check it in the browser.
 - `npm run dev` — dev server on :3000
 - `npm run seed` — build + run `dist/seed.js`; fills db.sqlite with sample data (no-op if users table isn't empty — delete db.sqlite to reseed)
+- `npm run seed:big` — build + run `dist/seed-big.js`; ~10x the data (70 users, 18 groups, queue across stations, a dozen flips) for stress-testing. Same no-op guard. `MWA_DB_PATH` overrides the db file for both seeds.
