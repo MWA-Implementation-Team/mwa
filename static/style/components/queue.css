@@ -7,6 +7,14 @@
     align-items: center;
 }
 
+/* The interact page shows the scanned user's name above the art. */
+.mwa-queue-name {
+    margin: 0 0 var(--space-2);
+    text-align: center;
+    font-size: var(--text-5);
+    font-weight: bold;
+}
+
 .mwa-queue-art {
     display: grid;
     place-items: center;

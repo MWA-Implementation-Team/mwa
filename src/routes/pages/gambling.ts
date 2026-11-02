@@ -1,6 +1,5 @@
 import { initChess, chessTakeTurn, settleBoardGameTimeout } from '#src/db/gambling/index.js';
 import { requireApiUser, requireUser } from '#src/auth.js';
-import { InviteToGamblePageProps } from '#src/client/pages/app/gambling/InviteToGamblePage.js';
 import {
     acceptGamblingSession,
     CoinSide,
@@ -31,7 +30,7 @@ import { c4Width } from '#src/client/gambling/connect4.js';
 import { calcTurnTimeLeftMs } from '#src/client/gambling/turns.js';
 
 // error_type values pages render as an inline message
-const gambleErrorMessages = {
+export const gambleErrorMessages = {
     broke: 'gamblingInsufficientCoins',
     invalid: 'gamblingInvalidBet',
 } as const satisfies Record<string, keyof Language>;
@@ -47,28 +46,6 @@ export function registerGamblingRoutes(app: MwaHono) {
         return writePage(ctx, 'gambling', {
             sessions: games,
             invitations,
-        });
-    });
-
-    app.get('/app/interact/:token/gamble', async (ctx) => {
-        const user = requireUser(ctx);
-        if (user instanceof Response) return user;
-
-        const token = ctx.req.param('token');
-        const target = findUserByInteractToken(ctx.var, token);
-        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
-
-        const errorGame = ctx.req.query('error_game') as GameType;
-        const message =
-            gambleErrorMessages[ctx.req.query('error_type') as keyof typeof gambleErrorMessages];
-        let error: InviteToGamblePageProps['error'] | undefined = undefined;
-        if (errorGame === 'coin_flip' || errorGame === 'connect_4' || errorGame === 'chess') {
-            error = { dialog: errorGame, message };
-        }
-
-        return writePage(ctx, 'inviteToGamble', {
-            targetUsername: target.username,
-            error,
         });
     });
 
@@ -91,7 +68,7 @@ export function registerGamblingRoutes(app: MwaHono) {
         const betAmount = Number(form.get('bet_amount'));
         if (!Number.isSafeInteger(betAmount) || betAmount <= 0) {
             return ctx.redirect(
-                `/app/interact/${encodeURIComponent(token)}/gamble?error_game=${gameType}&error_type=invalid`,
+                `/app/interact/${encodeURIComponent(token)}?error_game=${gameType}&error_type=invalid`,
             );
         }
 
@@ -129,7 +106,7 @@ export function registerGamblingRoutes(app: MwaHono) {
 
         if (sessionId === null) {
             return ctx.redirect(
-                `/app/interact/${encodeURIComponent(token)}/gamble?error_game=${gameType}&error_type=broke`,
+                `/app/interact/${encodeURIComponent(token)}?error_game=${gameType}&error_type=broke`,
             );
         }
 

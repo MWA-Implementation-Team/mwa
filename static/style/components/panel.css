@@ -80,20 +80,6 @@
     margin-top: var(--space-3);
 }
 
-/* Vertical pile for dialog footers — margin comes from the footer's own
-   padding there. */
-.mwa-actions--col {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-2);
-    margin-top: 0;
-}
-
-/* Buttons nested in a form don't stretch on their own. */
-.mwa-actions--col .mwa-button {
-    width: 100%;
-}
-
 .mwa-directory {
     list-style: none;
     padding: 0;

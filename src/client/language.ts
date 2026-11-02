@@ -11,6 +11,7 @@ export type Language = {
     titleActivity: string;
     titleLeaderboard: string;
     titleGambling: string;
+    titleInteract: string;
     titleHost: string;
     titleAdmin: string;
     titleError: string;
@@ -19,7 +20,6 @@ export type Language = {
     titleGamblingRejected: string;
     titleGamblingCoinFlip: string;
     titleGamblingConnect4: string;
-    titleGamblingInvite: string;
 
     headerHome: string;
     headerLeaderboard: string;
@@ -37,8 +37,8 @@ export type Language = {
     loginCode: string;
     loginVerify: string;
 
-    interactHeading: string;
     interactSelfJoke: string;
+    interactGeneralTitle: string;
     interactSendMoneyTitle: string;
     interactProfileDetailTitle: string;
     interactDetailEmail: string;
@@ -48,6 +48,15 @@ export type Language = {
     interactAwardAmount: string;
     interactAwardNote: string;
     interactAwardSubmit: string;
+    interactSendSubmit: string;
+    interactSendAvailable: string;
+    interactSendAll: string;
+    interactSendInvalid: string;
+    interactSendInsufficient: string;
+    interactMoneySent: string;
+    interactAwardInvalid: string;
+    interactAwarded: string;
+    interactGroupNone: string;
     accountQrHint: string;
     accountQrReset: string;
     qrClaimed: string;
@@ -204,7 +213,6 @@ export type Language = {
     gamblingNoInvitations: string;
     gamblingNoActiveGames: string;
     gamblingVersus: string;
-    gamblingWith: string;
     gamblingChallenge: string;
     gamblingBetAmount: string;
     gamblingSendInvite: string;
@@ -230,7 +238,6 @@ export type Language = {
     gamblingOpen: string;
     gamblingInProgress: string;
     gamblingReturn: string;
-    gamblingAction: string;
 
     gamblingCoinFlip: string;
     gamblingHeads: string;
@@ -271,6 +278,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleActivity: 'first years | {name}',
         titleLeaderboard: 'first years | Leaderboard',
         titleGambling: 'first years | Gambling',
+        titleInteract: 'first years | Interact with {name}',
         titleHost: 'first years | Host',
         titleAdmin: 'first years | Admin',
         titleError: 'first years | {status}',
@@ -279,7 +287,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingRejected: 'first years | Rejected',
         titleGamblingCoinFlip: 'first years | Coin flip',
         titleGamblingConnect4: 'first years | Connect 4',
-        titleGamblingInvite: 'first years | Gamble with {name}',
 
         headerHome: 'App',
 
@@ -298,8 +305,8 @@ export const languages: Record<LanguageCode, Language> = {
         loginCode: 'Code from the email',
         loginVerify: 'Verify code',
 
-        interactHeading: 'Interact with {name}',
         interactSelfJoke: "That's you! Scan someone else's code instead.",
+        interactGeneralTitle: 'General information',
         interactSendMoneyTitle: 'Send money',
         interactProfileDetailTitle: 'Profile details',
         interactDetailEmail: 'Email',
@@ -309,6 +316,15 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardAmount: 'Amount',
         interactAwardNote: 'Note (optional)',
         interactAwardSubmit: 'Award',
+        interactSendSubmit: 'Send',
+        interactSendAvailable: 'Available {amount}',
+        interactSendAll: 'All',
+        interactSendInvalid: 'Enter a valid whole-number amount.',
+        interactSendInsufficient: 'You do not have enough coins.',
+        interactMoneySent: 'Sent {amount} coins.',
+        interactAwardInvalid: 'Enter a valid whole-number amount.',
+        interactAwarded: 'Coins awarded.',
+        interactGroupNone: 'Not in a group.',
         accountQrHint:
             'Your personal QR is shown in the sidebar. Reset it to invalidate the old code.',
         accountQrReset: 'Reset QR code',
@@ -466,7 +482,6 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingNoInvitations: 'No invitations yet.',
         gamblingNoActiveGames: 'No games running.',
         gamblingVersus: '{p1} vs {p2}',
-        gamblingWith: 'Gamble with {name}',
         gamblingChallenge: 'Challenge',
         gamblingBetAmount: 'Bet amount',
         gamblingSendInvite: 'Send invite',
@@ -493,7 +508,6 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingOpen: 'Open',
         gamblingInProgress: 'You are currently gambling.',
         gamblingReturn: 'Return',
-        gamblingAction: 'Gamble',
 
         gamblingCoinFlip: 'Coin flip',
         gamblingHeads: 'Heads',
@@ -534,6 +548,7 @@ export const languages: Record<LanguageCode, Language> = {
         titleActivity: 'pirmakursiu | {name}',
         titleLeaderboard: 'pirmakursiu | Lyderių lentelė',
         titleGambling: 'pirmakursiu | Lošimai',
+        titleInteract: 'pirmakursiu | Sąveika su {name}',
         titleHost: 'pirmakursiu | Vedėjas',
         titleAdmin: 'pirmakursiu | Administravimas',
         titleError: 'pirmakursiu | {status}',
@@ -542,7 +557,6 @@ export const languages: Record<LanguageCode, Language> = {
         titleGamblingRejected: 'pirmakursiu | Kvietimas atmestas',
         titleGamblingCoinFlip: 'pirmakursiu | Monetos metimas',
         titleGamblingConnect4: 'pirmakursiu | Keturi iš eilės',
-        titleGamblingInvite: 'pirmakursiu | Lošk su {name}',
 
         headerHome: 'Programa',
 
@@ -562,8 +576,8 @@ export const languages: Record<LanguageCode, Language> = {
         loginCode: 'Kodas iš laiško',
         loginVerify: 'Patvirtinti kodą',
 
-        interactHeading: 'Sąveika su {name}',
         interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
+        interactGeneralTitle: 'Bendra informacija',
         interactSendMoneyTitle: 'Siųsti pinigus',
         interactProfileDetailTitle: 'Profilio detalės',
         interactDetailEmail: 'El. paštas',
@@ -573,6 +587,15 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardAmount: 'Suma',
         interactAwardNote: 'Žinutė (neprivaloma)',
         interactAwardSubmit: 'Suteikti',
+        interactSendSubmit: 'Siųsti',
+        interactSendAvailable: 'Galima {amount}',
+        interactSendAll: 'Viską',
+        interactSendInvalid: 'Neteisinga suma.',
+        interactSendInsufficient: 'Nepakanka monetų.',
+        interactMoneySent: 'Išsiųsta {amount} monetų.',
+        interactAwardInvalid: 'Neteisinga suma.',
+        interactAwarded: 'Koinai suteikti.',
+        interactGroupNone: 'Nėra grupėje.',
         accountQrHint:
             'Jūsų asmeninis QR rodomas šone. Čia galite jį sukurti iš naujo (senasis nustos veikti).',
         accountQrReset: 'Iš naujo sukurti QR kodą',
@@ -733,7 +756,6 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingNoInvitations: 'Kvietimų kol kas nėra.',
         gamblingNoActiveGames: 'Šiuo metu vykstančių žaidimų nėra.',
         gamblingVersus: '{p1} prieš {p2}',
-        gamblingWith: 'Lošk su {name}',
         gamblingChallenge: 'Siųsti iššūkį',
         gamblingBetAmount: 'Statymo suma',
         gamblingSendInvite: 'Pakviesti',
@@ -760,7 +782,6 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingOpen: 'Atidaryti',
         gamblingInProgress: 'Šiuo metu dalyvauji lošime.',
         gamblingReturn: 'Grįžti',
-        gamblingAction: 'Lošti',
 
         gamblingCoinFlip: 'Monetos metimas',
         gamblingHeads: 'Herbas',

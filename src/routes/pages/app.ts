@@ -1,5 +1,9 @@
 import { requireRole, requireUser } from '#src/auth.js';
-import { listUserTransactions, insertTransaction } from '#src/db/transactions/index.js';
+import {
+    listUserTransactions,
+    insertTransaction,
+    transferCoins,
+} from '#src/db/transactions/index.js';
 import {
     LeaderboardBoard,
     listGroupLeaderboard,
@@ -32,9 +36,9 @@ import {
     listStationGroups,
 } from '#src/db/queue/index.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
-import type { InteractProfile } from '#src/client/pages/app/InteractDialog.js';
 import { cookieSession } from '#src/client/constants.js';
 import { findUserByInteractToken, rotateInteractToken } from '#src/db/interactions/index.js';
+import { gambleErrorMessages } from './gambling.js';
 import { claimSystemQrCode } from '#src/db/systemqr/index.js';
 import { updateUsername } from '#src/db/users/index.js';
 import { deleteSession } from '#src/db/sessions/index.js';
@@ -103,36 +107,18 @@ export function registerAppRoutes(app: MwaHono) {
             'youUsernameInvalid',
         ] as const);
 
-        // ?interact=<token> opens the scanned user's dialog over home. A bad
-        // token 404s like the old page did. Group-request feedback comes back
-        // without the token — the dialog stays closed and the message shows in
-        // the team panel.
-        let interact: InteractProfile | null = null;
+        // QRs minted while the interact flow was a dialog on /app point to
+        // ?interact=<token> — bounce them onto the standalone page so old
+        // codes and shares keep working.
         const interactToken = ctx.req.query('interact');
         if (interactToken !== undefined) {
-            const target = findUserByInteractToken(ctx.var, interactToken);
-            if (!target) return writeErrorPage(ctx, 404);
-
-            const self = target.id === user.id;
-            // Profile detail is serialized into #ssr-data — populate it only
-            // for roles whose view includes it, never for regular users.
-            interact = {
-                token: interactToken,
-                self,
-                username: target.username,
-                detail:
-                    !self && (user.role === 'host' || user.role === 'admin')
-                        ? {
-                              email: target.email,
-                              currentBalance: target.currentBalance,
-                              joinedAt: target.createdAt.toISOString(),
-                          }
-                        : null,
-            };
+            const url = new URL(ctx.req.url);
+            const target = new URL(`/app/interact/${encodeURIComponent(interactToken)}`, url);
+            url.searchParams.forEach((value, key) => {
+                if (key !== 'interact') target.searchParams.set(key, value);
+            });
+            return ctx.redirect(target.pathname + target.search, 303);
         }
-
-        const interactError = queryFlag(ctx, 'interactError', ['groupRequestFailed'] as const);
-        const interactNotice = queryFlag(ctx, 'interactNotice', ['groupRequestSent'] as const);
 
         // owner first, then join order — the member table reads top-down
         const groupMembers = group ? listGroupMemberInfos(ctx.var, group.id) : [];
@@ -158,9 +144,6 @@ export function registerAppRoutes(app: MwaHono) {
             queueCanJoin: memberCount >= QUEUE_MIN_GROUP_SIZE,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
             standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
-            interact,
-            interactError,
-            interactNotice,
         });
     });
 
@@ -248,15 +231,14 @@ export function registerAppRoutes(app: MwaHono) {
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
 
-        // Landing without the token keeps the interact dialog closed — the
-        // feedback note shows in the home page's team panel instead.
+        const back = `/app/interact/${encodeURIComponent(token)}`;
         if (findUserGroup(ctx.var, user.id)) {
-            return ctx.redirect('/app?interactError=groupRequestFailed', 303);
+            return ctx.redirect(`${back}?interactError=groupRequestFailed`, 303);
         }
 
         createGroupInvite(ctx.var, user.id, target.id);
         publish(notificationsChannel(target.id), '');
-        return ctx.redirect('/app?interactNotice=groupRequestSent', 303);
+        return ctx.redirect(`${back}?interactNotice=groupRequestSent`, 303);
     });
 
     // Accepting a team-up invite forms the group immediately — the accepter
@@ -456,17 +438,114 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect(target, 303);
     });
 
-    // Links minted before the interact page became a dialog on /app — bounce
-    // them onto the query-param form so old shares and QR payloads still land.
+    // Scanner paying the scanned user — amount comes from the page's send
+    // form. Errors bounce back to it; a sent transfer lands on the page with
+    // the amount as a success note.
+    app.post('/app/interact/:token/send-money', async (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) return writeErrorPage(ctx, 400);
+
+        const back = `/app/interact/${encodeURIComponent(token)}`;
+        const amount = Number(form.get('amount'));
+        if (!Number.isSafeInteger(amount) || amount <= 0) {
+            return ctx.redirect(`${back}?sendError=interactSendInvalid`, 303);
+        }
+
+        const result = transferCoins(ctx.var, user.id, target.id, amount);
+        if (result !== 'sent') {
+            const key = result === 'too_broke' ? 'interactSendInsufficient' : 'interactSendInvalid';
+            return ctx.redirect(`${back}?sendError=${key}`, 303);
+        }
+        return ctx.redirect(`${back}?sent=${amount}`, 303);
+    });
+
+    // What the personal QR opens — the standalone interact page.
     app.get('/app/interact/:token', (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
-        const url = new URL(ctx.req.url);
-        const target = new URL('/app', url);
-        url.searchParams.forEach((value, key) => target.searchParams.set(key, value));
-        target.searchParams.set('interact', ctx.req.param('token'));
-        return ctx.redirect(target.pathname + target.search, 303);
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target) return writeErrorPage(ctx, 404);
+
+        const self = target.id === user.id;
+        // Profile detail is serialized into #ssr-data — populate it only for
+        // roles whose view includes it, never for regular users.
+        const detail =
+            !self && (user.role === 'host' || user.role === 'admin')
+                ? {
+                      email: target.email,
+                      currentBalance: target.currentBalance,
+                      joinedAt: target.createdAt.toISOString(),
+                  }
+                : null;
+
+        const interactError = queryFlag(ctx, 'interactError', [
+            'groupRequestFailed',
+            'interactAwardInvalid',
+        ] as const);
+        const interactNotice = queryFlag(ctx, 'interactNotice', [
+            'groupRequestSent',
+            'interactAwarded',
+        ] as const);
+        const sendError = queryFlag(ctx, 'sendError', [
+            'interactSendInvalid',
+            'interactSendInsufficient',
+        ] as const);
+        const sent = Number(ctx.req.query('sent'));
+        const sentAmount = Number.isSafeInteger(sent) && sent > 0 ? sent : null;
+
+        // the scanned user's team for the shared-info panel — same stable
+        // emoji pick the home queue panel uses, sad face when groupless
+        const targetGroup = findUserGroup(ctx.var, target.id);
+        const group = targetGroup
+            ? {
+                  name: targetGroup.name,
+                  memberCount: listGroupMembers(ctx.var, targetGroup.id).length,
+              }
+            : null;
+        const groupEmoji = targetGroup
+            ? GROUP_ART_PLACEHOLDERS[targetGroup.id % GROUP_ART_PLACEHOLDERS.length]
+            : NO_GROUP_ART;
+
+        // a challenge POST that bounced — reopen its game's dialog with the
+        // message, same contract the invite page used
+        const errorGame = queryFlag(ctx, 'error_game', [
+            'coin_flip',
+            'connect_4',
+            'chess',
+        ] as const);
+        const errorType = queryFlag(ctx, 'error_type', ['invalid', 'broke'] as const);
+        const gamblingError = errorGame
+            ? {
+                  dialog: errorGame,
+                  message: errorType ? gambleErrorMessages[errorType] : undefined,
+              }
+            : undefined;
+
+        return writePage(ctx, 'interact', {
+            token,
+            self,
+            target: { username: target.username },
+            group,
+            groupEmoji,
+            // same three boards as the home standings table, for the target
+            // and their team
+            standings: listViewerStandings(ctx.var, target.id, targetGroup?.id ?? null),
+            detail,
+            interactError,
+            interactNotice,
+            sendError,
+            sentAmount,
+            gamblingError,
+        });
     });
 
     // Host (admin) award form: give the scanned user coins plus write an optional note
@@ -481,19 +560,17 @@ export function registerAppRoutes(app: MwaHono) {
         const form = await ctx.req.formData().catch(() => null);
         if (!form) return writeErrorPage(ctx, 400);
 
+        const back = `/app/interact/${encodeURIComponent(token)}`;
         const amount = Number(form.get('amount'));
         if (!Number.isSafeInteger(amount) || amount <= 0) {
-            return ctx.redirect(
-                `/app/interact/${encodeURIComponent(token)}?awardError=invalid`,
-                303,
-            );
+            return ctx.redirect(`${back}?interactError=interactAwardInvalid`, 303);
         }
 
         const note = form.get('note');
         const noteText = typeof note === 'string' && note.trim() ? note.trim().slice(0, 200) : null;
 
         insertTransaction(ctx.var, 'system', target.id, amount, undefined, noteText);
-        return ctx.redirect(`/app/interact/${encodeURIComponent(token)}?awarded=1`, 303);
+        return ctx.redirect(`${back}?interactNotice=interactAwarded`, 303);
     });
 
     // Reward qr scan (the secret in the QR is the route param)

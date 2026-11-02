@@ -1,6 +1,7 @@
 import { MwaState } from '#src/state.js';
 import { runTransaction } from '../transaction.js';
 import { findUserGroup } from '../groups/index.js';
+import { findUserById } from '../users/index.js';
 
 export type TransactionKind =
     'transfer' | 'purchase' | 'system' | 'gambling_deduction' | 'gambling_winnings' | 'host_grant';
@@ -36,6 +37,39 @@ export function listUserTransactions(state: MwaState, userId: number, limit = 10
     }));
 }
 
+function insertParentTx(state: MwaState, kind: TransactionKind): number {
+    const insertParentTxQuery = state.prepare(`
+    INSERT INTO parent_transactions (kind) VALUES (?)
+    RETURNING id
+    `);
+    const { id } = insertParentTxQuery.get(kind)!;
+    return id as number;
+}
+
+// stamp the user's current group so coins are attributed where they were earned
+function insertChildTx(
+    state: MwaState,
+    parentId: number,
+    userId: number,
+    balanceDelta: number,
+    systemQrCodeId?: number,
+    note?: string | null,
+) {
+    const group = findUserGroup(state, userId);
+    const insertChildTxQuery = state.prepare(`
+    INSERT INTO child_transactions (parent_id, user_id, balance_delta, group_id, system_qr_code_id, note)
+    VALUES (?, ?, ?, ?, ?, ?)
+    `);
+    insertChildTxQuery.run(
+        parentId,
+        userId,
+        balanceDelta,
+        group?.id ?? null,
+        systemQrCodeId ?? null,
+        note ?? null,
+    );
+}
+
 // Inserts a parent transaction and its single child row, returning the
 // parent id. Expected to run inside a transaction. `systemQrCodeId` links a
 // system credit to the reward QR that produced it; `note` is an optional
@@ -48,28 +82,34 @@ export function insertTransaction(
     systemQrCodeId?: number,
     note?: string | null,
 ): number {
-    const insertParentTx = state.prepare(`
-    INSERT INTO parent_transactions (kind) VALUES (?)
-    RETURNING id
-    `);
-    const { id: parentId } = insertParentTx.get(kind)!;
+    const parentId = insertParentTx(state, kind);
+    insertChildTx(state, parentId, userId, balanceDelta, systemQrCodeId, note);
+    return parentId;
+}
 
-    // stamp the user's current group so coins are attributed where they were earned
-    const group = findUserGroup(state, userId);
-    const insertChildTx = state.prepare(`
-    INSERT INTO child_transactions (parent_id, user_id, balance_delta, group_id, system_qr_code_id, note)
-    VALUES (?, ?, ?, ?, ?, ?)
-    `);
-    insertChildTx.run(
-        parentId,
-        userId,
-        balanceDelta,
-        group?.id ?? null,
-        systemQrCodeId ?? null,
-        note ?? null,
-    );
+export type TransferCoinsResult = 'sent' | 'too_broke' | 'invalid';
 
-    return parentId as number;
+// Player-to-player payment: one parent 'transfer' row with two children — the
+// sender's debit and the recipient's credit — so the pair stays linked. The
+// balance check and both inserts run in one transaction.
+export function transferCoins(
+    state: MwaState,
+    fromUserId: number,
+    toUserId: number,
+    amount: number,
+): TransferCoinsResult {
+    if (fromUserId === toUserId || !Number.isSafeInteger(amount) || amount <= 0) {
+        return 'invalid';
+    }
+    return runTransaction(state.db, () => {
+        const sender = findUserById(state, fromUserId);
+        if (!sender || sender.currentBalance < amount) return 'too_broke';
+
+        const parentId = insertParentTx(state, 'transfer');
+        insertChildTx(state, parentId, fromUserId, -amount);
+        insertChildTx(state, parentId, toUserId, amount);
+        return 'sent';
+    });
 }
 
 export function giveCoins(state: MwaState, userId: number, amount: number) {

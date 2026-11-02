@@ -19,11 +19,7 @@ export const leaderboardPage: Page<LeaderboardPageProps> = {
 const boards = ['activity', 'gambling', 'combined'] as const;
 const scopes = ['players', 'groups'] as const;
 
-const boardLabelKey = {
-    activity: 'leaderboardActivity',
-    gambling: 'leaderboardGambling',
-    combined: 'leaderboardCombined',
-} as const;
+import { boardLabelKey } from '#src/client/boards.js';
 
 const scopeLabelKey = {
     players: 'leaderboardPlayers',

@@ -110,16 +110,32 @@ start so queue/badge rows can foreign-key them.
 ## Interactions and gambling
 
 The `PageShell` sidebar renders a personal QR using `uqr` on every page, linking
-to `/app?interact=<token>` — the home route resolves the token and opens the
-scanned user's dialog (`InteractDialog`); the old `/app/interact/:token` path
-redirects there so earlier links and QR payloads keep working.
+to `/app/interact/<token>` — the standalone interact page
+(`InteractPage`); `/app?interact=<token>` redirects there so codes minted
+while the flow lived in a home-page dialog keep working.
 Migration `05_interact_tokens.sql` stores one permanent random token per user;
 it identifies the target but grants no permissions. Any signed-in scanner can
-challenge another user; hosts/admins also see their email, balance, and join date.
-Self-scans show no actions, and money transfers remain a placeholder.
+challenge another user or send them coins; hosts/admins also see their email,
+balance, and join date. Self-scans show no actions.
+
+The shared-info panel ("Bendra informacija") mirrors the home queue panel:
+the target's team on the left (group emoji, member count, join button) and
+their personal + group standings across all three boards on the right. The
+send-money panel holds the amount widget — built with −/+ steppers and
+quick-add chips, then posts to `POST /app/interact/:token/send-money`.
+`transferCoins` (`src/db/transactions/index.ts`) checks the sender's balance
+and writes one parent `transfer` transaction with two child rows (the
+sender's debit and the recipient's credit) in a single database transaction.
+A bad amount or insufficient funds bounce back with `?sendError=…`; a
+sent transfer lands back on the page with a `?sent=<amount>` success note.
+
+The gambling panel lists coin flip, Connect 4, and chess as a table —
+each Challenge link opens a small bet dialog posting to
+`POST /app/interact/:token/gamble`. Joining the target's team is
+`POST /app/interact/:token/group-request`.
 
 A host/admin scanner gets an
-award form in the interact dialog (`POST /app/interact/:token/award`) to credit
+award form on the interact page (`POST /app/interact/:token/award`) to credit
 the scanned user coins plus an optional note; the note is stored on the child
 transaction and shown on the recipient's home page. Regular scanners just see
 the profile. The personal token can be rotated from the QR sidebar pane
@@ -148,8 +164,8 @@ the owner edits them from the home table's per-field dialogs (`POST
 /app/group/edit`).
 
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
-invitations. `/app/interact/:token/gamble` creates a challenge; re-challenging the
-same player while an invite is still open redirects to that session instead of
+invitations. `POST /app/interact/:token/gamble` creates a challenge; re-challenging
+the same player while an invite is still open redirects to that session instead of
 stacking invites. Session pages live at `/app/gambling/sessions/:id`, with POST
 `/accept` and `/reject` actions restricted to the invited player. Any signed-in
 user can view a session.

@@ -7,7 +7,15 @@ import QrPane from '#src/client/ui/QrPane.js';
 import { displayActor } from '#src/client/display.js';
 
 export type Section =
-    'home' | 'leaderboard' | 'host' | 'admin' | 'gambling' | 'landing' | 'login' | 'error';
+    | 'home'
+    | 'leaderboard'
+    | 'host'
+    | 'admin'
+    | 'gambling'
+    | 'interact'
+    | 'landing'
+    | 'login'
+    | 'error';
 
 type PageShellProps = {
     section: Section;
