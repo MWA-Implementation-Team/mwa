@@ -161,6 +161,7 @@ export type Language = {
     youEmail: string;
     youRole: string;
     youSave: string;
+    youSaved: string;
     youUsernameTaken: string;
     youUsernameInvalid: string;
     adminPanelHead: string;
@@ -180,6 +181,7 @@ export type Language = {
     groupPhone: string;
     groupSettings: string;
     groupSettingsEdit: string;
+    groupSaved: string;
     groupDelete: string;
     groupDeleteConfirm: string;
     groupDeleteFailed: string;
@@ -430,6 +432,7 @@ export const languages: Record<LanguageCode, Language> = {
         youEmail: 'Email',
         youRole: 'Role',
         youSave: 'Save',
+        youSaved: 'Settings saved.',
         youUsernameTaken: 'That username is taken',
         youUsernameInvalid: 'Usernames are 1–16 lowercase letters, numbers, _ or -',
         adminPanelHead: 'administration',
@@ -449,6 +452,7 @@ export const languages: Record<LanguageCode, Language> = {
         groupPhone: 'Emergency phone',
         groupSettings: 'Group settings',
         groupSettingsEdit: 'Edit group settings',
+        groupSaved: 'Group settings saved.',
         groupDelete: 'Delete group',
         groupDeleteConfirm: 'Delete group?',
         groupDeleteFailed: 'failed to delete group',
@@ -701,6 +705,7 @@ export const languages: Record<LanguageCode, Language> = {
         youEmail: 'El. paštas',
         youRole: 'Rolė',
         youSave: 'Išsaugoti',
+        youSaved: 'Nustatymai išsaugoti.',
         youUsernameTaken: 'Šis vartotojo vardas užimtas',
         youUsernameInvalid: 'Varde gali būti 1–16 mažųjų raidžių, skaičių, _ arba -',
 
@@ -721,6 +726,7 @@ export const languages: Record<LanguageCode, Language> = {
         groupPhone: 'Skubios pagalbos telefonas',
         groupSettings: 'Grupės nustatymai',
         groupSettingsEdit: 'Keičiami grupės nustatymai',
+        groupSaved: 'Grupės nustatymai išsaugoti.',
         groupDelete: 'Ištrinti grupę',
         groupDeleteConfirm: 'Ištrinti grupę?',
         groupDeleteFailed: 'nepavyko ištrinti grupės',

@@ -19,7 +19,9 @@ type HomePageProps = {
     groupOwnerId: number | null;
     groupMembers: { userId: number; username: string }[];
     groupError?: keyof Language;
+    groupNotice?: keyof Language;
     youError?: keyof Language;
+    youNotice?: keyof Language;
     queuePosition: number | null;
     queueCanJoin: boolean;
     queueError?: keyof Language;
@@ -59,7 +61,9 @@ function HomePage({
     groupOwnerId,
     groupMembers,
     groupError,
+    groupNotice,
     youError,
+    youNotice,
     queuePosition,
     queueCanJoin,
     queueError,
@@ -225,6 +229,7 @@ function HomePage({
                 </div>
                 <div class="mwa-panel-body">
                     {groupError && <Toast kind="error">{t(groupError)}</Toast>}
+                    {groupNotice && <Toast kind="success">{t(groupNotice)}</Toast>}
                     {groupMembers.length === 0 ? (
                         <p class="mwa-muted">{t('groupNone')}</p>
                     ) : (
@@ -438,6 +443,7 @@ function HomePage({
                         />
                     </div>
                     {youError && <Toast kind="error">{t(youError)}</Toast>}
+                    {youNotice && <Toast kind="success">{t(youNotice)}</Toast>}
                 </form>
             </Dialog>
 

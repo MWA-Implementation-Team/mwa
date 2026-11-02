@@ -106,6 +106,8 @@ export function registerAppRoutes(app: MwaHono) {
             'youUsernameTaken',
             'youUsernameInvalid',
         ] as const);
+        const youNotice = queryFlag(ctx, 'youNotice', ['youSaved'] as const);
+        const groupNotice = queryFlag(ctx, 'groupNotice', ['groupSaved'] as const);
 
         // QRs minted while the interact flow was a dialog on /app point to
         // ?interact=<token> — bounce them onto the standalone page so old
@@ -137,7 +139,9 @@ export function registerAppRoutes(app: MwaHono) {
             groupOwnerId: group?.ownerId ?? null,
             groupMembers,
             groupError,
+            groupNotice,
             youError,
+            youNotice,
             queueError,
             qrClaimedAmount,
             qrError,
@@ -217,7 +221,7 @@ export function registerAppRoutes(app: MwaHono) {
         const result = updateGroup(ctx.var, group.id, user.id, name, phoneNumber);
         if (result === 'taken') return ctx.redirect('/app?groupError=groupNameTaken', 303);
         if (result !== 'updated') return ctx.redirect('/app?groupError=groupEditFailed', 303);
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app?groupNotice=groupSaved', 303);
     });
 
     // Join request from the interact page — the requester asks into the
@@ -295,7 +299,7 @@ export function registerAppRoutes(app: MwaHono) {
             const error = result === 'taken' ? 'youUsernameTaken' : 'youUsernameInvalid';
             return ctx.redirect(`/app?youError=${error}`, 303);
         }
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app?youNotice=youSaved', 303);
     });
 
     app.post('/app/queue/join', (ctx) => {
