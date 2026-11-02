@@ -2,6 +2,7 @@ import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import Dialog from '#src/client/ui/Dialog.js';
+import { Toast } from '#src/client/ui/Toast.js';
 import { GameType } from '#src/db/gambling/index.js';
 import { Language } from '#src/client/language.js';
 import PageShell from '../PageShell.js';
@@ -104,10 +105,8 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             <option value="tails">{t('gamblingTails')}</option>
                         </select>
                     </div>
-                    {error?.message && (
-                        <p class="mwa-note mwa-note--error" role="alert">
-                            {t(error.message)}
-                        </p>
+                    {error?.dialog === 'coin_flip' && (
+                        <Toast kind="error">{t(error.message)}</Toast>
                     )}
                 </form>
             </Dialog>
@@ -131,10 +130,8 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             required
                         />
                     </div>
-                    {error?.message && (
-                        <p class="mwa-note mwa-note--error" role="alert">
-                            {t(error.message)}
-                        </p>
+                    {error?.dialog === 'connect_4' && (
+                        <Toast kind="error">{t(error.message)}</Toast>
                     )}
                 </form>
             </Dialog>
@@ -157,11 +154,7 @@ function InviteToGamblePage({ targetUsername, error }: InviteToGamblePageProps) 
                             required
                         />
                     </div>
-                    {error?.message && (
-                        <p class="mwa-note mwa-note--error" role="alert">
-                            {t(error.message)}
-                        </p>
-                    )}
+                    {error?.dialog === 'chess' && <Toast kind="error">{t(error.message)}</Toast>}
                 </form>
             </Dialog>
         </PageShell>

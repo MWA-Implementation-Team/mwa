@@ -1,0 +1,60 @@
+/* Toast stack — fixed bottom-right. The container is a manual popover, so it
+   renders in the top layer above modal <dialog>s; the declarations after
+   inset reset the popover UA styles (margin:auto, border, padding, canvas
+   background, overflow:auto). */
+.mwa-toasts {
+    position: fixed;
+    inset: auto var(--space-3) var(--space-3) auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+    width: fit-content;
+    max-width: min(30rem, calc(100vw - 2 * var(--space-3)));
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--foreground);
+    overflow: visible;
+}
+
+.mwa-toast {
+    padding: var(--space-3);
+    background: var(--muted);
+    border: 3px solid var(--border);
+    color: var(--foreground);
+    font-size: var(--text-7);
+    box-shadow: var(--shadow-panel);
+    cursor: pointer;
+    animation: mwa-toast-in 0.2s ease-out;
+}
+
+/* The kind tints are translucent — layer them over the opaque --muted base
+   instead of swapping the background so stacked toasts don't show through. */
+.mwa-toast--error {
+    color: var(--toast-error-fg);
+    background-image: linear-gradient(var(--toast-error-bg), var(--toast-error-bg));
+    border-color: var(--toast-error-border);
+}
+
+.mwa-toast--success {
+    color: var(--toast-success-fg);
+    background-image: linear-gradient(var(--toast-success-bg), var(--toast-success-bg));
+    border-color: var(--toast-success-border);
+}
+
+.mwa-toast--closing {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+    transition:
+        opacity 0.2s ease-in,
+        transform 0.2s ease-in;
+}
+
+@keyframes mwa-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(var(--space-2));
+    }
+}

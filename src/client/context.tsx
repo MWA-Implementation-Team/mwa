@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'preact/hooks';
 import { defaultLanguage, LanguageCode, translate, TranslateFn } from './language.js';
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
 import { reviveUser, User, UserJson } from '#src/client/api/users.js';
+import { Toasts } from './ui/Toast.js';
 
 import type { Notification } from '#src/db/users/index.js';
 export type { Notification };
@@ -81,5 +82,10 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
         return () => updates.close();
     }, [init.user?.id]);
 
-    return <ClientContext value={value}>{content}</ClientContext>;
+    return (
+        <ClientContext value={value}>
+            {content}
+            <Toasts />
+        </ClientContext>
+    );
 }

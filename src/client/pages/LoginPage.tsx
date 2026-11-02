@@ -2,6 +2,7 @@ import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import PageShell from './app/PageShell.js';
+import { Toast } from '#src/client/ui/Toast.js';
 
 export type LoginErrorKey =
     | 'loginInvalidEmail'
@@ -68,11 +69,7 @@ function LoginPage({ errorKey, sentTo, sentKind, goto }: LoginPageProps) {
                         </form>
                     )}
 
-                    {errorKey && (
-                        <p class="mwa-note mwa-note--error" role="alert">
-                            {t(errorKey)}
-                        </p>
-                    )}
+                    {errorKey && <Toast kind="error">{t(errorKey)}</Toast>}
                 </div>
             </section>
         </PageShell>

@@ -1,7 +1,6 @@
 @import './tokens.css';
 @import './base.css';
 @import './components/panel.css';
-@import './components/note.css';
 @import './components/form.css';
 @import './components/landing.css';
 @import './components/button.css';
@@ -16,3 +15,4 @@
 @import './components/connect4.css';
 @import './components/dialog.css';
 @import './components/chess.css';
+@import './components/toast.css';

@@ -3,6 +3,7 @@ import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import type { WaitingQueueRow } from '#src/db/queue/index.js';
 import PageShell from './PageShell.js';
+import { Toast } from '#src/client/ui/Toast.js';
 import { Language } from '#src/client/language.js';
 
 type HostPageProps = {
@@ -71,11 +72,7 @@ function HostPage({
 
                     <p class="mwa-muted">{t('hostWaiting', { n: String(waiting.length) })}</p>
 
-                    {error && (
-                        <p class="mwa-note mwa-note--error" role="alert">
-                            {t(error)}
-                        </p>
-                    )}
+                    {error && <Toast kind="error">{t(error)}</Toast>}
 
                     <div class="mwa-actions">
                         <button type="submit" form="host-call" disabled={waiting.length === 0}>
