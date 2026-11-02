@@ -69,7 +69,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
         ├── activities/        one slug-named folder per station (Card + Detail + activity.ts)
         ├── pages/             one component per page, each a Page<P> object;
         │                      app/PageShell.tsx wraps them in the shell layout
-        └── ui/                shared components (toggles, icons, Trans, controlled Dialog)
+        └── ui/                shared components (toggles, icons, Trans, controlled Dialog, toasts)
 
 Generated, gitignored:  dist/   tsc output — served to the browser at /client/*
                         db.sqlite   local database, created on first run

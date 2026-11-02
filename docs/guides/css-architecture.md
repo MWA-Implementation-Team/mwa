@@ -22,7 +22,7 @@ Go down this list and stop at the first match:
    spacing scale) → change the variable in `oat.css`, `@layer theme { :root { … } }`.
 2. **How a plain element looks everywhere** (every button, every input, every link)
    → edit Oat's rule for it in `oat.css`.
-3. **A value only app components use** (panel header background, note colours,
+3. **A value only app components use** (panel header background, toast colours,
    transaction bar colours) → add a token to `static/style/tokens.css`.
 4. **A component Oat doesn't have** → a file in `static/style/components/`.
 5. **The page frame** (`.mwa` root, backdrop, skip link, `.mwa-frame`, logo) →
@@ -54,15 +54,15 @@ Before you write a new class, check whether Oat markup already does the job:
 
 ## Files
 
-| File                       | Contains                                                          |
-| -------------------------- | ----------------------------------------------------------------- |
-| `static/oat.css`           | forked Oat: theme variables + plain-element styles                |
-| `static/style/main.css`    | `@import`s only — the one place `@import` is allowed              |
-| `static/style/tokens.css`  | app-only tokens; the only app file that may contain raw colours   |
-| `static/style/base.css`    | `@font-face` for Montserrat, `.mwa` frame, skip link, logo        |
-| `static/style/components/` | one file per component family (`panel`, `note`, `tx`, `landing`…) |
-| `static/fonts/`            | self-hosted `.woff2` files                                        |
-| `static/img/`              | self-hosted images (backdrop, activity card art)                  |
+| File                       | Contains                                                           |
+| -------------------------- | ------------------------------------------------------------------ |
+| `static/oat.css`           | forked Oat: theme variables + plain-element styles                 |
+| `static/style/main.css`    | `@import`s only — the one place `@import` is allowed               |
+| `static/style/tokens.css`  | app-only tokens; the only app file that may contain raw colours    |
+| `static/style/base.css`    | `@font-face` for Montserrat, `.mwa` frame, skip link, logo         |
+| `static/style/components/` | one file per component family (`panel`, `toast`, `tx`, `landing`…) |
+| `static/fonts/`            | self-hosted `.woff2` files                                         |
+| `static/img/`              | self-hosted images (backdrop, activity card art)                   |
 
 `main.css` imports tokens, then base, then the components in a fixed order. A new
 component file goes at the end of the list, unless it has to override an earlier one.
@@ -78,7 +78,7 @@ Use Oat's variables first:
 - `--danger`, `--success`, `--warning` — status colours
 
 Add an app token to `tokens.css` only when none of those fits. Name it for what it's
-for (`--note-error-bg`), not for what it looks like (`--dark-red`).
+for (`--toast-error-bg`), not for what it looks like (`--dark-red`).
 
 Sizes come from Oat's scales:
 
@@ -98,7 +98,7 @@ colours.
 ## Components
 
 - **Naming:** kebab-case. `mwa-<block>`, `mwa-<block>-<part>`, `mwa-<block>--<modifier>`
-  (`mwa-note`, `mwa-panel-head`, `mwa-note--error`). The landing sidebar uses
+  (`mwa-toast`, `mwa-panel-head`, `mwa-toast--error`). The landing sidebar uses
   `landing-*`; activity font classes are the activity's folder name.
 - **Selectors:** keep them flat. One class is best. No IDs, specificity at most
   `0,3,1`, nesting at most one level.
