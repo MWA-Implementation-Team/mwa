@@ -107,7 +107,12 @@ export function registerAppRoutes(app: MwaHono) {
             'youUsernameInvalid',
         ] as const);
         const youNotice = queryFlag(ctx, 'youNotice', ['youSaved'] as const);
-        const groupNotice = queryFlag(ctx, 'groupNotice', ['groupSaved'] as const);
+        const groupNotice = queryFlag(ctx, 'groupNotice', [
+            'groupSaved',
+            'groupKicked',
+            'groupDeleted',
+            'groupLeft',
+        ] as const);
 
         // QRs minted while the interact flow was a dialog on /app point to
         // ?interact=<token> — bounce them onto the standalone page so old
@@ -161,7 +166,7 @@ export function registerAppRoutes(app: MwaHono) {
         if (!group || removeGroupMember(ctx.var, group.id, user.id) !== 'removed') {
             return ctx.redirect('/app?groupError=groupLeaveFailed#panel-group', 303);
         }
-        return ctx.redirect('/app#panel-group', 303);
+        return ctx.redirect('/app?groupNotice=groupLeft#panel-group', 303);
     });
 
     // Deleting is the owner's only way out — owner check is inside
@@ -174,7 +179,7 @@ export function registerAppRoutes(app: MwaHono) {
         if (!group || !deleteGroup(ctx.var, group.id, user.id)) {
             return ctx.redirect('/app?groupError=groupDeleteFailed#panel-group', 303);
         }
-        return ctx.redirect('/app#panel-group', 303);
+        return ctx.redirect('/app?groupNotice=groupDeleted#panel-group', 303);
     });
 
     // Kicking is owner-only; removeGroupMember refuses non-members and
@@ -194,7 +199,7 @@ export function registerAppRoutes(app: MwaHono) {
         ) {
             return ctx.redirect('/app?groupError=groupKickFailed#panel-group', 303);
         }
-        return ctx.redirect('/app#panel-group', 303);
+        return ctx.redirect('/app?groupNotice=groupKicked#panel-group', 303);
     });
 
     // The group's name/phone are edited from the home table's per-field
