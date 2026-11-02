@@ -4,7 +4,7 @@ import { Hono } from 'hono';
 import { addGroupMember, createGroup } from '#src/db/groups/index.js';
 import { createUser } from '#src/db/users/index.js';
 import { createSession } from '#src/db/sessions/index.js';
-import { giveCoins, insertTransaction } from '#src/db/transactions/index.js';
+import { grantCoins, insertTransaction } from '#src/db/transactions/index.js';
 import { registerAppRoutes } from './app.js';
 import { createTestMwaState, MwaHono, setupHonoState } from '#src/state.js';
 
@@ -33,8 +33,8 @@ describe('GET /app/leaderboard', () => {
     it('defaults to the activity players board and ranks by earned', async () => {
         const me = createUser(state, 'lbv_me@example.com', 'lbv_me');
         const rich = createUser(state, 'lbv_rich@example.com', 'lbv_rich');
-        giveCoins(state, me.id, 5);
-        giveCoins(state, rich.id, 50);
+        grantCoins(state, me.id, 5);
+        grantCoins(state, rich.id, 50);
         // transfers and gambling wins must not move the activity board
         insertTransaction(state, 'transfer', me.id, 500);
         insertTransaction(state, 'gambling_winnings', me.id, 500);
@@ -72,7 +72,7 @@ describe('GET /app/leaderboard', () => {
         insertTransaction(state, 'gambling_deduction', me.id, -10);
         insertTransaction(state, 'gambling_winnings', me.id, 25);
         const clean = createUser(state, 'lbg_net_clean@example.com', 'lbg_net_clean');
-        giveCoins(state, clean.id, 100);
+        grantCoins(state, clean.id, 100);
 
         const res = await app.request('/app/leaderboard?board=gambling', {
             headers: authCookie(me.id),
@@ -91,8 +91,8 @@ describe('GET /app/leaderboard', () => {
     it('combined board ranks by net balance including transfers', async () => {
         const me = createUser(state, 'lbc_me@example.com', 'lbc_me');
         const drained = createUser(state, 'lbc_drained@example.com', 'lbc_drained');
-        giveCoins(state, me.id, 10);
-        giveCoins(state, drained.id, 40);
+        grantCoins(state, me.id, 10);
+        grantCoins(state, drained.id, 40);
         insertTransaction(state, 'transfer', drained.id, -30);
 
         const res = await app.request('/app/leaderboard?board=combined', {
@@ -111,7 +111,7 @@ describe('GET /app/leaderboard', () => {
         const other = createUser(state, 'lbgs_other@example.com', 'lbgs_other');
         createGroup(state, 'lbgs alpha', me.id, '555');
         createGroup(state, 'lbgs zeta', other.id, '555');
-        giveCoins(state, me.id, 20);
+        grantCoins(state, me.id, 20);
 
         const res = await app.request('/app/leaderboard?scope=groups', {
             headers: authCookie(me.id),
@@ -146,7 +146,7 @@ describe('GET /app/leaderboard', () => {
         const me = viewer('lbstaff_me');
         const host = createUser(state, 'lbstaff_host@example.com', 'lbstaff_host');
         state.prepare(`UPDATE users SET role = ? WHERE id = ?`).run('host', host.id);
-        giveCoins(state, host.id, 999);
+        grantCoins(state, host.id, 999);
 
         const res = await app.request('/app/leaderboard?board=combined', {
             headers: me.headers,

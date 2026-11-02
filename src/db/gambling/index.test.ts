@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { createUser, findUserById, queryUserNotification } from '../users/index.js';
-import { giveCoins } from '../transactions/index.js';
+import { grantCoins } from '../transactions/index.js';
 import {
     acceptGamblingSession,
     cancelGamblingSession,
@@ -34,7 +34,7 @@ const withoutTurnTime = (game: ReturnType<typeof findGamblingSessionById>) => {
 
 function fundedUser(email: string, username: string, coins: number) {
     const user = createUser(state, email, username);
-    if (coins > 0) giveCoins(state, user.id, coins);
+    if (coins > 0) grantCoins(state, user.id, coins);
     return user;
 }
 

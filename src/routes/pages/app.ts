@@ -1,9 +1,5 @@
 import { requireRole, requireUser } from '#src/auth.js';
-import {
-    listUserTransactions,
-    insertTransaction,
-    transferCoins,
-} from '#src/db/transactions/index.js';
+import { grantCoins, listUserTransactions, transferCoins } from '#src/db/transactions/index.js';
 import {
     LeaderboardBoard,
     listGroupLeaderboard,
@@ -583,7 +579,7 @@ export function registerAppRoutes(app: MwaHono) {
         const note = form.get('note');
         const noteText = typeof note === 'string' && note.trim() ? note.trim().slice(0, 200) : null;
 
-        insertTransaction(ctx.var, 'system', target.id, amount, undefined, noteText);
+        grantCoins(ctx.var, target.id, amount, noteText);
         return ctx.redirect(`${back}?interactNotice=interactAwarded`, 303);
     });
 

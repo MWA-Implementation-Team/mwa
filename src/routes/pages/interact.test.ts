@@ -5,7 +5,8 @@ import { createUser, findUserById } from '#src/db/users/index.js';
 import { createSession } from '#src/db/sessions/index.js';
 import { getOrCreateInteractToken } from '#src/db/interactions/index.js';
 import { createSystemQrCode } from '#src/db/systemqr/index.js';
-import { giveCoins } from '#src/db/transactions/index.js';
+import { grantCoins, listUserTransactions } from '#src/db/transactions/index.js';
+import { listPlayerLeaderboard } from '#src/db/leaderboard/index.js';
 import { registerAppRoutes } from './app.js';
 import { registerGamblingRoutes } from './gambling.js';
 import { createTestMwaState, MwaHono, setupHonoState } from '#src/state.js';
@@ -180,6 +181,10 @@ describe('POST /app/interact/:token/award', () => {
         });
         assert.equal(res.status, 303);
         assert.equal(findUserById(state, owner.id)!.currentBalance, 100);
+        const kinds = listUserTransactions(state, owner.id).map((tx) => tx.kind);
+        assert.deepEqual(kinds, ['host_grant']);
+        const board = listPlayerLeaderboard(state, 'activity');
+        assert.equal(board.find((row) => row.userId === owner.id)?.score, 100);
     });
 
     it('rejects a non-positive amount', async () => {
@@ -234,7 +239,7 @@ describe('POST /app/interact/:token/send-money', () => {
     it('moves coins between the two balances', async () => {
         const owner = createUser(state, 'payee@example.com', 'payee_user');
         const sender = createUser(state, 'payer@example.com', 'payer_user');
-        giveCoins(state, sender.id, 50);
+        grantCoins(state, sender.id, 50);
         const token = getOrCreateInteractToken(state, owner.id);
 
         const res = await post(token, sender.id, 'amount=20');
@@ -247,7 +252,7 @@ describe('POST /app/interact/:token/send-money', () => {
     it('bounces back to the page on a bad amount', async () => {
         const owner = createUser(state, 'payee2@example.com', 'payee2_user');
         const sender = createUser(state, 'payer2@example.com', 'payer2_user');
-        giveCoins(state, sender.id, 50);
+        grantCoins(state, sender.id, 50);
         const token = getOrCreateInteractToken(state, owner.id);
 
         const res = await post(token, sender.id, 'amount=-5');
@@ -262,7 +267,7 @@ describe('POST /app/interact/:token/send-money', () => {
     it('bounces back when the sender cannot cover it', async () => {
         const owner = createUser(state, 'payee3@example.com', 'payee3_user');
         const sender = createUser(state, 'payer3@example.com', 'payer3_user');
-        giveCoins(state, sender.id, 10);
+        grantCoins(state, sender.id, 10);
         const token = getOrCreateInteractToken(state, owner.id);
 
         const res = await post(token, sender.id, 'amount=11');
@@ -277,7 +282,7 @@ describe('POST /app/interact/:token/send-money', () => {
 
     it('404s on self-send and on a bad token', async () => {
         const user = createUser(state, 'selfpay@example.com', 'selfpay_user');
-        giveCoins(state, user.id, 50);
+        grantCoins(state, user.id, 50);
         const token = getOrCreateInteractToken(state, user.id);
 
         const self = await post(token, user.id, 'amount=5');
@@ -292,7 +297,7 @@ describe('POST /app/interact/:token/gamble', () => {
     it('bounces a bad bet back onto the interact page with the game flag', async () => {
         const owner = createUser(state, 'gtarget@example.com', 'gtarget_user');
         const challenger = createUser(state, 'gchall@example.com', 'gchall_user');
-        giveCoins(state, challenger.id, 50);
+        grantCoins(state, challenger.id, 50);
         const token = getOrCreateInteractToken(state, owner.id);
 
         const res = await app.request(`/app/interact/${token}/gamble`, {

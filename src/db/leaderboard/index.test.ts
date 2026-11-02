@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import { listGroupLeaderboard, listPlayerLeaderboard, type LeaderboardBoard } from './index.js';
 import { addGroupMember, createGroup, deleteGroup, removeGroupMember } from '../groups/index.js';
 import { createUser } from '../users/index.js';
-import { giveCoins, insertTransaction } from '../transactions/index.js';
+import { grantCoins, insertTransaction } from '../transactions/index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});
@@ -26,8 +26,8 @@ describe('db/leaderboard listPlayerLeaderboard activity', () => {
     it('ranks users by earned coins, highest first', () => {
         const a = user('lb_act_a');
         const b = user('lb_act_b');
-        giveCoins(state, a.id, 10);
-        giveCoins(state, b.id, 30);
+        grantCoins(state, a.id, 10);
+        grantCoins(state, b.id, 30);
 
         const rows = listPlayerLeaderboard(state, 'activity');
         const top = rows.filter((r) => r.username.startsWith('lb_act_'));
@@ -43,7 +43,7 @@ describe('db/leaderboard listPlayerLeaderboard activity', () => {
     it('counts host grants but not transfers, purchases, or gambling', () => {
         const earner = user('lb_act_kinds');
         user('lb_act_other');
-        giveCoins(state, earner.id, 10);
+        grantCoins(state, earner.id, 10);
         insertTransaction(state, 'host_grant', earner.id, 5);
         // positive deltas of non-earning kinds must not count
         insertTransaction(state, 'transfer', earner.id, 50);
@@ -60,7 +60,7 @@ describe('db/leaderboard listPlayerLeaderboard activity', () => {
         const nobody = user('lb_act_zero');
         const staff = user('lb_act_staff');
         setRole(staff.id, 'host');
-        giveCoins(state, staff.id, 999);
+        grantCoins(state, staff.id, 999);
 
         const rows = listPlayerLeaderboard(state, 'activity');
         assert.equal(rows.find((r) => r.userId === nobody.id)?.score, 0);
@@ -92,7 +92,7 @@ describe('db/leaderboard listPlayerLeaderboard gambling', () => {
         insertTransaction(state, 'gambling_winnings', player.id, 10);
         insertTransaction(state, 'gambling_deduction', player.id, -5);
         const clean = user('lb_gam_clean');
-        giveCoins(state, clean.id, 100);
+        grantCoins(state, clean.id, 100);
 
         const rows = listPlayerLeaderboard(state, 'gambling');
         const row = rows.find((r) => r.userId === player.id)!;
@@ -108,7 +108,7 @@ describe('db/leaderboard listPlayerLeaderboard combined', () => {
     it('ranks by net balance across all kinds', () => {
         const rich = user('lb_all_rich');
         const poor = user('lb_all_poor');
-        giveCoins(state, rich.id, 40);
+        grantCoins(state, rich.id, 40);
         insertTransaction(state, 'transfer', rich.id, -10);
         insertTransaction(state, 'gambling_winnings', poor.id, 15);
 
@@ -126,7 +126,7 @@ describe('db/leaderboard listPlayerLeaderboard combined', () => {
 describe('db/leaderboard listGroupLeaderboard', () => {
     it('sums coins earned while stamped to the group', () => {
         const { user: u, group } = grouped('lb_gs_u', 'lb gs group');
-        giveCoins(state, u.id, 20);
+        grantCoins(state, u.id, 20);
         insertTransaction(state, 'host_grant', u.id, 5);
         insertTransaction(state, 'gambling_winnings', u.id, 99); // never counts on activity
 
@@ -137,10 +137,10 @@ describe('db/leaderboard listGroupLeaderboard', () => {
 
     it('counts nothing earned before joining or by non-members', () => {
         const future = user('lb_gs_late');
-        giveCoins(state, future.id, 100); // groupless: group_id stays NULL
+        grantCoins(state, future.id, 100); // groupless: group_id stays NULL
         const { group } = grouped('lb_gs_member', 'lb gs timing');
         const outsider = user('lb_gs_out');
-        giveCoins(state, outsider.id, 50);
+        grantCoins(state, outsider.id, 50);
         addGroupMember(state, group.id, future.id);
 
         const row = listGroupLeaderboard(state, 'activity').find((g) => g.id === group.id)!;
@@ -153,7 +153,7 @@ describe('db/leaderboard listGroupLeaderboard', () => {
         const b = user('lb_gs_b');
         addGroupMember(state, group.id, a.id);
         addGroupMember(state, group.id, b.id);
-        giveCoins(state, a.id, 40);
+        grantCoins(state, a.id, 40);
         assert.equal(removeGroupMember(state, group.id, a.id), 'removed');
 
         const row = listGroupLeaderboard(state, 'activity').find((g) => g.id === group.id)!;
@@ -163,7 +163,7 @@ describe('db/leaderboard listGroupLeaderboard', () => {
 
     it('clears stamps when the group is deleted', () => {
         const { user: u, group } = grouped('lb_gs_del', 'lb gs deleted');
-        giveCoins(state, u.id, 10);
+        grantCoins(state, u.id, 10);
 
         assert.ok(deleteGroup(state, group.id, u.id));
         const stamp = state
@@ -177,8 +177,8 @@ describe('db/leaderboard listGroupLeaderboard', () => {
         for (const board of boards) {
             const zeta = grouped('lb_ord_z', 'lb ord zeta').group;
             const alpha = grouped('lb_ord_a', 'lb ord alpha').group;
-            giveCoins(state, zeta.ownerId, 5);
-            giveCoins(state, alpha.ownerId, 50);
+            grantCoins(state, zeta.ownerId, 5);
+            grantCoins(state, alpha.ownerId, 50);
 
             const rows = listGroupLeaderboard(state, board).filter((g) =>
                 g.name.startsWith('lb ord '),
