@@ -8,7 +8,7 @@ export default function LanguageToggle() {
     const { lang, updateLang } = useContext(ClientContext);
 
     function handleChange(newLang: string) {
-        document.cookie = `${cookieLanguage}=${newLang}`;
+        document.cookie = `${cookieLanguage}=${newLang}; path=/; SameSite=Lax`;
         updateLang(newLang as LanguageCode);
     }
 
