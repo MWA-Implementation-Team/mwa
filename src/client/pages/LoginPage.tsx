@@ -2,6 +2,7 @@ import { Page } from '#src/client/pages.js';
 import { useContext } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import PageShell from './app/PageShell.js';
+import { Toast } from '#src/client/ui/Toast.js';
 
 export type LoginErrorKey =
     | 'loginInvalidEmail'
@@ -16,6 +17,9 @@ type LoginPageProps = {
     sentTo?: string;
     challengeId?: string;
     sentKind?: 'login' | 'signup';
+    // set by GET /auth/verify — the emailed link lands here and only the
+    // posted form spends the one-shot token
+    confirmToken?: string;
     goto?: string;
 };
 
@@ -24,13 +28,29 @@ export const loginPage: Page<LoginPageProps> = {
     title: (t) => t('titleLogin'),
 };
 
-function LoginPage({ errorKey, sentTo, challengeId, sentKind, goto }: LoginPageProps) {
+function LoginPage({
+    errorKey,
+    sentTo,
+    challengeId,
+    sentKind,
+    confirmToken,
+    goto,
+}: LoginPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="login" nav={false}>
             <section class="mwa-panel">
                 <div class="mwa-panel-body">
-                    {sentTo && challengeId ? (
+                    {confirmToken ? (
+                        <>
+                            <p class="mwa-muted">{t('loginConfirmPrompt')}</p>
+                            <form method="POST" action="/auth/verify" class="mwa-form">
+                                <input type="hidden" name="token" value={confirmToken} />
+                                {goto && <input type="hidden" name="goto" value={goto} />}
+                                <button type="submit">{t('loginConfirmSubmit')}</button>
+                            </form>
+                        </>
+                    ) : sentTo && challengeId ? (
                         <>
                             <p class="mwa-muted">
                                 {sentKind === 'signup'
@@ -70,11 +90,7 @@ function LoginPage({ errorKey, sentTo, challengeId, sentKind, goto }: LoginPageP
                         </form>
                     )}
 
-                    {errorKey && (
-                        <p class="mwa-note mwa-note--error" role="alert">
-                            {t(errorKey)}
-                        </p>
-                    )}
+                    {errorKey && <Toast kind="error">{t(errorKey)}</Toast>}
                 </div>
             </section>
         </PageShell>

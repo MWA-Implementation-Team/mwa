@@ -71,6 +71,11 @@ export function registerNodeModulesRoutes(app: MwaHono) {
         '/preact-jsx-runtime.module.js',
         serveStatic({ path: 'node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js' }),
     );
+
+    app.get(
+        '/preact-compat.module.js',
+        serveStatic({ path: 'node_modules/preact/compat/dist/compat.module.js' }),
+    );
 }
 
 type RootProps<P extends RegisteredPageId> = {
@@ -96,6 +101,7 @@ export function Root<P extends RegisteredPageId>({
             preact: '/preact.module.js',
             'chess.js': '/chess.module.js',
             'preact/hooks': '/preact-hooks.module.js',
+            'preact/compat': '/preact-compat.module.js',
             'preact/jsx-runtime': '/preact-jsx-runtime.module.js',
         },
     };

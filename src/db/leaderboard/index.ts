@@ -17,6 +17,8 @@ export type GroupRow = {
     name: string;
     memberCount: number;
     score: number;
+    // a disbanded group keeps its row and score but is marked on the page
+    disbanded: boolean;
 };
 
 // kinds that mint coins into the economy. Transfers, purchases and gambling
@@ -108,7 +110,8 @@ export function listGroupLeaderboard(state: MwaState, board: LeaderboardBoard): 
         groups.id,
         groups.name,
         COALESCE(m.member_count, 0) AS member_count,
-        COALESCE(s.score, 0) AS score
+        COALESCE(s.score, 0) AS score,
+        groups.disbanded_at IS NOT NULL AS disbanded
     FROM groups
     LEFT JOIN (
         SELECT group_id, COUNT(*) AS member_count
@@ -130,5 +133,6 @@ export function listGroupLeaderboard(state: MwaState, board: LeaderboardBoard): 
         name: row.name as string,
         memberCount: row.member_count as number,
         score: row.score as number,
+        disbanded: Boolean(row.disbanded),
     }));
 }

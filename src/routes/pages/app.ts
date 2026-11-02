@@ -1,9 +1,5 @@
 import { requireRole, requireUser } from '#src/auth.js';
-import {
-    listUserTransactions,
-    insertTransaction,
-    transferCoins,
-} from '#src/db/transactions/index.js';
+import { grantCoins, listUserTransactions, transferCoins } from '#src/db/transactions/index.js';
 import {
     LeaderboardBoard,
     listGroupLeaderboard,
@@ -13,7 +9,7 @@ import {
 import {
     acceptGroupInvite,
     createGroupInvite,
-    deleteGroup,
+    disbandGroup,
     deleteGroupInvite,
     findGroupInviteById,
     findUserGroup,
@@ -32,6 +28,7 @@ import {
     QUEUE_MIN_GROUP_SIZE,
     getQueuePosition,
     getUserWaitingEntry,
+    listGroupCompletions,
     listWaitingQueue,
     listStationGroups,
 } from '#src/db/queue/index.js';
@@ -84,11 +81,13 @@ export function registerAppRoutes(app: MwaHono) {
             'queueJoinFailed',
             'queueLeaveFailed',
             'queueTooSmall',
+            'queueAtStation',
+            'queueAllDone',
         ] as const);
         const groupError = queryFlag(ctx, 'groupError', [
             'groupKickFailed',
             'groupLeaveFailed',
-            'groupDeleteFailed',
+            'groupDisbandFailed',
             'groupEditFailed',
             'groupNameTaken',
             'groupAcceptFailed',
@@ -98,6 +97,7 @@ export function registerAppRoutes(app: MwaHono) {
         const qrClaimed = Number(ctx.req.query('claimed'));
         const qrClaimedAmount = Number.isSafeInteger(qrClaimed) && qrClaimed > 0 ? qrClaimed : null;
         const qrError = queryFlag(ctx, 'qrError', [
+            'not_found',
             'expired',
             'used_up',
             'already_claimed',
@@ -105,6 +105,13 @@ export function registerAppRoutes(app: MwaHono) {
         const youError = queryFlag(ctx, 'youError', [
             'youUsernameTaken',
             'youUsernameInvalid',
+        ] as const);
+        const youNotice = queryFlag(ctx, 'youNotice', ['youSaved', 'youQrReset'] as const);
+        const groupNotice = queryFlag(ctx, 'groupNotice', [
+            'groupSaved',
+            'groupKicked',
+            'groupDeleted',
+            'groupLeft',
         ] as const);
 
         // QRs minted while the interact flow was a dialog on /app point to
@@ -131,6 +138,8 @@ export function registerAppRoutes(app: MwaHono) {
             );
         }
 
+        const completed = group ? listGroupCompletions(ctx.var, group.id) : [];
+
         return writePage(ctx, 'home', {
             transactions: listUserTransactions(ctx.var, user.id),
             groupName: group?.name ?? null,
@@ -140,10 +149,19 @@ export function registerAppRoutes(app: MwaHono) {
             groupOwnerId: group?.ownerId ?? null,
             groupMembers,
             groupError,
+            groupNotice,
             youError,
+            youNotice,
             queueError,
             qrClaimedAmount,
             qrError,
+            stationProgress: group
+                ? (Object.keys(registeredActivities) as ActivitySlug[]).map((slug) => ({
+                      slug,
+                      name: registeredActivities[slug].name,
+                      done: completed.includes(slug),
+                  }))
+                : null,
             queueCanJoin: memberCount >= QUEUE_MIN_GROUP_SIZE,
             queuePosition: queueEntry ? getQueuePosition(ctx.var, queueEntry.id) : null,
             standings: listViewerStandings(ctx.var, user.id, group?.id ?? null),
@@ -160,20 +178,21 @@ export function registerAppRoutes(app: MwaHono) {
         if (!group || removeGroupMember(ctx.var, group.id, user.id) !== 'removed') {
             return ctx.redirect('/app?groupError=groupLeaveFailed#panel-group', 303);
         }
-        return ctx.redirect('/app#panel-group', 303);
+        return ctx.redirect('/app?groupNotice=groupLeft#panel-group', 303);
     });
 
-    // Deleting is the owner's only way out — owner check is inside
-    // deleteGroup, members/queue rows cascade away with the group.
-    app.post('/app/group/delete', (ctx) => {
+    // Disbanding is the owner's only way out — owner check is inside
+    // disbandGroup. It's a soft delete: the row stays (scores and queue
+    // history survive), members leave and queue spots close.
+    app.post('/app/group/disband', (ctx) => {
         const user = requireUser(ctx);
         if (user instanceof Response) return user;
 
         const group = findUserGroup(ctx.var, user.id);
-        if (!group || !deleteGroup(ctx.var, group.id, user.id)) {
-            return ctx.redirect('/app?groupError=groupDeleteFailed#panel-group', 303);
+        if (!group || !disbandGroup(ctx.var, group.id, user.id)) {
+            return ctx.redirect('/app?groupError=groupDisbandFailed#panel-group', 303);
         }
-        return ctx.redirect('/app#panel-group', 303);
+        return ctx.redirect('/app?groupNotice=groupDeleted#panel-group', 303);
     });
 
     // Kicking is owner-only; removeGroupMember refuses non-members and
@@ -193,7 +212,7 @@ export function registerAppRoutes(app: MwaHono) {
         ) {
             return ctx.redirect('/app?groupError=groupKickFailed#panel-group', 303);
         }
-        return ctx.redirect('/app#panel-group', 303);
+        return ctx.redirect('/app?groupNotice=groupKicked#panel-group', 303);
     });
 
     // The group's name/phone are edited from the home table's per-field
@@ -220,7 +239,7 @@ export function registerAppRoutes(app: MwaHono) {
         const result = updateGroup(ctx.var, group.id, user.id, name, phoneNumber);
         if (result === 'taken') return ctx.redirect('/app?groupError=groupNameTaken', 303);
         if (result !== 'updated') return ctx.redirect('/app?groupError=groupEditFailed', 303);
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app?groupNotice=groupSaved', 303);
     });
 
     // Join request from the interact page — the requester asks into the
@@ -233,6 +252,7 @@ export function registerAppRoutes(app: MwaHono) {
         const token = ctx.req.param('token');
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+        if (user.role !== 'user' || target.role !== 'user') return writeErrorPage(ctx, 403);
 
         const back = `/app/interact/${encodeURIComponent(token)}`;
         if (findUserGroup(ctx.var, user.id)) {
@@ -298,7 +318,7 @@ export function registerAppRoutes(app: MwaHono) {
             const error = result === 'taken' ? 'youUsernameTaken' : 'youUsernameInvalid';
             return ctx.redirect(`/app?youError=${error}`, 303);
         }
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app?youNotice=youSaved', 303);
     });
 
     app.post('/app/queue/join', (ctx) => {
@@ -311,6 +331,12 @@ export function registerAppRoutes(app: MwaHono) {
         const result = joinQueue(ctx.var, group.id);
         if (result.type === 'too_small') {
             return ctx.redirect('/app?queueError=queueTooSmall#panel-game', 303);
+        }
+        if (result.type === 'at_station') {
+            return ctx.redirect('/app?queueError=queueAtStation#panel-game', 303);
+        }
+        if (result.type === 'all_done') {
+            return ctx.redirect('/app?queueError=queueAllDone#panel-game', 303);
         }
         if (result.type !== 'joined') {
             return ctx.redirect('/app?queueError=queueJoinFailed#panel-game', 303);
@@ -418,7 +444,7 @@ export function registerAppRoutes(app: MwaHono) {
             return ctx.redirect(`${target}&error=hostRequestFailed`, 303);
         }
 
-        callNextGroups(ctx.var, Math.min(count, 20), station);
+        callNextGroups(ctx.var, Math.min(count, 4), station);
         return ctx.redirect(target, 303);
     });
 
@@ -451,6 +477,7 @@ export function registerAppRoutes(app: MwaHono) {
         const token = ctx.req.param('token');
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+        if (user.role !== 'user' || target.role !== 'user') return writeErrorPage(ctx, 403);
 
         const form = await ctx.req.formData().catch(() => null);
         if (!form) return writeErrorPage(ctx, 400);
@@ -479,16 +506,8 @@ export function registerAppRoutes(app: MwaHono) {
         if (!target) return writeErrorPage(ctx, 404);
 
         const self = target.id === user.id;
-        // Profile detail is serialized into #ssr-data — populate it only for
-        // roles whose view includes it, never for regular users.
-        const detail =
-            !self && (user.role === 'host' || user.role === 'admin')
-                ? {
-                      email: target.email,
-                      currentBalance: target.currentBalance,
-                      joinedAt: target.createdAt.toISOString(),
-                  }
-                : null;
+        // staff get the award-shaped send panel instead of play actions
+        const canAward = !self && (user.role === 'host' || user.role === 'admin');
 
         const interactError = queryFlag(ctx, 'interactError', [
             'groupRequestFailed',
@@ -537,12 +556,13 @@ export function registerAppRoutes(app: MwaHono) {
             token,
             self,
             target: { username: target.username },
+            canPlay: user.role === 'user' && target.role === 'user',
             group,
             groupEmoji,
             // same three boards as the home standings table, for the target
             // and their team
             standings: listViewerStandings(ctx.var, target.id, targetGroup?.id ?? null),
-            detail,
+            canAward,
             interactError,
             interactNotice,
             sendError,
@@ -572,7 +592,7 @@ export function registerAppRoutes(app: MwaHono) {
         const note = form.get('note');
         const noteText = typeof note === 'string' && note.trim() ? note.trim().slice(0, 200) : null;
 
-        insertTransaction(ctx.var, 'system', target.id, amount, undefined, noteText);
+        grantCoins(ctx.var, target.id, amount, noteText);
         return ctx.redirect(`${back}?interactNotice=interactAwarded`, 303);
     });
 
@@ -595,6 +615,6 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         rotateInteractToken(ctx.var, user.id);
-        return ctx.redirect('/app', 303);
+        return ctx.redirect('/app?youNotice=youQrReset', 303);
     });
 }

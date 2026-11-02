@@ -15,6 +15,7 @@ export type SystemQrCode = {
 
 export type SystemQrClaimResult =
     | { type: 'claimed'; balanceDelta: number }
+    | { type: 'not_found' }
     | { type: 'expired' }
     | { type: 'used_up' }
     | { type: 'already_claimed' };
@@ -69,7 +70,7 @@ export function claimSystemQrCode(
 ): SystemQrClaimResult {
     return runTransaction(state.db, () => {
         const qr = findSystemQrCodeBySecret(state, secret);
-        if (!qr) return { type: 'used_up' };
+        if (!qr) return { type: 'not_found' };
         if (qr.expiresAt && qr.expiresAt <= new Date().toISOString()) {
             return { type: 'expired' };
         }

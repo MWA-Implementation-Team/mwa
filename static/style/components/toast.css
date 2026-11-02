@@ -1,0 +1,64 @@
+/* Toast stack — fixed bottom-right. While a modal <dialog> is open the stack
+   portals into it: the dialog's transform makes it the containing block, so
+   the same insets pin the stack to the dialog's bottom-right corner. */
+.mwa-toasts {
+    position: fixed;
+    inset: auto var(--space-3) var(--space-3) auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+    width: fit-content;
+    max-width: min(30rem, calc(100% - 2 * var(--space-3)));
+    /* Oat pads direct div children of <dialog> and lets them scroll — neither
+       fits a floating stack */
+    padding: 0;
+    overflow: visible;
+    color: var(--foreground);
+}
+
+/* Portaled into an open <dialog>: pinned to the dialog's top-right — the
+   bottom-right collides with the footer's action buttons. */
+.mwa-toasts--in-dialog {
+    inset: var(--space-3) var(--space-3) auto auto;
+}
+
+.mwa-toast {
+    padding: var(--space-3);
+    background: var(--muted);
+    border: 3px solid var(--border);
+    color: var(--foreground);
+    font-size: var(--text-7);
+    box-shadow: var(--shadow-panel);
+    cursor: pointer;
+    animation: mwa-toast-in 0.2s ease-out;
+}
+
+/* The kind tints are translucent — layer them over the opaque --muted base
+   instead of swapping the background so stacked toasts don't show through. */
+.mwa-toast--error {
+    color: var(--toast-error-fg);
+    background-image: linear-gradient(var(--toast-error-bg), var(--toast-error-bg));
+    border-color: var(--toast-error-border);
+}
+
+.mwa-toast--success {
+    color: var(--toast-success-fg);
+    background-image: linear-gradient(var(--toast-success-bg), var(--toast-success-bg));
+    border-color: var(--toast-success-border);
+}
+
+.mwa-toast--closing {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+    transition:
+        opacity 0.2s ease-in,
+        transform 0.2s ease-in;
+}
+
+@keyframes mwa-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(var(--space-2));
+    }
+}

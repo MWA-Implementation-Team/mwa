@@ -50,12 +50,6 @@ FROM users
 LEFT JOIN child_transactions ON child_transactions.user_id = users.id
 `;
 
-export function listUsers(state: MwaState): User[] {
-    const listUsersQuery = state.prepare(`${selectUserWithBalance} GROUP BY users.id`);
-
-    return listUsersQuery.all().map((row) => mapUser(row));
-}
-
 export function findUserByUsername(state: MwaState, username: string): User | null {
     const userByUsernameQuery = state.prepare(
         `${selectUserWithBalance} WHERE username = ? GROUP BY users.id`,

@@ -15,8 +15,10 @@ alongside mailpit; the web inbox is at http://localhost:8025. Bare-metal
 to load `.env`; production startup uses the process environment.
 
 The factory selects SMTP when `MWA_SMTP_HOST` is set. It also reads `MWA_SMTP_PORT`
-(default `25`), `MWA_SMTP_SECURE` (`true` enables TLS), and `MWA_MAIL_FROM` (default
-`mwa@localhost`). The login route calls
+(default `25`), `MWA_SMTP_SECURE` (`true` enables implicit TLS), `MWA_SMTP_STARTTLS`
+(`true` requires a STARTTLS upgrade — the send fails rather than going plaintext),
+`MWA_SMTP_USER`/`MWA_SMTP_PASS` (SMTP auth — set only when the relay needs it), and
+`MWA_MAIL_FROM` (default `mwa@localhost`). The login route calls
 `ctx.var.mailer.sendLoginEmail(to, { lang, url, code })`. `getRequestLanguage(ctx)`
 reads the language cookie, defaulting to English. The email subject, HTML body,
 and plain-text fallback use that language through the shared translation system.
@@ -42,9 +44,16 @@ There is no global transport setter.
   `attempts` on the row — 5 strikes kills it. Resends are capped at one per
   minute per email, and a successfully sent email invalidates the previous
   token (a failed send discards the new row, so the old link stays alive).
-- **`GET /auth/verify?token=`** and **`POST /auth/verify` (`email` + `code`)**
-  (`src/routes/pages/auth.ts`) share `logIn`: consume the token atomically
-  (replays get an error page), then resolve the user — registered email →
+  The code form carries an independent random `challenge_id`, stored as a hash
+  (migration 15). Only that challenge's attempts can be consumed; the email alone
+  cannot select it. Cooldown responses return HTTP 429 with `Retry-After`, without
+  disclosing an existing challenge.
+- **`GET /auth/verify?token=`** (`src/routes/pages/auth.ts`) never redeems —
+  mail scanners prefetch links, so it only renders a confirm form posting the
+  token back. **`POST /auth/verify`** consumes the token atomically when the
+  form carries a non-empty `token` (replays get an error page) and otherwise
+  runs the `challenge_id` + `code` fallback. Both paths share `logIn`: resolve the
+  user — registered email →
   `markEmailVerified`; new email → `createUser` with a `deriveUsername`-derived
   name (local part sanitized to `[a-z0-9_-]`, deduped). A `sessions` row (30 days,
   sha256 at rest) becomes the `mwa-session` cookie (`HttpOnly`, `SameSite=Lax`,
@@ -58,7 +67,9 @@ There is no global transport setter.
   redirect, wrong role → 403 page) and `requireApiUser` / `requireApiRole` for
   JSON routes (401/403 JSON). See the policy table below.
 - **`POST /app` (logout)** deletes the session row _and_ the cookie — the token
-  stops working server-side immediately.
+  stops working server-side immediately. Notification streams revalidate their
+  original session before sending updates; invalid sessions cause `session-ended`
+  and closure. Idle streams wait for the next update, without watchers or timers.
 - **CSRF**: `hono/csrf` runs on all form-encoded POSTs (see `src/main.ts`) —
   requests without a matching `Sec-Fetch-Site`/`Origin` get 403. Curl users add
   `-H 'Origin: http://localhost:3000'`.
@@ -80,12 +91,11 @@ sqlite3 db.sqlite "UPDATE users SET role = 'host' WHERE username = 'alice';"
 | `GET /app`, `GET /app/*`                                         | `requireUser`                                           |
 | `POST /app` (logout)                                             | session cookie                                          |
 | `GET /app/admin`, `POST /app/admin/*`                            | admin in production; any logged-in user in dev          |
-| `GET /api/users`                                                 | `requireApiUser`                                        |
 | `GET /api/notifications`, `GET /app/gambling/sessions/:id/watch` | `requireApiUser`                                        |
 | Gambling challenge/accept/reject POSTs                           | `requireUser`; accept/reject require the invited player |
 
 `POST /app/admin/mint-coins` takes `username` and a positive safe-integer `amount`,
-crediting a `system` transaction through `giveCoins`. In dev, any logged-in
+crediting a `host_grant` transaction through `grantCoins`. In dev, any logged-in
 user can visit `/app/admin` directly; the navigation link remains admin-only.
 
 Connect 4's `POST /app/gambling/sessions/:id/c4-place` and chess's
@@ -99,21 +109,23 @@ only accept moves on that player's turn in a running game.
    and shows a code field.
 3. With the console mailer, look for `[console mailer] alice@mwa.dev` followed by
    the subject and email text containing the link and code. With SMTP/mailpit, open
-   the web inbox instead. Open the link — you're logged in; the header shows
-   `App (alice)`.
+   the web inbox instead. Open the link and press **Continue** on the confirm
+   page — you're logged in; the header shows `App (alice)`.
 4. Or instead: submit again, then type the **code** into the field — same result.
 5. A fresh email → "signup link" copy; the link creates the
    account and lands on `/app` with a derived username.
-6. The same link/code a second time → "expired or already used".
+6. Submitting the same link/code a second time → "expired or already used"
+   (reopening the link just shows the confirm form again).
 7. **Logout** → back at `/login`; the old cookie value is dead.
 8. For curl tests you need a real session cookie — mint one through the flow:
 
     ```shell
     curl -s -X POST localhost:3000/login -H 'Origin: http://localhost:3000' \
         -d 'email=alice@mwa.dev'
-    # copy the link from the server console, then:
-    curl -s -c cookies.txt 'http://localhost:3000/auth/verify?token=…'
-    curl -s -b cookies.txt localhost:3000/api/users   # → 200 JSON
+    # copy the token from the link in the server console, then:
+    curl -s -c cookies.txt -X POST localhost:3000/auth/verify \
+        -H 'Origin: http://localhost:3000' -d 'token=…'
+    curl -s -b cookies.txt -o /dev/null -w '%{http_code}\n' localhost:3000/app   # → 200
     ```
 
     `mwa-session` is an opaque token — you can't forge it in the browser console

@@ -36,18 +36,13 @@ export type Language = {
     loginSentSignup: string;
     loginCode: string;
     loginVerify: string;
+    loginConfirmPrompt: string;
+    loginConfirmSubmit: string;
 
     interactSelfJoke: string;
     interactGeneralTitle: string;
     interactSendMoneyTitle: string;
-    interactProfileDetailTitle: string;
-    interactDetailEmail: string;
-    interactDetailBalance: string;
-    interactDetailJoined: string;
-    interactAwardTitle: string;
-    interactAwardAmount: string;
     interactAwardNote: string;
-    interactAwardSubmit: string;
     interactSendSubmit: string;
     interactSendAvailable: string;
     interactSendAll: string;
@@ -60,6 +55,7 @@ export type Language = {
     accountQrHint: string;
     accountQrReset: string;
     qrClaimed: string;
+    qrErrorNotFound: string;
     qrErrorExpired: string;
     qrErrorUsedUp: string;
     qrErrorAlreadyClaimed: string;
@@ -103,6 +99,9 @@ export type Language = {
     queueGroupSize: string;
     queueNeedGroup: string;
     queueTooSmall: string;
+    queueAtStation: string;
+    queueAllDone: string;
+    homeStationProgress: string;
     queueJoinFailed: string;
     queueLeaveFailed: string;
     dashStandings: string;
@@ -115,6 +114,7 @@ export type Language = {
     hostPrevStation: string;
     hostNextStation: string;
     hostDone: string;
+    hostAlreadyDone: string;
     hostNextUp: string;
     hostQueueEmpty: string;
     hostRequestFailed: string;
@@ -133,6 +133,7 @@ export type Language = {
     dialogClose: string;
 
     activityBack: string;
+    activityCompleted: string;
 
     leaderboardTypeLabel: string;
     leaderboardScopeLabel: string;
@@ -149,6 +150,7 @@ export type Language = {
     leaderboardColGames: string;
     leaderboardNoGroups: string;
     leaderboardNoPlayers: string;
+    lbDisbanded: string;
     leaderboardMemberCount: string;
     leaderboardGames: string;
     leaderboardGroupTag: string;
@@ -161,6 +163,8 @@ export type Language = {
     youEmail: string;
     youRole: string;
     youSave: string;
+    youSaved: string;
+    youQrReset: string;
     youUsernameTaken: string;
     youUsernameInvalid: string;
     adminPanelHead: string;
@@ -173,16 +177,20 @@ export type Language = {
     groupKickHint: string;
     groupLeave: string;
     groupLeaveHint: string;
-    groupDeleteHint: string;
+    groupDisbandHint: string;
     groupKickFailed: string;
     groupLeaveFailed: string;
+    groupKicked: string;
+    groupDeleted: string;
+    groupLeft: string;
     groupName: string;
     groupPhone: string;
     groupSettings: string;
     groupSettingsEdit: string;
-    groupDelete: string;
-    groupDeleteConfirm: string;
-    groupDeleteFailed: string;
+    groupSaved: string;
+    groupDisband: string;
+    groupDisbandConfirm: string;
+    groupDisbandFailed: string;
     groupRequestJoin: string;
     groupInviteCreates: string;
     groupRequestSent: string;
@@ -305,18 +313,13 @@ export const languages: Record<LanguageCode, Language> = {
         loginSentSignup: 'We sent a signup link to {email} — click it to create your account.',
         loginCode: 'Code from the email',
         loginVerify: 'Verify code',
+        loginConfirmPrompt: 'Continue to sign in.',
+        loginConfirmSubmit: 'Continue',
 
         interactSelfJoke: "That's you! Scan someone else's code instead.",
         interactGeneralTitle: 'General information',
         interactSendMoneyTitle: 'Send money',
-        interactProfileDetailTitle: 'Profile details',
-        interactDetailEmail: 'Email',
-        interactDetailBalance: 'Balance',
-        interactDetailJoined: 'Joined',
-        interactAwardTitle: 'Award coins',
-        interactAwardAmount: 'Amount',
         interactAwardNote: 'Note (optional)',
-        interactAwardSubmit: 'Award',
         interactSendSubmit: 'Send',
         interactSendAvailable: 'Available {amount}',
         interactSendAll: 'All',
@@ -330,6 +333,7 @@ export const languages: Record<LanguageCode, Language> = {
             'Your personal QR is shown in the sidebar. Reset it to invalidate the old code.',
         accountQrReset: 'Reset QR code',
         qrClaimed: 'You found {amount} coins!',
+        qrErrorNotFound: "This QR code doesn't exist.",
         qrErrorExpired: 'This QR code has expired.',
         qrErrorUsedUp: 'This QR code has already been fully used.',
         qrErrorAlreadyClaimed: 'You have already claimed this QR code.',
@@ -373,6 +377,10 @@ export const languages: Record<LanguageCode, Language> = {
         queueGroupSize: '{n} people in the group',
         queueNeedGroup: 'You need a group to join the queue.',
         queueTooSmall: 'Your group needs at least 2 people to join the queue.',
+        queueAtStation:
+            'Your team is at a station right now — finish it before rejoining the queue.',
+        queueAllDone: 'Your team has completed every station!',
+        homeStationProgress: 'Stations',
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
         dashStandings: 'Your standings',
@@ -385,6 +393,7 @@ export const languages: Record<LanguageCode, Language> = {
         hostPrevStation: 'Previous station',
         hostNextStation: 'Next station',
         hostDone: 'Done',
+        hostAlreadyDone: 'done here',
         hostNextUp: 'Next in line',
         hostQueueEmpty: 'The queue is empty',
         hostRequestFailed: 'Could not request groups',
@@ -403,6 +412,7 @@ export const languages: Record<LanguageCode, Language> = {
         dialogClose: 'Close',
 
         activityBack: '← back to activities',
+        activityCompleted: '✓ Your team completed this station',
 
         leaderboardTypeLabel: 'Leaderboard board',
         leaderboardScopeLabel: 'Leaderboard scope',
@@ -419,6 +429,7 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardColGames: 'games',
         leaderboardNoGroups: 'No groups yet.',
         leaderboardNoPlayers: 'No players yet.',
+        lbDisbanded: 'disbanded',
         leaderboardMemberCount: '{n} member(s)',
         leaderboardGames: '{n} game(s)',
         leaderboardGroupTag: '*group',
@@ -431,6 +442,8 @@ export const languages: Record<LanguageCode, Language> = {
         youEmail: 'Email',
         youRole: 'Role',
         youSave: 'Save',
+        youSaved: 'Settings saved.',
+        youQrReset: 'QR code reset.',
         youUsernameTaken: 'That username is taken',
         youUsernameInvalid: 'Usernames are 1–16 lowercase letters, numbers, _ or -',
         adminPanelHead: 'administration',
@@ -443,16 +456,20 @@ export const languages: Record<LanguageCode, Language> = {
         groupKickHint: 'Remove {name} from the group',
         groupLeave: 'Leave',
         groupLeaveHint: 'Leave this group',
-        groupDeleteHint: 'Delete this group and all its members',
+        groupDisbandHint: 'Disband this group and remove all members',
         groupKickFailed: 'Could not remove the member',
         groupLeaveFailed: 'Could not leave the group',
+        groupKicked: 'Member kicked.',
+        groupDeleted: 'Group deleted.',
+        groupLeft: 'Left the group.',
         groupName: 'Name',
         groupPhone: 'Emergency phone',
         groupSettings: 'Group settings',
         groupSettingsEdit: 'Edit group settings',
-        groupDelete: 'Delete group',
-        groupDeleteConfirm: 'Delete group?',
-        groupDeleteFailed: 'failed to delete group',
+        groupSaved: 'Group settings saved.',
+        groupDisband: 'Disband group',
+        groupDisbandConfirm: 'Disband group?',
+        groupDisbandFailed: 'failed to disband group',
         groupRequestJoin: 'Join their team',
         groupInviteCreates: 'Accepting creates a new team with you as the owner.',
         groupRequestSent: 'Join request sent.',
@@ -577,18 +594,13 @@ export const languages: Record<LanguageCode, Language> = {
             'Išsiuntėme registracijos nuorodą į {email} — paspausk ją, kad sukurtum paskyrą.',
         loginCode: 'Kodas iš laiško',
         loginVerify: 'Patvirtinti kodą',
+        loginConfirmPrompt: 'Tęskite, kad prisijungtumėte.',
+        loginConfirmSubmit: 'Tęsti',
 
         interactSelfJoke: 'Tai jūs! Nuskanuokite ką nors kitą.',
         interactGeneralTitle: 'Bendra informacija',
         interactSendMoneyTitle: 'Siųsti pinigus',
-        interactProfileDetailTitle: 'Profilio detalės',
-        interactDetailEmail: 'El. paštas',
-        interactDetailBalance: 'Balansas',
-        interactDetailJoined: 'Prisijungė',
-        interactAwardTitle: 'Suteikti miciaus koinų',
-        interactAwardAmount: 'Suma',
         interactAwardNote: 'Žinutė (neprivaloma)',
-        interactAwardSubmit: 'Suteikti',
         interactSendSubmit: 'Siųsti',
         interactSendAvailable: 'Galima {amount}',
         interactSendAll: 'Viską',
@@ -602,6 +614,7 @@ export const languages: Record<LanguageCode, Language> = {
             'Jūsų asmeninis QR rodomas šone. Čia galite jį sukurti iš naujo (senasis nustos veikti).',
         accountQrReset: 'Iš naujo sukurti QR kodą',
         qrClaimed: 'Radote {amount} miciaus koinų!',
+        qrErrorNotFound: 'Šis QR kodas neegzistuoja.',
         qrErrorExpired: 'Šis QR kodas nebegalioja.',
         qrErrorUsedUp: 'Šis QR kodas jau panaudotas.',
         qrErrorAlreadyClaimed: 'Jūs jau panaudojote šį QR kodą.',
@@ -645,6 +658,9 @@ export const languages: Record<LanguageCode, Language> = {
         queueGroupSize: '{n} nariai grupėje',
         queueNeedGroup: 'Norint stoti į eilę, reikia grupės.',
         queueTooSmall: 'Norint stoti į eilę, grupėje turi būti bent 2 nariai.',
+        queueAtStation: 'Jūsų komanda dabar prie stotelės — užbaikite ją prieš vėl stodami į eilę.',
+        queueAllDone: 'Jūsų komanda įveikė visas stoteles!',
+        homeStationProgress: 'Stotelės',
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
         dashStandings: 'Tavo pozicijos',
@@ -657,6 +673,7 @@ export const languages: Record<LanguageCode, Language> = {
         hostPrevStation: 'Ankstesnė veikla',
         hostNextStation: 'Kita veikla',
         hostDone: 'Atlikta',
+        hostAlreadyDone: 'jau atlikta',
         hostNextUp: 'Eilėje toliau',
         hostQueueEmpty: 'Eilė tuščia',
         hostRequestFailed: 'Nepavyko pakviesti grupių',
@@ -675,6 +692,7 @@ export const languages: Record<LanguageCode, Language> = {
         dialogClose: 'Uždaryti',
 
         activityBack: '← atgal į veiklas',
+        activityCompleted: '✓ Jūsų komanda įveikė šią stotelę',
 
         leaderboardTypeLabel: 'Lentelės tipas',
         leaderboardScopeLabel: 'Lentelės apimtis',
@@ -691,6 +709,7 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardColGames: 'žaidimai',
         leaderboardNoGroups: 'Grupių kol kas nėra.',
         leaderboardNoPlayers: 'Žaidėjų kol kas nėra.',
+        lbDisbanded: 'išformuota',
         leaderboardMemberCount: 'Nariai: {n}',
         leaderboardGames: 'Žaidimai: {n}',
         leaderboardGroupTag: '*grupė',
@@ -703,6 +722,8 @@ export const languages: Record<LanguageCode, Language> = {
         youEmail: 'El. paštas',
         youRole: 'Rolė',
         youSave: 'Išsaugoti',
+        youSaved: 'Nustatymai išsaugoti.',
+        youQrReset: 'QR kodas atstatytas.',
         youUsernameTaken: 'Šis vartotojo vardas užimtas',
         youUsernameInvalid: 'Varde gali būti 1–16 mažųjų raidžių, skaičių, _ arba -',
 
@@ -716,16 +737,20 @@ export const languages: Record<LanguageCode, Language> = {
         groupKickHint: 'Pašalinti {name} iš grupės',
         groupLeave: 'Išeiti',
         groupLeaveHint: 'Išeiti iš grupės',
-        groupDeleteHint: 'Ištrinti grupę ir visus narius',
+        groupDisbandHint: 'Išformuoti grupę ir pašalinti visus narius',
         groupKickFailed: 'Nepavyko pašalinti nario',
         groupLeaveFailed: 'Nepavyko išeiti iš grupės',
+        groupKicked: 'Narys išmestas.',
+        groupDeleted: 'Grupė ištrinta.',
+        groupLeft: 'Išėjote iš grupės.',
         groupName: 'Pavadinimas',
         groupPhone: 'Skubios pagalbos telefonas',
         groupSettings: 'Grupės nustatymai',
         groupSettingsEdit: 'Keičiami grupės nustatymai',
-        groupDelete: 'Ištrinti grupę',
-        groupDeleteConfirm: 'Ištrinti grupę?',
-        groupDeleteFailed: 'nepavyko ištrinti grupės',
+        groupSaved: 'Grupės nustatymai išsaugoti.',
+        groupDisband: 'Išformuoti grupę',
+        groupDisbandConfirm: 'Išformuoti grupę?',
+        groupDisbandFailed: 'nepavyko išformuoti grupės',
         groupRequestJoin: 'Prisijungti prie komandos',
         groupInviteCreates: 'Priėmus bus sukurta nauja komanda, kurios savininkas būsi tu.',
         groupRequestSent: 'Prašymas išsiųstas.',

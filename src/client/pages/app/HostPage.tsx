@@ -4,6 +4,7 @@ import { ClientContext } from '#src/client/context.js';
 import type { WaitingQueueRow } from '#src/db/queue/index.js';
 import { ActivitySlug, registeredActivities } from '#src/client/activities.js';
 import PageShell from './PageShell.js';
+import { Toast } from '#src/client/ui/Toast.js';
 import { Language } from '#src/client/language.js';
 
 type HostPageProps = {
@@ -38,6 +39,9 @@ function HostPage({
     const station = activities[index]?.slug ?? initialStation;
     const { Card } = registeredActivities[station];
     const onStation = atStation.filter((entry) => entry.activitySlug === station);
+    // groups that already completed this station keep their spot but can't
+    // be called to it again
+    const eligible = waiting.filter((entry) => !entry.completedSlugs.includes(station)).length;
     const [count, setCount] = useState(1);
 
     const cycle = (step: 1 | -1) =>
@@ -136,16 +140,12 @@ function HostPage({
                                 <button
                                     type="submit"
                                     class="mwa-button"
-                                    disabled={count > waiting.length}
+                                    disabled={count > eligible}
                                 >
                                     {t('hostRequest')}
                                 </button>
                             </form>
-                            {error && (
-                                <p class="mwa-note mwa-note--error" role="alert">
-                                    {t(error)}
-                                </p>
-                            )}
+                            {error && <Toast kind="error">{t(error)}</Toast>}
                         </div>
                         <div class="table mwa-tx">
                             <table>
@@ -163,7 +163,15 @@ function HostPage({
                                         waiting.map((entry, i) => (
                                             <tr key={entry.id}>
                                                 <td>{i + 1}.</td>
-                                                <td>{entry.groupName}</td>
+                                                <td>
+                                                    {entry.groupName}
+                                                    {entry.completedSlugs.includes(station) && (
+                                                        <span class="mwa-standing-hint">
+                                                            {' '}
+                                                            {t('hostAlreadyDone')}
+                                                        </span>
+                                                    )}
+                                                </td>
                                             </tr>
                                         ))
                                     )}

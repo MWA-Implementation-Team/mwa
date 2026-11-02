@@ -20,29 +20,45 @@ import { MwaContext, MwaHono } from '#src/state.js';
 import { getCookie, setCookie } from 'hono/cookie';
 
 export function registerAuthRoutes(app: MwaHono) {
-    // The link inside login emails. Consuming a token is one-shot: it's marked
-    // used in the same statement that returns the email, so replays get nothing.
+    // The link inside login emails. GET never redeems — mail scanners prefetch
+    // it — it only renders the confirm form; the POST below spends the token.
     app.get('/auth/verify', async (ctx) => {
         const token = ctx.req.query('token');
-        const email = token ? redeemLoginToken(ctx.var, token) : null;
-        if (!email) {
+        if (!token) {
             return writePage(ctx, 'login', {
                 errorKey: 'loginLinkExpired',
             });
         }
-        return logIn(ctx, email, ctx.req.query('goto'));
+        return writePage(ctx, 'login', {
+            confirmToken: token,
+            goto: ctx.req.query('goto'),
+        });
     });
 
-    // The paste-the-code fallback on the "we sent it" page. Wrong codes count
-    // against the token — too many kills it (see db/sessions/index.ts).
+    // The paste-the-code fallback on the "we sent it" page, and the confirm
+    // form from the emailed link (a non-empty `token` redeems the token).
+    // Wrong codes count against the token — too many kills it (see
+    // db/sessions/index.ts).
     app.post('/auth/verify', async (ctx) => {
         const form = await ctx.req.formData().catch(() => null);
         if (!form) {
             return ctx.text(translate(getRequestLanguage(ctx))('badRequest'), 400);
         }
+        const goto = String(form.get('goto') ?? '') || undefined;
+
+        const token = String(form.get('token') ?? '').trim();
+        if (token) {
+            const email = redeemLoginToken(ctx.var, token);
+            if (!email) {
+                return writePage(ctx, 'login', {
+                    errorKey: 'loginLinkExpired',
+                });
+            }
+            return logIn(ctx, email, goto);
+        }
+
         const challengeId = String(form.get('challenge_id') ?? '');
         const code = String(form.get('code') ?? '').trim();
-        const goto = String(form.get('goto') ?? '') || undefined;
 
         const result = redeemLoginCode(ctx.var, challengeId, code);
         if (result.type === 'invalid') {

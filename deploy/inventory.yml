@@ -1,0 +1,8 @@
+all:
+    hosts:
+        mwa:
+            ansible_host: 2.29.146.96
+            ansible_user: root
+            # ForwardAgent lets the VM's git clone auth to GitHub through
+            # your local ssh-agent — no deploy key on the VM needed.
+            ansible_ssh_extra_args: -o ForwardAgent=yes

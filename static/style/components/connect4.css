@@ -8,9 +8,12 @@
 
 .mwa-connect4-cell {
     display: flex;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3.25rem;
+    height: 3.25rem;
     padding: 0;
+
+    border-radius: 100%;
+    min-height: 0px;
 }
 
 .mwa-connect4-cell[data-cell='x'] {
@@ -24,4 +27,12 @@
 .mwa-connect4-cell[data-cell='x'],
 .mwa-connect4-cell[data-cell='o'] {
     opacity: 1;
+}
+
+.mwa-connect4-table tr:hover {
+    background: transparent;
+}
+
+.mwa-connect4-table td {
+    padding: var(--space-2);
 }

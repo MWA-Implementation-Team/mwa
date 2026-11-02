@@ -22,7 +22,7 @@ Follow `GET /` through the code:
    `mwa-session` cookie and resolves it through the `sessions` table to a `users`
    row — see [auth](guides/auth.md).
 3. **The route loads data.** It calls typed functions from `src/db/<domain>/index.ts` (e.g.
-   `listUsers(ctx.var)`), which wrap prepared statements. The results become _page props_.
+   `listWaitingQueue(ctx.var)`), which wrap prepared statements. The results become _page props_.
 4. **`writePage` renders the page.** `writePage(ctx, 'landing', { users })` in
    `src/pages.tsx` builds `ctxInit = { lang, user, notification }` (lang from the
    `mwa-language` cookie, user from `currentUser`, notification from the database) and renders the `Root` component with
@@ -57,7 +57,7 @@ works in three different environments:
 - **TypeScript** resolves `#src/*` via `tsconfig.json` `paths` → `./src/*`.
 - **Node** resolves `#src/*` via `package.json` `imports` → `./dist/*` (the compiled
   output — `tsc` leaves the specifier untouched).
-- **The browser** resolves `#src/` via the importmap to `/`, and `main.ts` serves
+- **The browser** resolves `#src/` via the importmap to `/`, and the app serves
   `dist/` — so `#src/client/pages.js` becomes `/client/pages.js`, i.e.
   `dist/client/pages.js`.
 
@@ -82,7 +82,7 @@ Two consequences:
    `http://localhost:3001/watch` and reloads the tab;
 4. changes in `static/` broadcast a reload without restarting the server.
 
-In dev mode, `main.ts` also serves the whole repo root as static files (so sourcemaps
+In dev mode, the app also serves the whole repo root as static files (so sourcemaps
 and sources resolve). In production it only serves `static/` and `dist/`, and refuses
 `.js.map` requests.
 
@@ -105,7 +105,16 @@ missing props are a compile error caught by `npm run lint`, not a runtime surpri
 stations: `ActivitySlug` is derived from its keys, the `/activities/:slug` route
 validates the param against it (unknown slug → 404), and `syncActivities(state)`
 (`src/db/activities/index.ts`) inserts every slug into the `activities` table on server
-start so queue/badge rows can foreign-key them.
+start so queue/badge rows can foreign-key them. A group **completes** a station
+when a host marks its `called` queue entry `done_at` — no separate table; the
+definition lives in `listGroupCompletions` (`src/db/queue/index.ts`), which reads
+distinct `activity_slug`s from called-and-done rows. Completions belong to the
+group (they survive disbanding, like its score), pay nothing themselves — hosts
+award players via scan — and gate the queue: `callNextGroups` skips groups that
+already did that station, `joinQueue` reports `all_done` once every registered
+slug is finished. The home queue panel renders a per-station ✓/— table, the
+activity page shows a completion banner, and the host page marks already-done
+rows so they can't be called twice.
 
 ## Interactions and gambling
 
@@ -115,14 +124,18 @@ to `/app/interact/<token>` — the standalone interact page
 while the flow lived in a home-page dialog keep working.
 Migration `05_interact_tokens.sql` stores one permanent random token per user;
 it identifies the target but grants no permissions. Any signed-in scanner can
-challenge another user or send them coins; hosts/admins also see their email,
-balance, and join date. Self-scans show no actions.
+challenge another user or send them coins. Staff don't play: hosts and admins
+can neither send money, gamble, or request a team-up nor be the target of
+those flows — the POSTs answer 403 and the interact page hides the play
+panels (`canPlay`) when either side has a staff role. Instead they get the
+award-shaped send panel (`canAward`). Self-scans show no actions.
 
 The shared-info panel ("Bendra informacija") mirrors the home queue panel:
 the target's team on the left (group emoji, member count, join button) and
 their personal + group standings across all three boards on the right. The
-send-money panel holds the amount widget — built with −/+ steppers and
-quick-add chips, then posts to `POST /app/interact/:token/send-money`.
+send-money panel (`SendPanel` in `InteractPage.tsx`, shared by both roles)
+holds the amount widget — built with −/+ steppers and quick-add chips, then
+posts to `POST /app/interact/:token/send-money`.
 `transferCoins` (`src/db/transactions/index.ts`) checks the sender's balance
 and writes one parent `transfer` transaction with two child rows (the
 sender's debit and the recipient's credit) in a single database transaction.
@@ -134,11 +147,10 @@ each Challenge link opens a small bet dialog posting to
 `POST /app/interact/:token/gamble`. Joining the target's team is
 `POST /app/interact/:token/group-request`.
 
-A host/admin scanner gets an
-award form on the interact page (`POST /app/interact/:token/award`) to credit
-the scanned user coins plus an optional note; the note is stored on the child
-transaction and shown on the recipient's home page. Regular scanners just see
-the profile. The personal token can be rotated from the QR sidebar pane
+A host/admin scanner sees the same send panel in its award shape — unclamped,
+with an optional note — posting to `POST /app/interact/:token/award` to credit
+the scanned user coins (`host_grant` via `grantCoins`); the note is stored on the child
+transaction and shown on the recipient's home page. The personal token can be rotated from the QR sidebar pane
 (`POST /app/you/reset-qr`), which invalidates the old code immediately.
 
 Reward QRs are the `system_qr_codes` table that has existed since migration 01.
@@ -161,7 +173,15 @@ target sees it as a `group_invite` notification. Accepting
 if the accepter has none, a group is created in one transaction — the accepter
 owns it, the name is a random `team-…` placeholder and the phone empty until
 the owner edits them from the home table's per-field dialogs (`POST
-/app/group/edit`).
+/app/group/edit`). The owner can also disband the team (`POST
+/app/group/disband` → `disbandGroup`): a soft delete that stamps
+`disbanded_at` (`14_group_disband.sql`) instead of removing the row, so the
+group keeps its stamped coins and queue history. Members are deleted, a
+waiting queue spot closes as `left`, a group mid-station is marked `left`
+rather than done, and a partial unique index frees the name for reuse.
+Queue IDs are non-reusable (`16_queue_ids.sql`), so stale host Done forms cannot
+target new entries. `17_query_indexes.sql` indexes recipient invites by
+`(to_user_id, id)` and Connect 4 history by `(session, id)`.
 
 `/app/gambling` replaces `/app/casino`, listing running games and the viewer's
 invitations. `POST /app/interact/:token/gamble` creates a challenge; re-challenging
@@ -190,8 +210,8 @@ participation, running status, time remaining, column capacity, and turn order.
 server and UI. `connect_4_turns` stores timestamped board snapshots, starting with
 an empty board attributed to the second player. `src/client/gambling/turns.ts`
 derives each player's remaining clock from those timestamps. Each player currently
-has **30 seconds total**, counting only their own turns (`c4PlayerTurnTime`,
-temporarily reduced for testing); running out awards the opponent the win.
+has **2 minutes total**, counting only their own turns (`c4PlayerTurnTime`);
+running out awards the opponent the win.
 Game labels, invitations, and results use English/Lithuanian translations.
 
 Chess randomly assigns colours on acceptance and gives each player **five minutes
@@ -244,7 +264,8 @@ Board definitions (`src/db/leaderboard/index.ts`):
   stamped net for groups.
 
 Player boards only rank `role = 'user'` accounts — admins and hosts never appear.
-Group boards rank every group by stamped score with member count. The page renders
+Group boards rank every group by stamped score with member count — disbanded
+groups stay listed, marked with a muted `disbanded` tag. The page renders
 a dense table: when a board lists more than 20 rows, the viewer's own standing is
 pinned in a bold `mwa-lb-you` header row, their in-list row gets `mwa-lb--self`,
 and their groupmates get a dimmed `*group` tag (`mwa-standing-hint`) after the

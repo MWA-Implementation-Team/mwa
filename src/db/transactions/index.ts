@@ -103,7 +103,9 @@ export function transferCoins(
     }
     return runTransaction(state.db, () => {
         const sender = findUserById(state, fromUserId);
-        if (!sender || sender.currentBalance < amount) return 'too_broke';
+        // hosts/admins can go negative — they fund prizes and refunds
+        const unlimited = sender?.role === 'host' || sender?.role === 'admin';
+        if (!sender || (!unlimited && sender.currentBalance < amount)) return 'too_broke';
 
         const parentId = insertParentTx(state, 'transfer');
         insertChildTx(state, parentId, fromUserId, -amount);
@@ -112,8 +114,10 @@ export function transferCoins(
     });
 }
 
-export function giveCoins(state: MwaState, userId: number, amount: number) {
+// Staff-side coin grant: a 'host_grant' credit in one transaction.
+// `note` is the optional reason shown on the recipient's home page.
+export function grantCoins(state: MwaState, userId: number, amount: number, note?: string | null) {
     return runTransaction(state.db, () => {
-        insertTransaction(state, 'system', userId, amount);
+        insertTransaction(state, 'host_grant', userId, amount, undefined, note);
     });
 }

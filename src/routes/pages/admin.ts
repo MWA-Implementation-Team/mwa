@@ -1,5 +1,5 @@
 import { requireRole, requireUser } from '#src/auth.js';
-import { giveCoins } from '#src/db/transactions/index.js';
+import { grantCoins } from '#src/db/transactions/index.js';
 import { findUserByUsername } from '#src/db/users/index.js';
 import { createSystemQrCode, listSystemQrCodes } from '#src/db/systemqr/index.js';
 import { writePage } from '#src/pages.js';
@@ -59,7 +59,7 @@ export function registerAdminRoutes(app: MwaHono) {
             });
         }
 
-        giveCoins(ctx.var, target.id, amount);
+        grantCoins(ctx.var, target.id, amount);
         return ctx.redirect('/app/admin?minted=1');
     });
 

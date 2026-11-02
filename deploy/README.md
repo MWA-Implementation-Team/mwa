@@ -1,0 +1,90 @@
+# Deploy
+
+One Ansible playbook turns a fresh Ubuntu 24.04 VM into the running app:
+Docker + `app`/`caddy` containers behind Caddy TLS, secrets from an
+encrypted vault.
+
+## Prerequisites
+
+- ansible-core ≥ 2.17 on your machine (`ansible --version`)
+- `just` on your machine (`brew install just`) — the justfile wraps the
+  commands below: `just deploy`, `just logs`, `just db-pull`, `just --list`
+- `ansible-galaxy collection install -r deploy/requirements.yml`
+- A VM: Ubuntu 24.04, reachable over ssh **with key auth** —
+  `ssh root@<ip>` must work non-interactively. Operators install their
+  own keys on the VM by hand (e.g. `ssh-copy-id`).
+- DNS: A/AAAA record for `domain` → the VM's IP, done at your registrar.
+  Do this **before** the first run — Caddy can't issue a cert until it
+  resolves.
+- A GitHub ssh key **in your local agent** — `ssh -T git@github.com`
+  works, `ssh-add -l` lists it. The VM clones the private repo through
+  agent forwarding (`ansible_ssh_extra_args` in inventory.yml).
+- The vault password (ask the other operator) — either keep it in
+  `deploy/.vault_pass` (gitignored, picked up automatically by the justfile)
+  or enter it when `--ask-vault-pass` prompts
+
+## Fill in the real values
+
+- `deploy/inventory.yml` — `ansible_host`, `ansible_user`
+- `deploy/group_vars/all/vars.yml` — `domain`,
+  `smtp_host`/`smtp_port`/`smtp_starttls`, `mail_from`
+- `deploy/group_vars/all/vault.yml` — `smtp_user`, `smtp_pass`, then:
+
+    ```shell
+    ansible-vault encrypt deploy/group_vars/all/vault.yml
+    ```
+
+The generated environment sets `ORIGIN=https://<domain>` so login links, QR URLs,
+and CSRF checks use the public HTTPS address behind Caddy.
+
+## First run
+
+```shell
+ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --ask-vault-pass
+```
+
+After it converges:
+
+1. Confirm `https://<domain>` loads (cert issuance can take a minute).
+2. Confirm both operators can still ssh in with their keys.
+3. Set `ssh_lockdown: true` in `vars.yml` and rerun with `--tags base` —
+   password auth gets disabled.
+
+Re-running the playbook is safe; a healthy second run reports no changes.
+
+## Everyday ops
+
+```shell
+# converge everything (idempotent)
+ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --ask-vault-pass
+
+# dry run — see what would change, apply nothing
+ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --check --diff --ask-vault-pass
+
+# one layer only
+... --tags app        # base | docker | app
+
+# on the VM
+cd /opt/mwa && docker compose -f deploy/compose.prod.yaml ps
+docker compose -f deploy/compose.prod.yaml logs -f app
+```
+
+## Deploying a new version
+
+The playbook tracks `repo_ref` (`main`). To ship, merge to main and:
+
+```shell
+ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --ask-vault-pass --tags app
+```
+
+This pulls the clone, rebuilds the image, and recreates the container.
+Auto-deploy on push is deliberately not built yet.
+
+## Rotating secrets
+
+```shell
+ansible-vault edit deploy/group_vars/all/vault.yml
+ansible-playbook -i deploy/inventory.yml deploy/playbook.yml --ask-vault-pass --tags app
+```
+
+The `.env` re-render changes the container config → compose recreates it.

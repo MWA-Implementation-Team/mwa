@@ -1,0 +1,64 @@
+# Production stack. Run from the repo root on the VM:
+#   docker compose -f deploy/compose.prod.yaml up -d --build
+# Paths resolve relative to this file's dir — '..' is the repo root.
+
+name: mwa
+
+services:
+    app:
+        build:
+            context: ..
+        env_file: ../.env
+        volumes:
+            # host dir, not a named volume — the db sits at
+            # deploy_dir/data/db.sqlite, readable/scp-able straight off the VM
+            - ../data:/data
+        restart: unless-stopped
+        # no published ports — caddy reaches the app over this network
+        healthcheck:
+            # distroless has no PATH entry for node — the binary is /nodejs/bin/node
+            test:
+                - CMD
+                - /nodejs/bin/node
+                - -e
+                - "fetch('http://localhost:3000/').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+            interval: 30s
+            timeout: 5s
+            retries: 3
+
+    caddy:
+        image: caddy:2-alpine
+        ports:
+            - '80:80'
+            - '443:443'
+        volumes:
+            - ../Caddyfile:/etc/caddy/Caddyfile:ro
+            - caddy-data:/data
+            - caddy-config:/config
+        restart: unless-stopped
+        depends_on:
+            app:
+                condition: service_started
+
+    # opt-in db admin UI — `just dbgate` brings it up and ssh-tunnels it.
+    # bound to localhost only; reach it via ssh -L, never publish it.
+    # runs as uid 65532 like the app container so edits keep the same
+    # file ownership — flip to user: "0" if dbgate won't start under it.
+    dbgate:
+        image: dbgate/dbgate:7.3.3-alpine
+        profiles: [tools]
+        user: '65532'
+        ports:
+            - '127.0.0.1:5050:3000'
+        volumes:
+            - ../data:/db
+        environment:
+            CONNECTIONS: mwa
+            ENGINE_mwa: sqlite@dbgate-plugin-sqlite
+            FILE_mwa: /db/db.sqlite
+            LABEL_mwa: mwa
+        restart: unless-stopped
+
+volumes:
+    caddy-data:
+    caddy-config:
