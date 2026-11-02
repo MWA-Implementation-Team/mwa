@@ -1,15 +1,9 @@
-import { ChessView } from './ChessView.js';
+import { ChessView } from '../../../gambling/ChessView.js';
 import { Trans } from '#src/client/ui/Trans.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
 import { ClientContext } from '#src/client/context.js';
 import { Page } from '#src/client/pages.js';
-import {
-    CoinFlipGame,
-    CoinSide,
-    Connect4Game,
-    Gambler,
-    RunningGame,
-} from '#src/db/gambling/index.js';
+import { CoinFlipGame, Connect4Game, Gambler, RunningGame } from '#src/db/gambling/index.js';
 import { Language, TranslateFn } from '#src/client/language.js';
 import { subscribeSharedSse } from '#src/client/sse.js';
 import { c4Height, c4Width, Connect4Board } from '#src/client/gambling/connect4.js';
@@ -19,6 +13,8 @@ import { useContext, useEffect, useState } from 'preact/hooks';
 import PageShell from '#src/client/pages/app/PageShell.js';
 import { Toast } from '#src/client/ui/Toast.js';
 import { displayActor } from '#src/client/display.js';
+import { GamblingCoin } from '#src/client/gambling/GamblingCoin.js';
+import { coinSideTrans, sideName } from '#src/client/gambling/util.js';
 
 type GamblingSessionPageProps = {
     sessionId: number;
@@ -278,24 +274,7 @@ function CoinFlipping({ currentGame, side }: { currentGame: CoinFlipGame; side: 
                         p2: displayActor(currentGame.p2Name, user, t),
                     })}
                 </p>
-                {currentGame.status.type === 'ended' ? (
-                    <>
-                        {<h3>{t(coinSideTrans(currentGame.status.flipResult))}</h3>}
-                        <p>
-                            {side === currentGame.status.winner
-                                ? t('gamblingYouWin')
-                                : t('gamblingWinner', {
-                                      player: displayActor(
-                                          sideName(currentGame, currentGame.status.winner),
-                                          user,
-                                          t,
-                                      ),
-                                  })}
-                        </p>
-                    </>
-                ) : (
-                    <p class="mwa-muted">{t('gamblingCoinFlipping')}</p>
-                )}
+                <GamblingCoin currentGame={currentGame} side={side} />
             </div>
         </>
     );
@@ -359,40 +338,38 @@ function Connect4View({
 
     return (
         <>
-            <form method="POST" action={`/app/gambling/sessions/${sessionId}/c4-place`}>
-                <table>
-                    <tbody>
-                        {Array.from({ length: c4Height }, (_, y) => (
-                            <tr key={y}>
-                                {Array.from({ length: c4Width }, (_, x) => (
-                                    <td key={x}>
-                                        <button
-                                            type="submit"
-                                            name="x"
-                                            value={x}
-                                            disabled={!isYourTurn}
-                                            class="mwa-connect4-cell"
-                                            data-cell={board.get(x, c4Height - 1 - y)}
-                                        >
-                                            {isWinCell(x, c4Height - 1 - y) && 'x'}
-                                        </button>
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <div class="mwa-panel-head">
+                <h2>{t('gamblingConnect4')}</h2>
+            </div>
 
-                {status}
-            </form>
+            <div class="mwa-panel-body">
+                <form method="POST" action={`/app/gambling/sessions/${sessionId}/c4-place`}>
+                    <table class="mwa-connect4-table">
+                        <tbody>
+                            {Array.from({ length: c4Height }, (_, y) => (
+                                <tr key={y}>
+                                    {Array.from({ length: c4Width }, (_, x) => (
+                                        <td key={x}>
+                                            <button
+                                                type="submit"
+                                                name="x"
+                                                value={x}
+                                                disabled={!isYourTurn}
+                                                class="mwa-connect4-cell"
+                                                data-cell={board.get(x, c4Height - 1 - y)}
+                                            >
+                                                {isWinCell(x, c4Height - 1 - y) && 'x'}
+                                            </button>
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    {status}
+                </form>
+            </div>
         </>
     );
-}
-
-function coinSideTrans(side: CoinSide) {
-    return side === 'heads' ? 'gamblingHeads' : 'gamblingTails';
-}
-
-function sideName(game: RunningGame, gambler: Gambler) {
-    return gambler === 'p1' ? game.p1Name : game.p2Name;
 }
