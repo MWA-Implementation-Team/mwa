@@ -59,8 +59,8 @@ db-query sql:
     echo "const { DatabaseSync } = require('node:sqlite'); console.table(new DatabaseSync('/data/db.sqlite').prepare('{{ sql }}').all())" \
         | ssh {{ vm }} "{{ compose }} exec -T app /nodejs/bin/node"
 
-# dbgate web UI on the live db (read-only) — open http://localhost:5050,
-# Ctrl-C closes the tunnel. drop :ro in compose to allow edits.
+# dbgate web UI on the live db, read-write — open http://localhost:5050,
+# Ctrl-C closes the tunnel. edits land directly on the app's db.
 dbgate:
     ssh {{ vm }} "{{ compose }} --profile tools up -d dbgate"
     @echo "dbgate on http://localhost:5050 — Ctrl-C to close the tunnel"
