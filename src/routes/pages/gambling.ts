@@ -232,7 +232,9 @@ export function registerGamblingRoutes(app: MwaHono) {
         }
 
         const sessionId = Number(ctx.req.param('id'));
-        cancelGamblingSession(ctx.var, sessionId, 'rejected', user.id);
+        if (!cancelGamblingSession(ctx.var, sessionId, 'rejected', user.id)) {
+            return writeErrorPage(ctx, 404);
+        }
         broadcastSessionUpdate(ctx.var, sessionId);
         return ctx.redirect(safeGoto(ctx, goto) ?? '/app');
     });

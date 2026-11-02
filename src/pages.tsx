@@ -119,7 +119,7 @@ export function Root<P extends RegisteredPageId>({
     }
 
     return (
-        <html>
+        <html lang={ctxInit.lang}>
             <head>
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { Hono } from 'hono';
 import { createUser, findUserByEmail } from '#src/db/users/index.js';
-import { createLoginToken } from '#src/db/sessions/index.js';
+import { createLoginToken, createSession, findSessionUserId } from '#src/db/sessions/index.js';
 import { registerAuthRoutes } from './auth.js';
 import { registerAppRoutes } from './app.js';
 import { registerLoginRoutes } from './login.js';
@@ -36,8 +36,11 @@ describe('GET /auth/verify — link path', () => {
     it('logs in an existing user and redirects to /app', async () => {
         const user = createUser(state, 'verify@example.com', 'verify_u');
         const { token } = createLoginToken(state, user.email);
-
-        const res = await app.request(`/auth/verify?token=${token}`);
+        const previousToken = createSession(state, user.id);
+        const res = await app.request(`/auth/verify?token=${token}`, {
+            headers: { cookie: `mwa-session=${previousToken}` },
+        });
+        assert.equal(findSessionUserId(state, previousToken), null);
         assert.equal(res.status, 302);
         assert.equal(res.headers.get('location'), '/app');
 

@@ -1,11 +1,11 @@
 import { ReactNode } from 'preact/compat';
-import { useContext, useEffect, useRef } from 'preact/hooks';
+import { useContext, useEffect, useId, useRef } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 
 export type DialogProps = {
     isOpen: boolean;
     onClose?: () => void;
-    title?: string;
+    title: string;
     class?: string;
     // extra buttons injected into the footer, between Close and submit
     actions?: ReactNode;
@@ -34,6 +34,7 @@ export default function Dialog({
 }: DialogProps) {
     const { t } = useContext(ClientContext);
     const dialogRef = useRef<HTMLDialogElement>(null);
+    const titleId = useId();
 
     useEffect(() => {
         const dialog = dialogRef.current;
@@ -73,6 +74,7 @@ export default function Dialog({
     return (
         <dialog
             ref={dialogRef}
+            aria-labelledby={titleId}
             class={className}
             onClose={onClose}
             onCancel={closable ? undefined : (e) => e.preventDefault()}
@@ -80,7 +82,7 @@ export default function Dialog({
         >
             {title && (
                 <header>
-                    <h2>{title}</h2>
+                    <h2 id={titleId}>{title}</h2>
                 </header>
             )}
             <div class="mwa-dialog-body">{children}</div>

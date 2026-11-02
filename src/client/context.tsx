@@ -66,6 +66,10 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
     );
 
     useEffect(() => {
+        document.documentElement.lang = lang;
+    }, [lang]);
+
+    useEffect(() => {
         const page = registeredPages[pageId] as Page<RegisteredPageProps<P>>;
         if (page.customTitle) return;
         const title = page.title(value.t, pageProps, lang);
@@ -76,6 +80,10 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
         if (!init.user) return; // /api/notifications requires a session
         const updates = new EventSource('/api/notifications');
         updates.onmessage = (event) => setNotification(JSON.parse(event.data));
+        updates.addEventListener('session-ended', () => {
+            updates.close();
+            window.location.reload();
+        });
         return () => updates.close();
     }, [init.user?.id]);
 

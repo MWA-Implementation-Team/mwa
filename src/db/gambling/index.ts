@@ -396,7 +396,7 @@ export function cancelGamblingSession(
     reason: 'expired' | 'rejected',
     userId?: number,
 ) {
-    runTransaction(state.db, () => {
+    return runTransaction(state.db, () => {
         const row = state
             .prepare(
                 `
@@ -405,7 +405,7 @@ export function cancelGamblingSession(
         `,
             )
             .get(sessionId, userId ?? null, userId ?? null);
-        if (!row) return;
+        if (!row) return false;
 
         state
             .prepare(
@@ -426,6 +426,7 @@ export function cancelGamblingSession(
         `,
             )
             .run(row.p1_deposit_tx);
+        return true;
     });
 }
 

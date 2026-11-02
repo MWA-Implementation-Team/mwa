@@ -3,6 +3,7 @@ import { translate } from '#src/client/language.js';
 import { cookieSession } from '#src/client/constants.js';
 import {
     createSession,
+    deleteSession,
     redeemLoginCode,
     redeemLoginToken,
     sessionTtlDays,
@@ -16,7 +17,7 @@ import {
 import { writePage } from '#src/pages.js';
 import { safeGoto } from '#src/routes/pages/login.js';
 import { MwaContext, MwaHono } from '#src/state.js';
-import { setCookie } from 'hono/cookie';
+import { getCookie, setCookie } from 'hono/cookie';
 
 export function registerAuthRoutes(app: MwaHono) {
     // The link inside login emails. Consuming a token is one-shot: it's marked
@@ -66,6 +67,8 @@ async function logIn(ctx: MwaContext, email: string, goto?: string): Promise<Res
         user = createUser(ctx.var, email, deriveUsername(ctx.var, email));
     }
     markEmailVerified(ctx.var, user.id);
+    const previousToken = getCookie(ctx, cookieSession);
+    if (previousToken) deleteSession(ctx.var, previousToken);
     setCookie(ctx, cookieSession, createSession(ctx.var, user.id), {
         httpOnly: true,
         sameSite: 'Lax',
