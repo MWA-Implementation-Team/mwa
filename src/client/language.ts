@@ -98,13 +98,13 @@ export type Language = {
     queueLeaveFailed: string;
     dashStandings: string;
 
-    hostCallTitle: string;
-    hostStation: string;
+    hostAssign: string;
     hostCount: string;
     hostRequest: string;
-    hostWaiting: string;
     hostAtStation: string;
     hostStationEmpty: string;
+    hostPrevStation: string;
+    hostNextStation: string;
     hostDone: string;
     hostNextUp: string;
     hostQueueEmpty: string;
@@ -360,13 +360,13 @@ export const languages: Record<LanguageCode, Language> = {
         queueLeaveFailed: 'Could not leave the queue',
         dashStandings: 'Your standings',
 
-        hostCallTitle: 'Send groups to a station',
-        hostStation: 'Station',
+        hostAssign: 'Assign groups',
         hostCount: 'Groups to call',
         hostRequest: 'Request from queue',
-        hostWaiting: '{n} group(s) waiting in the queue',
-        hostAtStation: 'At the station',
+        hostAtStation: 'Teams assigned to the activity',
         hostStationEmpty: 'No groups at this station',
+        hostPrevStation: 'Previous station',
+        hostNextStation: 'Next station',
         hostDone: 'Done',
         hostNextUp: 'Next in line',
         hostQueueEmpty: 'The queue is empty',
@@ -624,13 +624,13 @@ export const languages: Record<LanguageCode, Language> = {
         queueLeaveFailed: 'Nepavyko palikti eilės',
         dashStandings: 'Tavo pozicijos',
 
-        hostCallTitle: 'Siųsti grupes į stotį',
-        hostStation: 'Stotis',
         hostCount: 'Kiek grupių kviesti',
         hostRequest: 'Paimti iš eilės',
-        hostWaiting: 'Eilėje laukia grupių: {n}',
-        hostAtStation: 'Prie stoties',
-        hostStationEmpty: 'Prie šios stoties grupių nėra',
+        hostAssign: 'Grupių priskirimas',
+        hostAtStation: 'Veiklai priskirtos komandos',
+        hostStationEmpty: 'Prie šios veiklos grupių nėra',
+        hostPrevStation: 'Ankstesnė veikla',
+        hostNextStation: 'Kita veikla',
         hostDone: 'Atlikta',
         hostNextUp: 'Eilėje toliau',
         hostQueueEmpty: 'Eilė tuščia',

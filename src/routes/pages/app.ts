@@ -382,8 +382,8 @@ export function registerAppRoutes(app: MwaHono) {
         });
     });
 
-    // One host page serves every station — the host picks which activity
-    // they're staffing from a dropdown, so there's no host↔station binding.
+    // One host page serves every station — the host cycles cards client-side
+    // to pick the activity they're staffing, so there's no host↔station binding.
     app.get('/app/host', async (ctx) => {
         const user = requireRole(ctx, 'host', 'admin');
         if (user instanceof Response) return user;
