@@ -128,26 +128,6 @@ function HomePage({
                         ) : (
                             <p class="mwa-muted mwa-queue-cta">{t('queueNeedGroup')}</p>
                         )}
-
-                        {stationProgress && (
-                            <div class="table mwa-tx">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th colSpan={2}>{t('homeStationProgress')}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {stationProgress.map((s) => (
-                                            <tr key={s.slug}>
-                                                <td>{s.name}</td>
-                                                <td class="mwa-tx-amount">{s.done ? '✓' : '—'}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
                     </div>
 
                     <div>
@@ -184,6 +164,26 @@ function HomePage({
                                 </tbody>
                             </table>
                         </div>
+
+                        {stationProgress && (
+                            <div class="table mwa-tx">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colSpan={2}>{t('homeStationProgress')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {stationProgress.map((s) => (
+                                            <tr key={s.slug}>
+                                                <td>{s.name}</td>
+                                                <td class="mwa-tx-amount">{s.done ? '✓' : '—'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
