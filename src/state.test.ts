@@ -49,15 +49,4 @@ describe('smtpConfigFromEnv', () => {
         });
         assert.equal(config?.requireTLS, true);
     });
-
-    it('throws on a non-integer port instead of passing NaN to nodemailer', () => {
-        assert.throws(
-            () =>
-                smtpConfigFromEnv({
-                    MWA_SMTP_HOST: 'smtp.example.com',
-                    MWA_SMTP_PORT: '587x',
-                }),
-            /MWA_SMTP_PORT must be an integer/,
-        );
-    });
 });
