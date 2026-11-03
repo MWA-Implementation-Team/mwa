@@ -42,12 +42,12 @@ services:
 
     # opt-in db admin UI — `just dbgate` brings it up and ssh-tunnels it.
     # bound to localhost only; reach it via ssh -L, never publish it.
-    # runs as uid 65532 like the app container so edits keep the same
-    # file ownership — flip to user: "0" if dbgate won't start under it.
+    # runs as root — dbgate writes /.dbgate and /etc/hosts at boot, and
+    # root can also write the 65532-owned data dir for live edits.
     dbgate:
         image: dbgate/dbgate:7.3.3-alpine
         profiles: [tools]
-        user: '65532'
+        user: '0'
         ports:
             - '127.0.0.1:5050:3000'
         volumes:
