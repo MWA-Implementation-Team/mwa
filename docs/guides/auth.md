@@ -99,6 +99,7 @@ sqlite3 db.sqlite "UPDATE users SET role = 'host' WHERE username = 'alice';"
 | `GET /app/admin`, `POST /app/admin/*`                            | admin in production; any logged-in user in dev          |
 | `GET /api/notifications`, `GET /app/gambling/sessions/:id/watch` | `requireApiUser`                                        |
 | Gambling challenge/accept/reject POSTs                           | `requireUser`; accept/reject require the invited player |
+| `POST /app/interact/:token/award`, `/award-group`                | `requireRole('host', 'admin')`                          |
 
 `POST /app/admin/mint-coins` takes `username` and a positive safe-integer `amount`,
 crediting a `host_grant` transaction through `grantCoins`. In dev, any logged-in

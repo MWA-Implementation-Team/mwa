@@ -155,7 +155,10 @@ each Challenge link opens a small bet dialog posting to
 A host/admin scanner sees the same send panel in its award shape — unclamped,
 with an optional note — posting to `POST /app/interact/:token/award` to credit
 the scanned user coins (`host_grant` via `grantCoins`); the note is stored on the child
-transaction and shown on the recipient's home page. The personal token can be rotated from the QR sidebar pane
+transaction and shown on the recipient's home page. When the target is in a
+group, a second `formaction` submit posts to `POST /app/interact/:token/award-group`,
+which grants the amount to every member of that group (`?interactError=interactAwardNoGroup`
+when the target is groupless). The personal token can be rotated from the QR sidebar pane
 (`POST /app/you/reset-qr`), which invalidates the old code immediately.
 
 Reward QRs are the `system_qr_codes` table that has existed since migration 01.

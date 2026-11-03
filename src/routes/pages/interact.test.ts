@@ -4,6 +4,7 @@ import { Hono } from 'hono';
 import { createUser, findUserById } from '#src/db/users/index.js';
 import { createSession } from '#src/db/sessions/index.js';
 import { getOrCreateInteractCode, getOrCreateInteractToken } from '#src/db/interactions/index.js';
+import { addGroupMember, createGroup, findUserGroup } from '#src/db/groups/index.js';
 import { createSystemQrCode } from '#src/db/systemqr/index.js';
 import { grantCoins, listUserTransactions } from '#src/db/transactions/index.js';
 import { listPlayerLeaderboard } from '#src/db/leaderboard/index.js';
@@ -273,6 +274,67 @@ describe('GET /app/interact?code= — sąveikos kodas lookup', () => {
         });
         assert.equal(bad.status, 303);
         assert.equal(bad.headers.get('location'), '/app?codeError=interactCodeInvalid');
+    });
+});
+
+describe('POST /app/interact/:token/award-group', () => {
+    it('lets a host award every member of the target group', async () => {
+        const owner = createUser(state, 'grpowner@example.com', 'grpowner');
+        const mate = createUser(state, 'grpmate@example.com', 'grpmate');
+        createGroup(state, 'award grp', owner.id, '555');
+        addGroupMember(state, findUserGroup(state, owner.id)!.id, mate.id);
+        const host = createUser(state, 'grphost@example.com', 'grphost');
+        promote(host.id, 'host');
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await app.request(`/app/interact/${token}/award-group`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(host.id),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'amount=25&note=team+prize',
+        });
+        assert.equal(res.status, 303);
+        assert.match(res.headers.get('location') ?? '', /interactNotice=interactAwardedGroup/);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 25);
+        assert.equal(findUserById(state, mate.id)!.currentBalance, 25);
+    });
+
+    it('errors when the target has no group', async () => {
+        const owner = createUser(state, 'grpsolo@example.com', 'grpsolo');
+        const host = createUser(state, 'grphost2@example.com', 'grphost2');
+        promote(host.id, 'host');
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await app.request(`/app/interact/${token}/award-group`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(host.id),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'amount=25',
+        });
+        assert.equal(res.status, 303);
+        assert.match(res.headers.get('location') ?? '', /interactError=interactAwardNoGroup/);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 0);
+    });
+
+    it('forbids a regular user from group-awarding', async () => {
+        const owner = createUser(state, 'grpowner3@example.com', 'grpowner3');
+        const scanner = createUser(state, 'grpscan@example.com', 'grpscan');
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await app.request(`/app/interact/${token}/award-group`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(scanner.id),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'amount=25',
+        });
+        assert.equal(res.status, 403);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 0);
     });
 });
 

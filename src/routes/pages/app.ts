@@ -532,10 +532,12 @@ export function registerAppRoutes(app: MwaHono) {
         const interactError = queryFlag(ctx, 'interactError', [
             'groupRequestFailed',
             'interactAwardInvalid',
+            'interactAwardNoGroup',
         ] as const);
         const interactNotice = queryFlag(ctx, 'interactNotice', [
             'groupRequestSent',
             'interactAwarded',
+            'interactAwardedGroup',
         ] as const);
         const sendError = queryFlag(ctx, 'sendError', [
             'interactSendInvalid',
@@ -614,6 +616,38 @@ export function registerAppRoutes(app: MwaHono) {
 
         grantCoins(ctx.var, target.id, amount, noteText);
         return ctx.redirect(`${back}?interactNotice=interactAwarded`, 303);
+    });
+
+    // Same award form, group-wide: credits every member of the target's team.
+    app.post('/app/interact/:token/award-group', async (ctx) => {
+        const user = requireRole(ctx, 'host', 'admin');
+        if (user instanceof Response) return user;
+
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) return writeErrorPage(ctx, 400);
+
+        const back = `/app/interact/${encodeURIComponent(token)}`;
+        const group = findUserGroup(ctx.var, target.id);
+        if (!group) {
+            return ctx.redirect(`${back}?interactError=interactAwardNoGroup`, 303);
+        }
+
+        const amount = Number(form.get('amount'));
+        if (!Number.isSafeInteger(amount) || amount <= 0) {
+            return ctx.redirect(`${back}?interactError=interactAwardInvalid`, 303);
+        }
+
+        const note = form.get('note');
+        const noteText = typeof note === 'string' && note.trim() ? note.trim().slice(0, 200) : null;
+
+        for (const member of listGroupMembers(ctx.var, group.id)) {
+            grantCoins(ctx.var, member.userId, amount, noteText);
+        }
+        return ctx.redirect(`${back}?interactNotice=interactAwardedGroup`, 303);
     });
 
     // Reward qr scan (the secret in the QR is the route param)
