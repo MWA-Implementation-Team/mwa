@@ -115,8 +115,6 @@ export type Language = {
 
     dashSupport: string;
     dashCall: string;
-    dashGuide: string;
-    dashGuideBody: string;
 
     shellSkip: string;
     shellLogoAlt: string;
@@ -387,8 +385,6 @@ export const languages: Record<LanguageCode, Language> = {
 
         dashSupport: 'Support',
         dashCall: 'Call support',
-        dashGuide: 'Guide & explanations',
-        dashGuideBody: 'This section can contain explanations of the dashboard features.',
 
         shellSkip: 'Skip to content',
         shellLogoAlt: 'first years Event home',
@@ -659,8 +655,6 @@ export const languages: Record<LanguageCode, Language> = {
 
         dashSupport: 'Pagalba',
         dashCall: 'Skambinti pagalbai',
-        dashGuide: 'Vadovas ir paaiškinimai',
-        dashGuideBody: 'Šiame skyriuje gali būti pateikiami prietaisų skydelio paaiškinimai.',
 
         shellSkip: 'Pereiti prie turinio',
         shellLogoAlt: 'pirmakursiu renginio pradžia',

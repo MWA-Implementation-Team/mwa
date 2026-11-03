@@ -2,7 +2,7 @@ import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { Transaction, TransactionKind } from '#src/client/api/transactions.js';
-import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
+import { PhoneIcon } from '#src/client/ui/icons.js';
 import PageShell from './PageShell.js';
 import Dialog from '#src/client/ui/Dialog.js';
 import { Language } from '#src/client/language.js';
@@ -75,7 +75,6 @@ function HomePage({
     standings,
 }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
-    const [guideOpen, setGuideOpen] = useState(false);
     const [usernameDialogOpen, setUsernameDialogOpen] = useState(youError !== undefined);
     const [groupNameEditOpen, setGroupNameEditOpen] = useState(false);
     const [groupPhoneEditOpen, setGroupPhoneEditOpen] = useState(false);
@@ -434,16 +433,7 @@ function HomePage({
                         <a class="mwa-button" href="tel:+37061880077">
                             <PhoneIcon /> {t('dashCall')}: +370 618 80077
                         </a>
-                        <button
-                            type="button"
-                            class="mwa-button"
-                            aria-expanded={guideOpen}
-                            onClick={() => setGuideOpen(!guideOpen)}
-                        >
-                            <BookIcon /> {t('dashGuide')}
-                        </button>
                     </div>
-                    {guideOpen && <p class="mwa-muted">{t('dashGuideBody')}</p>}
                 </div>
             </section>
 
