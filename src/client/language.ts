@@ -366,7 +366,7 @@ export const languages: Record<LanguageCode, Language> = {
         queueAtStation:
             'Your team is at a station right now — finish it before rejoining the queue.',
         queueAllDone: 'Your team has completed every station!',
-        homeStationProgress: 'Stations',
+        homeStationProgress: 'Activities',
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
         dashStandings: 'Your standings',
@@ -638,7 +638,7 @@ export const languages: Record<LanguageCode, Language> = {
         queueTooSmall: 'Norint stoti į eilę, grupėje turi būti bent 2 nariai.',
         queueAtStation: 'Jūsų komanda dabar prie stotelės — užbaikite ją prieš vėl stodami į eilę.',
         queueAllDone: 'Jūsų komanda įveikė visas stoteles!',
-        homeStationProgress: 'Stotelės',
+        homeStationProgress: 'Veiklos',
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
         dashStandings: 'Tavo pozicijos',
