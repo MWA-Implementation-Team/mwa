@@ -43,21 +43,11 @@ restart:
 vault:
     ansible-vault edit deploy/group_vars/all/vault.yml {{ vault_flag }}
 
-# seed the prod db with sample data — no-op if users already exist
-seed:
-    ssh {{ vm }} "{{ compose }} exec -T app /nodejs/bin/node dist/seed.js"
-
 # consistent db snapshot to your laptop (VACUUM INTO is atomic on a live db)
 db-pull file="dump.sqlite":
     echo "const { DatabaseSync } = require('node:sqlite'); new DatabaseSync('/data/db.sqlite').exec(\"VACUUM INTO '/data/dump.sqlite'\")" \
         | ssh {{ vm }} "{{ compose }} exec -T app /nodejs/bin/node"
     scp {{ vm }}:/opt/mwa/data/dump.sqlite {{ file }}
-
-# ad-hoc SELECT on the live db — just db-query 'SELECT COUNT(*) c FROM users'
-# (SQL lands inside a JS string — keep quotes out of it)
-db-query sql:
-    echo "const { DatabaseSync } = require('node:sqlite'); console.table(new DatabaseSync('/data/db.sqlite').prepare('{{ sql }}').all())" \
-        | ssh {{ vm }} "{{ compose }} exec -T app /nodejs/bin/node"
 
 # dbgate web UI on the live db, read-write — open http://localhost:5050,
 # Ctrl-C closes the tunnel. edits land directly on the app's db.
@@ -66,6 +56,7 @@ dbgate:
     @echo "dbgate on http://localhost:5050 — Ctrl-C to close the tunnel"
     ssh -N -L 5050:localhost:5050 {{ vm }}
 
-# stop the dbgate container on the VM
-dbgate-down:
-    ssh {{ vm }} "{{ compose }} --profile tools stop dbgate"
+# just the tunnel — for when dbgate is already up on the VM
+dbgate-tunnel:
+    @echo "dbgate on http://localhost:5050 — Ctrl-C to close the tunnel"
+    ssh -N -L 5050:localhost:5050 {{ vm }}
