@@ -44,6 +44,7 @@ export type Language = {
     interactAwardGroup: string;
     interactAwardedGroup: string;
     interactAwardNoGroup: string;
+    stationBanner: string;
     accountQrHint: string;
     accountQrReset: string;
     qrClaimed: string;
@@ -313,6 +314,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardGroup: 'Award group ({n})',
         interactAwardedGroup: 'Whole group awarded.',
         interactAwardNoGroup: 'They have no group.',
+        stationBanner: 'Your group is assigned to {name}',
         accountQrHint:
             'Your personal QR is shown in the sidebar. Reset it to invalidate the old code.',
         accountQrReset: 'Reset QR code',
@@ -585,6 +587,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardGroup: 'Apdovanoti grupę ({n})',
         interactAwardedGroup: 'Grupė apdovanota.',
         interactAwardNoGroup: 'Vartotojas neturi grupės.',
+        stationBanner: 'Grupės priskirta veikla „{name}“',
         accountQrHint:
             'Jūsų asmeninis QR rodomas šone. Čia galite jį sukurti iš naujo (senasis nustos veikti).',
         accountQrReset: 'Iš naujo sukurti QR kodą',

@@ -12,6 +12,8 @@ import { BootData } from './client/bootstrap.js';
 import { getRequestLanguage } from './utils.js';
 import { MwaContext, MwaHono } from './state.js';
 import { getOrCreateInteractCode, getOrCreateInteractToken } from '#src/db/interactions/index.js';
+import { getUserCalledEntry } from '#src/db/queue/index.js';
+import { isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { renderSVG } from 'uqr';
 import { queryUserNotification } from './db/users/index.js';
 
@@ -36,11 +38,21 @@ export function writePage<P extends RegisteredPageId>(
               };
           })()
         : null;
+    // the station the user's group is called to right now — shown as a fixed
+    // banner in PageShell; null when waiting/groupless/done
+    const called = user ? getUserCalledEntry(ctx.var, user.id) : null;
+    const atStation = called?.activitySlug
+        ? isActivitySlug(called.activitySlug)
+            ? registeredActivities[called.activitySlug].name
+            : called.activitySlug
+        : null;
+
     const ctxInit: ClientContextWrapperInit = {
         lang: getRequestLanguage(ctx),
         user: user && serialize(user),
         qr,
         notification: queryUserNotification(ctx.var, user?.id),
+        atStation,
     };
 
     const root = Root({

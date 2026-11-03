@@ -116,6 +116,11 @@ slug is finished. The home queue panel renders a per-station ✓/— table, the
 activity page shows a completion banner, and the host page marks already-done
 rows so they can't be called twice.
 
+While a group is called to a station (`status='called'`, `done_at` unset),
+every member sees a fixed top banner — `writePage` puts the station's display
+name into `ctxInit.atStation` (`getUserCalledEntry`), and `PageShell` renders
+`StationBanner` plus a `mwa--at-station` padding modifier on the frame.
+
 ## Interactions and gambling
 
 The `PageShell` sidebar renders a personal QR using `uqr` on every page, linking

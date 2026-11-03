@@ -17,6 +17,9 @@ export type ClientContextType = {
     // personal QR + typed "sąveikos kodas" shown in the sidebar — logged in only
     qr: { svg: string; url: string; code: string } | null;
     notification: Notification | null;
+    // display name of the station the user's group is called to — drives the
+    // fixed PageShell banner; null when not at a station
+    atStation: string | null;
 };
 
 export const ClientContext = createContext<ClientContextType>({
@@ -26,6 +29,7 @@ export const ClientContext = createContext<ClientContextType>({
     user: null,
     qr: null,
     notification: null,
+    atStation: null,
 });
 
 // ---
@@ -35,6 +39,7 @@ export type ClientContextWrapperInit = {
     user: UserJson | null;
     qr: { svg: string; url: string; code: string } | null;
     notification: Notification | null;
+    atStation: string | null;
 };
 
 export type ClientContextWrapperProps<P extends RegisteredPageId> = {
@@ -60,6 +65,7 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
             user: init.user && reviveUser(init.user),
             qr: init.qr,
             notification,
+            atStation: init.atStation,
         }),
         [lang, init.user, init.qr, notification],
     );
