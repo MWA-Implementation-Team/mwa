@@ -44,18 +44,26 @@ There is no global transport setter.
   `attempts` on the row — 5 strikes kills it. Resends are capped at one per
   minute per email, and a successfully sent email invalidates the previous
   token (a failed send discards the new row, so the old link stays alive).
+  The code form carries an independent random `challenge_id`, stored as a hash
+  (migration 15). Only that challenge's attempts can be consumed; the email alone
+  cannot select it. Cooldown responses return HTTP 429 with `Retry-After`, without
+  disclosing an existing challenge. Reservation happens synchronously before mail
+  delivery in this single-process app. Used/expired rows are retained as cooldown
+  history, not pruned. Migration 15 clears existing login tokens (old links/codes
+  stop working), but preserves sessions.
 - **`GET /auth/verify?token=`** (`src/routes/pages/auth.ts`) never redeems —
   mail scanners prefetch links, so it only renders a confirm form posting the
   token back. **`POST /auth/verify`** consumes the token atomically when the
   form carries a non-empty `token` (replays get an error page) and otherwise
-  runs the `email` + `code` fallback. Both paths share `logIn`: resolve the
+  runs the `challenge_id` + `code` fallback. Both paths share `logIn`: resolve the
   user — registered email →
   `markEmailVerified`; new email → `createUser` with a `deriveUsername`-derived
   name (local part sanitized to `[a-z0-9_-]`, deduped). A `sessions` row (30 days,
   sha256 at rest) becomes the `mwa-session` cookie (`HttpOnly`, `SameSite=Lax`,
   `Secure` in prod). Redirect: `safeGoto` accepts normalized same-origin paths and
-  queries (no route allowlist), else `/app`, where the you tab shows the
-  derived username.
+  queries against configured `ORIGIN`, rejecting normalized `//` paths (no route
+  allowlist), else `/app`, where the you tab shows the derived username. Signing
+  in also deletes the session being replaced.
 - **`currentUser(ctx)`** (`src/auth.ts`) resolves `mwa-session` → `sessions` →
   `User | null`. It's the only place "who is logged in" is decided.
 - **Route guards** (`src/auth.ts`) are how routes consume it:
@@ -63,9 +71,12 @@ There is no global transport setter.
   redirect, wrong role → 403 page) and `requireApiUser` / `requireApiRole` for
   JSON routes (401/403 JSON). See the policy table below.
 - **`POST /app` (logout)** deletes the session row _and_ the cookie — the token
-  stops working server-side immediately.
+  stops working server-side immediately. Notification streams revalidate their
+  original session before sending updates; invalid sessions cause `session-ended`
+  and closure. Idle streams wait for the next update, without watchers or timers.
 - **CSRF**: `hono/csrf` runs on all form-encoded POSTs (see `src/main.ts`) —
-  requests without a matching `Sec-Fetch-Site`/`Origin` get 403. Curl users add
+  the allowed origin comes from `ORIGIN`, not the request Host header. Requests
+  without a matching `Sec-Fetch-Site`/`Origin` get 403. Curl users add
   `-H 'Origin: http://localhost:3000'`.
 
 ## Roles
@@ -105,7 +116,8 @@ only accept moves on that player's turn in a running game.
    the subject and email text containing the link and code. With SMTP/mailpit, open
    the web inbox instead. Open the link and press **Continue** on the confirm
    page — you're logged in; the header shows `App (alice)`.
-4. Or instead: submit again, then type the **code** into the field — same result.
+4. Or instead: wait for the one-minute cooldown, submit again, then type the
+   **code** into that response page's field — same result.
 5. A fresh email → "signup link" copy; the link creates the
    account and lands on `/app` with a derived username.
 6. Submitting the same link/code a second time → "expired or already used"

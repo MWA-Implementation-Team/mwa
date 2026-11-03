@@ -30,13 +30,9 @@
 }
 
 .mwa-connect4-table tr:hover {
-    background: transparent !important;
+    background: transparent;
 }
 
 .mwa-connect4-table td {
     padding: var(--space-2);
-}
-.mwa-connect4-status {
-    padding-left: var(--space-2);
-    margin-bottom: var(--space-2);
 }

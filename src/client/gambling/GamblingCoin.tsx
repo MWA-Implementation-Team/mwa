@@ -21,6 +21,7 @@ export function GamblingCoin({ currentGame, side }: Props) {
     ).current;
     const updateOutcome = useRef<(outcome?: CoinSide) => void>(() => {});
     const [isSpinning, setIsSpinning] = useState(initialOutcome === undefined);
+    const showTails = initialOutcome === 'tails';
 
     useEffect(() => {
         if (initialOutcome !== undefined) return;
@@ -92,10 +93,7 @@ export function GamblingCoin({ currentGame, side }: Props) {
     return (
         <>
             <div class="mwa-coin-wrapper">
-                <div
-                    class={`mwa-coin${initialOutcome === 'tails' ? ' mwa-coin--tails' : ''}`}
-                    ref={coinRef}
-                >
+                <div class={showTails ? 'mwa-coin mwa-coin--tails' : 'mwa-coin'} ref={coinRef}>
                     <div class="mwa-coin-side">
                         <img src="/img/gambling/heads.webp" alt="Heads" />
                     </div>

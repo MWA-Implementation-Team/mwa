@@ -1,12 +1,8 @@
-const subscriptions = new Map<string, SubscriptionImpl[]>();
+const subscriptions = new Map<string, Set<SubscriptionImpl>>();
 
 export function publish(channel: string, message: string) {
-    for (const sub of subscriptions.get(channel) ?? []) {
-        sub.queue.push(message);
-        sub.nextResolve?.();
-        sub.nextPromise = undefined;
-        sub.nextResolve = undefined;
-    }
+    // receives only the latest message
+    for (const sub of subscriptions.get(channel) ?? []) sub.send(message);
 }
 
 export type Subscription = {
@@ -29,48 +25,45 @@ export function notificationsChannel(userId: number): string {
 class SubscriptionImpl {
     #channel: string;
     #isClosed = false;
-    queue: string[] = [];
-    nextPromise: Promise<void> | undefined;
-    nextResolve: (() => void) | undefined;
+    #message: string | undefined;
+    #wake: (() => void) | undefined;
 
     constructor(channel: string) {
         this.#channel = channel;
-        const subs = subscriptions.get(channel);
-        if (subs) {
-            subs.push(this);
-        } else {
-            subscriptions.set(channel, [this]);
-        }
+        let subs = subscriptions.get(channel);
+        if (!subs) subscriptions.set(channel, (subs = new Set()));
+        subs.add(this);
+    }
+
+    send(message: string) {
+        if (this.#isClosed) return;
+        this.#message = message;
+        this.#wake?.();
+        this.#wake = undefined;
     }
 
     async recv(): Promise<string | null> {
-        while (true) {
-            if (this.#isClosed) return null;
-
-            const first = this.queue.shift();
-            if (first !== undefined) {
-                return first;
+        while (!this.#isClosed) {
+            if (this.#message !== undefined) {
+                const message = this.#message;
+                this.#message = undefined;
+                return message;
             }
-
-            if (!this.nextPromise) {
-                this.nextPromise = new Promise<void>((res) => {
-                    this.nextResolve = res;
-                });
-            }
-            await this.nextPromise;
+            await new Promise<void>((resolve) => {
+                this.#wake = resolve;
+            });
         }
+        return null;
     }
 
     close(): void {
         if (this.#isClosed) return;
         this.#isClosed = true;
-
+        this.#message = undefined;
         const subs = subscriptions.get(this.#channel)!;
-        subs.splice(subs.indexOf(this), 1);
-        if (subs.length === 0) {
-            subscriptions.delete(this.#channel);
-        }
-
-        this.nextResolve?.();
+        subs.delete(this);
+        if (subs.size === 0) subscriptions.delete(this.#channel);
+        this.#wake?.();
+        this.#wake = undefined;
     }
 }

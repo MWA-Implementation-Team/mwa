@@ -40,7 +40,8 @@ effect and manage it themselves, as `GamblingSessionPage` does for session updat
 **Switching language**: `LanguageToggle` writes the `mwa-language` cookie and calls
 `updateLang`. `updateLang` re-renders all `t()` output instantly; the cookie makes the
 _next_ SSR response (navigations, reloads) use the same language — `writePage` reads it
-into `ctxInit.lang`.
+into `ctxInit.lang`. The document's `<html lang>` is set during SSR and updated
+when the client language changes.
 
 ## Server responses and emails
 
@@ -58,6 +59,9 @@ language selected when it was sent.
 
 API error identifiers (`unauthorized`, `forbidden`) and server diagnostics remain
 stable identifiers/logs. Translate the user-facing message where it is displayed.
+
+`Dialog` requires a translated `title`; its heading supplies the accessible name
+through `aria-labelledby`.
 
 ## Styling
 

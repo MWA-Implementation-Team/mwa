@@ -24,6 +24,10 @@ Visit http://localhost:3000/ — log in with `alice@mwa.dev`: submit the form, t
 the login link printed in the server console (dev "email" goes to logs, see
 [docs/guides/auth.md](docs/guides/auth.md)).
 
+Set `ORIGIN` to the public HTTP(S) origin (scheme, host, and optional port) for
+login links, QR URLs, and CSRF checks. It defaults to `http://localhost:3000`;
+production deployments must set their public HTTPS origin (the deployment template does this).
+
 ## Commands
 
 | command          | what it does                                                             |

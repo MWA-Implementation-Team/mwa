@@ -27,7 +27,7 @@ export function writePage<P extends RegisteredPageId>(
         ? (() => {
               const url = new URL(
                   `/app/interact/${encodeURIComponent(getOrCreateInteractToken(ctx.var, user.id))}`,
-                  ctx.req.url,
+                  ctx.var.origin,
               ).toString();
               return { svg: renderSVG(url), url };
           })()
@@ -125,7 +125,7 @@ export function Root<P extends RegisteredPageId>({
     }
 
     return (
-        <html>
+        <html lang={ctxInit.lang}>
             <head>
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />

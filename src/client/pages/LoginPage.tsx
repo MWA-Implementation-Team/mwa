@@ -7,6 +7,7 @@ import { Toast } from '#src/client/ui/Toast.js';
 export type LoginErrorKey =
     | 'loginInvalidEmail'
     | 'loginSendFailed'
+    | 'loginRateLimited'
     | 'loginLinkExpired'
     | 'loginWrongCode'
     | 'loginCodeExpired';
@@ -14,6 +15,7 @@ export type LoginErrorKey =
 type LoginPageProps = {
     errorKey?: LoginErrorKey;
     sentTo?: string;
+    challengeId?: string;
     sentKind?: 'login' | 'signup';
     // set by GET /auth/verify — the emailed link lands here and only the
     // posted form spends the one-shot token
@@ -26,7 +28,14 @@ export const loginPage: Page<LoginPageProps> = {
     title: (t) => t('titleLogin'),
 };
 
-function LoginPage({ errorKey, sentTo, sentKind, confirmToken, goto }: LoginPageProps) {
+function LoginPage({
+    errorKey,
+    sentTo,
+    challengeId,
+    sentKind,
+    confirmToken,
+    goto,
+}: LoginPageProps) {
     const { t } = useContext(ClientContext);
     return (
         <PageShell section="login" nav={false}>
@@ -41,7 +50,7 @@ function LoginPage({ errorKey, sentTo, sentKind, confirmToken, goto }: LoginPage
                                 <button type="submit">{t('loginConfirmSubmit')}</button>
                             </form>
                         </>
-                    ) : sentTo ? (
+                    ) : sentTo && challengeId ? (
                         <>
                             <p class="mwa-muted">
                                 {sentKind === 'signup'
@@ -49,7 +58,7 @@ function LoginPage({ errorKey, sentTo, sentKind, confirmToken, goto }: LoginPage
                                     : t('loginSentLogin', { email: sentTo })}
                             </p>
                             <form method="POST" action="/auth/verify" class="mwa-form">
-                                <input type="hidden" name="email" value={sentTo} />
+                                <input type="hidden" name="challenge_id" value={challengeId} />
                                 {goto && <input type="hidden" name="goto" value={goto} />}
                                 <div class="mwa-field">
                                     <label for="code">{t('loginCode')}</label>

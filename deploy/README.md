@@ -34,6 +34,9 @@ encrypted vault.
     ansible-vault encrypt deploy/group_vars/all/vault.yml
     ```
 
+The generated environment sets `ORIGIN=https://<domain>` so login links, QR URLs,
+and CSRF checks use the public HTTPS address behind Caddy.
+
 ## First run
 
 ```shell
