@@ -16,10 +16,10 @@ type InteractPageProps = {
     self: boolean;
     target: { username: string };
     // the scanned user's team, if they have one — the shared-info panel shows
-    // it with the same per-group emoji the home queue panel picks
+    // it with a per-group emoji
     group: { name: string; memberCount: number } | null;
-    // the scanned user's team emoji — the route picks the same stable
-    // placeholder as the home queue panel
+    // the scanned user's team emoji — a stable placeholder the route picks
+    // off the group id
     groupEmoji: string;
     // the target's personal + team position on each board — the same three
     // rows the home standings table shows
@@ -121,9 +121,11 @@ function InteractPage({
 
     return (
         <PageShell section="interact">
-            {interactError && interactError !== 'interactAwardInvalid' && (
-                <Toast kind="error">{t(interactError)}</Toast>
-            )}
+            {interactError &&
+                interactError !== 'interactAwardInvalid' &&
+                interactError !== 'interactAwardNoGroup' && (
+                    <Toast kind="error">{t(interactError)}</Toast>
+                )}
             {interactNotice && interactNotice !== 'interactAwarded' && (
                 <Toast kind="success">{t(interactNotice)}</Toast>
             )}
@@ -214,8 +216,28 @@ function InteractPage({
                     action={post('award')}
                     max={null}
                     withNote
-                    error={interactError === 'interactAwardInvalid' ? interactError : undefined}
-                    notice={interactNotice === 'interactAwarded' ? t(interactNotice) : undefined}
+                    error={
+                        interactError === 'interactAwardInvalid' ||
+                        interactError === 'interactAwardNoGroup'
+                            ? interactError
+                            : undefined
+                    }
+                    notice={
+                        interactNotice === 'interactAwarded' ||
+                        interactNotice === 'interactAwardedGroup'
+                            ? t(interactNotice)
+                            : undefined
+                    }
+                    extraSubmit={
+                        group
+                            ? {
+                                  formaction: post('award-group'),
+                                  label: t('interactAwardGroup', {
+                                      n: String(group.memberCount),
+                                  }),
+                              }
+                            : undefined
+                    }
                 />
             )}
 
@@ -300,12 +322,16 @@ function SendPanel({
     withNote,
     error,
     notice,
+    extraSubmit,
 }: {
     action: string;
     max: number | null;
     withNote?: boolean;
     error?: keyof Language;
     notice?: string;
+    // second submit posting the same form elsewhere — the host's award-group
+    // button; submit buttons may override the form's action via formaction
+    extraSubmit?: { formaction: string; label: string };
 }) {
     const { t } = useContext(ClientContext);
     const [sendAmount, setSendAmount] = useState(0);
@@ -379,6 +405,16 @@ function SendPanel({
                     >
                         {t('interactSendSubmit')}
                     </button>
+                    {extraSubmit && (
+                        <button
+                            type="submit"
+                            class="mwa-button"
+                            formaction={extraSubmit.formaction}
+                            disabled={sendAmount < 1 || sendAmount > cap}
+                        >
+                            {extraSubmit.label}
+                        </button>
+                    )}
                 </form>
             </div>
         </section>

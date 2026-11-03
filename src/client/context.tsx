@@ -14,9 +14,12 @@ export type ClientContextType = {
     updateLang: (lang: LanguageCode) => void;
     t: TranslateFn;
     user: User | null; // logged-in user, else null
-    // personal QR shown in the sidebar — present only when logged in
-    qr: { svg: string; url: string } | null;
+    // personal QR + typed "sąveikos kodas" shown in the sidebar — logged in only
+    qr: { svg: string; url: string; code: string } | null;
     notification: Notification | null;
+    // display name of the station the user's group is called to — drives the
+    // fixed PageShell banner; null when not at a station
+    atStation: string | null;
 };
 
 export const ClientContext = createContext<ClientContextType>({
@@ -26,6 +29,7 @@ export const ClientContext = createContext<ClientContextType>({
     user: null,
     qr: null,
     notification: null,
+    atStation: null,
 });
 
 // ---
@@ -33,8 +37,9 @@ export const ClientContext = createContext<ClientContextType>({
 export type ClientContextWrapperInit = {
     lang: LanguageCode;
     user: UserJson | null;
-    qr: { svg: string; url: string } | null;
+    qr: { svg: string; url: string; code: string } | null;
     notification: Notification | null;
+    atStation: string | null;
 };
 
 export type ClientContextWrapperProps<P extends RegisteredPageId> = {
@@ -60,6 +65,7 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
             user: init.user && reviveUser(init.user),
             qr: init.qr,
             notification,
+            atStation: init.atStation,
         }),
         [lang, init.user, init.qr, notification],
     );

@@ -1,0 +1,24 @@
+/* Fixed strip pinned to the top of the viewport while the group is called
+   to a station. .mwa--at-station pads the page so the bar never covers
+   content. */
+.mwa-station-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    padding: var(--space-2) var(--space-3);
+    /* --panel-head-bg is translucent — layer it over the opaque page
+       background so scrolled content can't bleed through the bar */
+    background-color: var(--background);
+    background-image: var(--panel-head-bg);
+    box-shadow: var(--shadow-panel);
+    color: var(--foreground);
+    text-align: center;
+    font-size: var(--text-7);
+    font-weight: 700;
+}
+
+.mwa--at-station {
+    padding-top: var(--space-10);
+}

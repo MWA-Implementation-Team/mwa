@@ -3,7 +3,9 @@ import { describe, it } from 'node:test';
 import { Hono } from 'hono';
 import { createUser, findUserById } from '#src/db/users/index.js';
 import { createSession } from '#src/db/sessions/index.js';
-import { getOrCreateInteractToken } from '#src/db/interactions/index.js';
+import { getOrCreateInteractCode, getOrCreateInteractToken } from '#src/db/interactions/index.js';
+import { addGroupMember, createGroup, findUserGroup } from '#src/db/groups/index.js';
+import { joinQueue } from '#src/db/queue/index.js';
 import { createSystemQrCode } from '#src/db/systemqr/index.js';
 import { grantCoins, listUserTransactions } from '#src/db/transactions/index.js';
 import { listPlayerLeaderboard } from '#src/db/leaderboard/index.js';
@@ -35,6 +37,32 @@ describe('GET /app — personal QR', () => {
         const token = getOrCreateInteractToken(state, user.id);
         assert.match(html, new RegExp(`/app/interact/${token}`));
         assert.match(html, /<svg/);
+    });
+
+    it('shows the station banner while the group is called to one', async () => {
+        const user = createUser(state, 'banner@example.com', 'banner_user');
+        const mate = createUser(state, 'bannermate@example.com', 'bannermate');
+        const group = createGroup(state, 'banner grp', user.id, '555');
+        addGroupMember(state, group.id, mate.id);
+        joinQueue(state, group.id);
+        state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('egypt')`).run();
+        state.db
+            .prepare(
+                `UPDATE queue_entries SET status = 'called', activity_slug = 'egypt'
+                 WHERE group_id = ? AND status = 'waiting'`,
+            )
+            .run(group.id);
+
+        const res = await app.request('/app', { headers: authCookie(user.id) });
+        const html = await res.text();
+        assert.match(html, /mwa-station-banner/);
+        assert.match(html, /Your group is assigned to /);
+    });
+
+    it('renders no station banner for a waiting or groupless user', async () => {
+        const solo = createUser(state, 'nobanner@example.com', 'nobanner');
+        const res = await app.request('/app', { headers: authCookie(solo.id) });
+        assert.doesNotMatch(await res.text(), /mwa-station-banner/);
     });
 });
 
@@ -235,6 +263,102 @@ describe('POST /app/interact/:token/award', () => {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: 'amount=100',
+        });
+        assert.equal(res.status, 403);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 0);
+    });
+});
+
+describe('GET /app/interact?code= — sąveikos kodas lookup', () => {
+    it('redirects a typed code onto the token page', async () => {
+        const owner = createUser(state, 'codeowner@example.com', 'codeowner');
+        const scanner = createUser(state, 'codescan@example.com', 'codescan');
+        const code = getOrCreateInteractCode(state, owner.id);
+
+        const res = await app.request(`/app/interact?code=${code}`, {
+            headers: authCookie(scanner.id),
+        });
+        assert.equal(res.status, 303);
+        assert.equal(
+            res.headers.get('location'),
+            `/app/interact/${getOrCreateInteractToken(state, owner.id)}`,
+        );
+    });
+
+    it('is case-insensitive and bounces unknown codes back to /app', async () => {
+        const owner = createUser(state, 'codeowner2@example.com', 'codeowner2');
+        const scanner = createUser(state, 'codescan2@example.com', 'codescan2');
+        const code = getOrCreateInteractCode(state, owner.id);
+
+        const lower = await app.request(`/app/interact?code=${code.toLowerCase()}`, {
+            headers: authCookie(scanner.id),
+        });
+        assert.equal(lower.status, 303);
+        assert.match(lower.headers.get('location') ?? '', /\/app\/interact\//);
+
+        const bad = await app.request('/app/interact?code=NOPE1', {
+            headers: authCookie(scanner.id),
+        });
+        assert.equal(bad.status, 303);
+        assert.equal(bad.headers.get('location'), '/app?codeError=interactCodeInvalid');
+    });
+});
+
+describe('POST /app/interact/:token/award-group', () => {
+    it('lets a host award every member of the target group', async () => {
+        const owner = createUser(state, 'grpowner@example.com', 'grpowner');
+        const mate = createUser(state, 'grpmate@example.com', 'grpmate');
+        createGroup(state, 'award grp', owner.id, '555');
+        addGroupMember(state, findUserGroup(state, owner.id)!.id, mate.id);
+        const host = createUser(state, 'grphost@example.com', 'grphost');
+        promote(host.id, 'host');
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await app.request(`/app/interact/${token}/award-group`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(host.id),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'amount=25&note=team+prize',
+        });
+        assert.equal(res.status, 303);
+        assert.match(res.headers.get('location') ?? '', /interactNotice=interactAwardedGroup/);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 25);
+        assert.equal(findUserById(state, mate.id)!.currentBalance, 25);
+    });
+
+    it('errors when the target has no group', async () => {
+        const owner = createUser(state, 'grpsolo@example.com', 'grpsolo');
+        const host = createUser(state, 'grphost2@example.com', 'grphost2');
+        promote(host.id, 'host');
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await app.request(`/app/interact/${token}/award-group`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(host.id),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'amount=25',
+        });
+        assert.equal(res.status, 303);
+        assert.match(res.headers.get('location') ?? '', /interactError=interactAwardNoGroup/);
+        assert.equal(findUserById(state, owner.id)!.currentBalance, 0);
+    });
+
+    it('forbids a regular user from group-awarding', async () => {
+        const owner = createUser(state, 'grpowner3@example.com', 'grpowner3');
+        const scanner = createUser(state, 'grpscan@example.com', 'grpscan');
+        const token = getOrCreateInteractToken(state, owner.id);
+
+        const res = await app.request(`/app/interact/${token}/award-group`, {
+            method: 'POST',
+            headers: {
+                ...authCookie(scanner.id),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'amount=25',
         });
         assert.equal(res.status, 403);
         assert.equal(findUserById(state, owner.id)!.currentBalance, 0);

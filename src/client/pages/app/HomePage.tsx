@@ -2,7 +2,7 @@ import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
 import { Transaction, TransactionKind } from '#src/client/api/transactions.js';
-import { BookIcon, PhoneIcon } from '#src/client/ui/icons.js';
+import { PhoneIcon } from '#src/client/ui/icons.js';
 import PageShell from './PageShell.js';
 import Dialog from '#src/client/ui/Dialog.js';
 import { Language } from '#src/client/language.js';
@@ -14,7 +14,6 @@ type HomePageProps = {
     transactions: Transaction[];
     groupName: string | null;
     groupPhone: string | null;
-    groupEmoji: string;
     groupMemberCount: number | null;
     groupOwnerId: number | null;
     groupMembers: { userId: number; username: string }[];
@@ -29,6 +28,7 @@ type HomePageProps = {
     queueError?: keyof Language;
     qrClaimedAmount?: number | null;
     qrError?: 'not_found' | 'expired' | 'used_up' | 'already_claimed';
+    codeError?: keyof Language;
     standings: ViewerStanding[];
 };
 
@@ -58,7 +58,6 @@ function HomePage({
     transactions,
     groupName,
     groupPhone,
-    groupEmoji,
     groupMemberCount,
     groupOwnerId,
     groupMembers,
@@ -72,10 +71,10 @@ function HomePage({
     queueError,
     qrClaimedAmount,
     qrError,
+    codeError,
     standings,
 }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
-    const [guideOpen, setGuideOpen] = useState(false);
     const [usernameDialogOpen, setUsernameDialogOpen] = useState(youError !== undefined);
     const [groupNameEditOpen, setGroupNameEditOpen] = useState(false);
     const [groupPhoneEditOpen, setGroupPhoneEditOpen] = useState(false);
@@ -86,6 +85,7 @@ function HomePage({
                 <Toast kind="success">{t('qrClaimed', { amount: String(qrClaimedAmount) })}</Toast>
             )}
             {qrError && <Toast kind="error">{t(qrErrorKey[qrError])}</Toast>}
+            {codeError && <Toast kind="error">{t(codeError)}</Toast>}
             <section class="mwa-panel" id="panel-game">
                 <div class="mwa-panel-head">
                     <h2>{t('dashGame')}</h2>
@@ -93,9 +93,6 @@ function HomePage({
                 <div class="mwa-panel-body mwa-queue-grid">
                     <div>
                         <p class="mwa-queue-name">{displayUsername(user!.username)}</p>
-                        <div class="mwa-queue-art" aria-hidden="true">
-                            {groupEmoji}
-                        </div>
                         {queueError && <Toast kind="error">{t(queueError)}</Toast>}
 
                         {groupMemberCount !== null && (
@@ -436,16 +433,7 @@ function HomePage({
                         <a class="mwa-button" href="tel:+37061880077">
                             <PhoneIcon /> {t('dashCall')}: +370 618 80077
                         </a>
-                        <button
-                            type="button"
-                            class="mwa-button"
-                            aria-expanded={guideOpen}
-                            onClick={() => setGuideOpen(!guideOpen)}
-                        >
-                            <BookIcon /> {t('dashGuide')}
-                        </button>
                     </div>
-                    {guideOpen && <p class="mwa-muted">{t('dashGuideBody')}</p>}
                 </div>
             </section>
 

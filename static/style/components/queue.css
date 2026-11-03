@@ -1,5 +1,6 @@
-/* Home queue panel — group art square with a link-style action on the left,
-   per-board "your standings" list on the right. */
+/* Shared two-column grid for the home queue panel and the interact
+   shared-info panel — name and actions on the left, per-board "your
+   standings" list (plus home's per-activity ✓/— list) on the right. */
 .mwa-queue-grid {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);

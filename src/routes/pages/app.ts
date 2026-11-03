@@ -34,7 +34,11 @@ import {
 } from '#src/db/queue/index.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
-import { findUserByInteractToken, rotateInteractToken } from '#src/db/interactions/index.js';
+import {
+    findTokenByInteractCode,
+    findUserByInteractToken,
+    rotateInteractToken,
+} from '#src/db/interactions/index.js';
 import { gambleErrorMessages } from './gambling.js';
 import { claimSystemQrCode } from '#src/db/systemqr/index.js';
 import { updateUsername } from '#src/db/users/index.js';
@@ -72,10 +76,6 @@ export function registerAppRoutes(app: MwaHono) {
         const queueEntry = getUserWaitingEntry(ctx.var, user.id);
 
         const memberCount = group ? listGroupMembers(ctx.var, group.id).length : 0;
-        const groupEmoji =
-            group && memberCount >= 1 && memberCount <= 6
-                ? GROUP_ART_PLACEHOLDERS[group.id % GROUP_ART_PLACEHOLDERS.length]
-                : NO_GROUP_ART;
 
         const queueError = queryFlag(ctx, 'queueError', [
             'queueJoinFailed',
@@ -102,6 +102,7 @@ export function registerAppRoutes(app: MwaHono) {
             'used_up',
             'already_claimed',
         ] as const);
+        const codeError = queryFlag(ctx, 'codeError', ['interactCodeInvalid'] as const);
         const youError = queryFlag(ctx, 'youError', [
             'youUsernameTaken',
             'youUsernameInvalid',
@@ -144,7 +145,6 @@ export function registerAppRoutes(app: MwaHono) {
             transactions: listUserTransactions(ctx.var, user.id),
             groupName: group?.name ?? null,
             groupPhone: group?.phoneNumber ?? null,
-            groupEmoji,
             groupMemberCount: group ? memberCount : null,
             groupOwnerId: group?.ownerId ?? null,
             groupMembers,
@@ -155,6 +155,7 @@ export function registerAppRoutes(app: MwaHono) {
             queueError,
             qrClaimedAmount,
             qrError,
+            codeError,
             stationProgress: group
                 ? (Object.keys(registeredActivities) as ActivitySlug[]).map((slug) => ({
                       slug,
@@ -496,6 +497,20 @@ export function registerAppRoutes(app: MwaHono) {
         return ctx.redirect(`${back}?sent=${amount}`, 303);
     });
 
+    // Typed-code entry to the interact page — the sidebar's "sąveikos kodas"
+    // form GETs here; a hit redirects to the token's canonical page.
+    app.get('/app/interact', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const code = (ctx.req.query('code') ?? '').trim().toUpperCase();
+        const token = /^[A-Z]{5}$/.test(code) ? findTokenByInteractCode(ctx.var, code) : null;
+        if (!token) {
+            return ctx.redirect('/app?codeError=interactCodeInvalid', 303);
+        }
+        return ctx.redirect(`/app/interact/${encodeURIComponent(token)}`, 303);
+    });
+
     // What the personal QR opens — the standalone interact page.
     app.get('/app/interact/:token', (ctx) => {
         const user = requireUser(ctx);
@@ -512,10 +527,12 @@ export function registerAppRoutes(app: MwaHono) {
         const interactError = queryFlag(ctx, 'interactError', [
             'groupRequestFailed',
             'interactAwardInvalid',
+            'interactAwardNoGroup',
         ] as const);
         const interactNotice = queryFlag(ctx, 'interactNotice', [
             'groupRequestSent',
             'interactAwarded',
+            'interactAwardedGroup',
         ] as const);
         const sendError = queryFlag(ctx, 'sendError', [
             'interactSendInvalid',
@@ -525,7 +542,7 @@ export function registerAppRoutes(app: MwaHono) {
         const sentAmount = Number.isSafeInteger(sent) && sent > 0 ? sent : null;
 
         // the scanned user's team for the shared-info panel — same stable
-        // emoji pick the home queue panel uses, sad face when groupless
+        // emoji placeholder keyed off the group id, sad face when groupless
         const targetGroup = findUserGroup(ctx.var, target.id);
         const group = targetGroup
             ? {
@@ -594,6 +611,38 @@ export function registerAppRoutes(app: MwaHono) {
 
         grantCoins(ctx.var, target.id, amount, noteText);
         return ctx.redirect(`${back}?interactNotice=interactAwarded`, 303);
+    });
+
+    // Same award form, group-wide: credits every member of the target's team.
+    app.post('/app/interact/:token/award-group', async (ctx) => {
+        const user = requireRole(ctx, 'host', 'admin');
+        if (user instanceof Response) return user;
+
+        const token = ctx.req.param('token');
+        const target = findUserByInteractToken(ctx.var, token);
+        if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
+
+        const form = await ctx.req.formData().catch(() => null);
+        if (!form) return writeErrorPage(ctx, 400);
+
+        const back = `/app/interact/${encodeURIComponent(token)}`;
+        const group = findUserGroup(ctx.var, target.id);
+        if (!group) {
+            return ctx.redirect(`${back}?interactError=interactAwardNoGroup`, 303);
+        }
+
+        const amount = Number(form.get('amount'));
+        if (!Number.isSafeInteger(amount) || amount <= 0) {
+            return ctx.redirect(`${back}?interactError=interactAwardInvalid`, 303);
+        }
+
+        const note = form.get('note');
+        const noteText = typeof note === 'string' && note.trim() ? note.trim().slice(0, 200) : null;
+
+        for (const member of listGroupMembers(ctx.var, group.id)) {
+            grantCoins(ctx.var, member.userId, amount, noteText);
+        }
+        return ctx.redirect(`${back}?interactNotice=interactAwardedGroup`, 303);
     });
 
     // Reward qr scan (the secret in the QR is the route param)

@@ -38,6 +38,13 @@ export type Language = {
     interactAwardInvalid: string;
     interactAwarded: string;
     interactGroupNone: string;
+    interactCodeTitle: string;
+    interactCodeInput: string;
+    interactCodeInvalid: string;
+    interactAwardGroup: string;
+    interactAwardedGroup: string;
+    interactAwardNoGroup: string;
+    stationBanner: string;
     accountQrHint: string;
     accountQrReset: string;
     qrClaimed: string;
@@ -108,8 +115,6 @@ export type Language = {
 
     dashSupport: string;
     dashCall: string;
-    dashGuide: string;
-    dashGuideBody: string;
 
     shellSkip: string;
     shellLogoAlt: string;
@@ -301,6 +306,13 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardInvalid: 'Enter a valid whole-number amount.',
         interactAwarded: 'Coins awarded.',
         interactGroupNone: 'Not in a group.',
+        interactCodeTitle: 'Interact code',
+        interactCodeInput: "Friend's code",
+        interactCodeInvalid: 'No one has that code.',
+        interactAwardGroup: 'Award group ({n})',
+        interactAwardedGroup: 'Whole group awarded.',
+        interactAwardNoGroup: 'They have no group.',
+        stationBanner: 'Your group is assigned to {name}',
         accountQrHint:
             'Your personal QR is shown in the sidebar. Reset it to invalidate the old code.',
         accountQrReset: 'Reset QR code',
@@ -352,7 +364,7 @@ export const languages: Record<LanguageCode, Language> = {
         queueAtStation:
             'Your team is at a station right now — finish it before rejoining the queue.',
         queueAllDone: 'Your team has completed every station!',
-        homeStationProgress: 'Stations',
+        homeStationProgress: 'Activities',
         queueJoinFailed: 'Could not join the queue',
         queueLeaveFailed: 'Could not leave the queue',
         dashStandings: 'Your standings',
@@ -373,8 +385,6 @@ export const languages: Record<LanguageCode, Language> = {
 
         dashSupport: 'Support',
         dashCall: 'Call support',
-        dashGuide: 'Guide & explanations',
-        dashGuideBody: 'This section can contain explanations of the dashboard features.',
 
         shellSkip: 'Skip to content',
         shellLogoAlt: 'first years Event home',
@@ -567,6 +577,13 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardInvalid: 'Neteisinga suma.',
         interactAwarded: 'Koinai suteikti.',
         interactGroupNone: 'Nėra grupėje.',
+        interactCodeTitle: 'Sąveikos kodas',
+        interactCodeInput: 'Draugo kodas',
+        interactCodeInvalid: 'Niekas neturi tokio kodo.',
+        interactAwardGroup: 'Apdovanoti grupę ({n})',
+        interactAwardedGroup: 'Grupė apdovanota.',
+        interactAwardNoGroup: 'Vartotojas neturi grupės.',
+        stationBanner: 'Grupės priskirta veikla „{name}“',
         accountQrHint:
             'Jūsų asmeninis QR rodomas šone. Čia galite jį sukurti iš naujo (senasis nustos veikti).',
         accountQrReset: 'Iš naujo sukurti QR kodą',
@@ -617,7 +634,7 @@ export const languages: Record<LanguageCode, Language> = {
         queueTooSmall: 'Norint stoti į eilę, grupėje turi būti bent 2 nariai.',
         queueAtStation: 'Jūsų komanda dabar prie stotelės — užbaikite ją prieš vėl stodami į eilę.',
         queueAllDone: 'Jūsų komanda įveikė visas stoteles!',
-        homeStationProgress: 'Stotelės',
+        homeStationProgress: 'Veiklos',
         queueJoinFailed: 'Nepavyko stoti į eilę',
         queueLeaveFailed: 'Nepavyko palikti eilės',
         dashStandings: 'Tavo pozicijos',
@@ -638,8 +655,6 @@ export const languages: Record<LanguageCode, Language> = {
 
         dashSupport: 'Pagalba',
         dashCall: 'Skambinti pagalbai',
-        dashGuide: 'Vadovas ir paaiškinimai',
-        dashGuideBody: 'Šiame skyriuje gali būti pateikiami prietaisų skydelio paaiškinimai.',
 
         shellSkip: 'Pereiti prie turinio',
         shellLogoAlt: 'pirmakursiu renginio pradžia',

@@ -114,6 +114,20 @@ export function getUserWaitingEntry(state: MwaState, userId: number): QueueEntry
     return row ? mapQueueEntry(row) : null;
 }
 
+// The station the user's group is called to right now, if any — status
+// stays 'called' with done_at unset until the host marks them done.
+export function getUserCalledEntry(state: MwaState, userId: number): QueueEntry | null {
+    const query = state.prepare(`
+        SELECT queue_entries.id, queue_entries.group_id, queue_entries.joined_at,
+               queue_entries.status, queue_entries.closed_at, queue_entries.done_at, queue_entries.activity_slug
+        FROM queue_entries
+        JOIN group_members ON group_members.group_id = queue_entries.group_id
+        WHERE group_members.user_id = ? AND queue_entries.status = 'called' AND queue_entries.done_at IS NULL
+    `);
+    const row = query.get(userId);
+    return row ? mapQueueEntry(row) : null;
+}
+
 // 1-based place in line. ids order the queue — they're monotonic, so a
 // rejoined group correctly lands behind everyone already waiting.
 export function getQueuePosition(state: MwaState, entryId: number): number | null {

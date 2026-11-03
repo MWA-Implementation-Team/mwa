@@ -4,6 +4,8 @@ import { ClientContext, Notification } from '#src/client/context.js';
 import Dialog from '#src/client/ui/Dialog.js';
 import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 import QrPane from '#src/client/ui/QrPane.js';
+import InteractCodePane from '#src/client/ui/InteractCodePane.js';
+import StationBanner from '#src/client/ui/StationBanner.js';
 import { displayActor } from '#src/client/display.js';
 
 export type Section =
@@ -36,7 +38,7 @@ export default function PageShell({
     side,
     children,
 }: PageShellProps) {
-    const { t, user, qr, notification } = useContext(ClientContext);
+    const { t, user, qr, notification, atStation } = useContext(ClientContext);
 
     const showAlert = notification !== null && !hideNotification;
 
@@ -97,6 +99,7 @@ export default function PageShell({
                 </section>
             )}
             {qr && <QrPane />}
+            {qr && <InteractCodePane />}
             <section class="landing-section landing-pane-lang">
                 <h2>{t('landingLangTitle')}</h2>
                 <div class="landing-footer">
@@ -107,7 +110,8 @@ export default function PageShell({
     );
 
     return (
-        <div class="mwa">
+        <div class={atStation ? 'mwa mwa--at-station' : 'mwa'}>
+            <StationBanner />
             <a class="mwa-skip" href="#mwa-main">
                 {t('shellSkip')}
             </a>

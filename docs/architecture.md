@@ -116,6 +116,11 @@ slug is finished. The home queue panel renders a per-station ✓/— table, the
 activity page shows a completion banner, and the host page marks already-done
 rows so they can't be called twice.
 
+While a group is called to a station (`status='called'`, `done_at` unset),
+every member sees a fixed top banner — `writePage` puts the station's display
+name into `ctxInit.atStation` (`getUserCalledEntry`), and `PageShell` renders
+`StationBanner` plus a `mwa--at-station` padding modifier on the frame.
+
 ## Interactions and gambling
 
 The `PageShell` sidebar renders a personal QR using `uqr` on every page, linking
@@ -123,7 +128,12 @@ to `/app/interact/<token>` — the standalone interact page
 (`InteractPage`); `/app?interact=<token>` redirects there so codes minted
 while the flow lived in a home-page dialog keep working.
 Migration `05_interact_tokens.sql` stores one permanent random token per user;
-it identifies the target but grants no permissions. Any signed-in scanner can
+it identifies the target but grants no permissions. Below the QR, a sidebar
+pane shows the owner's 5-letter "sąveikos kodas" (`code` on the same row,
+migration 18, minted lazily like the token and untouched by QR rotation) and a
+field for a friend's code: the GET form hits `/app/interact?code=`, which
+resolves the code to its token and redirects to the canonical page — a miss
+bounces to `/app?codeError=interactCodeInvalid`. Any signed-in scanner can
 challenge another user or send them coins. Staff don't play: hosts and admins
 can neither send money, gamble, or request a team-up nor be the target of
 those flows — the POSTs answer 403 and the interact page hides the play
@@ -150,7 +160,10 @@ each Challenge link opens a small bet dialog posting to
 A host/admin scanner sees the same send panel in its award shape — unclamped,
 with an optional note — posting to `POST /app/interact/:token/award` to credit
 the scanned user coins (`host_grant` via `grantCoins`); the note is stored on the child
-transaction and shown on the recipient's home page. The personal token can be rotated from the QR sidebar pane
+transaction and shown on the recipient's home page. When the target is in a
+group, a second `formaction` submit posts to `POST /app/interact/:token/award-group`,
+which grants the amount to every member of that group (`?interactError=interactAwardNoGroup`
+when the target is groupless). The personal token can be rotated from the QR sidebar pane
 (`POST /app/you/reset-qr`), which invalidates the old code immediately.
 
 Reward QRs are the `system_qr_codes` table that has existed since migration 01.
