@@ -59,16 +59,18 @@ describe('db/users', () => {
         assert.equal(findUserByUsername(state, 'legacy_user')?.email, 'legacy@example.com');
     });
 
-    it('deriveUsername sanitizes the local part to ascii', () => {
-        assert.equal(deriveUsername(state, 'fresh.face@example.com'), 'fresh_face');
-        assert.equal(deriveUsername(state, 'ąčę@example.com'), 'user');
-        assert.equal(deriveUsername(state, 'a'.repeat(30) + '@example.com'), 'a'.repeat(16));
+    it('deriveUsername returns a stable pseudonym that hides the email', () => {
+        const name = deriveUsername(state, 'fresh.face@example.com');
+        assert.match(name, /^[a-z]+_[a-z]+_\d{2}$/);
+        assert.ok(!name.includes('fresh'));
+        // deterministic — the same email always maps to the same pseudonym
+        assert.equal(deriveUsername(state, 'fresh.face@example.com'), name);
     });
 
     it('deriveUsername dedupes with a numeric suffix', () => {
-        createUser(state, 'dd1@example.com', 'same');
-        createUser(state, 'dd2@example.com', 'same2');
-        assert.equal(deriveUsername(state, 'same@x.com'), 'same3');
+        const base = deriveUsername(state, 'taken-name@example.com');
+        createUser(state, 'dd1@example.com', base);
+        assert.equal(deriveUsername(state, 'taken-name@example.com'), `${base.slice(0, 15)}2`);
     });
 
     it('updateUsername trims, lowercases, and renames', () => {
