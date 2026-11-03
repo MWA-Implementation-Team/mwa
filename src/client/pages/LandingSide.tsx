@@ -18,9 +18,7 @@ const socials = [
 ];
 
 const sponsors = [
-    { name: 'Eckes-Granini Baltic', href: 'https://www.eckes-granini.lt/' },
     { name: 'SKALVIJA', href: 'https://skalvija.lt/' },
-    { name: 'EUREKA knygynas', href: 'https://knygynas.biz/' },
     { name: 'VERTICAL', href: 'https://www.vertical.lt/' },
     { name: 'ŠMC', href: 'https://cac.lt/' },
 ];
