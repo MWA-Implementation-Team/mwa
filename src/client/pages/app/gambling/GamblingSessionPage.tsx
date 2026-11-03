@@ -23,30 +23,7 @@ type GamblingSessionPageProps = {
 
 export const gamblingSessionPage: Page<GamblingSessionPageProps> = {
     Component: GamblingSessionPage,
-    title: (t, props) => title(t, props.game),
-    customTitle: true,
 };
-
-function title(t: TranslateFn, game: RunningGame): string {
-    switch (game.status.type) {
-        case 'pending':
-            return t('titleGamblingRequest');
-        case 'expired':
-            return t('titleGamblingExpired');
-        case 'rejected':
-            return t('titleGamblingRejected');
-        case 'running':
-        case 'ended':
-            switch (game.gameType) {
-                case 'coin_flip':
-                    return t('titleGamblingCoinFlip');
-                case 'chess':
-                    return t('gamblingChess');
-                case 'connect_4':
-                    return t('titleGamblingConnect4');
-            }
-    }
-}
 
 function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPageProps) {
     const { user, t } = useContext(ClientContext);
@@ -64,10 +41,6 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
         updates.onerror = () => setIsDisconnected(true);
         return () => updates.close();
     }, [sessionId]);
-
-    useEffect(() => {
-        document.title = title(t, currentGame);
-    }, [currentGame, t]);
 
     const disconnected = isDisconnected ? (
         <Toast kind="error">
@@ -91,12 +64,14 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                     <button
                                         formaction={`/app/gambling/sessions/${sessionId}/accept`}
                                         type="submit"
+                                        class="mwa-button"
                                     >
                                         {t('gamblingAccept')}
                                     </button>
                                     <button
                                         formaction={`/app/gambling/sessions/${sessionId}/reject?goto=${encodeURIComponent('/app')}`}
                                         type="submit"
+                                        class="mwa-button"
                                     >
                                         {t('gamblingReject')}
                                     </button>

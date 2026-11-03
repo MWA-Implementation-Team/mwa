@@ -41,7 +41,6 @@ type InteractPageProps = {
 
 export const interactPage: Page<InteractPageProps> = {
     Component: InteractPage,
-    title: (t, { target }) => t('titleInteract', { name: displayUsername(target.username) }),
 };
 
 // What the personal QR opens — /app/interact/<token>.

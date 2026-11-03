@@ -37,8 +37,8 @@ export type ActivityProps = {
 };
 
 export type Activity = {
-    // Display name — used for the <title> and anywhere the app refers
-    // to the station generically. Proper noun, not translated.
+    // Display name — used anywhere the app refers to the station
+    // generically. Proper noun, not translated.
     name: string;
     // Rendered inside a link on the activities list page and again at
     // the top of the station's own page.

@@ -19,7 +19,6 @@ type BadgesPageProps = {};
 
 export const badgesPage: Page<BadgesPageProps> = {
     Component: BadgesPage,
-    title: (t) => t('titleBadges'),
 };
 
 function BadgesPage({}: BadgesPageProps) {
@@ -38,9 +37,9 @@ function BadgesPage({}: BadgesPageProps) {
 }
 ```
 
-Every page exports a `Page<P>` object: `Component` renders the body, and
-`title(t, props, lang)` produces the `<title>` — it runs on the server (in `writePage`)
-and again in the browser when the language changes.
+Every page exports a `Page<P>` object whose `Component` renders the body. The
+`<title>` is the same on every page (`titleApp`) — `writePage` renders it on the
+server and `ClientContextWrapper` keeps it in sync when the language changes.
 
 ## 2. Register the page id
 
@@ -90,22 +89,18 @@ The `section` prop controls which link gets `aria-current="page"`.
 In `src/client/language.ts`, add the keys to the `Language` type:
 
 ```ts
-titleGambling: string;
-titleBadges: string;
-titleError: string;
+headerBadges: string;
 ```
 
-then to `headerBadges` in the same type, and finally a value in **both** `en` and `lt`
+then a value in **both** `en` and `lt`
 (`Record<LanguageCode, Language>` forces completeness — forgetting one is a compile
 error):
 
 ```ts
 // en
-titleBadges: 'first years | Badges',
 headerBadges: 'Badges',
 
 // lt
-titleBadges: 'first years | Ženkleliai',
 headerBadges: 'Ženkleliai',
 ```
 
@@ -120,8 +115,7 @@ allowlist to update.
 
 1. `npm run lint` — catches unregistered ids, missing translation keys, unused imports.
 2. `npm run dev`, log in (see [auth](auth.md) — the link is in the server console),
-   open http://localhost:3000/app/badges — the page renders and the browser tab
-   shows `first years | Badges`.
+   open http://localhost:3000/app/badges — the page renders.
 3. `curl -s -b cookies.txt http://localhost:3000/app/badges` (mint `cookies.txt` via
    the verify flow in [auth](auth.md)) and search the HTML for `"pageId":"badges"`
    inside the `<script id="ssr-data">` tag — that confirms the right page id was

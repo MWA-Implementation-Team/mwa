@@ -1,4 +1,5 @@
 import { MwaState } from '#src/state.js';
+import { createHash } from 'node:crypto';
 import { SQLOutputValue } from 'node:sqlite';
 import { queryActiveGamblingSession, queryGamblingInvitations } from '../gambling/index.js';
 import { findUserGroup, queryUserGroupInvite } from '../groups/index.js';
@@ -114,12 +115,89 @@ export function markEmailVerified(state: MwaState, userId: number) {
     markEmailVerifiedQuery.run(userId);
 }
 
+// Pseudonym word pools — every word is ≤6 chars so adjective_noun_NN stays
+// inside the 16-char username limit.
+const pseudonymAdjectives = [
+    'agile',
+    'alert',
+    'bold',
+    'brave',
+    'brisk',
+    'calm',
+    'cheery',
+    'clever',
+    'cosy',
+    'eager',
+    'fleet',
+    'fuzzy',
+    'gentle',
+    'glad',
+    'happy',
+    'jolly',
+    'keen',
+    'kind',
+    'lively',
+    'lucky',
+    'merry',
+    'mighty',
+    'nimble',
+    'perky',
+    'proud',
+    'quick',
+    'quiet',
+    'shiny',
+    'smart',
+    'sunny',
+    'swift',
+    'witty',
+] as const;
+
+const pseudonymNouns = [
+    'badger',
+    'beaver',
+    'bison',
+    'boar',
+    'crane',
+    'drake',
+    'eagle',
+    'egret',
+    'elk',
+    'falcon',
+    'finch',
+    'fox',
+    'gecko',
+    'goose',
+    'hare',
+    'heron',
+    'lark',
+    'lynx',
+    'marten',
+    'mink',
+    'moose',
+    'otter',
+    'owl',
+    'panda',
+    'perch',
+    'pike',
+    'raven',
+    'seal',
+    'stork',
+    'tiger',
+    'viper',
+    'wolf',
+] as const;
+
 // New accounts are created from an email link, so nobody picks a username at
-// signup — derive one from the email's local part. Users fix it on /app's you tab.
+// signup — derive a stable pseudonym by hashing the email. Deriving from the
+// local part would leak the address into every leaderboard; the hash keeps the
+// name stable for a given email without revealing it. Users fix it on /app's
+// you tab.
 export function deriveUsername(state: MwaState, email: string): string {
-    const local = email.split('@')[0].toLowerCase();
-    const base = local.replace(/[^a-z0-9_-]/g, '_').replace(/^_+|_+$/g, '') || 'user';
-    const trimmed = base.slice(0, 16);
+    const hash = createHash('sha256').update(email).digest();
+    const adjective = pseudonymAdjectives[hash[0] % pseudonymAdjectives.length];
+    const noun = pseudonymNouns[hash[1] % pseudonymNouns.length];
+    const tag = String(hash.readUInt16BE(2) % 100).padStart(2, '0');
+    const trimmed = `${adjective}_${noun}_${tag}`;
     let candidate = trimmed;
     let n = 2;
     while (findUserByUsername(state, candidate)) {

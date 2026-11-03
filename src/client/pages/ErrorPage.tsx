@@ -7,7 +7,6 @@ type ErrorPageProps = {
 
 export const errorPage: Page<ErrorPageProps> = {
     Component: ErrorPage,
-    title: (t, { status }) => t('titleError', { status: `${status}` }),
 };
 
 function ErrorPage({ status }: ErrorPageProps) {

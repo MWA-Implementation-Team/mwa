@@ -57,8 +57,9 @@ There is no global transport setter.
   form carries a non-empty `token` (replays get an error page) and otherwise
   runs the `challenge_id` + `code` fallback. Both paths share `logIn`: resolve the
   user — registered email →
-  `markEmailVerified`; new email → `createUser` with a `deriveUsername`-derived
-  name (local part sanitized to `[a-z0-9_-]`, deduped). A `sessions` row (30 days,
+  `markEmailVerified`; new email → `createUser` with a `deriveUsername` pseudonym
+  (`adjective_noun_NN` picked by hashing the email, deduped — the address never
+  leaks into the public name). A `sessions` row (30 days,
   sha256 at rest) becomes the `mwa-session` cookie (`HttpOnly`, `SameSite=Lax`,
   `Secure` in prod). Redirect: `safeGoto` accepts normalized same-origin paths and
   queries against configured `ORIGIN`, rejecting normalized `//` paths (no route

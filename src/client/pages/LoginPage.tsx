@@ -25,7 +25,6 @@ type LoginPageProps = {
 
 export const loginPage: Page<LoginPageProps> = {
     Component: LoginPage,
-    title: (t) => t('titleLogin'),
 };
 
 function LoginPage({
@@ -47,7 +46,9 @@ function LoginPage({
                             <form method="POST" action="/auth/verify" class="mwa-form">
                                 <input type="hidden" name="token" value={confirmToken} />
                                 {goto && <input type="hidden" name="goto" value={goto} />}
-                                <button type="submit">{t('loginConfirmSubmit')}</button>
+                                <button type="submit" class="mwa-button">
+                                    {t('loginConfirmSubmit')}
+                                </button>
                             </form>
                         </>
                     ) : sentTo && challengeId ? (
@@ -71,7 +72,9 @@ function LoginPage({
                                         required
                                     />
                                 </div>
-                                <button type="submit">{t('loginVerify')}</button>
+                                <button type="submit" class="mwa-button">
+                                    {t('loginVerify')}
+                                </button>
                             </form>
                         </>
                     ) : (
@@ -86,7 +89,9 @@ function LoginPage({
                                     required
                                 />
                             </div>
-                            <button type="submit">{t('loginSendLink')}</button>
+                            <button type="submit" class="mwa-button">
+                                {t('loginSendLink')}
+                            </button>
                         </form>
                     )}
 

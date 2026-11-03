@@ -85,7 +85,9 @@ describe('GET /auth/verify — link path', () => {
         assert.ok(user, 'account should exist after verify');
         assert.equal(user.role, 'user');
         assert.ok(user.emailVerifiedAt instanceof Date);
-        assert.equal(user.username, 'fresh_face'); // derived from the local part
+        // pseudonym derived by hashing the email — the local part stays hidden
+        assert.match(user.username, /^[a-z]+_[a-z]+_\d{2}/);
+        assert.ok(!user.username.includes('fresh'));
 
         const cookie = sessionCookie(res);
         const authed = await app.request('/app', { headers: { cookie: `mwa-session=${cookie}` } });

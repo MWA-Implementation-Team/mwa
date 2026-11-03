@@ -117,7 +117,7 @@ export function Root<P extends RegisteredPageId>({
 
     const page = registeredPages[pageId] as Page<RegisteredPageProps<P>>;
 
-    const title = page.title(translate(ctxInit.lang), pageProps, ctxInit.lang);
+    const title = translate(ctxInit.lang)('titleApp');
 
     let bodyStyle = undefined;
     if (themeOverride) {

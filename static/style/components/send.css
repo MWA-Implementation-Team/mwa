@@ -18,8 +18,10 @@
     place-items: center;
     inline-size: var(--space-8);
     block-size: var(--space-8);
+    min-height: 0;
     padding: 0;
     border: 1px solid var(--border);
+    box-shadow: none;
     border-radius: var(--radius-full);
     background: var(--muted);
     color: var(--foreground);
@@ -54,12 +56,14 @@
 }
 
 .mwa-send-chip {
+    min-height: 0;
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--border);
     border-radius: var(--radius-full);
     background: var(--muted);
     color: var(--foreground);
     font-size: var(--text-7);
+    box-shadow: none;
     cursor: pointer;
 }
 

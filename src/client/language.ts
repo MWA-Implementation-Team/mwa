@@ -5,21 +5,7 @@ export const defaultLanguage: LanguageCode = 'en';
 export type Language = {
     displayName: string;
 
-    titleLanding: string;
-    titleLogin: string;
-    titleHome: string;
-    titleActivity: string;
-    titleLeaderboard: string;
-    titleGambling: string;
-    titleInteract: string;
-    titleHost: string;
-    titleAdmin: string;
-    titleError: string;
-    titleGamblingRequest: string;
-    titleGamblingExpired: string;
-    titleGamblingRejected: string;
-    titleGamblingCoinFlip: string;
-    titleGamblingConnect4: string;
+    titleApp: string;
 
     headerHome: string;
     headerLeaderboard: string;
@@ -281,21 +267,7 @@ export const languages: Record<LanguageCode, Language> = {
     en: {
         displayName: 'English',
 
-        titleLanding: 'first years | Home',
-        titleLogin: 'first years | Login',
-        titleHome: 'first years | App',
-        titleActivity: 'first years | {name}',
-        titleLeaderboard: 'first years | Leaderboard',
-        titleGambling: 'first years | Gambling',
-        titleInteract: 'first years | Interact with {name}',
-        titleHost: 'first years | Host',
-        titleAdmin: 'first years | Admin',
-        titleError: 'first years | {status}',
-        titleGamblingRequest: 'first years | Challenge request',
-        titleGamblingExpired: 'first years | Expired',
-        titleGamblingRejected: 'first years | Rejected',
-        titleGamblingCoinFlip: 'first years | Coin flip',
-        titleGamblingConnect4: 'first years | Connect 4',
+        titleApp: 'Freshman Event',
 
         headerHome: 'App',
 
@@ -560,22 +532,7 @@ export const languages: Record<LanguageCode, Language> = {
     lt: {
         displayName: 'Lietuvių',
 
-        titleLanding: 'pirmakursiu | Pradžia',
-        titleLogin: 'pirmakursiu | Prisijungimas',
-        titleHome: 'pirmakursiu | Programa',
-
-        titleActivity: 'pirmakursiu | {name}',
-        titleLeaderboard: 'pirmakursiu | Lyderių lentelė',
-        titleGambling: 'pirmakursiu | Lošimai',
-        titleInteract: 'pirmakursiu | Sąveika su {name}',
-        titleHost: 'pirmakursiu | Vedėjas',
-        titleAdmin: 'pirmakursiu | Administravimas',
-        titleError: 'pirmakursiu | {status}',
-        titleGamblingRequest: 'pirmakursiu | Kvietimas lošti',
-        titleGamblingExpired: 'pirmakursiu | Kvietimas nebegalioja',
-        titleGamblingRejected: 'pirmakursiu | Kvietimas atmestas',
-        titleGamblingCoinFlip: 'pirmakursiu | Monetos metimas',
-        titleGamblingConnect4: 'pirmakursiu | Keturi iš eilės',
+        titleApp: 'Pirmakursių Renginys',
 
         headerHome: 'Programa',
 
