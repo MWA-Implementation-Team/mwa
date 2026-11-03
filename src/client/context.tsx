@@ -14,8 +14,8 @@ export type ClientContextType = {
     updateLang: (lang: LanguageCode) => void;
     t: TranslateFn;
     user: User | null; // logged-in user, else null
-    // personal QR shown in the sidebar — present only when logged in
-    qr: { svg: string; url: string } | null;
+    // personal QR + typed "sąveikos kodas" shown in the sidebar — logged in only
+    qr: { svg: string; url: string; code: string } | null;
     notification: Notification | null;
 };
 
@@ -33,7 +33,7 @@ export const ClientContext = createContext<ClientContextType>({
 export type ClientContextWrapperInit = {
     lang: LanguageCode;
     user: UserJson | null;
-    qr: { svg: string; url: string } | null;
+    qr: { svg: string; url: string; code: string } | null;
     notification: Notification | null;
 };
 

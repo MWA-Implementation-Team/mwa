@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import { Hono } from 'hono';
 import { createUser, findUserById } from '#src/db/users/index.js';
 import { createSession } from '#src/db/sessions/index.js';
-import { getOrCreateInteractToken } from '#src/db/interactions/index.js';
+import { getOrCreateInteractCode, getOrCreateInteractToken } from '#src/db/interactions/index.js';
 import { createSystemQrCode } from '#src/db/systemqr/index.js';
 import { grantCoins, listUserTransactions } from '#src/db/transactions/index.js';
 import { listPlayerLeaderboard } from '#src/db/leaderboard/index.js';
@@ -238,6 +238,41 @@ describe('POST /app/interact/:token/award', () => {
         });
         assert.equal(res.status, 403);
         assert.equal(findUserById(state, owner.id)!.currentBalance, 0);
+    });
+});
+
+describe('GET /app/interact?code= — sąveikos kodas lookup', () => {
+    it('redirects a typed code onto the token page', async () => {
+        const owner = createUser(state, 'codeowner@example.com', 'codeowner');
+        const scanner = createUser(state, 'codescan@example.com', 'codescan');
+        const code = getOrCreateInteractCode(state, owner.id);
+
+        const res = await app.request(`/app/interact?code=${code}`, {
+            headers: authCookie(scanner.id),
+        });
+        assert.equal(res.status, 303);
+        assert.equal(
+            res.headers.get('location'),
+            `/app/interact/${getOrCreateInteractToken(state, owner.id)}`,
+        );
+    });
+
+    it('is case-insensitive and bounces unknown codes back to /app', async () => {
+        const owner = createUser(state, 'codeowner2@example.com', 'codeowner2');
+        const scanner = createUser(state, 'codescan2@example.com', 'codescan2');
+        const code = getOrCreateInteractCode(state, owner.id);
+
+        const lower = await app.request(`/app/interact?code=${code.toLowerCase()}`, {
+            headers: authCookie(scanner.id),
+        });
+        assert.equal(lower.status, 303);
+        assert.match(lower.headers.get('location') ?? '', /\/app\/interact\//);
+
+        const bad = await app.request('/app/interact?code=NOPE1', {
+            headers: authCookie(scanner.id),
+        });
+        assert.equal(bad.status, 303);
+        assert.equal(bad.headers.get('location'), '/app?codeError=interactCodeInvalid');
     });
 });
 

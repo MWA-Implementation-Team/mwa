@@ -4,6 +4,7 @@ import { ClientContext, Notification } from '#src/client/context.js';
 import Dialog from '#src/client/ui/Dialog.js';
 import LanguageToggle from '#src/client/ui/LanguageToggle.js';
 import QrPane from '#src/client/ui/QrPane.js';
+import InteractCodePane from '#src/client/ui/InteractCodePane.js';
 import { displayActor } from '#src/client/display.js';
 
 export type Section =
@@ -97,6 +98,7 @@ export default function PageShell({
                 </section>
             )}
             {qr && <QrPane />}
+            {qr && <InteractCodePane />}
             <section class="landing-section landing-pane-lang">
                 <h2>{t('landingLangTitle')}</h2>
                 <div class="landing-footer">

@@ -11,7 +11,7 @@ import { StatusCode } from 'hono/utils/http-status';
 import { BootData } from './client/bootstrap.js';
 import { getRequestLanguage } from './utils.js';
 import { MwaContext, MwaHono } from './state.js';
-import { getOrCreateInteractToken } from '#src/db/interactions/index.js';
+import { getOrCreateInteractCode, getOrCreateInteractToken } from '#src/db/interactions/index.js';
 import { renderSVG } from 'uqr';
 import { queryUserNotification } from './db/users/index.js';
 
@@ -29,7 +29,11 @@ export function writePage<P extends RegisteredPageId>(
                   `/app/interact/${encodeURIComponent(getOrCreateInteractToken(ctx.var, user.id))}`,
                   ctx.var.origin,
               ).toString();
-              return { svg: renderSVG(url), url };
+              return {
+                  svg: renderSVG(url),
+                  url,
+                  code: getOrCreateInteractCode(ctx.var, user.id),
+              };
           })()
         : null;
     const ctxInit: ClientContextWrapperInit = {

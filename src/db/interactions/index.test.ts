@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { createUser } from '../users/index.js';
-import { findUserByInteractToken, getOrCreateInteractToken } from './index.js';
+import {
+    findTokenByInteractCode,
+    findUserByInteractToken,
+    getOrCreateInteractCode,
+    getOrCreateInteractToken,
+    rotateInteractToken,
+} from './index.js';
 import { createTestMwaState } from '#src/state.js';
 
 const state = createTestMwaState({});
@@ -39,5 +45,33 @@ describe('db/interactions', () => {
     it('findUserByInteractToken returns null for unknown tokens', () => {
         assert.equal(findUserByInteractToken(state, 'nope'), null);
         assert.equal(findUserByInteractToken(state, ''), null);
+    });
+
+    it('mints a 5-letter unambiguous code for a user', () => {
+        const user = createUser(state, 'code@example.com', 'code_user');
+        assert.match(getOrCreateInteractCode(state, user.id), /^[A-HJ-KM-NP-Z]{5}$/);
+    });
+
+    it('code is stable and resolves to the same token', () => {
+        const user = createUser(state, 'codec@example.com', 'codec_user');
+        const code = getOrCreateInteractCode(state, user.id);
+        assert.equal(getOrCreateInteractCode(state, user.id), code);
+        assert.equal(
+            findTokenByInteractCode(state, code),
+            getOrCreateInteractToken(state, user.id),
+        );
+    });
+
+    it('minting the token row later backfills the code too', () => {
+        const user = createUser(state, 'codeb@example.com', 'codeb_user');
+        const code = getOrCreateInteractCode(state, user.id);
+        // rotating the QR token leaves the code — and its lookup — untouched
+        const newToken = rotateInteractToken(state, user.id);
+        assert.equal(findTokenByInteractCode(state, code), newToken);
+    });
+
+    it('findTokenByInteractCode returns null for unknown codes', () => {
+        assert.equal(findTokenByInteractCode(state, 'ZZZZZ'), null);
+        assert.equal(findTokenByInteractCode(state, ''), null);
     });
 });

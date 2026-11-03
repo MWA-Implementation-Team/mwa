@@ -34,7 +34,11 @@ import {
 } from '#src/db/queue/index.js';
 import { ActivitySlug, isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { cookieSession } from '#src/client/constants.js';
-import { findUserByInteractToken, rotateInteractToken } from '#src/db/interactions/index.js';
+import {
+    findTokenByInteractCode,
+    findUserByInteractToken,
+    rotateInteractToken,
+} from '#src/db/interactions/index.js';
 import { gambleErrorMessages } from './gambling.js';
 import { claimSystemQrCode } from '#src/db/systemqr/index.js';
 import { updateUsername } from '#src/db/users/index.js';
@@ -102,6 +106,7 @@ export function registerAppRoutes(app: MwaHono) {
             'used_up',
             'already_claimed',
         ] as const);
+        const codeError = queryFlag(ctx, 'codeError', ['interactCodeInvalid'] as const);
         const youError = queryFlag(ctx, 'youError', [
             'youUsernameTaken',
             'youUsernameInvalid',
@@ -155,6 +160,7 @@ export function registerAppRoutes(app: MwaHono) {
             queueError,
             qrClaimedAmount,
             qrError,
+            codeError,
             stationProgress: group
                 ? (Object.keys(registeredActivities) as ActivitySlug[]).map((slug) => ({
                       slug,
@@ -494,6 +500,20 @@ export function registerAppRoutes(app: MwaHono) {
             return ctx.redirect(`${back}?sendError=${key}`, 303);
         }
         return ctx.redirect(`${back}?sent=${amount}`, 303);
+    });
+
+    // Typed-code entry to the interact page — the sidebar's "sąveikos kodas"
+    // form GETs here; a hit redirects to the token's canonical page.
+    app.get('/app/interact', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        const code = (ctx.req.query('code') ?? '').trim().toUpperCase();
+        const token = /^[A-Z]{5}$/.test(code) ? findTokenByInteractCode(ctx.var, code) : null;
+        if (!token) {
+            return ctx.redirect('/app?codeError=interactCodeInvalid', 303);
+        }
+        return ctx.redirect(`/app/interact/${encodeURIComponent(token)}`, 303);
     });
 
     // What the personal QR opens — the standalone interact page.

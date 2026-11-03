@@ -123,7 +123,12 @@ to `/app/interact/<token>` — the standalone interact page
 (`InteractPage`); `/app?interact=<token>` redirects there so codes minted
 while the flow lived in a home-page dialog keep working.
 Migration `05_interact_tokens.sql` stores one permanent random token per user;
-it identifies the target but grants no permissions. Any signed-in scanner can
+it identifies the target but grants no permissions. Below the QR, a sidebar
+pane shows the owner's 5-letter "sąveikos kodas" (`code` on the same row,
+migration 18, minted lazily like the token and untouched by QR rotation) and a
+field for a friend's code: the GET form hits `/app/interact?code=`, which
+resolves the code to its token and redirects to the canonical page — a miss
+bounces to `/app?codeError=interactCodeInvalid`. Any signed-in scanner can
 challenge another user or send them coins. Staff don't play: hosts and admins
 can neither send money, gamble, or request a team-up nor be the target of
 those flows — the POSTs answer 403 and the interact page hides the play

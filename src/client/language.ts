@@ -38,6 +38,9 @@ export type Language = {
     interactAwardInvalid: string;
     interactAwarded: string;
     interactGroupNone: string;
+    interactCodeTitle: string;
+    interactCodeInput: string;
+    interactCodeInvalid: string;
     accountQrHint: string;
     accountQrReset: string;
     qrClaimed: string;
@@ -301,6 +304,9 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardInvalid: 'Enter a valid whole-number amount.',
         interactAwarded: 'Coins awarded.',
         interactGroupNone: 'Not in a group.',
+        interactCodeTitle: 'Interact code',
+        interactCodeInput: "Friend's code",
+        interactCodeInvalid: 'No one has that code.',
         accountQrHint:
             'Your personal QR is shown in the sidebar. Reset it to invalidate the old code.',
         accountQrReset: 'Reset QR code',
@@ -567,6 +573,9 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwardInvalid: 'Neteisinga suma.',
         interactAwarded: 'Koinai suteikti.',
         interactGroupNone: 'Nėra grupėje.',
+        interactCodeTitle: 'Sąveikos kodas',
+        interactCodeInput: 'Draugo kodas',
+        interactCodeInvalid: 'Niekas neturi tokio kodo.',
         accountQrHint:
             'Jūsų asmeninis QR rodomas šone. Čia galite jį sukurti iš naujo (senasis nustos veikti).',
         accountQrReset: 'Iš naujo sukurti QR kodą',

@@ -98,6 +98,16 @@ A permanent, unguessable string identifying a user for the personal-QR flow — 
 value every render. It identifies the target but authorizes nothing — the
 scanner's session and role decide what they can do.
 
+## Interact code
+
+The human-typeable alias of an interact token — the 5-letter "sąveikos kodas"
+shown in the sidebar pane under the QR (`code` column on `interact_tokens`,
+migration 18). Minted lazily by `getOrCreateInteractCode` from a 23-letter
+unambiguous alphabet (no I/L/O); QR rotation (`rotateInteractToken`) leaves it
+alone. Typing it into the pane's field GETs `/app/interact?code=`, which
+redirects to the token's `/app/interact/<token>` page. Unlike the token it's
+guessable, but it still authorizes nothing — the scanner's session decides.
+
 ## Interaction
 
 Something a scanner can do with the owner of an interact token — today just the

@@ -29,6 +29,7 @@ type HomePageProps = {
     queueError?: keyof Language;
     qrClaimedAmount?: number | null;
     qrError?: 'not_found' | 'expired' | 'used_up' | 'already_claimed';
+    codeError?: keyof Language;
     standings: ViewerStanding[];
 };
 
@@ -72,6 +73,7 @@ function HomePage({
     queueError,
     qrClaimedAmount,
     qrError,
+    codeError,
     standings,
 }: HomePageProps) {
     const { t, user, lang } = useContext(ClientContext);
@@ -86,6 +88,7 @@ function HomePage({
                 <Toast kind="success">{t('qrClaimed', { amount: String(qrClaimedAmount) })}</Toast>
             )}
             {qrError && <Toast kind="error">{t(qrErrorKey[qrError])}</Toast>}
+            {codeError && <Toast kind="error">{t(codeError)}</Toast>}
             <section class="mwa-panel" id="panel-game">
                 <div class="mwa-panel-head">
                     <h2>{t('dashGame')}</h2>
