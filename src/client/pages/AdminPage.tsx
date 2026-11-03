@@ -24,7 +24,6 @@ type AdminPageProps = {
 
 export const adminPage: Page<AdminPageProps> = {
     Component: AdminPage,
-    title: (t) => t('titleAdmin'),
 };
 
 function AdminPage({ message, qrCreated, qrError, qrCodes }: AdminPageProps) {
@@ -56,7 +55,9 @@ function AdminPage({ message, qrCreated, qrError, qrCodes }: AdminPageProps) {
                             />
                         </div>
                         <div class="mwa-actions">
-                            <button type="submit">Mint coins</button>
+                            <button type="submit" class="mwa-button">
+                                Mint coins
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -99,7 +100,9 @@ function AdminPage({ message, qrCreated, qrError, qrCodes }: AdminPageProps) {
                             />
                         </div>
                         <div class="mwa-actions">
-                            <button type="submit">Create QR</button>
+                            <button type="submit" class="mwa-button">
+                                Create QR
+                            </button>
                         </div>
                     </form>
                 </div>

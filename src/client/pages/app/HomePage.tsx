@@ -34,7 +34,6 @@ type HomePageProps = {
 
 export const homePage: Page<HomePageProps> = {
     Component: HomePage,
-    title: (t) => t('titleHome'),
 };
 
 const transactionKindKey = {
@@ -434,11 +433,12 @@ function HomePage({
                 </div>
                 <div class="mwa-panel-body">
                     <div class="mwa-actions">
-                        <button type="button">
-                            <PhoneIcon /> {t('dashCall')}
-                        </button>
+                        <a class="mwa-button" href="tel:+37061880077">
+                            <PhoneIcon /> {t('dashCall')}: +370 618 80077
+                        </a>
                         <button
                             type="button"
+                            class="mwa-button"
                             aria-expanded={guideOpen}
                             onClick={() => setGuideOpen(!guideOpen)}
                         >

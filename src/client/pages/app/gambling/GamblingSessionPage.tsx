@@ -91,12 +91,14 @@ function GamblingSessionPage({ sessionId, game, message }: GamblingSessionPagePr
                                     <button
                                         formaction={`/app/gambling/sessions/${sessionId}/accept`}
                                         type="submit"
+                                        class="mwa-button"
                                     >
                                         {t('gamblingAccept')}
                                     </button>
                                     <button
                                         formaction={`/app/gambling/sessions/${sessionId}/reject?goto=${encodeURIComponent('/app')}`}
                                         type="submit"
+                                        class="mwa-button"
                                     >
                                         {t('gamblingReject')}
                                     </button>
