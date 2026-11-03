@@ -76,10 +76,6 @@ export function registerAppRoutes(app: MwaHono) {
         const queueEntry = getUserWaitingEntry(ctx.var, user.id);
 
         const memberCount = group ? listGroupMembers(ctx.var, group.id).length : 0;
-        const groupEmoji =
-            group && memberCount >= 1 && memberCount <= 6
-                ? GROUP_ART_PLACEHOLDERS[group.id % GROUP_ART_PLACEHOLDERS.length]
-                : NO_GROUP_ART;
 
         const queueError = queryFlag(ctx, 'queueError', [
             'queueJoinFailed',
@@ -149,7 +145,6 @@ export function registerAppRoutes(app: MwaHono) {
             transactions: listUserTransactions(ctx.var, user.id),
             groupName: group?.name ?? null,
             groupPhone: group?.phoneNumber ?? null,
-            groupEmoji,
             groupMemberCount: group ? memberCount : null,
             groupOwnerId: group?.ownerId ?? null,
             groupMembers,
@@ -547,7 +542,7 @@ export function registerAppRoutes(app: MwaHono) {
         const sentAmount = Number.isSafeInteger(sent) && sent > 0 ? sent : null;
 
         // the scanned user's team for the shared-info panel — same stable
-        // emoji pick the home queue panel uses, sad face when groupless
+        // emoji placeholder keyed off the group id, sad face when groupless
         const targetGroup = findUserGroup(ctx.var, target.id);
         const group = targetGroup
             ? {

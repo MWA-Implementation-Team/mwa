@@ -16,10 +16,10 @@ type InteractPageProps = {
     self: boolean;
     target: { username: string };
     // the scanned user's team, if they have one — the shared-info panel shows
-    // it with the same per-group emoji the home queue panel picks
+    // it with a per-group emoji
     group: { name: string; memberCount: number } | null;
-    // the scanned user's team emoji — the route picks the same stable
-    // placeholder as the home queue panel
+    // the scanned user's team emoji — a stable placeholder the route picks
+    // off the group id
     groupEmoji: string;
     // the target's personal + team position on each board — the same three
     // rows the home standings table shows

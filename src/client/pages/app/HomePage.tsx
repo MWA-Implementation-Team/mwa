@@ -14,7 +14,6 @@ type HomePageProps = {
     transactions: Transaction[];
     groupName: string | null;
     groupPhone: string | null;
-    groupEmoji: string;
     groupMemberCount: number | null;
     groupOwnerId: number | null;
     groupMembers: { userId: number; username: string }[];
@@ -59,7 +58,6 @@ function HomePage({
     transactions,
     groupName,
     groupPhone,
-    groupEmoji,
     groupMemberCount,
     groupOwnerId,
     groupMembers,
@@ -96,9 +94,6 @@ function HomePage({
                 <div class="mwa-panel-body mwa-queue-grid">
                     <div>
                         <p class="mwa-queue-name">{displayUsername(user!.username)}</p>
-                        <div class="mwa-queue-art" aria-hidden="true">
-                            {groupEmoji}
-                        </div>
                         {queueError && <Toast kind="error">{t(queueError)}</Toast>}
 
                         {groupMemberCount !== null && (
