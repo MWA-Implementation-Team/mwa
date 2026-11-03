@@ -58,7 +58,6 @@ type BadgesPageProps = {
 
 export const badgesPage: Page<BadgesPageProps> = {
     Component: BadgesPage,
-    title: (t) => t('titleBadges'),
 };
 
 function BadgesPage({ badges }: BadgesPageProps) {

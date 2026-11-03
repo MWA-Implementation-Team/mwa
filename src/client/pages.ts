@@ -10,7 +10,6 @@ import { interactPage } from '#src/client/pages/app/InteractPage.js';
 import { hostPage } from '#src/client/pages/app/HostPage.js';
 import { adminPage } from '#src/client/pages/AdminPage.js';
 import { gamblingSessionPage } from '#src/client/pages/app/gambling/GamblingSessionPage.js';
-import { LanguageCode, TranslateFn } from './language.js';
 
 export const registeredPages = {
     // These keys are used in the writePage function
@@ -27,10 +26,10 @@ export const registeredPages = {
     error: errorPage,
 } satisfies Record<string, Page<any>>;
 
+// Every page shares the same <title> (titleApp) — writePage renders it
+// server-side and ClientContextWrapper re-applies it on language switches.
 export type Page<P> = {
     Component: ComponentType<P>;
-    title: (t: TranslateFn, props: P, lang: LanguageCode) => string;
-    customTitle?: boolean;
 };
 
 export type RegisteredPageId = keyof typeof registeredPages;

@@ -17,7 +17,6 @@ type HostPageProps = {
 
 export const hostPage: Page<HostPageProps> = {
     Component: HostPage,
-    title: (t) => t('titleHost'),
 };
 
 function HostPage({

@@ -9,7 +9,6 @@ type LandingPageProps = {};
 
 export const landingPage: Page<LandingPageProps> = {
     Component: LandingPage,
-    title: (t) => t('titleLanding'),
 };
 
 const activities = Object.entries(registeredActivities) as [ActivitySlug, Activity][];

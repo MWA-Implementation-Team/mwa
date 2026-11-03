@@ -29,13 +29,9 @@ Missing keys in a non-default language fall back to English
 (`languages[lang]?.[key] || languages[defaultLanguage][key]`) — but since the type
 forces all keys to exist, this mainly guards against future partial languages.
 
-**Page titles** are translated via each page's `title(t, props, lang)` function — not
-inside the component. It runs server-side for the `<title>` tag in `writePage`, and
-`ClientContextWrapper` re-runs it in an effect whenever the language changes, so
-`document.title` stays in sync.
-
-Pages with live titles can set `customTitle: true` to skip the wrapper's title
-effect and manage it themselves, as `GamblingSessionPage` does for session updates.
+**Page title** — every page shares the same `<title>`, the `titleApp` string.
+`writePage` renders it server-side, and `ClientContextWrapper` re-applies it in an
+effect whenever the language changes, so `document.title` stays in sync.
 
 **Switching language**: `LanguageToggle` writes the `mwa-language` cookie and calls
 `updateLang`. `updateLang` re-renders all `t()` output instantly; the cookie makes the

@@ -46,8 +46,8 @@ Follow `GET /` through the code:
    `registeredPages[data.pageId].Component`, and calls `hydrate()` on `#app`.
 7. **Hydration.** Preact attaches event handlers and state to the DOM the server
    already sent — no re-render, no flash. Then effects run: `ClientContextWrapper`
-   (`src/client/context.tsx`) sets `document.title` from the page's `title()` so the
-   tab title tracks language changes.
+   (`src/client/context.tsx`) re-applies `document.title` (`titleApp` — the same on
+   every page) so the tab title tracks language changes.
 
 ## The `#src/` trick (how there's no bundler)
 

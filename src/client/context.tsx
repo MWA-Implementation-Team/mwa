@@ -2,7 +2,7 @@ import { createContext } from 'preact';
 import { ReactNode } from 'preact/compat';
 import { useState, useMemo, useEffect } from 'preact/hooks';
 import { defaultLanguage, LanguageCode, translate, TranslateFn } from './language.js';
-import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from './pages.js';
+import { RegisteredPageId, RegisteredPageProps } from './pages.js';
 import { reviveUser, User, UserJson } from '#src/client/api/users.js';
 import { Toasts } from './ui/Toast.js';
 
@@ -46,8 +46,6 @@ export type ClientContextWrapperProps<P extends RegisteredPageId> = {
 };
 
 export function ClientContextWrapper<P extends RegisteredPageId>({
-    pageId,
-    pageProps,
     init,
     content,
 }: ClientContextWrapperProps<P>) {
@@ -71,11 +69,8 @@ export function ClientContextWrapper<P extends RegisteredPageId>({
     }, [lang]);
 
     useEffect(() => {
-        const page = registeredPages[pageId] as Page<RegisteredPageProps<P>>;
-        if (page.customTitle) return;
-        const title = page.title(value.t, pageProps, lang);
-        document.title = title;
-    }, [pageId, pageProps, value]);
+        document.title = value.t('titleApp');
+    }, [value.t]);
 
     useEffect(() => {
         if (!init.user) return; // /api/notifications requires a session

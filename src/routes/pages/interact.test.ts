@@ -103,7 +103,7 @@ describe('GET /app/interact/:token', () => {
         });
         assert.equal(res.status, 200);
         const html = await res.text();
-        assert.match(html, /Interact with Target_user/);
+        assert.match(html, /Target_user/);
         assert.match(html, /send-money/);
         assert.doesNotMatch(html, /\/award/);
         assert.doesNotMatch(html, /target@example\.com/);

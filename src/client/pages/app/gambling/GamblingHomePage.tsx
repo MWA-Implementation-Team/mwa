@@ -13,7 +13,6 @@ type GamblingPageProps = {
 
 export const gamblingPage: Page<GamblingPageProps> = {
     Component: GamblingPage,
-    title: (t) => t('titleGambling'),
 };
 
 function GamblingPage({ sessions, invitations }: GamblingPageProps) {

@@ -67,7 +67,7 @@ so each directory entry describes what goes inside instead. Self-explanatory fil
     │   └── api/               JSON routes and notification SSE
     └── client/                code that also runs in the browser
         ├── bootstrap.tsx      browser entry: reads #ssr-data, hydrates #app
-        ├── pages.ts           registeredPages: page id → { Component, title }
+        ├── pages.ts           registeredPages: page id → { Component }
         ├── activities.ts      registeredActivities: activity slug → { name, Card, text }
         ├── context.tsx        ClientContext: lang, updateLang, t(), user, live notification
         ├── language.ts        translations (en, lt) + translate() / t()

@@ -13,7 +13,6 @@ type LeaderboardPageProps = {
 
 export const leaderboardPage: Page<LeaderboardPageProps> = {
     Component: LeaderboardPage,
-    title: (t) => t('titleLeaderboard'),
 };
 
 const boards = ['activity', 'gambling', 'combined'] as const;
