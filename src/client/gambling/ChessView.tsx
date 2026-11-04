@@ -1,3 +1,4 @@
+import { PlayAgainButton } from './PlayAgainButton.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import { Square, PieceSymbol, SQUARES } from 'chess.js';
 import { ChessGame, Gambler } from '#src/db/gambling/index.js';
@@ -157,6 +158,7 @@ export function ChessView({
                         </>
                     )}
                 </form>
+                <PlayAgainButton game={game} side={side} />
             </div>
         </>
     );

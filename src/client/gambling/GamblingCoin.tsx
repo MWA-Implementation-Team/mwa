@@ -1,3 +1,4 @@
+import { PlayAgainButton } from './PlayAgainButton.js';
 import { CoinFlipGame, CoinSide, Gambler } from '#src/db/gambling/index.js';
 import { useContext, useEffect, useRef, useState } from 'preact/hooks';
 import { ClientContext } from '../context.js';
@@ -118,6 +119,7 @@ export function GamblingCoin({ currentGame, side }: Props) {
                                   ),
                               })}
                     </p>
+                    <PlayAgainButton game={currentGame} side={side} />
                 </>
             ) : (
                 <p class="mwa-muted">{t('gamblingCoinFlipping')}</p>

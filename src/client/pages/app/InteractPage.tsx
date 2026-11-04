@@ -240,7 +240,7 @@ function InteractPage({
             )}
 
             {canPlay && (
-                <section class="mwa-panel">
+                <section id="gambling" class="mwa-panel">
                     <div class="mwa-panel-head">
                         <h2>{t('headerGambling')}</h2>
                     </div>

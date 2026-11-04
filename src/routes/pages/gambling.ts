@@ -89,17 +89,24 @@ export function registerGamblingRoutes(app: MwaHono) {
                     p1: user.id,
                     p2: target.id,
                     betAmount,
+                    inviteToken: token,
                 });
                 break;
             }
             case 'chess':
-                sessionId = initChess(ctx.var, { p1: user.id, p2: target.id, betAmount });
+                sessionId = initChess(ctx.var, {
+                    p1: user.id,
+                    p2: target.id,
+                    betAmount,
+                    inviteToken: token,
+                });
                 break;
             case 'connect_4': {
                 sessionId = initConnect4(ctx.var, {
                     p1: user.id,
                     p2: target.id,
                     betAmount,
+                    inviteToken: token,
                 });
                 break;
             }

@@ -217,6 +217,7 @@ export type Language = {
     gamblingNoActiveGames: string;
     gamblingVersus: string;
     gamblingChallenge: string;
+    gamblingPlayAgain: string;
     gamblingBetAmount: string;
     gamblingSendInvite: string;
     gamblingInsufficientCoins: string;
@@ -488,6 +489,7 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingNoActiveGames: 'No games running.',
         gamblingVersus: '{p1} vs {p2}',
         gamblingChallenge: 'Challenge',
+        gamblingPlayAgain: 'Play again',
         gamblingBetAmount: 'Bet amount',
         gamblingSendInvite: 'Send invite',
         gamblingInsufficientCoins: 'You do not have enough coins for this bet.',
@@ -762,6 +764,7 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingNoActiveGames: 'Šiuo metu vykstančių žaidimų nėra.',
         gamblingVersus: '{p1} prieš {p2}',
         gamblingChallenge: 'Siųsti iššūkį',
+        gamblingPlayAgain: 'Žaisti dar kartą',
         gamblingBetAmount: 'Statymo suma',
         gamblingSendInvite: 'Pakviesti',
         gamblingInsufficientCoins: 'Šiam statymui nepakanka monetų.',

@@ -1,3 +1,4 @@
+import { PlayAgainButton } from '#src/client/gambling/PlayAgainButton.js';
 import { ChessView } from '../../../gambling/ChessView.js';
 import { Trans } from '#src/client/ui/Trans.js';
 import { gamblingPendingExpiryMinutes } from '#src/client/constants.js';
@@ -339,6 +340,7 @@ function Connect4View({
 
                     {status}
                 </form>
+                <PlayAgainButton game={currentGame} side={side} />
             </div>
         </>
     );
