@@ -90,15 +90,13 @@ export function createUser(state: MwaState, email: string, username: string): Us
     return findUserById(state, id)!;
 }
 
-// Self-serve rename from /app's you tab — same charset as deriveUsername, so a
-// rename can't produce a name signup never would.
 export function updateUsername(
     state: MwaState,
     userId: number,
     raw: string,
 ): 'updated' | 'taken' | 'invalid' {
-    const username = raw.trim().toLowerCase();
-    if (username.length > MAX_USERNAME_LENGTH || !/^[a-z0-9_-]+$/.test(username)) {
+    const username = raw.trim().toLowerCase().normalize('NFC');
+    if (username.length > MAX_USERNAME_LENGTH || !/^[a-ząčęėįšųūž0-9_-]+$/u.test(username)) {
         return 'invalid';
     }
     const clash = findUserByUsername(state, username);

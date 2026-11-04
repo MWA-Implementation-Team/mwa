@@ -224,13 +224,15 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         const form = await ctx.req.formData().catch(() => null);
-        const name = String(form?.get('name') ?? '').trim();
+        const name = String(form?.get('name') ?? '')
+            .trim()
+            .normalize('NFC');
         const phoneNumber = String(form?.get('phone_number') ?? '').trim();
         const group = findUserGroup(ctx.var, user.id);
 
         if (
             !group ||
-            name === '' ||
+            !/^[a-ząčęėįšųūž0-9_-]+$/u.test(name.toLowerCase()) ||
             name.length > MAX_GROUP_NAME_LENGTH ||
             phoneNumber.length > MAX_PHONE_NUMBER_LENGTH
         ) {
