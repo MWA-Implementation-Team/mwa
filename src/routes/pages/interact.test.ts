@@ -21,7 +21,7 @@ registerAppRoutes(app);
 registerGamblingRoutes(app);
 
 function authCookie(userId: number) {
-    return { cookie: `mwa-session=${createSession(state, userId)}` };
+    return { cookie: `mwa-language=en; mwa-session=${createSession(state, userId)}` };
 }
 
 function promote(userId: number, role: string) {

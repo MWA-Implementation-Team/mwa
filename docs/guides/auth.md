@@ -20,7 +20,7 @@ The factory selects SMTP when `MWA_SMTP_HOST` is set. It also reads `MWA_SMTP_PO
 `MWA_SMTP_USER`/`MWA_SMTP_PASS` (SMTP auth — set only when the relay needs it), and
 `MWA_MAIL_FROM` (default `mwa@localhost`). The login route calls
 `ctx.var.mailer.sendLoginEmail(to, { lang, url, code })`. `getRequestLanguage(ctx)`
-reads the language cookie, defaulting to English. The email subject, HTML body,
+reads the language cookie, defaulting to Lithuanian. The email subject, HTML body,
 and plain-text fallback use that language through the shared translation system.
 Login labels, confirmations, and errors are available in English and Lithuanian.
 Routes pass typed error keys to the login page, so errors also update immediately

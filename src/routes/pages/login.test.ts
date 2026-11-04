@@ -32,7 +32,7 @@ let sent: { to: string; props: LoginEmailProps }[] = [];
 function postLogin(fields: Record<string, string>, query = '') {
     return app.request(`/login${query}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', cookie: 'mwa-language=en' },
         body: new URLSearchParams({ email: 'login@example.com', ...fields }).toString(),
     });
 }

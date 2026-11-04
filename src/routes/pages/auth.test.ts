@@ -27,7 +27,7 @@ function sessionCookie(res: Response): string {
 function postVerify(challengeId: string, code: string, extra: Record<string, string> = {}) {
     return app.request('/auth/verify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', cookie: 'mwa-language=en' },
         body: new URLSearchParams({ challenge_id: challengeId, code, ...extra }).toString(),
     });
 }
@@ -37,7 +37,7 @@ function postTokenVerify(token: string, extra: Record<string, string> = {}, cook
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            ...(cookie ? { cookie } : {}),
+            cookie: `mwa-language=en${cookie ? `; ${cookie}` : ''}`,
         },
         body: new URLSearchParams({ token, ...extra }).toString(),
     });
@@ -51,7 +51,9 @@ describe('GET /auth/verify — link path', () => {
 
         // prefetches only render the form — no cookie, token unconsumed
         for (let i = 0; i < 2; i++) {
-            const res = await app.request(`/auth/verify?token=${token}`);
+            const res = await app.request(`/auth/verify?token=${token}`, {
+                headers: { cookie: 'mwa-language=en' },
+            });
             assert.equal(res.status, 200);
             assert.equal(res.headers.get('set-cookie'), null);
             const html = await res.text();
@@ -101,7 +103,7 @@ describe('GET /auth/verify — link path', () => {
         for (const res of [
             await postTokenVerify(token), // replay
             await postTokenVerify('forged'),
-            await app.request('/auth/verify'), // no token at all
+            await app.request('/auth/verify', { headers: { cookie: 'mwa-language=en' } }), // no token at all
         ]) {
             assert.equal(res.status, 200);
             assert.match(await res.text(), /expired or already used/);
