@@ -5,7 +5,6 @@ import { runTransaction } from '../transaction.js';
 import { leaveQueue, QUEUE_MIN_GROUP_SIZE } from '../queue/index.js';
 
 export const MAX_GROUP_MEMBERS = 6;
-export const MAX_GROUP_NAME_LENGTH = 64;
 export const MAX_PHONE_NUMBER_LENGTH = 32;
 
 export type Group = {

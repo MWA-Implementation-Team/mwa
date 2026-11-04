@@ -15,7 +15,7 @@ setupHonoState(app, state);
 registerAppRoutes(app);
 
 function authCookie(userId: number) {
-    return { cookie: `mwa-session=${createSession(state, userId)}` };
+    return { cookie: `mwa-language=en; mwa-session=${createSession(state, userId)}` };
 }
 
 function viewer(name: string) {
@@ -83,7 +83,7 @@ describe('GET /app/leaderboard', () => {
         // the viewer's row: games count then net score in the amount cells
         assert.match(
             html,
-            />You<\/td><td class="mwa-tx-amount">1<\/td><td class="mwa-tx-amount">15\.00<\/td>/,
+            />You<\/td><td class="mwa-tx-amount">1<\/td><td class="mwa-tx-amount">15<\/td>/,
         );
         assert.doesNotMatch(html, /lbg_net_clean/, 'never-gamblers are omitted');
     });

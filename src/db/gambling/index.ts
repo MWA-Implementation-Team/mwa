@@ -19,6 +19,7 @@ export type SessionSummary = {
 };
 
 export type CommonGameOpts = {
+    inviteToken?: string;
     p1: number;
     p2: number;
     betAmount: number;
@@ -27,6 +28,7 @@ export type CommonGameOpts = {
 export type Gambler = 'p1' | 'p2';
 
 type RunningGameCommon = {
+    inviteToken: string | null;
     p1: number;
     p2: number;
     p1Name: string;
@@ -150,6 +152,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
         status,
         p1_deposit_tx,
         p2_deposit_tx,
+        invite_token,
         winner,
         p1,
         p2,
@@ -172,6 +175,7 @@ export function findGamblingSessionById(state: MwaState, sessionId: number): Run
     const statusRow = row.status as string;
 
     const common = {
+        inviteToken: row.invite_token as string | null,
         p1: row.p1 as number,
         p2: row.p2 as number,
         p1Name: row.p1_name as string,
@@ -520,11 +524,18 @@ function initGamblingSession(state: MwaState, type: GameType, opts: CommonGameOp
     }
 
     const insert = state.prepare(`
-    INSERT INTO gambling_sessions (p1, p2, bet_amount, game_type, p1_deposit_tx)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO gambling_sessions (p1, p2, bet_amount, game_type, p1_deposit_tx, invite_token)
+    VALUES (?, ?, ?, ?, ?, ?)
     RETURNING id
     `);
-    const row = insert.get(opts.p1, opts.p2, opts.betAmount, type, deductResult.parentId);
+    const row = insert.get(
+        opts.p1,
+        opts.p2,
+        opts.betAmount,
+        type,
+        deductResult.parentId,
+        opts.inviteToken ?? null,
+    );
     return row!.id as number;
 }
 

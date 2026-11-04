@@ -70,7 +70,7 @@ describe('db/users', () => {
     it('deriveUsername dedupes with a numeric suffix', () => {
         const base = deriveUsername(state, 'taken-name@example.com');
         createUser(state, 'dd1@example.com', base);
-        assert.equal(deriveUsername(state, 'taken-name@example.com'), `${base.slice(0, 15)}2`);
+        assert.equal(deriveUsername(state, 'taken-name@example.com'), `${base.slice(0, 29)}2`);
     });
 
     it('updateUsername trims, lowercases, and renames', () => {
@@ -82,8 +82,10 @@ describe('db/users', () => {
     it('updateUsername rejects bad input and taken names, keeps its own', () => {
         const a = createUser(state, 'una@example.com', 'rename_a');
         const b = createUser(state, 'unb@example.com', 'rename_b');
+        assert.equal(updateUsername(state, a.id, 'x'.repeat(30)), 'updated');
+        assert.equal(findUserById(state, a.id)!.username, 'x'.repeat(30));
         assert.equal(updateUsername(state, a.id, 'bad name!'), 'invalid');
-        assert.equal(updateUsername(state, a.id, 'x'.repeat(17)), 'invalid');
+        assert.equal(updateUsername(state, a.id, 'x'.repeat(31)), 'invalid');
         assert.equal(updateUsername(state, a.id, ''), 'invalid');
         assert.equal(updateUsername(state, a.id, 'RENAME_B'), 'taken');
         assert.equal(updateUsername(state, a.id, 'rename_a'), 'updated');

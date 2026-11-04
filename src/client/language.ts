@@ -1,6 +1,8 @@
+import { MAX_USERNAME_LENGTH } from './constants.js';
+
 export type LanguageCode = 'en' | 'lt';
 
-export const defaultLanguage: LanguageCode = 'en';
+export const defaultLanguage: LanguageCode = 'lt';
 
 export type Language = {
     displayName: string;
@@ -39,6 +41,7 @@ export type Language = {
     interactAwarded: string;
     interactGroupNone: string;
     interactCodeTitle: string;
+    interactCodeReset: string;
     interactCodeInput: string;
     interactCodeInvalid: string;
     interactAwardGroup: string;
@@ -214,6 +217,7 @@ export type Language = {
     gamblingNoActiveGames: string;
     gamblingVersus: string;
     gamblingChallenge: string;
+    gamblingPlayAgain: string;
     gamblingBetAmount: string;
     gamblingSendInvite: string;
     gamblingInsufficientCoins: string;
@@ -307,6 +311,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwarded: 'Coins awarded.',
         interactGroupNone: 'Not in a group.',
         interactCodeTitle: 'Interact code',
+        interactCodeReset: 'Reset interact code',
         interactCodeInput: "Friend's code",
         interactCodeInvalid: 'No one has that code.',
         interactAwardGroup: 'Award group ({n})',
@@ -427,7 +432,7 @@ export const languages: Record<LanguageCode, Language> = {
         youSaved: 'Settings saved.',
         youQrReset: 'QR code reset.',
         youUsernameTaken: 'That username is taken',
-        youUsernameInvalid: 'Usernames are 1–16 lowercase letters, numbers, _ or -',
+        youUsernameInvalid: `Usernames are 1–${MAX_USERNAME_LENGTH} lowercase letters, numbers, _ or -`,
         adminPanelHead: 'administration',
         adminPanelTodo: 'TODO: admin panel.',
 
@@ -484,6 +489,7 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingNoActiveGames: 'No games running.',
         gamblingVersus: '{p1} vs {p2}',
         gamblingChallenge: 'Challenge',
+        gamblingPlayAgain: 'Play again',
         gamblingBetAmount: 'Bet amount',
         gamblingSendInvite: 'Send invite',
         gamblingInsufficientCoins: 'You do not have enough coins for this bet.',
@@ -578,6 +584,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwarded: 'Koinai suteikti.',
         interactGroupNone: 'Nėra grupėje.',
         interactCodeTitle: 'Sąveikos kodas',
+        interactCodeReset: 'Perkurti sąveikos kodą',
         interactCodeInput: 'Draugo kodas',
         interactCodeInvalid: 'Niekas neturi tokio kodo.',
         interactAwardGroup: 'Apdovanoti grupę ({n})',
@@ -697,7 +704,7 @@ export const languages: Record<LanguageCode, Language> = {
         youSaved: 'Nustatymai išsaugoti.',
         youQrReset: 'QR kodas atstatytas.',
         youUsernameTaken: 'Šis vartotojo vardas užimtas',
-        youUsernameInvalid: 'Varde gali būti 1–16 mažųjų raidžių, skaičių, _ arba -',
+        youUsernameInvalid: `Varde gali būti 1–${MAX_USERNAME_LENGTH} mažųjų raidžių, skaičių, _ arba -`,
 
         adminPanelHead: 'administravimas',
         adminPanelTodo: 'TODO: administravimo skydelis.',
@@ -757,6 +764,7 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingNoActiveGames: 'Šiuo metu vykstančių žaidimų nėra.',
         gamblingVersus: '{p1} prieš {p2}',
         gamblingChallenge: 'Siųsti iššūkį',
+        gamblingPlayAgain: 'Žaisti dar kartą',
         gamblingBetAmount: 'Statymo suma',
         gamblingSendInvite: 'Pakviesti',
         gamblingInsufficientCoins: 'Šiam statymui nepakanka monetų.',

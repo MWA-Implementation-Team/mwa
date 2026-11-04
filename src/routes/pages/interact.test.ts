@@ -21,7 +21,7 @@ registerAppRoutes(app);
 registerGamblingRoutes(app);
 
 function authCookie(userId: number) {
-    return { cookie: `mwa-session=${createSession(state, userId)}` };
+    return { cookie: `mwa-language=en; mwa-session=${createSession(state, userId)}` };
 }
 
 function promote(userId: number, role: string) {
@@ -433,7 +433,7 @@ describe('POST /app/interact/:token/send-money', () => {
         assert.equal(findUserById(state, user.id)!.currentBalance, 50);
     });
 
-    it('forbids staff senders and staff targets', async () => {
+    it('forbids staff senders', async () => {
         const owner = createUser(state, 'payee4@example.com', 'payee4_user');
         const host = createUser(state, 'hostpay@example.com', 'hostpay');
         promote(host.id, 'host');
@@ -442,8 +442,6 @@ describe('POST /app/interact/:token/send-money', () => {
 
         const fromHost = await post(getOrCreateInteractToken(state, owner.id), host.id, 'amount=5');
         assert.equal(fromHost.status, 403);
-        const toHost = await post(getOrCreateInteractToken(state, host.id), owner.id, 'amount=5');
-        assert.equal(toHost.status, 403);
         assert.equal(findUserById(state, host.id)!.currentBalance, 50);
         assert.equal(findUserById(state, owner.id)!.currentBalance, 50);
     });

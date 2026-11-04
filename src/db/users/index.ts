@@ -1,3 +1,4 @@
+import { MAX_USERNAME_LENGTH } from '#src/client/constants.js';
 import { MwaState } from '#src/state.js';
 import { createHash } from 'node:crypto';
 import { SQLOutputValue } from 'node:sqlite';
@@ -89,15 +90,15 @@ export function createUser(state: MwaState, email: string, username: string): Us
     return findUserById(state, id)!;
 }
 
-// Self-serve rename from /app's you tab — same charset as deriveUsername, so a
-// rename can't produce a name signup never would.
 export function updateUsername(
     state: MwaState,
     userId: number,
     raw: string,
 ): 'updated' | 'taken' | 'invalid' {
-    const username = raw.trim().toLowerCase();
-    if (!/^[a-z0-9_-]{1,16}$/.test(username)) return 'invalid';
+    const username = raw.trim().toLowerCase().normalize('NFC');
+    if (username.length > MAX_USERNAME_LENGTH || !/^[a-ząčęėįšųūž0-9_-]+$/u.test(username)) {
+        return 'invalid';
+    }
     const clash = findUserByUsername(state, username);
     if (clash && clash.id !== userId) return 'taken';
 
@@ -116,7 +117,7 @@ export function markEmailVerified(state: MwaState, userId: number) {
 }
 
 // Pseudonym word pools — every word is ≤6 chars so adjective_noun_NN stays
-// inside the 16-char username limit.
+// comfortably inside the username limit.
 const pseudonymAdjectives = [
     'agile',
     'alert',
@@ -202,7 +203,7 @@ export function deriveUsername(state: MwaState, email: string): string {
     let n = 2;
     while (findUserByUsername(state, candidate)) {
         const suffix = `${n++}`;
-        candidate = trimmed.slice(0, 16 - suffix.length) + suffix;
+        candidate = trimmed.slice(0, MAX_USERNAME_LENGTH - suffix.length) + suffix;
     }
     return candidate;
 }

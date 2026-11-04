@@ -25,7 +25,7 @@ For JSX placeholders, use `Trans` from `src/client/ui/Trans.tsx`, e.g.
 `<Trans id="gamblingCoinFlipBetOutcome" values={{ amount: <strong>10</strong> }} />`.
 It inserts Preact children without parsing HTML; missing placeholders stay literal.
 
-Missing keys in a non-default language fall back to English
+Missing keys in a non-default language fall back to Lithuanian
 (`languages[lang]?.[key] || languages[defaultLanguage][key]`) — but since the type
 forces all keys to exist, this mainly guards against future partial languages.
 

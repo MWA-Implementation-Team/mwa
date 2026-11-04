@@ -116,9 +116,7 @@ function PlayersTable({
                             {games && (
                                 <td class="mwa-tx-amount">{viewerRow?.gamesPlayed ?? '—'}</td>
                             )}
-                            <td class="mwa-tx-amount">
-                                {viewerRow ? viewerRow.score.toFixed(2) : '—'}
-                            </td>
+                            <td class="mwa-tx-amount">{viewerRow ? viewerRow.score : '—'}</td>
                         </tr>
                     )}
                     {rows.map((row, index) => {
@@ -137,7 +135,7 @@ function PlayersTable({
                                     )}
                                 </td>
                                 {games && <td class="mwa-tx-amount">{row.gamesPlayed ?? 0}</td>}
-                                <td class="mwa-tx-amount">{row.score.toFixed(2)}</td>
+                                <td class="mwa-tx-amount">{row.score}</td>
                             </tr>
                         );
                     })}
@@ -178,9 +176,7 @@ function GroupsTable({
                             <td class="mwa-lb-rank">{viewerIndex >= 0 ? viewerIndex + 1 : '—'}</td>
                             <td>{viewerGroup?.name ?? '—'}</td>
                             <td class="mwa-tx-amount">{viewerGroup?.memberCount ?? '—'}</td>
-                            <td class="mwa-tx-amount">
-                                {viewerGroup ? viewerGroup.score.toFixed(2) : '—'}
-                            </td>
+                            <td class="mwa-tx-amount">{viewerGroup ? viewerGroup.score : '—'}</td>
                         </tr>
                     )}
                     {groups.map((group, index) => (
@@ -196,7 +192,7 @@ function GroupsTable({
                                 )}
                             </td>
                             <td class="mwa-tx-amount">{group.memberCount}</td>
-                            <td class="mwa-tx-amount">{group.score.toFixed(2)}</td>
+                            <td class="mwa-tx-amount">{group.score}</td>
                         </tr>
                     ))}
                 </tbody>

@@ -1,3 +1,4 @@
+import { MAX_GROUP_NAME_LENGTH } from '#src/client/constants.js';
 import { requireRole, requireUser } from '#src/auth.js';
 import { grantCoins, listUserTransactions, transferCoins } from '#src/db/transactions/index.js';
 import {
@@ -15,7 +16,6 @@ import {
     findUserGroup,
     listGroupMemberInfos,
     listGroupMembers,
-    MAX_GROUP_NAME_LENGTH,
     MAX_PHONE_NUMBER_LENGTH,
     removeGroupMember,
     updateGroup,
@@ -38,6 +38,7 @@ import {
     findTokenByInteractCode,
     findUserByInteractToken,
     rotateInteractToken,
+    rotateInteractCode,
 } from '#src/db/interactions/index.js';
 import { gambleErrorMessages } from './gambling.js';
 import { claimSystemQrCode } from '#src/db/systemqr/index.js';
@@ -224,13 +225,15 @@ export function registerAppRoutes(app: MwaHono) {
         if (user instanceof Response) return user;
 
         const form = await ctx.req.formData().catch(() => null);
-        const name = String(form?.get('name') ?? '').trim();
+        const name = String(form?.get('name') ?? '')
+            .trim()
+            .normalize('NFC');
         const phoneNumber = String(form?.get('phone_number') ?? '').trim();
         const group = findUserGroup(ctx.var, user.id);
 
         if (
             !group ||
-            name === '' ||
+            !/^[a-ząčęėįšųūž0-9_-]+$/u.test(name.toLowerCase()) ||
             name.length > MAX_GROUP_NAME_LENGTH ||
             phoneNumber.length > MAX_PHONE_NUMBER_LENGTH
         ) {
@@ -478,7 +481,7 @@ export function registerAppRoutes(app: MwaHono) {
         const token = ctx.req.param('token');
         const target = findUserByInteractToken(ctx.var, token);
         if (!target || target.id === user.id) return writeErrorPage(ctx, 404);
-        if (user.role !== 'user' || target.role !== 'user') return writeErrorPage(ctx, 403);
+        if (user.role !== 'user') return writeErrorPage(ctx, 403);
 
         const form = await ctx.req.formData().catch(() => null);
         if (!form) return writeErrorPage(ctx, 400);
@@ -656,6 +659,14 @@ export function registerAppRoutes(app: MwaHono) {
         const outcome =
             result.type === 'claimed' ? `claimed=${result.balanceDelta}` : `qrError=${result.type}`;
         return ctx.redirect(`/app?${outcome}`, 303);
+    });
+
+    app.post('/app/you/reset-code', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        rotateInteractCode(ctx.var, user.id);
+        return ctx.redirect('/app', 303);
     });
 
     // Reset the personal qr token (the old code stops working immediately))

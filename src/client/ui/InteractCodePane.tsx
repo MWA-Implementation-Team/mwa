@@ -24,6 +24,11 @@ export default function InteractCodePane() {
                     />
                 </form>
             </div>
+            <form method="POST" action="/app/you/reset-code">
+                <button type="submit" class="lang-link">
+                    {t('interactCodeReset')}
+                </button>
+            </form>
         </section>
     );
 }
