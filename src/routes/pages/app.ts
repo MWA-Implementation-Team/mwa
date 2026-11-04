@@ -1,3 +1,4 @@
+import { MAX_GROUP_NAME_LENGTH } from '#src/client/constants.js';
 import { requireRole, requireUser } from '#src/auth.js';
 import { grantCoins, listUserTransactions, transferCoins } from '#src/db/transactions/index.js';
 import {
@@ -15,7 +16,6 @@ import {
     findUserGroup,
     listGroupMemberInfos,
     listGroupMembers,
-    MAX_GROUP_NAME_LENGTH,
     MAX_PHONE_NUMBER_LENGTH,
     removeGroupMember,
     updateGroup,

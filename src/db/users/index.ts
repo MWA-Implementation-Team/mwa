@@ -1,3 +1,4 @@
+import { MAX_USERNAME_LENGTH } from '#src/client/constants.js';
 import { MwaState } from '#src/state.js';
 import { createHash } from 'node:crypto';
 import { SQLOutputValue } from 'node:sqlite';
@@ -97,7 +98,9 @@ export function updateUsername(
     raw: string,
 ): 'updated' | 'taken' | 'invalid' {
     const username = raw.trim().toLowerCase();
-    if (!/^[a-z0-9_-]{1,16}$/.test(username)) return 'invalid';
+    if (username.length > MAX_USERNAME_LENGTH || !/^[a-z0-9_-]+$/.test(username)) {
+        return 'invalid';
+    }
     const clash = findUserByUsername(state, username);
     if (clash && clash.id !== userId) return 'taken';
 
@@ -116,7 +119,7 @@ export function markEmailVerified(state: MwaState, userId: number) {
 }
 
 // Pseudonym word pools — every word is ≤6 chars so adjective_noun_NN stays
-// inside the 16-char username limit.
+// comfortably inside the username limit.
 const pseudonymAdjectives = [
     'agile',
     'alert',
@@ -202,7 +205,7 @@ export function deriveUsername(state: MwaState, email: string): string {
     let n = 2;
     while (findUserByUsername(state, candidate)) {
         const suffix = `${n++}`;
-        candidate = trimmed.slice(0, 16 - suffix.length) + suffix;
+        candidate = trimmed.slice(0, MAX_USERNAME_LENGTH - suffix.length) + suffix;
     }
     return candidate;
 }

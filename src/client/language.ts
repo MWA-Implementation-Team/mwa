@@ -1,3 +1,5 @@
+import { MAX_USERNAME_LENGTH } from './constants.js';
+
 export type LanguageCode = 'en' | 'lt';
 
 export const defaultLanguage: LanguageCode = 'lt';
@@ -427,7 +429,7 @@ export const languages: Record<LanguageCode, Language> = {
         youSaved: 'Settings saved.',
         youQrReset: 'QR code reset.',
         youUsernameTaken: 'That username is taken',
-        youUsernameInvalid: 'Usernames are 1–16 lowercase letters, numbers, _ or -',
+        youUsernameInvalid: `Usernames are 1–${MAX_USERNAME_LENGTH} lowercase letters, numbers, _ or -`,
         adminPanelHead: 'administration',
         adminPanelTodo: 'TODO: admin panel.',
 
@@ -697,7 +699,7 @@ export const languages: Record<LanguageCode, Language> = {
         youSaved: 'Nustatymai išsaugoti.',
         youQrReset: 'QR kodas atstatytas.',
         youUsernameTaken: 'Šis vartotojo vardas užimtas',
-        youUsernameInvalid: 'Varde gali būti 1–16 mažųjų raidžių, skaičių, _ arba -',
+        youUsernameInvalid: `Varde gali būti 1–${MAX_USERNAME_LENGTH} mažųjų raidžių, skaičių, _ arba -`,
 
         adminPanelHead: 'administravimas',
         adminPanelTodo: 'TODO: administravimo skydelis.',

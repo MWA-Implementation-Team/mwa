@@ -1,3 +1,4 @@
+import { MAX_GROUP_NAME_LENGTH, MAX_USERNAME_LENGTH } from '#src/client/constants.js';
 import { Page } from '#src/client/pages.js';
 import { useContext, useState } from 'preact/hooks';
 import { ClientContext } from '#src/client/context.js';
@@ -452,7 +453,7 @@ function HomePage({
                             name="username"
                             type="text"
                             defaultValue={user!.username}
-                            maxLength={16}
+                            maxLength={MAX_USERNAME_LENGTH}
                             required
                         />
                     </div>
@@ -483,6 +484,7 @@ function HomePage({
                             name="name"
                             type="text"
                             defaultValue={groupName ?? ''}
+                            maxLength={MAX_GROUP_NAME_LENGTH}
                             required
                         />
                     </div>
