@@ -1,6 +1,6 @@
 export type LanguageCode = 'en' | 'lt';
 
-export const defaultLanguage: LanguageCode = 'en';
+export const defaultLanguage: LanguageCode = 'lt';
 
 export type Language = {
     displayName: string;
