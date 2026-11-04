@@ -192,7 +192,7 @@ function HomePage({
                     <p class="mwa-intro">
                         {t('dashBalance')}:{' '}
                         <strong>
-                            {user!.currentBalance.toFixed(2)} {t('currencyName')}
+                            {user!.currentBalance} {t('currencyName')}
                         </strong>
                     </p>
 
@@ -232,7 +232,7 @@ function HomePage({
                                             </td>
                                             <td class="mwa-tx-amount">
                                                 {tx.balanceDelta > 0 ? '+' : ''}
-                                                {tx.balanceDelta.toFixed(2)}
+                                                {tx.balanceDelta}
                                             </td>
                                         </tr>
                                     ))}
