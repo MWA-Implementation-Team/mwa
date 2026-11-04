@@ -24,8 +24,6 @@ type InteractPageProps = {
     // the target's personal + team position on each board — the same three
     // rows the home standings table shows
     standings: ViewerStanding[];
-    // false when the scanner or the target is staff — staff don't send
-    // money, gamble, or team-up, so the play panels stay hidden
     canPlay: boolean;
     // true for host/admin scanners — they get the award-shaped send panel
     // (posts to /award, optional note, no balance clamp) instead of play
@@ -198,7 +196,7 @@ function InteractPage({
                 </div>
             </section>
 
-            {canPlay && (
+            {user?.role === 'user' && (
                 <SendPanel
                     action={post('send-money')}
                     max={user!.currentBalance}
