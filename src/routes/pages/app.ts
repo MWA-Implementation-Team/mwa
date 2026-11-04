@@ -38,6 +38,7 @@ import {
     findTokenByInteractCode,
     findUserByInteractToken,
     rotateInteractToken,
+    rotateInteractCode,
 } from '#src/db/interactions/index.js';
 import { gambleErrorMessages } from './gambling.js';
 import { claimSystemQrCode } from '#src/db/systemqr/index.js';
@@ -658,6 +659,14 @@ export function registerAppRoutes(app: MwaHono) {
         const outcome =
             result.type === 'claimed' ? `claimed=${result.balanceDelta}` : `qrError=${result.type}`;
         return ctx.redirect(`/app?${outcome}`, 303);
+    });
+
+    app.post('/app/you/reset-code', (ctx) => {
+        const user = requireUser(ctx);
+        if (user instanceof Response) return user;
+
+        rotateInteractCode(ctx.var, user.id);
+        return ctx.redirect('/app', 303);
     });
 
     // Reset the personal qr token (the old code stops working immediately))

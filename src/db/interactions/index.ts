@@ -37,12 +37,20 @@ export function getOrCreateInteractToken(state: MwaState, userId: number): strin
 const interactCodeAlphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ';
 
 export function getOrCreateInteractCode(state: MwaState, userId: number): string {
+    return mintInteractCode(state, userId, false);
+}
+
+export function rotateInteractCode(state: MwaState, userId: number): string {
+    return mintInteractCode(state, userId, true);
+}
+
+function mintInteractCode(state: MwaState, userId: number, rotate: boolean): string {
     const codeByUserQuery = state.prepare(`SELECT code FROM interact_tokens WHERE user_id = ?`);
     const existing = codeByUserQuery.get(userId);
     if (!existing) {
         // no row yet — mint token + row, then fall through to code minting
         getOrCreateInteractToken(state, userId);
-    } else if (existing.code) {
+    } else if (existing.code && !rotate) {
         return existing.code as string;
     }
     const setCodeQuery = state.prepare(`UPDATE interact_tokens SET code = ? WHERE user_id = ?`);
@@ -51,6 +59,7 @@ export function getOrCreateInteractCode(state: MwaState, userId: number): string
             { length: 5 },
             () => interactCodeAlphabet[randomInt(interactCodeAlphabet.length)],
         ).join('');
+        if (code === existing?.code) continue;
         try {
             setCodeQuery.run(code, userId);
             return code;

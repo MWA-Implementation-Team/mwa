@@ -41,6 +41,7 @@ export type Language = {
     interactAwarded: string;
     interactGroupNone: string;
     interactCodeTitle: string;
+    interactCodeReset: string;
     interactCodeInput: string;
     interactCodeInvalid: string;
     interactAwardGroup: string;
@@ -309,6 +310,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwarded: 'Coins awarded.',
         interactGroupNone: 'Not in a group.',
         interactCodeTitle: 'Interact code',
+        interactCodeReset: 'Reset interact code',
         interactCodeInput: "Friend's code",
         interactCodeInvalid: 'No one has that code.',
         interactAwardGroup: 'Award group ({n})',
@@ -580,6 +582,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwarded: 'Koinai suteikti.',
         interactGroupNone: 'Nėra grupėje.',
         interactCodeTitle: 'Sąveikos kodas',
+        interactCodeReset: 'Perkurti sąveikos kodą',
         interactCodeInput: 'Draugo kodas',
         interactCodeInvalid: 'Niekas neturi tokio kodo.',
         interactAwardGroup: 'Apdovanoti grupę ({n})',
