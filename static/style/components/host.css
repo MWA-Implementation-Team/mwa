@@ -89,14 +89,13 @@
 
 .mwa-host-count-option {
     position: relative;
-    flex: 1;
-    width: auto;
-    padding: var(--space-2) var(--space-4);
-    justify-content: center;
-    cursor: pointer;
     display: flex;
+    flex: 1;
     align-items: center;
     justify-content: center;
+    width: auto;
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
     color: var(--muted-foreground);
     background: transparent;
     border: 3px solid var(--border);
