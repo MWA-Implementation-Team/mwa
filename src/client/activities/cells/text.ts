@@ -6,7 +6,8 @@ export const text = {
 <li><strong>Epoch:</strong> before the era of Micius</li>
 <li><strong>Activity:</strong> a paired trek to the source of life</li>
 <li><strong>Participants:</strong> pairs — one can see, the other can't</li>
-<li><strong>Duration:</strong> ?</li>
+<li><strong>Duration:</strong> 10 minutes</li>
+<li><strong>Location:</strong> room 102</li>
 </ul>
 <p><strong>How it goes:</strong></p>
 <ol>
@@ -22,7 +23,8 @@ export const text = {
 <li><strong>Epocha:</strong> prieš Miciaus erą</li>
 <li><strong>Veikla:</strong> kelionė poromis iki gyvybės šaltinio</li>
 <li><strong>Dalyviai:</strong> poros — vienas mato, kitas ne</li>
-<li><strong>Trukmė:</strong> ?</li>
+<li><strong>Trukmė:</strong> 10 minučių</li>
+<li><strong>Vieta:</strong> 102 auditorija</li>
 </ul>
 <p><strong>Eiga:</strong></p>
 <ol>

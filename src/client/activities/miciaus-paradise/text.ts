@@ -4,7 +4,8 @@ export const text = {
 <li><strong>Epoch:</strong> Micius's paradise</li>
 <li><strong>Activity:</strong> a rest stop — service and snacks</li>
 <li><strong>Participants:</strong> all guests</li>
-<li><strong>Duration:</strong> —</li>
+<li><strong>Duration:</strong> open-ended</li>
+<li><strong>Location:</strong> 1st floor lounge</li>
 </ul>
 <p><strong>How it goes:</strong></p>
 <ol>
@@ -18,7 +19,8 @@ export const text = {
 <li><strong>Epocha:</strong> Miciaus rojus</li>
 <li><strong>Veikla:</strong> poilsio stotelė — aptarnavimas ir užkandžiai</li>
 <li><strong>Dalyviai:</strong> visi svečiai</li>
-<li><strong>Trukmė:</strong> —</li>
+<li><strong>Trukmė:</strong> neribota</li>
+<li><strong>Vieta:</strong> 1 aukšto poilsio zona</li>
 </ul>
 <p><strong>Eiga:</strong></p>
 <ol>

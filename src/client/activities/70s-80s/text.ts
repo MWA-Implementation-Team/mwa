@@ -6,6 +6,7 @@ export const text = {
 <li><strong>Activity:</strong> disco contests — songs, lyrics and dance</li>
 <li><strong>Participants:</strong> one group at a time</li>
 <li><strong>Duration:</strong> ~6–7 minutes</li>
+<li><strong>Location:</strong> room 103</li>
 </ul>
 <p><strong>How it goes:</strong></p>
 <ol>
@@ -20,6 +21,7 @@ export const text = {
 <li><strong>Veikla:</strong> disko rungtys — dainos, žodžiai ir šokis</li>
 <li><strong>Dalyviai:</strong> viena grupė vienu metu</li>
 <li><strong>Trukmė:</strong> ~6–7 minutės</li>
+<li><strong>Vieta:</strong> 103 auditorija</li>
 </ul>
 <p><strong>Eiga:</strong></p>
 <ol>

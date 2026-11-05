@@ -5,7 +5,8 @@ export const text = {
 <li><strong>Epoch:</strong> Ancient Egypt</li>
 <li><strong>Activity:</strong> hieroglyph deciphering</li>
 <li><strong>Participants:</strong> the whole team — 1 "Micius" (the actor) + the rest guessing</li>
-<li><strong>Duration:</strong> 5–8 minutes</li>
+<li><strong>Duration:</strong> 6–10 minutes</li>
+<li><strong>Location:</strong> 2nd floor corridor</li>
 </ul>
 <p><strong>How it goes:</strong></p>
 <ol>
@@ -21,7 +22,8 @@ export const text = {
 <li><strong>Epocha:</strong> Senovės Egiptas</li>
 <li><strong>Veikla:</strong> hieroglifų iššifravimas</li>
 <li><strong>Dalyviai:</strong> visa komanda — 1 „Micius“ (aktorius) + likę spėliotojai</li>
-<li><strong>Trukmė:</strong> 5–8 minutės</li>
+<li><strong>Trukmė:</strong> 6–10 minučių</li>
+<li><strong>Vieta:</strong> 2 aukšto koridorius</li>
 </ul>
 <p><strong>Eiga:</strong></p>
 <ol>
