@@ -65,7 +65,7 @@
     justify-content: center;
 }
 
-/* The 1–4 count pickers are radio inputs dressed as menu buttons — no
+/* The 1–4 count pickers are radio inputs dressed as outlined buttons — no
    JS needed, the picked value posts with the form. */
 .mwa-host-count {
     display: flex;
@@ -79,6 +79,27 @@
     padding: var(--space-2) var(--space-4);
     justify-content: center;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-foreground);
+    background: transparent;
+    border: 3px solid var(--border);
+    border-radius: 0;
+    font-family: inherit;
+    font-size: var(--text-7);
+    font-weight: 400;
+    line-height: normal;
+    text-align: center;
+    transition:
+        color 0.15s,
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.mwa-host-count-option:hover {
+    color: var(--foreground);
+    background: var(--muted);
 }
 
 .mwa-host-count-option input {
@@ -89,9 +110,10 @@
     cursor: inherit;
 }
 
-/* Selected count — same cue the menu's current page gets (text only). */
+/* Selected count — outlined with the foreground color for a clear cue. */
 .mwa-host-count-option:has(input:checked) {
     color: var(--foreground);
+    border-color: var(--foreground);
 }
 
 .mwa-host-count-option:has(input:focus-visible) {

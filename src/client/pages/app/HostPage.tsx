@@ -6,6 +6,7 @@ import { ActivitySlug, registeredActivities } from '#src/client/activities.js';
 import PageShell from './PageShell.js';
 import { Toast } from '#src/client/ui/Toast.js';
 import { Language } from '#src/client/language.js';
+import { PhoneIcon } from '#src/client/ui/icons.js';
 
 type HostPageProps = {
     activities: { slug: ActivitySlug; name: string }[];
@@ -88,29 +89,71 @@ function HostPage({
                                             <td colSpan={3}>{t('hostStationEmpty')}</td>
                                         </tr>
                                     ) : (
-                                        onStation.map((entry, i) => (
-                                            <tr key={entry.id}>
-                                                <td>{i + 1}.</td>
-                                                <td>{entry.groupName}</td>
-                                                <td class="mwa-tx-amount">
-                                                    <form method="post" action="/app/host/done">
-                                                        <input
-                                                            type="hidden"
-                                                            name="activity_slug"
-                                                            value={station}
-                                                        />
-                                                        <input
-                                                            type="hidden"
-                                                            name="entry_id"
-                                                            value={entry.id}
-                                                        />
-                                                        <button type="submit" class="lang-link">
-                                                            {t('hostDone')}
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        ))
+                                        onStation.map((entry, i) =>
+                                            entry.phoneNumber ? (
+                                                [
+                                                    <tr key={`${entry.id}-main`}>
+                                                        <td rowSpan={2}>{i + 1}.</td>
+                                                        <td>{entry.groupName}</td>
+                                                        <td class="mwa-tx-amount" rowSpan={2}>
+                                                            <form
+                                                                method="post"
+                                                                action="/app/host/done"
+                                                            >
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="activity_slug"
+                                                                    value={station}
+                                                                />
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="entry_id"
+                                                                    value={entry.id}
+                                                                />
+                                                                <button
+                                                                    type="submit"
+                                                                    class="lang-link"
+                                                                >
+                                                                    {t('hostDone')}
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>,
+                                                    <tr key={`${entry.id}-phone`}>
+                                                        <td>
+                                                            <a
+                                                                href={`tel:${entry.phoneNumber}`}
+                                                                class="lang-link"
+                                                            >
+                                                                <PhoneIcon /> {entry.phoneNumber}
+                                                            </a>
+                                                        </td>
+                                                    </tr>,
+                                                ]
+                                            ) : (
+                                                <tr key={entry.id}>
+                                                    <td>{i + 1}.</td>
+                                                    <td>{entry.groupName}</td>
+                                                    <td class="mwa-tx-amount">
+                                                        <form method="post" action="/app/host/done">
+                                                            <input
+                                                                type="hidden"
+                                                                name="activity_slug"
+                                                                value={station}
+                                                            />
+                                                            <input
+                                                                type="hidden"
+                                                                name="entry_id"
+                                                                value={entry.id}
+                                                            />
+                                                            <button type="submit" class="lang-link">
+                                                                {t('hostDone')}
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            ),
+                                        )
                                     )}
                                 </tbody>
                             </table>
@@ -124,7 +167,7 @@ function HostPage({
                                     aria-label={t('hostCount')}
                                 >
                                     {[1, 2, 3, 4].map((n) => (
-                                        <label key={n} class="mwa-button mwa-host-count-option">
+                                        <label key={n} class="mwa-host-count-option">
                                             <input
                                                 type="radio"
                                                 name="count"
@@ -159,20 +202,49 @@ function HostPage({
                                             <td colSpan={2}>{t('hostQueueEmpty')}</td>
                                         </tr>
                                     ) : (
-                                        waiting.map((entry, i) => (
-                                            <tr key={entry.id}>
-                                                <td>{i + 1}.</td>
-                                                <td>
-                                                    {entry.groupName}
-                                                    {entry.completedSlugs.includes(station) && (
-                                                        <span class="mwa-standing-hint">
-                                                            {' '}
-                                                            {t('hostAlreadyDone')}
-                                                        </span>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))
+                                        waiting.map((entry, i) =>
+                                            entry.phoneNumber ? (
+                                                [
+                                                    <tr key={`${entry.id}-main`}>
+                                                        <td rowSpan={2}>{i + 1}.</td>
+                                                        <td>
+                                                            {entry.groupName}
+                                                            {entry.completedSlugs.includes(
+                                                                station,
+                                                            ) && (
+                                                                <span class="mwa-standing-hint">
+                                                                    {' '}
+                                                                    {t('hostAlreadyDone')}
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                    </tr>,
+                                                    <tr key={`${entry.id}-phone`}>
+                                                        <td>
+                                                            <a
+                                                                href={`tel:${entry.phoneNumber}`}
+                                                                class="lang-link"
+                                                            >
+                                                                <PhoneIcon /> {entry.phoneNumber}
+                                                            </a>
+                                                        </td>
+                                                    </tr>,
+                                                ]
+                                            ) : (
+                                                <tr key={entry.id}>
+                                                    <td>{i + 1}.</td>
+                                                    <td>
+                                                        {entry.groupName}
+                                                        {entry.completedSlugs.includes(station) && (
+                                                            <span class="mwa-standing-hint">
+                                                                {' '}
+                                                                {t('hostAlreadyDone')}
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ),
+                                        )
                                     )}
                                 </tbody>
                             </table>

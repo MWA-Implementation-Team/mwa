@@ -17,7 +17,11 @@ export type QueueEntry = {
     activitySlug: string | null;
 };
 
-export type WaitingQueueRow = QueueEntry & { groupName: string; completedSlugs: string[] };
+export type WaitingQueueRow = QueueEntry & {
+    groupName: string;
+    phoneNumber: string;
+    completedSlugs: string[];
+};
 
 function mapQueueEntry(row: Record<string, SQLOutputValue>): QueueEntry {
     return {
@@ -180,7 +184,7 @@ export function listWaitingQueue(state: MwaState): WaitingQueueRow[] {
     const query = state.prepare(`
         SELECT queue_entries.id, queue_entries.group_id, queue_entries.joined_at,
                queue_entries.status, queue_entries.closed_at, queue_entries.done_at, queue_entries.activity_slug,
-               groups.name AS group_name
+               groups.name AS group_name, groups.phone_number
         FROM queue_entries
         JOIN groups ON groups.id = queue_entries.group_id
         WHERE queue_entries.status = 'waiting'
@@ -190,6 +194,7 @@ export function listWaitingQueue(state: MwaState): WaitingQueueRow[] {
     return query.all().map((row) => ({
         ...mapQueueEntry(row),
         groupName: row.group_name as string,
+        phoneNumber: row.phone_number as string,
         completedSlugs: completions.get(row.group_id as number) ?? [],
     }));
 }
@@ -237,7 +242,7 @@ export function listStationGroups(state: MwaState, activitySlug: string): Waitin
     const query = state.prepare(`
         SELECT queue_entries.id, queue_entries.group_id, queue_entries.joined_at,
                queue_entries.status, queue_entries.closed_at, queue_entries.done_at,
-               queue_entries.activity_slug, groups.name AS group_name
+               queue_entries.activity_slug, groups.name AS group_name, groups.phone_number
         FROM queue_entries
         JOIN groups ON groups.id = queue_entries.group_id
         WHERE queue_entries.status = 'called'
@@ -249,6 +254,7 @@ export function listStationGroups(state: MwaState, activitySlug: string): Waitin
     return query.all(activitySlug).map((row) => ({
         ...mapQueueEntry(row),
         groupName: row.group_name as string,
+        phoneNumber: row.phone_number as string,
         completedSlugs: completions.get(row.group_id as number) ?? [],
     }));
 }
