@@ -73,10 +73,10 @@ describe('db/users', () => {
         assert.equal(deriveUsername(state, 'taken-name@example.com'), `${base.slice(0, 29)}2`);
     });
 
-    it('updateUsername trims, lowercases, and renames', () => {
+    it('updateUsername trims, preserves case, and renames', () => {
         const user = createUser(state, 'rename@example.com', 'rename_me');
         assert.equal(updateUsername(state, user.id, '  NewName  '), 'updated');
-        assert.equal(findUserById(state, user.id)!.username, 'newname');
+        assert.equal(findUserById(state, user.id)!.username, 'NewName');
     });
 
     it('updateUsername rejects bad input and taken names, keeps its own', () => {
@@ -87,7 +87,7 @@ describe('db/users', () => {
         assert.equal(updateUsername(state, a.id, 'bad name!'), 'invalid');
         assert.equal(updateUsername(state, a.id, 'x'.repeat(31)), 'invalid');
         assert.equal(updateUsername(state, a.id, ''), 'invalid');
-        assert.equal(updateUsername(state, a.id, 'RENAME_B'), 'taken');
+        assert.equal(updateUsername(state, a.id, 'ReName_B'), 'taken');
         assert.equal(updateUsername(state, a.id, 'rename_a'), 'updated');
         assert.equal(findUserById(state, b.id)!.username, 'rename_b');
     });

@@ -7,7 +7,7 @@ import PageShell from './PageShell.js';
 import Dialog from '#src/client/ui/Dialog.js';
 import { Language } from '#src/client/language.js';
 import type { ViewerStanding } from '#src/db/leaderboard/index.js';
-import { displayActor, displayUsername } from '#src/client/display.js';
+import { displayActor } from '#src/client/display.js';
 import { Toast } from '#src/client/ui/Toast.js';
 
 type HomePageProps = {
@@ -92,7 +92,7 @@ function HomePage({
                 </div>
                 <div class="mwa-panel-body mwa-queue-grid">
                     <div>
-                        <p class="mwa-queue-name">{displayUsername(user!.username)}</p>
+                        <p class="mwa-queue-name">{user!.username}</p>
                         {queueError && <Toast kind="error">{t(queueError)}</Toast>}
 
                         {groupMemberCount !== null && (
@@ -353,9 +353,7 @@ function HomePage({
                                                                     type="submit"
                                                                     class="lang-link lang-link--danger"
                                                                     title={t('groupKickHint', {
-                                                                        name: displayUsername(
-                                                                            member.username,
-                                                                        ),
+                                                                        name: member.username,
                                                                     })}
                                                                 >
                                                                     {t('groupKick')}
@@ -397,7 +395,7 @@ function HomePage({
                             <tbody>
                                 <tr>
                                     <td>{t('youUsername')}</td>
-                                    <td>{displayUsername(user!.username)}</td>
+                                    <td>{user!.username}</td>
                                     <td class="mwa-tx-amount">
                                         <button
                                             type="button"

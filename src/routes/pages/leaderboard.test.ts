@@ -45,7 +45,7 @@ describe('GET /app/leaderboard', () => {
 
         // markup-only patterns — ssr-data embeds raw usernames in <head>, and
         // the viewer's own row renders "You" via displayActor
-        const richPos = html.indexOf('>Lbv_rich<');
+        const richPos = html.indexOf('>lbv_rich<');
         const mePos = html.indexOf('>You<');
         assert.ok(richPos > 0 && mePos > 0, 'both players render');
         assert.ok(richPos < mePos, 'higher earned ranks first');
@@ -99,7 +99,7 @@ describe('GET /app/leaderboard', () => {
             headers: authCookie(me.id),
         });
         const html = await res.text();
-        const drainedPos = html.indexOf('>Lbc_drained<');
+        const drainedPos = html.indexOf('>lbc_drained<');
         const mePos = html.indexOf('>You<');
         assert.ok(drainedPos > 0 && mePos > 0);
         // both at 10 net — tie falls to NOCASE username order: lbc_drained first? 'lbc_drained' < 'lbc_me' alphabetically
