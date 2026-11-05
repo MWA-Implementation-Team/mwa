@@ -13,14 +13,7 @@ export const landingPage: Page<LandingPageProps> = {
 
 const activities = Object.entries(registeredActivities) as [ActivitySlug, Activity][];
 
-function nextEventDate() {
-    const now = new Date();
-    let target = new Date(now.getFullYear(), 10, 5, 18);
-    if (target.getTime() <= now.getTime()) {
-        target = new Date(now.getFullYear() + 1, 10, 5, 18);
-    }
-    return target;
-}
+const eventDate = new Date(2026, 10, 5, 18);
 
 function Countdown() {
     const { t } = useContext(ClientContext);
@@ -30,7 +23,7 @@ function Countdown() {
         return () => clearInterval(id);
     }, []);
 
-    const diff = Math.max(0, nextEventDate().getTime() - now);
+    const diff = Math.max(0, eventDate.getTime() - now);
     const parts = [
         { value: Math.floor(diff / 86_400_000), label: t('countdownDays') },
         { value: Math.floor(diff / 3_600_000) % 24, label: t('countdownHours') },

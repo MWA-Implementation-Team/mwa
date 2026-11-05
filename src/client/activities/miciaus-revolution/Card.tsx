@@ -34,20 +34,6 @@ export function MiciausRevolutionCard({}: ActivityProps) {
                 }}
             />
 
-            <span
-                aria-hidden="true"
-                style={{
-                    position: 'absolute',
-                    right: 22,
-                    top: 5,
-                    fontSize: 88,
-                    color: '#ff1616',
-                    opacity: 0.8,
-                }}
-            >
-                ★
-            </span>
-
             <h2
                 style={{
                     position: 'relative',
