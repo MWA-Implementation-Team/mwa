@@ -44,21 +44,13 @@
     line-height: 1;
 }
 
-/* Right column items hug the right edge. The inner wrapper keeps the
-   column layout while letting tables fill the width so row hover works. */
+/* Right column stacks the at-station table, the request controls and the
+   queue table; children stretch to the column width so table row hover
+   spans it. */
 .mwa-host-side {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
     gap: var(--space-4);
-    width: 100%;
-}
-
-.mwa-host-side-inner {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    width: 100%;
 }
 
 .mwa-host-controls {
@@ -89,31 +81,11 @@
 
 .mwa-host-count-option {
     position: relative;
-    display: flex;
     flex: 1;
-    align-items: center;
-    justify-content: center;
     width: auto;
-    padding: var(--space-2) var(--space-4);
+    justify-content: center;
     cursor: pointer;
-    color: var(--muted-foreground);
     background: transparent;
-    border: 3px solid var(--border);
-    border-radius: 0;
-    font-family: inherit;
-    font-size: var(--text-7);
-    font-weight: 400;
-    line-height: normal;
-    text-align: center;
-    transition:
-        color 0.15s,
-        background 0.15s,
-        border-color 0.15s;
-}
-
-.mwa-host-count-option:hover {
-    color: var(--foreground);
-    background: var(--muted);
 }
 
 .mwa-host-count-option input {

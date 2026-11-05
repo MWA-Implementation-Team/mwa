@@ -1,6 +1,10 @@
 import { Page, RegisteredPageId, RegisteredPageProps, registeredPages } from '#src/client/pages.js';
 import { currentUser } from '#src/auth.js';
-import { ClientContextWrapper, ClientContextWrapperInit } from '#src/client/context.js';
+import {
+    ClientContextType,
+    ClientContextWrapper,
+    ClientContextWrapperInit,
+} from '#src/client/context.js';
 import { serialize } from '#src/client/serialize.js';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { renderToString } from 'preact-render-to-string';
@@ -16,6 +20,12 @@ import { getUserCalledEntry } from '#src/db/queue/index.js';
 import { isActivitySlug, registeredActivities } from '#src/client/activities.js';
 import { renderSVG } from 'uqr';
 import { queryUserNotification } from './db/users/index.js';
+
+function stationOf(slug: string | null | undefined): ClientContextType['atStation'] {
+    if (!slug) return null;
+    if (!isActivitySlug(slug)) return { name: slug, slug: null };
+    return { name: registeredActivities[slug].name, slug };
+}
 
 export function writePage<P extends RegisteredPageId>(
     ctx: MwaContext,
@@ -41,14 +51,7 @@ export function writePage<P extends RegisteredPageId>(
     // the station the user's group is called to right now — shown as a fixed
     // banner in PageShell; null when waiting/groupless/done
     const called = user ? getUserCalledEntry(ctx.var, user.id) : null;
-    const atStation = called?.activitySlug
-        ? isActivitySlug(called.activitySlug)
-            ? {
-                  name: registeredActivities[called.activitySlug].name,
-                  slug: called.activitySlug,
-              }
-            : { name: called.activitySlug, slug: null }
-        : null;
+    const atStation = stationOf(called?.activitySlug);
 
     const ctxInit: ClientContextWrapperInit = {
         lang: getRequestLanguage(ctx),

@@ -147,5 +147,6 @@ station. Marking done pays nothing; hosts award players by scan.
 The dashboard shows the caller's 1-based position; hosts read `listWaitingQueue`
 and call `callNextGroups` when a station frees up. Host actions use
 POST forms at `/app/host/call` and `/app/host/done`, restricted to hosts and
-admins. Each redirects back to the selected station with fresh queue data
-and localized errors.
+admins. Both host tables show each group's phone number as a `tel:` link
+next to its name (`phoneNumber` on `WaitingQueueRow`). Each redirects back
+to the selected station with fresh queue data and localized errors.

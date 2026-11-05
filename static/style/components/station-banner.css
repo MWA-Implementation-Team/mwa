@@ -22,7 +22,6 @@
 }
 
 a.mwa-station-banner:hover {
-    color: var(--foreground);
     text-decoration: underline;
 }
 
