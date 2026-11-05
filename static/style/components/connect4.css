@@ -8,9 +8,11 @@
 
 .mwa-connect4-cell {
     display: flex;
-    /* 7 columns must fit a phone viewport — shrink cells on narrow screens */
-    width: clamp(2rem, 11vw, 3.25rem);
-    height: clamp(2rem, 11vw, 3.25rem);
+    /* cells fill the td, which table-layout:fixed keeps at 1/7 of the
+       container — the board can never overflow its panel */
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
     padding: 0;
 
     border-radius: 100%;
@@ -34,12 +36,11 @@
     background: transparent;
 }
 
-.mwa-connect4-table td {
-    padding: var(--space-2);
+.mwa-connect4-table {
+    width: 100%;
+    table-layout: fixed;
 }
 
-@media (max-width: 699.98px) {
-    .mwa-connect4-table td {
-        padding: var(--space-1);
-    }
+.mwa-connect4-table td {
+    padding: var(--space-1);
 }
