@@ -75,7 +75,7 @@ function HomePage({
     codeError,
     standings,
 }: HomePageProps) {
-    const { t, user, lang } = useContext(ClientContext);
+    const { t, user, lang, qr } = useContext(ClientContext);
     const [usernameDialogOpen, setUsernameDialogOpen] = useState(youError !== undefined);
     const [groupNameEditOpen, setGroupNameEditOpen] = useState(false);
     const [groupPhoneEditOpen, setGroupPhoneEditOpen] = useState(false);
@@ -417,6 +417,17 @@ function HomePage({
                                     <td>{t('youRole')}</td>
                                     <td colSpan={2}>
                                         {user!.role.charAt(0).toUpperCase() + user!.role.slice(1)}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{t('interactCodeTitle')}</td>
+                                    <td>{qr?.code ?? '—'}</td>
+                                    <td class="mwa-tx-amount">
+                                        <form method="POST" action="/app/you/reset-code">
+                                            <button type="submit" class="lang-link">
+                                                {t('interactCodeReset')}
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             </tbody>
