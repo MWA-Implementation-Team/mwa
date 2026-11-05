@@ -5,7 +5,6 @@ import { ClientContext } from '#src/client/context.js';
 import PageShell from './PageShell.js';
 import Dialog from '#src/client/ui/Dialog.js';
 import { Toast } from '#src/client/ui/Toast.js';
-import { displayUsername } from '#src/client/display.js';
 import { Language } from '#src/client/language.js';
 import type { GameType } from '#src/db/gambling/index.js';
 import type { ViewerStanding } from '#src/db/leaderboard/index.js';
@@ -134,7 +133,7 @@ function InteractPage({
                 </div>
                 <div class="mwa-panel-body mwa-queue-grid">
                     <div>
-                        <p class="mwa-queue-name">{displayUsername(target.username)}</p>
+                        <p class="mwa-queue-name">{target.username}</p>
                         <div class="mwa-queue-art" aria-hidden="true">
                             {groupEmoji}
                         </div>
@@ -177,7 +176,7 @@ function InteractPage({
                                             </td>
                                         </tr>,
                                         <tr key={s.board + '-you'} class="mwa-standing-sub">
-                                            <td>{displayUsername(target.username)}</td>
+                                            <td>{target.username}</td>
                                             <td class="mwa-tx-amount">
                                                 {s.you ? `#${s.you.rank}` : '—'}
                                             </td>

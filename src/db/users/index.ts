@@ -95,8 +95,11 @@ export function updateUsername(
     userId: number,
     raw: string,
 ): 'updated' | 'taken' | 'invalid' {
-    const username = raw.trim().toLowerCase().normalize('NFC');
-    if (username.length > MAX_USERNAME_LENGTH || !/^[a-ząčęėįšųūž0-9_-]+$/u.test(username)) {
+    const username = raw.trim().normalize('NFC');
+    if (
+        username.length > MAX_USERNAME_LENGTH ||
+        !/^[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ0-9_-]+$/u.test(username)
+    ) {
         return 'invalid';
     }
     const clash = findUserByUsername(state, username);
