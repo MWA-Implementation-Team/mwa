@@ -100,6 +100,7 @@ function HostPage({
                                                                 <a
                                                                     href={`tel:${entry.phoneNumber}`}
                                                                     class="lang-link"
+                                                                    title={t('hostCall')}
                                                                 >
                                                                     {entry.phoneNumber}
                                                                 </a>
@@ -194,6 +195,7 @@ function HostPage({
                                                                 <a
                                                                     href={`tel:${entry.phoneNumber}`}
                                                                     class="lang-link"
+                                                                    title={t('hostCall')}
                                                                 >
                                                                     {entry.phoneNumber}
                                                                 </a>
