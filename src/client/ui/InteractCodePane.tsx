@@ -11,17 +11,23 @@ export default function InteractCodePane() {
         <section class="landing-section landing-pane-extra landing-pane-code">
             <h2>{t('interactCodeTitle')}</h2>
             <div class="landing-code">
+                <p class="landing-code-label">{t('interactCodeYours')}</p>
                 <p class="landing-code-own">{qr.code}</p>
                 <form method="GET" action="/app/interact" class="landing-code-form">
-                    <input
-                        type="text"
-                        name="code"
-                        placeholder={t('interactCodeInput')}
-                        aria-label={t('interactCodeInput')}
-                        maxLength={5}
-                        autoComplete="off"
-                        required
-                    />
+                    <div class="landing-code-row">
+                        <input
+                            type="text"
+                            name="code"
+                            placeholder={t('interactCodeInput')}
+                            aria-label={t('interactCodeInput')}
+                            maxLength={5}
+                            autoComplete="off"
+                            required
+                        />
+                        <button type="submit" class="mwa-button">
+                            {t('interactCodeSubmit')}
+                        </button>
+                    </div>
                 </form>
             </div>
             <form method="POST" action="/app/you/reset-code">

@@ -41,8 +41,10 @@ export type Language = {
     interactAwarded: string;
     interactGroupNone: string;
     interactCodeTitle: string;
+    interactCodeYours: string;
     interactCodeReset: string;
     interactCodeInput: string;
+    interactCodeSubmit: string;
     interactCodeInvalid: string;
     interactAwardGroup: string;
     interactAwardedGroup: string;
@@ -63,6 +65,7 @@ export type Language = {
     landingSocialEvent: string;
     landingFeedTitle: string;
     landingGoApp: string;
+    landingMain: string;
     landingLogin: string;
     countdownDays: string;
     countdownHours: string;
@@ -115,6 +118,7 @@ export type Language = {
     hostQueueEmpty: string;
     hostRequestFailed: string;
     hostDoneFailed: string;
+    hostCall: string;
 
     dashSupport: string;
     dashCall: string;
@@ -278,7 +282,7 @@ export const languages: Record<LanguageCode, Language> = {
 
         titleApp: 'Freshman Event',
 
-        headerHome: 'App',
+        headerHome: 'Event',
 
         headerLeaderboard: 'Leaderboard',
         headerGambling: 'Gambling',
@@ -311,8 +315,10 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwarded: 'Coins awarded.',
         interactGroupNone: 'Not in a group.',
         interactCodeTitle: 'Interact code',
+        interactCodeYours: 'Your interaction code',
         interactCodeReset: 'Reset interact code',
         interactCodeInput: "Friend's code",
+        interactCodeSubmit: 'Submit',
         interactCodeInvalid: 'No one has that code.',
         interactAwardGroup: 'Award group ({n})',
         interactAwardedGroup: 'Whole group awarded.',
@@ -334,6 +340,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingSocialEvent: 'Event',
         landingFeedTitle: 'Activities',
         landingGoApp: 'Go',
+        landingMain: 'Main',
         landingLogin: 'Login',
         countdownDays: 'days',
         countdownHours: 'hours',
@@ -387,6 +394,7 @@ export const languages: Record<LanguageCode, Language> = {
         hostQueueEmpty: 'The queue is empty',
         hostRequestFailed: 'Could not request groups',
         hostDoneFailed: 'Could not mark the group done',
+        hostCall: 'Call',
 
         dashSupport: 'Support',
         dashCall: 'Call support',
@@ -550,7 +558,7 @@ export const languages: Record<LanguageCode, Language> = {
 
         titleApp: 'Pirmakursių Renginys',
 
-        headerHome: 'Programa',
+        headerHome: 'Renginys',
 
         headerLeaderboard: 'Lyderių lentelė',
         headerGambling: 'Lošimai',
@@ -584,8 +592,10 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwarded: 'Koinai suteikti.',
         interactGroupNone: 'Nėra grupėje.',
         interactCodeTitle: 'Sąveikos kodas',
+        interactCodeYours: 'Jūsų sąveikos kodas',
         interactCodeReset: 'Perkurti sąveikos kodą',
         interactCodeInput: 'Draugo kodas',
+        interactCodeSubmit: 'Pateikti',
         interactCodeInvalid: 'Niekas neturi tokio kodo.',
         interactAwardGroup: 'Apdovanoti grupę ({n})',
         interactAwardedGroup: 'Grupė apdovanota.',
@@ -607,6 +617,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingSocialEvent: 'Renginys',
         landingFeedTitle: 'Veiklos',
         landingGoApp: 'Eiti',
+        landingMain: 'Pagrindinis',
         landingLogin: 'Prisijungti',
         countdownDays: 'dienų',
         countdownHours: 'valandų',
@@ -659,6 +670,7 @@ export const languages: Record<LanguageCode, Language> = {
         hostQueueEmpty: 'Eilė tuščia',
         hostRequestFailed: 'Nepavyko pakviesti grupių',
         hostDoneFailed: 'Nepavyko pažymėti grupės kaip atliktos',
+        hostCall: 'Skambinti',
 
         dashSupport: 'Pagalba',
         dashCall: 'Skambinti pagalbai',

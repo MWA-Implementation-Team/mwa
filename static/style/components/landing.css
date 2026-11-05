@@ -76,6 +76,12 @@
     text-align: center;
 }
 
+.landing-code-label {
+    margin: 0;
+    font-size: var(--text-8);
+    color: var(--muted-foreground);
+}
+
 .landing-code-own {
     margin: 0;
     font-family: var(--font-mono);
@@ -89,9 +95,21 @@
     width: 100%;
 }
 
-.landing-code-form input {
+.landing-code-row {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+}
+
+.landing-code-row input {
+    flex: 1;
+    min-width: 0;
     text-align: center;
     text-transform: uppercase;
+}
+
+.landing-code-row .mwa-button {
+    flex-shrink: 0;
 }
 
 .landing-menu {
