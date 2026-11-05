@@ -89,77 +89,42 @@ function HostPage({
                                                 <td colSpan={3}>{t('hostStationEmpty')}</td>
                                             </tr>
                                         ) : (
-                                            onStation.map((entry, i) =>
-                                                entry.phoneNumber ? (
-                                                    [
-                                                        <tr key={`${entry.id}-main`}>
-                                                            <td rowSpan={2}>{i + 1}.</td>
-                                                            <td>{entry.groupName}</td>
-                                                            <td class="mwa-tx-amount" rowSpan={2}>
-                                                                <form
-                                                                    method="post"
-                                                                    action="/app/host/done"
-                                                                >
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="activity_slug"
-                                                                        value={station}
-                                                                    />
-                                                                    <input
-                                                                        type="hidden"
-                                                                        name="entry_id"
-                                                                        value={entry.id}
-                                                                    />
-                                                                    <button
-                                                                        type="submit"
-                                                                        class="lang-link"
-                                                                    >
-                                                                        {t('hostDone')}
-                                                                    </button>
-                                                                </form>
-                                                            </td>
-                                                        </tr>,
-                                                        <tr key={`${entry.id}-phone`}>
-                                                            <td>
+                                            onStation.map((entry, i) => (
+                                                <tr key={entry.id}>
+                                                    <td>{i + 1}.</td>
+                                                    <td>
+                                                        {entry.groupName}
+                                                        {entry.phoneNumber && (
+                                                            <>
+                                                                {' '}
                                                                 <a
                                                                     href={`tel:${entry.phoneNumber}`}
                                                                     class="lang-link"
                                                                 >
                                                                     {entry.phoneNumber}
                                                                 </a>
-                                                            </td>
-                                                        </tr>,
-                                                    ]
-                                                ) : (
-                                                    <tr key={entry.id}>
-                                                        <td>{i + 1}.</td>
-                                                        <td>{entry.groupName}</td>
-                                                        <td class="mwa-tx-amount">
-                                                            <form
-                                                                method="post"
-                                                                action="/app/host/done"
-                                                            >
-                                                                <input
-                                                                    type="hidden"
-                                                                    name="activity_slug"
-                                                                    value={station}
-                                                                />
-                                                                <input
-                                                                    type="hidden"
-                                                                    name="entry_id"
-                                                                    value={entry.id}
-                                                                />
-                                                                <button
-                                                                    type="submit"
-                                                                    class="lang-link"
-                                                                >
-                                                                    {t('hostDone')}
-                                                                </button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                ),
-                                            )
+                                                            </>
+                                                        )}
+                                                    </td>
+                                                    <td class="mwa-tx-amount">
+                                                        <form method="post" action="/app/host/done">
+                                                            <input
+                                                                type="hidden"
+                                                                name="activity_slug"
+                                                                value={station}
+                                                            />
+                                                            <input
+                                                                type="hidden"
+                                                                name="entry_id"
+                                                                value={entry.id}
+                                                            />
+                                                            <button type="submit" class="lang-link">
+                                                                {t('hostDone')}
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            ))
                                         )}
                                     </tbody>
                                 </table>
@@ -212,51 +177,31 @@ function HostPage({
                                                 <td colSpan={2}>{t('hostQueueEmpty')}</td>
                                             </tr>
                                         ) : (
-                                            waiting.map((entry, i) =>
-                                                entry.phoneNumber ? (
-                                                    [
-                                                        <tr key={`${entry.id}-main`}>
-                                                            <td rowSpan={2}>{i + 1}.</td>
-                                                            <td>
-                                                                {entry.groupName}
-                                                                {entry.completedSlugs.includes(
-                                                                    station,
-                                                                ) && (
-                                                                    <span class="mwa-standing-hint">
-                                                                        {' '}
-                                                                        {t('hostAlreadyDone')}
-                                                                    </span>
-                                                                )}
-                                                            </td>
-                                                        </tr>,
-                                                        <tr key={`${entry.id}-phone`}>
-                                                            <td>
+                                            waiting.map((entry, i) => (
+                                                <tr key={entry.id}>
+                                                    <td>{i + 1}.</td>
+                                                    <td>
+                                                        {entry.groupName}
+                                                        {entry.completedSlugs.includes(station) && (
+                                                            <span class="mwa-standing-hint">
+                                                                {' '}
+                                                                {t('hostAlreadyDone')}
+                                                            </span>
+                                                        )}
+                                                        {entry.phoneNumber && (
+                                                            <>
+                                                                {' '}
                                                                 <a
                                                                     href={`tel:${entry.phoneNumber}`}
                                                                     class="lang-link"
                                                                 >
                                                                     {entry.phoneNumber}
                                                                 </a>
-                                                            </td>
-                                                        </tr>,
-                                                    ]
-                                                ) : (
-                                                    <tr key={entry.id}>
-                                                        <td>{i + 1}.</td>
-                                                        <td>
-                                                            {entry.groupName}
-                                                            {entry.completedSlugs.includes(
-                                                                station,
-                                                            ) && (
-                                                                <span class="mwa-standing-hint">
-                                                                    {' '}
-                                                                    {t('hostAlreadyDone')}
-                                                                </span>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ),
-                                            )
+                                                            </>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))
                                         )}
                                     </tbody>
                                 </table>
