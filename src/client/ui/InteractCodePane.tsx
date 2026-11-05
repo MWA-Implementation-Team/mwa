@@ -14,20 +14,15 @@ export default function InteractCodePane() {
                 <p class="landing-code-label">{t('interactCodeYours')}</p>
                 <p class="landing-code-own">{qr.code}</p>
                 <form method="GET" action="/app/interact" class="landing-code-form">
-                    <div class="landing-code-row">
-                        <input
-                            type="text"
-                            name="code"
-                            placeholder={t('interactCodeInput')}
-                            aria-label={t('interactCodeInput')}
-                            maxLength={5}
-                            autoComplete="off"
-                            required
-                        />
-                        <button type="submit" class="mwa-button">
-                            {t('interactCodeSubmit')}
-                        </button>
-                    </div>
+                    <input
+                        type="text"
+                        name="code"
+                        placeholder={t('interactCodeInput')}
+                        aria-label={t('interactCodeInput')}
+                        maxLength={5}
+                        autoComplete="off"
+                        required
+                    />
                 </form>
             </div>
             <form method="POST" action="/app/you/reset-code">
