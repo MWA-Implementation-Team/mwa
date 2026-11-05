@@ -75,26 +75,66 @@ function HostPage({
                         </div>
                     </div>
                     <div class="mwa-host-side">
-                        <div class="table mwa-tx">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th colSpan={3}>{t('hostAtStation')}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {onStation.length === 0 ? (
+                        <div class="mwa-host-side-inner">
+                            <div class="table mwa-tx mwa-host-table">
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <td colSpan={3}>{t('hostStationEmpty')}</td>
+                                            <th colSpan={3}>{t('hostAtStation')}</th>
                                         </tr>
-                                    ) : (
-                                        onStation.map((entry, i) =>
-                                            entry.phoneNumber ? (
-                                                [
-                                                    <tr key={`${entry.id}-main`}>
-                                                        <td rowSpan={2}>{i + 1}.</td>
+                                    </thead>
+                                    <tbody>
+                                        {onStation.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={3}>{t('hostStationEmpty')}</td>
+                                            </tr>
+                                        ) : (
+                                            onStation.map((entry, i) =>
+                                                entry.phoneNumber ? (
+                                                    [
+                                                        <tr key={`${entry.id}-main`}>
+                                                            <td rowSpan={2}>{i + 1}.</td>
+                                                            <td>{entry.groupName}</td>
+                                                            <td class="mwa-tx-amount" rowSpan={2}>
+                                                                <form
+                                                                    method="post"
+                                                                    action="/app/host/done"
+                                                                >
+                                                                    <input
+                                                                        type="hidden"
+                                                                        name="activity_slug"
+                                                                        value={station}
+                                                                    />
+                                                                    <input
+                                                                        type="hidden"
+                                                                        name="entry_id"
+                                                                        value={entry.id}
+                                                                    />
+                                                                    <button
+                                                                        type="submit"
+                                                                        class="lang-link"
+                                                                    >
+                                                                        {t('hostDone')}
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>,
+                                                        <tr key={`${entry.id}-phone`}>
+                                                            <td>
+                                                                <a
+                                                                    href={`tel:${entry.phoneNumber}`}
+                                                                    class="lang-link"
+                                                                >
+                                                                    {entry.phoneNumber}
+                                                                </a>
+                                                            </td>
+                                                        </tr>,
+                                                    ]
+                                                ) : (
+                                                    <tr key={entry.id}>
+                                                        <td>{i + 1}.</td>
                                                         <td>{entry.groupName}</td>
-                                                        <td class="mwa-tx-amount" rowSpan={2}>
+                                                        <td class="mwa-tx-amount">
                                                             <form
                                                                 method="post"
                                                                 action="/app/host/done"
@@ -117,95 +157,92 @@ function HostPage({
                                                                 </button>
                                                             </form>
                                                         </td>
-                                                    </tr>,
-                                                    <tr key={`${entry.id}-phone`}>
-                                                        <td>
-                                                            <a
-                                                                href={`tel:${entry.phoneNumber}`}
-                                                                class="lang-link"
-                                                            >
-                                                                {entry.phoneNumber}
-                                                            </a>
-                                                        </td>
-                                                    </tr>,
-                                                ]
-                                            ) : (
-                                                <tr key={entry.id}>
-                                                    <td>{i + 1}.</td>
-                                                    <td>{entry.groupName}</td>
-                                                    <td class="mwa-tx-amount">
-                                                        <form method="post" action="/app/host/done">
-                                                            <input
-                                                                type="hidden"
-                                                                name="activity_slug"
-                                                                value={station}
-                                                            />
-                                                            <input
-                                                                type="hidden"
-                                                                name="entry_id"
-                                                                value={entry.id}
-                                                            />
-                                                            <button type="submit" class="lang-link">
-                                                                {t('hostDone')}
-                                                            </button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            ),
-                                        )
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="mwa-host-controls">
-                            <form method="post" action="/app/host/call" class="mwa-host-request">
-                                <input type="hidden" name="activity_slug" value={station} />
-                                <div
-                                    class="mwa-host-count"
-                                    role="group"
-                                    aria-label={t('hostCount')}
+                                                    </tr>
+                                                ),
+                                            )
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mwa-host-controls">
+                                <form
+                                    method="post"
+                                    action="/app/host/call"
+                                    class="mwa-host-request"
                                 >
-                                    {[1, 2, 3, 4].map((n) => (
-                                        <label key={n} class="mwa-host-count-option">
-                                            <input
-                                                type="radio"
-                                                name="count"
-                                                value={n}
-                                                checked={count === n}
-                                                onChange={() => setCount(n)}
-                                            />
-                                            {n}
-                                        </label>
-                                    ))}
-                                </div>
-                                <button
-                                    type="submit"
-                                    class="mwa-button"
-                                    disabled={count > eligible}
-                                >
-                                    {t('hostRequest')}
-                                </button>
-                            </form>
-                            {error && <Toast kind="error">{t(error)}</Toast>}
-                        </div>
-                        <div class="table mwa-tx">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th colSpan={2}>{t('hostNextUp')}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {waiting.length === 0 ? (
+                                    <input type="hidden" name="activity_slug" value={station} />
+                                    <div
+                                        class="mwa-host-count"
+                                        role="group"
+                                        aria-label={t('hostCount')}
+                                    >
+                                        {[1, 2, 3, 4].map((n) => (
+                                            <label key={n} class="mwa-host-count-option">
+                                                <input
+                                                    type="radio"
+                                                    name="count"
+                                                    value={n}
+                                                    checked={count === n}
+                                                    onChange={() => setCount(n)}
+                                                />
+                                                {n}
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        class="mwa-button"
+                                        disabled={count > eligible}
+                                    >
+                                        {t('hostRequest')}
+                                    </button>
+                                </form>
+                                {error && <Toast kind="error">{t(error)}</Toast>}
+                            </div>
+                            <div class="table mwa-tx mwa-host-table">
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <td colSpan={2}>{t('hostQueueEmpty')}</td>
+                                            <th colSpan={2}>{t('hostNextUp')}</th>
                                         </tr>
-                                    ) : (
-                                        waiting.map((entry, i) =>
-                                            entry.phoneNumber ? (
-                                                [
-                                                    <tr key={`${entry.id}-main`}>
-                                                        <td rowSpan={2}>{i + 1}.</td>
+                                    </thead>
+                                    <tbody>
+                                        {waiting.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={2}>{t('hostQueueEmpty')}</td>
+                                            </tr>
+                                        ) : (
+                                            waiting.map((entry, i) =>
+                                                entry.phoneNumber ? (
+                                                    [
+                                                        <tr key={`${entry.id}-main`}>
+                                                            <td rowSpan={2}>{i + 1}.</td>
+                                                            <td>
+                                                                {entry.groupName}
+                                                                {entry.completedSlugs.includes(
+                                                                    station,
+                                                                ) && (
+                                                                    <span class="mwa-standing-hint">
+                                                                        {' '}
+                                                                        {t('hostAlreadyDone')}
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                        </tr>,
+                                                        <tr key={`${entry.id}-phone`}>
+                                                            <td>
+                                                                <a
+                                                                    href={`tel:${entry.phoneNumber}`}
+                                                                    class="lang-link"
+                                                                >
+                                                                    {entry.phoneNumber}
+                                                                </a>
+                                                            </td>
+                                                        </tr>,
+                                                    ]
+                                                ) : (
+                                                    <tr key={entry.id}>
+                                                        <td>{i + 1}.</td>
                                                         <td>
                                                             {entry.groupName}
                                                             {entry.completedSlugs.includes(
@@ -217,36 +254,13 @@ function HostPage({
                                                                 </span>
                                                             )}
                                                         </td>
-                                                    </tr>,
-                                                    <tr key={`${entry.id}-phone`}>
-                                                        <td>
-                                                            <a
-                                                                href={`tel:${entry.phoneNumber}`}
-                                                                class="lang-link"
-                                                            >
-                                                                {entry.phoneNumber}
-                                                            </a>
-                                                        </td>
-                                                    </tr>,
-                                                ]
-                                            ) : (
-                                                <tr key={entry.id}>
-                                                    <td>{i + 1}.</td>
-                                                    <td>
-                                                        {entry.groupName}
-                                                        {entry.completedSlugs.includes(station) && (
-                                                            <span class="mwa-standing-hint">
-                                                                {' '}
-                                                                {t('hostAlreadyDone')}
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ),
-                                        )
-                                    )}
-                                </tbody>
-                            </table>
+                                                    </tr>
+                                                ),
+                                            )
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
