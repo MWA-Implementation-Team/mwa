@@ -43,8 +43,11 @@ export function writePage<P extends RegisteredPageId>(
     const called = user ? getUserCalledEntry(ctx.var, user.id) : null;
     const atStation = called?.activitySlug
         ? isActivitySlug(called.activitySlug)
-            ? registeredActivities[called.activitySlug].name
-            : called.activitySlug
+            ? {
+                  name: registeredActivities[called.activitySlug].name,
+                  slug: called.activitySlug,
+              }
+            : { name: called.activitySlug, slug: called.activitySlug }
         : null;
 
     const ctxInit: ClientContextWrapperInit = {

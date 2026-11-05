@@ -118,8 +118,9 @@ rows so they can't be called twice.
 
 While a group is called to a station (`status='called'`, `done_at` unset),
 every member sees a fixed top banner — `writePage` puts the station's display
-name into `ctxInit.atStation` (`getUserCalledEntry`), and `PageShell` renders
-`StationBanner` plus a `mwa--at-station` padding modifier on the frame.
+name and slug into `ctxInit.atStation` (`getUserCalledEntry`), and `PageShell`
+renders `StationBanner` (a link to `/activities/<slug>`) plus a
+`mwa--at-station` padding modifier on the frame.
 
 ## Interactions and gambling
 

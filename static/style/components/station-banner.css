@@ -17,6 +17,13 @@
     text-align: center;
     font-size: var(--text-7);
     font-weight: 700;
+    text-decoration: none;
+    display: block;
+}
+
+.mwa-station-banner:hover {
+    color: var(--foreground);
+    text-decoration: underline;
 }
 
 .mwa--at-station {
