@@ -120,7 +120,7 @@ export type Language = {
     hostCall: string;
 
     dashSupport: string;
-    dashCall: string;
+    dashDiscord: string;
 
     shellSkip: string;
     shellLogoAlt: string;
@@ -395,7 +395,7 @@ export const languages: Record<LanguageCode, Language> = {
         hostCall: 'Call',
 
         dashSupport: 'Support',
-        dashCall: 'Call support',
+        dashDiscord: 'Discord: @alankiri',
 
         shellSkip: 'Skip to content',
         shellLogoAlt: 'first years Event home',
@@ -670,7 +670,7 @@ export const languages: Record<LanguageCode, Language> = {
         hostCall: 'Skambinti',
 
         dashSupport: 'Pagalba',
-        dashCall: 'Skambinti pagalbai',
+        dashDiscord: 'Discord: @alankiri',
 
         shellSkip: 'Pereiti prie turinio',
         shellLogoAlt: 'pirmakursiu renginio pradžia',
