@@ -192,10 +192,12 @@ describe('db/queue', () => {
         state.prepare(`INSERT OR IGNORE INTO activities (slug) VALUES ('test-station')`).run();
         const [ea, eb] = callNextGroups(state, 2, 'test-station');
 
+        const rows = listStationGroups(state, 'test-station');
         assert.deepEqual(
-            listStationGroups(state, 'test-station').map((r) => r.id),
+            rows.map((r) => r.id),
             [ea.id, eb.id],
         );
+        assert.equal(rows[0].phoneNumber, '555');
         // a different station sees nothing
         assert.equal(listStationGroups(state, 'other-station').length, 0);
 
@@ -246,6 +248,7 @@ describe('db/queue', () => {
             [b, a],
         );
         assert.match(rows[0].groupName, /queue group/);
+        assert.equal(rows[0].phoneNumber, '555');
     });
 
     it('listGroupCompletions returns distinct finished slugs only', () => {

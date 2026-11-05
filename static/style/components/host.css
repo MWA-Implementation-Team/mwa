@@ -6,6 +6,12 @@
     gap: var(--space-4);
 }
 
+/* Host tables read as a clean list — no row separators. */
+.mwa-host-table thead,
+.mwa-host-table tbody tr {
+    border-bottom: none;
+}
+
 @media (min-width: 700px) {
     .mwa-host {
         grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
@@ -38,11 +44,12 @@
     line-height: 1;
 }
 
-/* Right column items hug the right edge. */
+/* Right column stacks the at-station table, the request controls and the
+   queue table; children stretch to the column width so table row hover
+   spans it. */
 .mwa-host-side {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
     gap: var(--space-4);
 }
 
@@ -65,7 +72,7 @@
     justify-content: center;
 }
 
-/* The 1–4 count pickers are radio inputs dressed as menu buttons — no
+/* The 1–4 count pickers are radio inputs dressed as outlined buttons — no
    JS needed, the picked value posts with the form. */
 .mwa-host-count {
     display: flex;
@@ -76,9 +83,9 @@
     position: relative;
     flex: 1;
     width: auto;
-    padding: var(--space-2) var(--space-4);
     justify-content: center;
     cursor: pointer;
+    background: transparent;
 }
 
 .mwa-host-count-option input {
@@ -89,9 +96,10 @@
     cursor: inherit;
 }
 
-/* Selected count — same cue the menu's current page gets (text only). */
+/* Selected count — outlined with the foreground color for a clear cue. */
 .mwa-host-count-option:has(input:checked) {
     color: var(--foreground);
+    border-color: var(--foreground);
 }
 
 .mwa-host-count-option:has(input:focus-visible) {

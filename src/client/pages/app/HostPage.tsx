@@ -19,6 +19,19 @@ export const hostPage: Page<HostPageProps> = {
     Component: HostPage,
 };
 
+function PhoneLink({ phone }: { phone: string }) {
+    const { t } = useContext(ClientContext);
+    if (!phone) return null;
+    return (
+        <>
+            {' '}
+            <a href={`tel:${phone}`} class="lang-link" title={t('hostCall')}>
+                {phone}
+            </a>
+        </>
+    );
+}
+
 function HostPage({
     activities,
     waiting,
@@ -75,7 +88,7 @@ function HostPage({
                         </div>
                     </div>
                     <div class="mwa-host-side">
-                        <div class="table mwa-tx">
+                        <div class="table mwa-tx mwa-host-table">
                             <table>
                                 <thead>
                                     <tr>
@@ -91,7 +104,10 @@ function HostPage({
                                         onStation.map((entry, i) => (
                                             <tr key={entry.id}>
                                                 <td>{i + 1}.</td>
-                                                <td>{entry.groupName}</td>
+                                                <td>
+                                                    {entry.groupName}
+                                                    <PhoneLink phone={entry.phoneNumber} />
+                                                </td>
                                                 <td class="mwa-tx-amount">
                                                     <form method="post" action="/app/host/done">
                                                         <input
@@ -146,7 +162,7 @@ function HostPage({
                             </form>
                             {error && <Toast kind="error">{t(error)}</Toast>}
                         </div>
-                        <div class="table mwa-tx">
+                        <div class="table mwa-tx mwa-host-table">
                             <table>
                                 <thead>
                                     <tr>
@@ -170,6 +186,7 @@ function HostPage({
                                                             {t('hostAlreadyDone')}
                                                         </span>
                                                     )}
+                                                    <PhoneLink phone={entry.phoneNumber} />
                                                 </td>
                                             </tr>
                                         ))

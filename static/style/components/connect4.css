@@ -8,8 +8,11 @@
 
 .mwa-connect4-cell {
     display: flex;
-    width: 3.25rem;
-    height: 3.25rem;
+    /* cells fill the td, which table-layout:fixed keeps at 1/7 of the
+       container — the board can never overflow its panel */
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
     padding: 0;
 
     border-radius: 100%;
@@ -33,6 +36,11 @@
     background: transparent;
 }
 
+.mwa-connect4-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
 .mwa-connect4-table td {
-    padding: var(--space-2);
+    padding: var(--space-1);
 }

@@ -11,6 +11,7 @@ export default function InteractCodePane() {
         <section class="landing-section landing-pane-extra landing-pane-code">
             <h2>{t('interactCodeTitle')}</h2>
             <div class="landing-code">
+                <p class="landing-code-label">{t('interactCodeYours')}</p>
                 <p class="landing-code-own">{qr.code}</p>
                 <form method="GET" action="/app/interact" class="landing-code-form">
                     <input
@@ -23,12 +24,12 @@ export default function InteractCodePane() {
                         required
                     />
                 </form>
+                <form method="POST" action="/app/you/reset-code">
+                    <button type="submit" class="lang-link">
+                        {t('interactCodeReset')}
+                    </button>
+                </form>
             </div>
-            <form method="POST" action="/app/you/reset-code">
-                <button type="submit" class="lang-link">
-                    {t('interactCodeReset')}
-                </button>
-            </form>
         </section>
     );
 }

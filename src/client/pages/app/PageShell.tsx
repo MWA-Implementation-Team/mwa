@@ -43,6 +43,7 @@ export default function PageShell({
     const showAlert = notification !== null && !hideNotification;
 
     const navigation = [
+        { section: 'landing', label: t('landingMain'), href: '/' },
         { section: 'home', label: t('headerHome'), href: '/app' },
         {
             section: 'leaderboard',

@@ -41,6 +41,7 @@ export type Language = {
     interactAwarded: string;
     interactGroupNone: string;
     interactCodeTitle: string;
+    interactCodeYours: string;
     interactCodeReset: string;
     interactCodeInput: string;
     interactCodeInvalid: string;
@@ -63,6 +64,7 @@ export type Language = {
     landingSocialEvent: string;
     landingFeedTitle: string;
     landingGoApp: string;
+    landingMain: string;
     landingLogin: string;
     countdownDays: string;
     countdownHours: string;
@@ -115,9 +117,10 @@ export type Language = {
     hostQueueEmpty: string;
     hostRequestFailed: string;
     hostDoneFailed: string;
+    hostCall: string;
 
     dashSupport: string;
-    dashCall: string;
+    dashDiscord: string;
 
     shellSkip: string;
     shellLogoAlt: string;
@@ -278,10 +281,10 @@ export const languages: Record<LanguageCode, Language> = {
 
         titleApp: 'Freshman Event',
 
-        headerHome: 'App',
+        headerHome: 'Event',
 
         headerLeaderboard: 'Leaderboard',
-        headerGambling: 'Gambling',
+        headerGambling: 'Minigames',
         headerHost: 'Host tools',
         headerAdmin: 'Admin tools',
 
@@ -311,6 +314,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwarded: 'Coins awarded.',
         interactGroupNone: 'Not in a group.',
         interactCodeTitle: 'Interact code',
+        interactCodeYours: 'Your interaction code',
         interactCodeReset: 'Reset interact code',
         interactCodeInput: "Friend's code",
         interactCodeInvalid: 'No one has that code.',
@@ -334,6 +338,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingSocialEvent: 'Event',
         landingFeedTitle: 'Activities',
         landingGoApp: 'Go',
+        landingMain: 'Main',
         landingLogin: 'Login',
         countdownDays: 'days',
         countdownHours: 'hours',
@@ -349,8 +354,8 @@ export const languages: Record<LanguageCode, Language> = {
         txTransfer: 'Transfer',
         txPurchase: 'Purchase',
         txSystem: 'System credit',
-        txGamblingDeduction: 'Gambling deduction',
-        txGamblingWinnings: 'Gambling winnings',
+        txGamblingDeduction: 'Minigame deduction',
+        txGamblingWinnings: 'Minigame winnings',
         txHostGrant: 'Host grant',
         txColDate: 'Date',
         txColType: 'Type',
@@ -387,9 +392,10 @@ export const languages: Record<LanguageCode, Language> = {
         hostQueueEmpty: 'The queue is empty',
         hostRequestFailed: 'Could not request groups',
         hostDoneFailed: 'Could not mark the group done',
+        hostCall: 'Call',
 
         dashSupport: 'Support',
-        dashCall: 'Call support',
+        dashDiscord: 'Discord: @alankiri',
 
         shellSkip: 'Skip to content',
         shellLogoAlt: 'first years Event home',
@@ -404,10 +410,10 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardTypeLabel: 'Leaderboard board',
         leaderboardScopeLabel: 'Leaderboard scope',
         leaderboardActivity: 'Activity',
-        leaderboardGambling: 'Gambling',
+        leaderboardGambling: 'Minigames',
         leaderboardCombined: 'All',
         leaderboardActivityHint: 'earned at activity stations',
-        leaderboardGamblingHint: 'net gambling balance',
+        leaderboardGamblingHint: 'net minigame balance',
         leaderboardCombinedHint: 'total balance',
         leaderboardPlayers: 'players',
         leaderboardGroups: 'groups',
@@ -494,8 +500,8 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingSendInvite: 'Send invite',
         gamblingInsufficientCoins: 'You do not have enough coins for this bet.',
         gamblingInvalidBet: 'Enter a valid whole-number bet amount.',
-        gamblingRequest: 'Gambling request',
-        gamblingAcceptQuestion: 'Do you wish to accept this bet?',
+        gamblingRequest: 'Minigame invite',
+        gamblingAcceptQuestion: 'Do you wish to accept this challenge?',
         gamblingAccept: 'Accept',
         gamblingReject: 'Reject',
         gamblingDisconnected: 'Disconnected from server.',
@@ -511,9 +517,9 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingPlayerYou: '{player} (You)',
         gamblingDraw: "It's a draw!",
         gamblingWinner: '{player} won',
-        gamblingNotificationInvite: '{player} has invited you to gamble!',
+        gamblingNotificationInvite: '{player} has invited you to a minigame!',
         gamblingOpen: 'Open',
-        gamblingInProgress: 'You are currently gambling.',
+        gamblingInProgress: 'You are currently in a minigame.',
         gamblingReturn: 'Return',
 
         gamblingCoinFlip: 'Coin flip',
@@ -550,10 +556,10 @@ export const languages: Record<LanguageCode, Language> = {
 
         titleApp: 'Pirmakursių Renginys',
 
-        headerHome: 'Programa',
+        headerHome: 'Renginys',
 
         headerLeaderboard: 'Lyderių lentelė',
-        headerGambling: 'Lošimai',
+        headerGambling: 'Mini žaidimai',
         headerHost: 'Vedėjo įrankiai',
         headerAdmin: 'Administravimas',
 
@@ -584,6 +590,7 @@ export const languages: Record<LanguageCode, Language> = {
         interactAwarded: 'Koinai suteikti.',
         interactGroupNone: 'Nėra grupėje.',
         interactCodeTitle: 'Sąveikos kodas',
+        interactCodeYours: 'Jūsų sąveikos kodas',
         interactCodeReset: 'Perkurti sąveikos kodą',
         interactCodeInput: 'Draugo kodas',
         interactCodeInvalid: 'Niekas neturi tokio kodo.',
@@ -607,6 +614,7 @@ export const languages: Record<LanguageCode, Language> = {
         landingSocialEvent: 'Renginys',
         landingFeedTitle: 'Veiklos',
         landingGoApp: 'Eiti',
+        landingMain: 'Pagrindinis',
         landingLogin: 'Prisijungti',
         countdownDays: 'dienų',
         countdownHours: 'valandų',
@@ -622,8 +630,8 @@ export const languages: Record<LanguageCode, Language> = {
         txTransfer: 'Pervedimas',
         txPurchase: 'Pirkimas',
         txSystem: 'Sisteminis įskaitymas',
-        txGamblingDeduction: 'Lošimo atsiskaitymas',
-        txGamblingWinnings: 'Lošimo laimėjimas',
+        txGamblingDeduction: 'Mini žaidimo atsiskaitymas',
+        txGamblingWinnings: 'Mini žaidimo laimėjimas',
         txHostGrant: 'Vedėjo įskaitymas',
         txColDate: 'Data',
         txColType: 'Tipas',
@@ -659,9 +667,10 @@ export const languages: Record<LanguageCode, Language> = {
         hostQueueEmpty: 'Eilė tuščia',
         hostRequestFailed: 'Nepavyko pakviesti grupių',
         hostDoneFailed: 'Nepavyko pažymėti grupės kaip atliktos',
+        hostCall: 'Skambinti',
 
         dashSupport: 'Pagalba',
-        dashCall: 'Skambinti pagalbai',
+        dashDiscord: 'Discord: @alankiri',
 
         shellSkip: 'Pereiti prie turinio',
         shellLogoAlt: 'pirmakursiu renginio pradžia',
@@ -676,10 +685,10 @@ export const languages: Record<LanguageCode, Language> = {
         leaderboardTypeLabel: 'Lentelės tipas',
         leaderboardScopeLabel: 'Lentelės apimtis',
         leaderboardActivity: 'Aktyvumas',
-        leaderboardGambling: 'Lošimai',
+        leaderboardGambling: 'Mini žaidimai',
         leaderboardCombined: 'Viskas',
         leaderboardActivityHint: 'uždirbta per veiklas',
-        leaderboardGamblingHint: 'lošimų balansas',
+        leaderboardGamblingHint: 'mini žaidimų balansas',
         leaderboardCombinedHint: 'bendras balansas',
         leaderboardPlayers: 'žaidėjai',
         leaderboardGroups: 'grupės',
@@ -769,8 +778,8 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingSendInvite: 'Pakviesti',
         gamblingInsufficientCoins: 'Šiam statymui nepakanka monetų.',
         gamblingInvalidBet: 'Neteisinga statymo suma.',
-        gamblingRequest: 'Kvietimas lošti',
-        gamblingAcceptQuestion: 'Ar nori priimti šį statymą?',
+        gamblingRequest: 'Kvietimas į mini žaidimą',
+        gamblingAcceptQuestion: 'Ar nori priimti šį iššūkį?',
         gamblingAccept: 'Priimti',
         gamblingReject: 'Atmesti',
         gamblingDisconnected: 'Ryšys su serveriu nutrūko.',
@@ -786,9 +795,9 @@ export const languages: Record<LanguageCode, Language> = {
         gamblingPlayerYou: '{player} (Tu)',
         gamblingDraw: 'Lygiosios',
         gamblingWinner: 'Laimėjo {player}',
-        gamblingNotificationInvite: '{player} kviečia tave lošti!',
+        gamblingNotificationInvite: '{player} kviečia tave į mini žaidimą!',
         gamblingOpen: 'Atidaryti',
-        gamblingInProgress: 'Šiuo metu dalyvauji lošime.',
+        gamblingInProgress: 'Šiuo metu dalyvauji mini žaidime.',
         gamblingReturn: 'Grįžti',
 
         gamblingCoinFlip: 'Monetos metimas',

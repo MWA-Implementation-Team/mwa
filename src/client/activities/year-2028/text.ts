@@ -6,7 +6,8 @@ export const text = {
 <li><strong>Epoch:</strong> the 21st century</li>
 <li><strong>Activity:</strong> an online hunt — social media bingo</li>
 <li><strong>Participants:</strong> the whole team</li>
-<li><strong>Duration:</strong> ?</li>
+<li><strong>Duration:</strong> 5 minutes</li>
+<li><strong>Location:</strong> 3rd floor side entrance</li>
 </ul>
 <p><strong>How it goes:</strong></p>
 <ol>
@@ -22,7 +23,8 @@ export const text = {
 <li><strong>Epocha:</strong> XXI amžius</li>
 <li><strong>Veikla:</strong> internetinė medžioklė — socialinių tinklų bingo</li>
 <li><strong>Dalyviai:</strong> visa komanda</li>
-<li><strong>Trukmė:</strong> ?</li>
+<li><strong>Trukmė:</strong> 5 minutės</li>
+<li><strong>Vieta:</strong> 3 aukšto šoninis įėjimas</li>
 </ul>
 <p><strong>Eiga:</strong></p>
 <ol>

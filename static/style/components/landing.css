@@ -76,6 +76,12 @@
     text-align: center;
 }
 
+.landing-code-label {
+    margin: 0;
+    font-size: var(--text-8);
+    color: var(--muted-foreground);
+}
+
 .landing-code-own {
     margin: 0;
     font-family: var(--font-mono);

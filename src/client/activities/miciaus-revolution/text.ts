@@ -5,6 +5,7 @@ export const text = {
 <li><strong>Activity:</strong> drawing with the non-dominant hand</li>
 <li><strong>Teams:</strong> 1</li>
 <li><strong>Duration:</strong> 10 minutes</li>
+<li><strong>Location:</strong> room 213</li>
 </ul>
 <p><strong>How it goes:</strong></p>
 <ol>
@@ -21,6 +22,7 @@ export const text = {
 <li><strong>Veikla:</strong> piešimas nedominuojančia ranka</li>
 <li><strong>Komandos:</strong> 1</li>
 <li><strong>Trukmė:</strong> 10 minučių</li>
+<li><strong>Vieta:</strong> 213 auditorija</li>
 </ul>
 <p><strong>Eiga:</strong></p>
 <ol>

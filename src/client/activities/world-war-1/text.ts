@@ -18,7 +18,8 @@ export const text = {
 <li><strong>Epoch:</strong> World War I</li>
 <li><strong>Activity:</strong> throwing potatoes into bunkers</li>
 <li><strong>Teams:</strong> 2 at a time</li>
-<li><strong>Duration:</strong> ?</li>
+<li><strong>Duration:</strong> 5–10 minutes</li>
+<li><strong>Location:</strong> room 101</li>
 </ul>
 <p><strong>How it goes:</strong></p>
 <ol>
@@ -46,7 +47,8 @@ export const text = {
 <li><strong>Epocha:</strong> Pirmasis pasaulinis karas</li>
 <li><strong>Veikla:</strong> bulvių metymas į bunkerius</li>
 <li><strong>Komandos:</strong> 2 vienu metu</li>
-<li><strong>Trukmė:</strong> ?</li>
+<li><strong>Trukmė:</strong> 5–10 minučių</li>
+<li><strong>Vieta:</strong> 101 auditorija</li>
 </ul>
 <p><strong>Eiga:</strong></p>
 <ol>

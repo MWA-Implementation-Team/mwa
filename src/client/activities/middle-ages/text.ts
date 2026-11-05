@@ -11,8 +11,9 @@ export const text = {
 <ul>
 <li><strong>Epoch:</strong> the Middle Ages</li>
 <li><strong>Activity:</strong> a knights' tournament</li>
-<li><strong>Participants:</strong> the whole team</li>
-<li><strong>Duration:</strong> ?</li>
+<li><strong>Participants:</strong> two teams at once (three if they're smaller)</li>
+<li><strong>Duration:</strong> 10–15 minutes</li>
+<li><strong>Location:</strong> 3rd floor lounge</li>
 </ul>
 <p><strong>How it goes:</strong></p>
 <ol>
@@ -38,8 +39,9 @@ export const text = {
 <ul>
 <li><strong>Epocha:</strong> viduramžiai</li>
 <li><strong>Veikla:</strong> riterių turnyras</li>
-<li><strong>Dalyviai:</strong> visa komanda</li>
-<li><strong>Trukmė:</strong> ?</li>
+<li><strong>Dalyviai:</strong> 2 komandos vienu metu (3, jei grupės mažesnės)</li>
+<li><strong>Trukmė:</strong> 10–15 minučių</li>
+<li><strong>Vieta:</strong> 3 aukšto poilsio zona</li>
 </ul>
 <p><strong>Eiga:</strong></p>
 <ol>
