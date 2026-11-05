@@ -47,7 +47,7 @@ export function writePage<P extends RegisteredPageId>(
                   name: registeredActivities[called.activitySlug].name,
                   slug: called.activitySlug,
               }
-            : { name: called.activitySlug, slug: called.activitySlug }
+            : { name: called.activitySlug, slug: null }
         : null;
 
     const ctxInit: ClientContextWrapperInit = {

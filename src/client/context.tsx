@@ -18,8 +18,9 @@ export type ClientContextType = {
     qr: { svg: string; url: string; code: string } | null;
     notification: Notification | null;
     // station the user's group is called to — drives the fixed PageShell
-    // banner (links to the activity page); null when not at a station
-    atStation: { name: string; slug: string } | null;
+    // banner (links to the activity page when slug is set); null when not
+    // at a station
+    atStation: { name: string; slug: string | null } | null;
 };
 
 export const ClientContext = createContext<ClientContextType>({
@@ -39,7 +40,7 @@ export type ClientContextWrapperInit = {
     user: UserJson | null;
     qr: { svg: string; url: string; code: string } | null;
     notification: Notification | null;
-    atStation: { name: string; slug: string } | null;
+    atStation: { name: string; slug: string | null } | null;
 };
 
 export type ClientContextWrapperProps<P extends RegisteredPageId> = {
