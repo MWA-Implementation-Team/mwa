@@ -6,7 +6,6 @@ import { ActivitySlug, registeredActivities } from '#src/client/activities.js';
 import PageShell from './PageShell.js';
 import { Toast } from '#src/client/ui/Toast.js';
 import { Language } from '#src/client/language.js';
-import { PhoneIcon } from '#src/client/ui/icons.js';
 
 type HostPageProps = {
     activities: { slug: ActivitySlug; name: string }[];
@@ -125,7 +124,7 @@ function HostPage({
                                                                 href={`tel:${entry.phoneNumber}`}
                                                                 class="lang-link"
                                                             >
-                                                                <PhoneIcon /> {entry.phoneNumber}
+                                                                {entry.phoneNumber}
                                                             </a>
                                                         </td>
                                                     </tr>,
@@ -225,7 +224,7 @@ function HostPage({
                                                                 href={`tel:${entry.phoneNumber}`}
                                                                 class="lang-link"
                                                             >
-                                                                <PhoneIcon /> {entry.phoneNumber}
+                                                                {entry.phoneNumber}
                                                             </a>
                                                         </td>
                                                     </tr>,

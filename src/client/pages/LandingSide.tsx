@@ -42,9 +42,6 @@ export function LandingSide() {
                 <div class="landing-footer">
                     {user ? (
                         <>
-                            <a href="/" class="mwa-button">
-                                {t('landingMain')}
-                            </a>
                             <a href="/app" class="mwa-button">
                                 {t('landingGoApp')}
                             </a>

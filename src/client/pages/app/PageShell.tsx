@@ -50,6 +50,7 @@ export default function PageShell({
             href: '/app/leaderboard?scope=groups',
         },
         { section: 'gambling', label: t('headerGambling'), href: '/app/gambling' },
+        { section: 'landing', label: t('landingMain'), href: '/' },
     ];
     if (user && (user.role === 'host' || user.role === 'admin')) {
         navigation.push({ section: 'host', label: t('headerHost'), href: '/app/host' });
